@@ -1,3 +1,7 @@
+/* eslint-disable import/extensions */
+// Tailwind CSS must be imported first
+import '@/global.css'; // 👈 add this line at the top
+
 // eslint-disable-next-line import/extensions
 import SpaceMonoFont from '@assets/fonts/SpaceMono-Regular.ttf';
 import store from '@store/index';
@@ -27,7 +31,6 @@ const ReduxWrapper = () => {
     SpaceMono: SpaceMonoFont,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);

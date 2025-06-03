@@ -20,7 +20,7 @@ interface StepProps extends MultiStepFormProps {
 const Step1 = ({ next, data }: StepProps) => {
   return (
     <View>
-      <Text>Step 1</Text>
+      <Text className="bg-red-600">Step 1</Text>
       <Text>{JSON.stringify(data)}</Text>
       <Button onPress={() => next?.()} title="Next" />
     </View>
