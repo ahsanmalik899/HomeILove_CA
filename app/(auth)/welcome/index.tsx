@@ -12,7 +12,7 @@ const Welcome = () => {
   return (
     <SafeAreaView>
       <Text
-        className="bg-red-500"
+        className="bg-green-500"
         style={{
           fontSize: ms(20),
         }}
