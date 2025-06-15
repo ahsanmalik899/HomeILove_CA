@@ -113,7 +113,7 @@ const Welcome = () => {
             className="absolute top-6 right-6"
             onPress={() => setCurrentIndex(totalScreens - 1)}
           >
-            <Text className="text-black-700 text-base">Skip</Text>
+            <Text className="text-black-700 text-base">Skep</Text>
           </TouchableOpacity>
         </View>
         <Image
