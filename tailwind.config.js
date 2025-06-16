@@ -26,6 +26,7 @@ module.exports = {
         customeFilled: '#EC8000',
         customOffwhite: '#F2F2F2',
         customdarkCard: '#001B3B',
+        dotcolor: '#00929B',
       },
     },
   },

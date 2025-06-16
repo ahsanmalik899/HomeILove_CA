@@ -1,3 +1,6 @@
+import Arrow from '@assets/onboarding/arrow.svg';
+import { hs, ms, vs } from '@utils/design/design';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
   Image,
@@ -7,14 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
+import backgroundImage from '../../../assets/onboarding/bgimage.png';
 import onboarding1 from '../../../assets/onboarding/onboarding1.png';
 import onboarding2 from '../../../assets/onboarding/onboarding2.png';
 import onboarding3 from '../../../assets/onboarding/onboarding3.png';
 import onboarding4 from '../../../assets/onboarding/onboarding4.png';
 import onboarding5 from '../../../assets/onboarding/onboarding5.png';
-
-import backgroundImage from '../../../assets/onboarding/bgimage.png';
 
 const Welcome = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -22,7 +23,7 @@ const Welcome = () => {
 
   const screens = [
     {
-      title: 'Change the way you love homing.',
+      title: 'Change the way you\nlove homing.',
       description:
         'Raise queries for your home search to reputed and experienced agents',
       image: onboarding1,
@@ -45,8 +46,9 @@ const Welcome = () => {
       image: onboarding4,
     },
     {
-      title: 'Real-estate related business? post your profile for FREE.',
-      description: 'Post business profile postings across nationwide',
+      title: 'Real-estate related\nbusiness? post your \nprofile for FREE.',
+      description:
+        'Post business profile along with services across nationwide',
       image: onboarding5,
     },
   ];
@@ -56,8 +58,8 @@ const Welcome = () => {
   const dots = Array.from({ length: totalScreens }, (_, index) => (
     <View
       key={index}
-      className={`w-2.5 h-2.5 rounded-full ${
-        currentIndex === index ? 'bg-green-700' : 'bg-gray-400'
+      className={`w-2 h-2 rounded-full ${
+        currentIndex === index ? 'bg-dotcolor' : 'bg-gray-400'
       }`}
     />
   ));
@@ -66,14 +68,19 @@ const Welcome = () => {
     if (currentIndex === 0) {
       return (
         <View className="flex-row flex-wrap">
-          <Text className="text-4xl font-bold text-black-700 text-left">
+          <Text className="  text-black-700 " style={styles.headingtext}>
             Change the{' '}
           </Text>
-          <Text className="text-4xl font-bold text-green-700 text-left">
+          <Text
+            className=" text-green-700 text-left"
+            style={styles.headingtext}
+          >
             way
           </Text>
-          <Text className="text-4xl font-bold text-black-700 text-left">
-            {' '}
+          <Text
+            className="  text-black-700 text-left"
+            style={styles.headingtext}
+          >
             you love homing.
           </Text>
         </View>
@@ -81,22 +88,19 @@ const Welcome = () => {
     }
     if (currentIndex === 1) {
       return (
-        <View className="flex-row flex-wrap">
-          <Text className="text-3xl font-bold text-black-700 text-left">
+        <View>
+          <Text style={styles.headingtext}>
             Get informed with latest{' '}
-          </Text>
-          <Text className="text-3xl font-bold text-green-700 text-left">
-            trends
-          </Text>
-          <Text className="text-3xl font-bold text-black-700 text-left">
-            {' '}
-            in your FEED.
+            <Text style={[styles.headingtext, { color: '#059669' }]}>
+              trends
+            </Text>
+            in{'\n'} your FEED.
           </Text>
         </View>
       );
     }
     return (
-      <Text className="text-4xl font-bold text-black-700 text-left">
+      <Text className="  text-black-700 text-left" style={styles.headingtext}>
         {currentScreen.title}
       </Text>
     );
@@ -104,45 +108,43 @@ const Welcome = () => {
 
   return (
     <ImageBackground source={backgroundImage} style={styles.background}>
-      <View className="flex-1 bg-black-100 items-center p-5">
-        <View className="flex-row justify-between w-full pt-6">
-          <Text className="text-black-700 text-base ml-7">{`${
-            currentIndex + 1
-          }/${totalScreens}`}</Text>
-          <TouchableOpacity
-            className="absolute top-6 right-6"
-            onPress={() => setCurrentIndex(totalScreens - 1)}
-          >
-            <Text className="text-black-700 text-base">Skip</Text>
+      <View className="flex-1   items-center">
+        <View
+          className="flex-row  justify-between items-center w-full px-5 mt-2"
+          style={styles.header}
+        >
+          <Text>{`${currentIndex + 1}/${totalScreens}`}</Text>
+          <TouchableOpacity onPress={() => setCurrentIndex(totalScreens - 1)}>
+            <Text className="text-black-700 ">Skip</Text>
           </TouchableOpacity>
         </View>
         <Image
           source={currentScreen.image}
-          className="w-[250px] h-[250px] mt-32"
+          style={styles.iamge}
           resizeMode="contain"
         />
-        <View
-          className={`w-full ${currentIndex === 4 ? 'mt-16' : 'mt-20'} ml-5`}
-        >
+        <View style={styles.heading}>
           {renderTitle()}
-          <Text className="text-xl text-black-600 text-left my-2.5">
+          <Text className="text-xl " style={styles.discription}>
             {currentScreen.description}
           </Text>
         </View>
         <View className="flex-1" />
-        <View className="flex-row justify-between items-center w-full mb-0">
-          <View className="flex-row gap-0.5 ml-5 mt-[-70px]">{dots}</View>
+        <View
+          className="flex-row justify-between  text-center items-center w-full px-5 mt-2"
+          style={styles.bottom}
+        >
+          <View className="flex-row ">{dots}</View>
           <TouchableOpacity
-            className="p-3 bg-white-700 rounded-full mt-[-120px]"
+            className="p-3 bg-white-700 "
             onPress={() => {
-              if (currentIndex < totalScreens - 1) {
-                setCurrentIndex(currentIndex + 1);
-              } else {
-                setCurrentIndex(0);
+              if (currentIndex === totalScreens - 1) {
+                router.replace('/(auth)/signup');
               }
+              setCurrentIndex(currentIndex + 1);
             }}
           >
-            <Text className="text-green-700 text-3xl">➔</Text>
+            <Arrow />
           </TouchableOpacity>
         </View>
       </View>
@@ -155,6 +157,30 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+  },
+  iamge: {
+    marginTop: vs(120),
+    width: hs(300),
+    height: vs(250),
+  },
+  header: {
+    marginTop: vs(50),
+    paddingHorizontal: hs(20),
+  },
+  heading: {
+    marginTop: vs(120),
+    marginHorizontal: hs(20),
+  },
+  headingtext: {
+    fontSize: ms(30),
+    letterSpacing: 2,
+    fontWeight: 600,
+  },
+  discription: {
+    marginTop: vs(20),
+  },
+  bottom: {
+    marginBottom: vs(30),
   },
 });
 
