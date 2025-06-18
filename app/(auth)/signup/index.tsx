@@ -20,6 +20,7 @@ import {
 
 // Assuming the logo is a local asset (replace with your logo path)
 import logo from '../../../assets/Splashimg/logo1.png'; // Adjust the path to your logo file
+import backgroundImage from '../../../assets/signupbg/bg.png';
 
 const { height, width } = Dimensions.get('window');
 
@@ -59,13 +60,12 @@ export default function SignUpScreen() {
   const [businessTypeError, setBusinessTypeError] = useState('');
   const [uploadLogoError, setUploadLogoError] = useState('');
 
-  // Business types array
+  // Updated business types array based on the image
   const businessTypes = [
     'Select Business Type',
-    'Real Estate',
-    'Construction',
-    'Interior Design',
-  ]; // Ensure this array is defined
+    'Business',
+    'Private buyer or Seller',
+  ]; // Updated to match the image
 
   // Validation functions
   const validateName = (value: string) => {
@@ -183,6 +183,7 @@ export default function SignUpScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
+      <Image source={backgroundImage} style={styles.backgroundImage} />
 
       {/* Top section with logo */}
       <View style={styles.topSection}>
@@ -377,6 +378,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#4A90A4', // Teal background color matching the image
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '0%',
+    opacity: 0.8, // Adjust opacity to make form readable over image
   },
   topSection: {
     flex: 0.25,
