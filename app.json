@@ -4,12 +4,12 @@
     "slug": "home-i-love",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/logo/logo.png",
     "newArchEnabled": true,
     "scheme": "template",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/adaptive-icon.png",
+      "image": "./assets/logo/logo.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
@@ -28,7 +28,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/logo/logo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.revnosoft.homeilove"

@@ -27,6 +27,7 @@ module.exports = {
         customOffwhite: '#F2F2F2',
         customdarkCard: '#001B3B',
         dotcolor: '#00929B',
+        backgroudcolor: '#A1E4E5',
       },
     },
   },

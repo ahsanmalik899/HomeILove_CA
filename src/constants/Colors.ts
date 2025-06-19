@@ -10,6 +10,7 @@ export default {
     tint: tintColorLight,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
+    backgroundcolor: '#A1E4E4',
     theme: {
       yellow: '#FFF7C6',
       darkYellow: '#FDEEA4',
