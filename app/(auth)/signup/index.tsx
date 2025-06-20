@@ -1,14 +1,13 @@
 /* eslint-disable global-require */
 /* eslint-disable react/style-prop-object */
 /* eslint-disable react/function-component-definition */
-/* eslint-disable import/prefer-default-export */
+
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signupbg/bg.png';
+import { Ionicons } from '@expo/vector-icons';
 import Colors from '@src/constants/Colors';
 import { hs, ms, vs } from '@utils/design/design';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Formik } from 'formik';
-import { useState } from 'react';
+// import * as ImagePicker from 'expo-image-picker';
 import {
   Alert,
   ImageBackground,
@@ -19,6 +18,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
+import { LinearGradient } from 'expo-linear-gradient';
+import { Formik } from 'formik';
+import { useState } from 'react';
+
+import { router } from 'expo-router';
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as Yup from 'yup';
 // Assuming the logo is a local asset (replace with your logo path)
@@ -40,18 +45,41 @@ export default function SignUpScreen() {
     ),
     // logo: Yup.string().required('Please upload a logo'),
   });
+  // const [logoImage, setLogoImage] = useState(null);
+  // const pickImage = async setFieldValue => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== 'granted') {
+  //     Alert.alert(
+  //       'Permission Denied',
+  //       'We need permission to access your photos.',
+  //     );
+  //     return;
+  //   }
 
+  //   const result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   if (!result.canceled) {
+  //     setLogoImage(result.assets[0].uri);
+  //     setFieldValue('logo', result.assets[0].uri);
+  //   }
+  // };
+  const [showPassword, setShowPassword] = useState(true);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [open, setOpen] = useState(false);
   return (
     <LinearGradient
       colors={[Colors.light.backgroundcolor, '#FFFFFF']}
       style={styles.colordbackground}
       start={{ x: 0.6, y: 0 }}
-      end={{ x: 0.6, y: 0.3 }}
+      end={{ x: 0.65, y: 0.4 }}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="flex-1 ">
-          {/* Top section with logo */}
           <View style={styles.topSection}>
             <View style={styles.logoContainer}>
               <Logo />
@@ -60,9 +88,9 @@ export default function SignUpScreen() {
 
           <ImageBackground
             source={backgroundimage}
-            style={styles.bottomSection}
             resizeMode="cover"
             className="flex-1 "
+            style={styles.bottomSection}
           >
             <View style={styles.formContainer}>
               <Text style={styles.title}>Create{'\n'}Account.</Text>
@@ -133,30 +161,61 @@ export default function SignUpScreen() {
                     {touched.email && errors.email && (
                       <Text style={styles.error}>{errors.email}</Text>
                     )}
-
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Password"
-                      secureTextEntry
-                      onChangeText={handleChange('password')}
-                      onBlur={handleBlur('password')}
-                      value={values.password}
-                    />
+                    <View style={styles.passwordContainer}>
+                      <TextInput
+                        style={styles.passwordInput}
+                        placeholder="Password"
+                        secureTextEntry={showPassword}
+                        onChangeText={handleChange('password')}
+                        onBlur={handleBlur('password')}
+                        value={values.password}
+                      />
+                      <TouchableOpacity
+                        onPress={() => setShowPassword(!showPassword)}
+                      >
+                        <Ionicons
+                          name={
+                            showPassword ? 'eye-outline' : 'eye-off-outline'
+                          }
+                          size={20}
+                          color="#9A9A9A"
+                        />
+                      </TouchableOpacity>
+                    </View>
                     {touched.password && errors.password && (
                       <Text style={styles.error}>{errors.password}</Text>
                     )}
 
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Confirm Password"
-                      secureTextEntry
-                      onChangeText={handleChange('confirmPassword')}
-                      onBlur={handleBlur('confirmPassword')}
-                      value={values.confirmPassword}
-                    />
+                    {/* Confirm Password Field */}
+                    <View style={styles.passwordContainer}>
+                      <TextInput
+                        style={styles.passwordInput}
+                        placeholder="Confirm Password"
+                        secureTextEntry={showConfirmPassword}
+                        onChangeText={handleChange('confirmPassword')}
+                        onBlur={handleBlur('confirmPassword')}
+                        value={values.confirmPassword}
+                      />
+                      <TouchableOpacity
+                        onPress={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        <Ionicons
+                          name={
+                            showConfirmPassword
+                              ? 'eye-outline'
+                              : 'eye-off-outline'
+                          }
+                          size={20}
+                          color="#9A9A9A"
+                        />
+                      </TouchableOpacity>
+                    </View>
                     {touched.confirmPassword && errors.confirmPassword && (
                       <Text style={styles.error}>{errors.confirmPassword}</Text>
                     )}
+
                     <DropDownPicker
                       open={open}
                       value={values.busenessType}
@@ -178,6 +237,40 @@ export default function SignUpScreen() {
                     {touched.busenessType && errors.busenessType && (
                       <Text style={styles.error}>{errors.busenessType}</Text>
                     )}
+                    {/* <TouchableOpacity
+                      style={[
+                        styles.button,
+                        { backgroundColor: '#4CAF50', marginBottom: 15 },
+                      ]}
+                      onPress={() => pickImage(setFieldValue)}
+                    >
+                      <Text style={styles.buttonText}>Upload Logo</Text>
+                    </TouchableOpacity> */}
+
+                    {/* {logoImage && (
+                      <Image
+                        source={{ uri: logoImage }}
+                        style={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: 8,
+                          marginBottom: 15,
+                        }}
+                      />
+                    )} */}
+
+                    {touched.logo && errors.logo && (
+                      <Text style={styles.error}>{errors.logo}</Text>
+                    )}
+                    <View style={styles.loginTextContainer}>
+                      <Text style={styles.loginTextBlack}>
+                        Already have an account?{' '}
+                      </Text>
+                      <TouchableOpacity onPress={() => router.push('/signin')}>
+                        {' '}
+                        <Text style={styles.loginTextGreen}>Login</Text>
+                      </TouchableOpacity>
+                    </View>
                     <TouchableOpacity
                       style={styles.button}
                       onPress={() => handleSubmit()}
@@ -187,12 +280,6 @@ export default function SignUpScreen() {
                   </View>
                 )}
               </Formik>
-              <View style={styles.loginTextContainer}>
-                <Text style={styles.loginTextBlack}>
-                  Already have an account?{' '}
-                </Text>
-                <Text style={styles.loginTextGreen}>Login</Text>
-              </View>
             </View>
           </ImageBackground>
         </View>
@@ -212,12 +299,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: vs(70),
-    marginBottom: vs(50),
+    marginBottom: vs(20),
   },
   loginTextContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: vs(25),
+
     marginTop: vs(10),
   },
   loginTextBlack: {
@@ -229,31 +316,48 @@ const styles = StyleSheet.create({
     color: '#4A90A4',
     fontWeight: '600',
   },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: ms(8),
+    marginBottom: vs(15),
+    paddingHorizontal: hs(15),
+    backgroundColor: '#FFFFFF',
+  },
+
+  passwordInput: {
+    flex: 1,
+    height: vs(48),
+    fontSize: ms(14),
+    color: '#333',
+  },
+
   logoContainer: {
     alignItems: 'center',
   },
 
   formContainer: {
     paddingHorizontal: hs(20),
-    borderTopLeftRadius: ms(50),
-    borderTopRightRadius: ms(80),
   },
   title: {
     fontSize: ms(30),
     fontWeight: 400,
+    marginTop: vs(50),
     color: 'black',
   },
   subtitle: {
     fontSize: ms(15),
     color: 'black',
     fontWeight: '500',
-    marginBottom: vs(30),
+    marginTop: vs(10),
+    marginBottom: vs(20),
     lineHeight: vs(20),
   },
   label: {
     fontSize: ms(14),
     color: '#333',
-    marginBottom: vs(15),
     fontWeight: '500',
   },
   input: {
@@ -271,17 +375,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   form: {
-    marginTop: 20,
+    marginTop: vs(10),
   },
   bottomSection: {
-    flex: 0.75,
+    flex: 1,
+    overflow: 'hidden',
+    marginTop: vs(35),
     backgroundImage: backgroundimage,
-    borderTopLeftRadius: ms(30),
-    borderTopRightRadius: ms(30),
+    borderTopLeftRadius: ms(40),
+    borderTopRightRadius: ms(40),
   },
   error: {
     color: 'red',
-    marginBottom: 8,
+    marginBottom: 5,
   },
   button: {
     backgroundColor: '#D32F2F',
