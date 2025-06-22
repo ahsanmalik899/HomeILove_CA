@@ -1,13 +1,17 @@
 /* eslint-disable global-require */
 /* eslint-disable react/style-prop-object */
 /* eslint-disable react/function-component-definition */
-
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signupbg/bg.png';
+import Uploadlogo from '@assets/signupbg/solar_upload-bold-duotone.svg';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@src/constants/Colors';
 import { hs, ms, vs } from '@utils/design/design';
 // import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Formik } from 'formik';
+import { useState } from 'react';
 import {
   Alert,
   ImageBackground,
@@ -19,16 +23,13 @@ import {
   View,
 } from 'react-native';
 
-import { LinearGradient } from 'expo-linear-gradient';
-import { Formik } from 'formik';
-import { useState } from 'react';
-
 import { router } from 'expo-router';
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as Yup from 'yup';
 // Assuming the logo is a local asset (replace with your logo path)
 
 export default function SignUpScreen() {
+  const [imagename, setimagename] = useState('');
   const SignupSchema = Yup.object().shape({
     name: Yup.string().min(2, 'Too Short!').required('Name is required'),
     mobile: Yup.string()
@@ -43,32 +44,26 @@ export default function SignUpScreen() {
       ['Select Business Type'],
       'Please select business type',
     ),
-    // logo: Yup.string().required('Please upload a logo'),
+    logo: Yup.string().required('Please upload a logo'),
   });
-  // const [logoImage, setLogoImage] = useState(null);
-  // const pickImage = async setFieldValue => {
-  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     Alert.alert(
-  //       'Permission Denied',
-  //       'We need permission to access your photos.',
-  //     );
-  //     return;
-  //   }
+  const pickImage = async (
+    setFieldValue: (field: string, value: string) => void,
+  ) => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const selectedImage = result.assets[0].uri;
+      setimagename(result.assets[0].fileName);
+      setFieldValue('logo', selectedImage);
+    }
+  };
 
-  //   const result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   });
-
-  //   if (!result.canceled) {
-  //     setLogoImage(result.assets[0].uri);
-  //     setFieldValue('logo', result.assets[0].uri);
-  //   }
-  // };
   const [showPassword, setShowPassword] = useState(true);
+
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [open, setOpen] = useState(false);
   return (
@@ -237,28 +232,18 @@ export default function SignUpScreen() {
                     {touched.busenessType && errors.busenessType && (
                       <Text style={styles.error}>{errors.busenessType}</Text>
                     )}
-                    {/* <TouchableOpacity
-                      style={[
-                        styles.button,
-                        { backgroundColor: '#4CAF50', marginBottom: 15 },
-                      ]}
-                      onPress={() => pickImage(setFieldValue)}
-                    >
-                      <Text style={styles.buttonText}>Upload Logo</Text>
-                    </TouchableOpacity> */}
-
-                    {/* {logoImage && (
-                      <Image
-                        source={{ uri: logoImage }}
-                        style={{
-                          width: 100,
-                          height: 100,
-                          borderRadius: 8,
-                          marginBottom: 15,
-                        }}
-                      />
-                    )} */}
-
+                    <View style={styles.input}>
+                      <Text style={styles.textview}>{imagename}</Text>
+                      <TouchableOpacity
+                        className="absolute right-0  "
+                        onPress={() => pickImage(setFieldValue)}
+                      >
+                        <View className="flex-row " style={styles.uploadbutton}>
+                          <Uploadlogo />
+                          <Text style={styles.buttonText}>Upload Logo</Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
                     {touched.logo && errors.logo && (
                       <Text style={styles.error}>{errors.logo}</Text>
                     )}
@@ -369,7 +354,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: hs(15),
     backgroundColor: '#FFFFFF',
     fontSize: ms(14),
+
     color: '#333',
+  },
+  textview: {
+    marginVertical: 'auto',
   },
   container: {
     padding: 20,
@@ -399,6 +388,15 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  uploadbutton: {
+    backgroundColor: '#D32F2F',
+    color: 'white',
+    borderRadius: 8,
+    marginVertical: vs(3),
+    paddingVertical: vs(10),
+    paddingHorizontal: hs(5),
+    alignItems: 'center',
   },
   signUpButtonText: {
     color: '#FFFFFF',
