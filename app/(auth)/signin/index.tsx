@@ -1,15 +1,300 @@
-import { useRouter } from 'expo-router';
+/* eslint-disable react/jsx-no-undef */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
+/* eslint-disable prettier/prettier */
+/* eslint-disable react/function-component-definition */
+import Logo from '@assets/logo/logo-black.svg';
+import backgroundimage from '@assets/signupbg/bg.png';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '@src/constants/Colors';
+import { hs, ms, vs } from '@utils/design/design';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Formik } from 'formik';
+import { useState } from 'react';
+import { Alert, Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import * as Yup from 'yup';
 
-import { Button, Text, View } from 'react-native';
+export default function SignInScreen() {
+  const [showPassword, setShowPassword] = useState(false);
 
-const Signin = () => {
-  const router = useRouter();
+  const SignInSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().min(6, 'Incorrect password').required('Password is required'),
+  });
+
   return (
-    <View>
-      <Text>Signin</Text>
-      <Button onPress={() => router.push('./(main)/home/')} title="signin" />
-    </View>
-  );
-};
+    <ImageBackground
+      source={backgroundimage}
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={[Colors.light.backgroundcolor, '#FFFFFF']}
+        style={styles.colordbackground}
+        start={{ x: 0.6, y: 0 }}
+        end={{ x: 0.6, y: 0.3 }}
+      >
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <View className="flex-1">
+            <View style={styles.topSection}>
+              <View style={styles.logoContainer}>
+                <Logo />
+              </View>
+            </View>
 
-export default Signin;
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Sign in.</Text>
+              <Text style={styles.subtitle}>
+                Sign in to find your perfect home or service.
+              </Text>
+
+              <Formik
+                initialValues={{ email: '', password: '' }}
+                validationSchema={SignInSchema}
+                onSubmit={values => {
+                  console.log('Form submitted:', values);
+                  Alert.alert('Login Success', 'Welcome back to HomeiLove!');
+                }}
+              >
+                {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                  <View style={styles.form}>
+                    {/* Email Input */}
+                    <TextInput
+                      style={[styles.input, touched.email && errors.email ? styles.errorInput : null]}
+                      placeholder="Email Address"
+                      keyboardType="email-address"
+                      onChangeText={handleChange('email')}
+                      onBlur={handleBlur('email')}
+                      value={values.email}
+                    />
+                    {touched.email && errors.email && (
+                      <Text style={styles.error}>{errors.email}</Text>
+                    )}
+
+                    {/* Password Input with Eye Icon */}
+                    <View style={[styles.passwordContainer, touched.password && errors.password ? styles.errorInput : null]}>
+                      <TextInput
+                        style={styles.passwordInput}
+                        placeholder="Password"
+                        secureTextEntry={!showPassword}
+                        onChangeText={handleChange('password')}
+                        onBlur={handleBlur('password')}
+                        value={values.password}
+                      />
+                      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                        <Ionicons
+                          name={showPassword ? 'eye' : 'eye-off'}
+                          size={20}
+                          color="#999"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {touched.password && errors.password && (
+                      <Text style={styles.error}>{errors.password}</Text>
+                    )}
+
+                    {/* Forgot Password */}
+                    <View style={styles.forgotContainer}>
+                      <Text style={styles.forgotText}>Forgot Password?</Text>
+                      <View style={styles.forgotLine} />
+                    </View>
+
+                    {/* Sign In Button */}
+                    <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+                      <Text style={styles.buttonText}>Sign In</Text>
+                    </TouchableOpacity>
+
+                    {/* OR Separator */}
+                    <View style={styles.orContainer}>
+                      <View style={styles.line} />
+                      <Text style={styles.orText}>or</Text>
+                      <View style={styles.line} />
+                    </View>
+
+                    {/* Social Login */}
+                    <View style={styles.socialIcons}>
+                      <Image
+                        source={{
+                          uri: 'https://img.icons8.com/color/48/000000/google-logo.png'
+                        }}
+                        style={styles.socialIcon}
+                      />
+                      <Image
+                        source={{
+                          uri: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png',
+                        }}
+                        style={styles.socialIcon}
+                      />
+                      <Image
+                        source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/mac-os.png' }}
+                        style={styles.socialIcon}
+                      />
+                    </View>
+
+                    {/* Register Link */}
+                    <View style={styles.registerContainer}>
+                      <Text style={styles.loginTextBlack}>
+                        Don’t have an account?{' '}
+                      </Text>
+                      <Text style={styles.loginTextGreen}>Register Now</Text>
+                    </View>
+                  </View>
+                )}
+              </Formik>
+            </View>
+          </View>
+          
+        </ScrollView>
+      </LinearGradient>
+    </ImageBackground>
+  );
+}
+
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+  },
+  colordbackground: {
+    flex: 1,
+  },
+  topSection: {
+    flex: 0.25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: vs(70),
+    marginBottom: vs(50),
+  },
+  logoContainer: {
+    alignItems: 'center',
+  },
+  formContainer: {
+    paddingHorizontal: hs(20),
+    borderTopLeftRadius: ms(50),
+    borderTopRightRadius: ms(40),
+    borderRadius: ms(30),
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+  },
+  title: {
+    fontSize: ms(37),
+    fontWeight: '600',
+    color: 'black',
+    marginTop: vs(35),
+  },
+  subtitle: {
+    fontSize: ms(18),
+    color: 'black',
+    fontWeight: '400',
+    marginTop: vs(15),
+    lineHeight: vs(20),
+  },
+  input: {
+    height: vs(48),
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: ms(8),
+    marginBottom: vs(15),
+    paddingHorizontal: hs(15),
+    backgroundColor: '#FFFFFF',
+    fontSize: ms(14),
+    color: '#333',
+  },
+  errorInput: {
+    borderColor: 'red',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: ms(8),
+    paddingHorizontal: hs(15),
+    backgroundColor: '#FFFFFF',
+    height: vs(48),
+    marginBottom: vs(15),
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: ms(14),
+    color: '#333',
+  },
+  forgotContainer: {
+    alignItems: 'flex-end',
+    marginBottom: vs(25),
+  },
+  forgotText: {
+    fontSize: ms(14),
+    color: '#4A90A4',
+    fontWeight: '600',
+  },
+  forgotLine: {
+    height: 2,
+    backgroundColor: '#4A90A4',
+    width: 120,
+    marginTop: 0,
+  },
+  button: {
+    backgroundColor: '#D32F2F',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  orContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: vs(20),
+  },
+  orText: {
+    marginHorizontal: 10,
+    fontSize: ms(19),
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ccc',
+  },
+  socialIcons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: vs(20),
+  },
+  socialIcon: {
+    width: 40,
+    height: 40,
+    marginHorizontal: 15,
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: vs(25),
+  },
+  loginTextBlack: {
+    fontSize: ms(14),
+    color: '#666',
+    marginTop: vs(10),
+  },
+  loginTextGreen: {
+    fontSize: ms(14),
+    color: '#4A90A4',
+    fontWeight: '600',
+    marginTop: vs(10),
+  },
+  error: {
+    color: 'red',
+    marginBottom: vs(8),
+  },
+  form: {
+    marginTop: vs(20),
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+});
