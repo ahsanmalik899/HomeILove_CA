@@ -8,6 +8,7 @@ export default {
     textGray: '#636362',
     background: '#20201F',
     tint: tintColorLight,
+    red: '#BF0A30',
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
     backgroundcolor: '#A1E4E4',

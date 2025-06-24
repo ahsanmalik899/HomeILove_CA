@@ -6,6 +6,7 @@ import backgroundimage from '@assets/signupbg/bg.png';
 import Uploadlogo from '@assets/signupbg/solar_upload-bold-duotone.svg';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@src/constants/Colors';
+import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 // import * as ImagePicker from 'expo-image-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -13,7 +14,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Formik } from 'formik';
 import { useState } from 'react';
 import {
-  Alert,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -23,12 +23,17 @@ import {
   View,
 } from 'react-native';
 
+// eslint-disable-next-line import/order
+import { useSignupMutation } from '@/store/api/user/Authapi';
+import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
 import { router } from 'expo-router';
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as Yup from 'yup';
 // Assuming the logo is a local asset (replace with your logo path)
 
 export default function SignUpScreen() {
+  const [signup, { isLoading }] = useSignupMutation();
   const [imagename, setimagename] = useState('');
   const SignupSchema = Yup.object().shape({
     name: Yup.string().min(2, 'Too Short!').required('Name is required'),
@@ -106,9 +111,16 @@ export default function SignUpScreen() {
                   logo: '',
                 }}
                 validationSchema={SignupSchema}
-                onSubmit={values => {
-                  console.log('Form submitted:', values); // ✅ Check if this logs
-                  Alert.alert('Account Created', 'Welcome to HomeLove!');
+                onSubmit={async values => {
+                  try {
+                    const res = await signup(values).unwrap();
+
+                    renderToastSuccess(res.message || 'Signup successful');
+
+                    router.replace('/signin');
+                  } catch (err) {
+                    renderToastError(err?.data.message || 'Signup failed');
+                  }
                 }}
               >
                 {({
@@ -256,12 +268,7 @@ export default function SignUpScreen() {
                         <Text style={styles.loginTextGreen}>Login</Text>
                       </TouchableOpacity>
                     </View>
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() => handleSubmit()}
-                    >
-                      <Text style={styles.buttonText}>Sign Up</Text>
-                    </TouchableOpacity>
+                    <LargeButton handleSubmit={handleSubmit} text="Sign up " />
                   </View>
                 )}
               </Formik>
@@ -269,6 +276,7 @@ export default function SignUpScreen() {
           </ImageBackground>
         </View>
       </ScrollView>
+      <Loading isLoading={isLoading} text="Creating account...." />
     </LinearGradient>
   );
 }
@@ -380,17 +388,17 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#D32F2F',
-    padding: 15,
+    padding: ms(15),
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 15,
+    marginVertical: vs(15),
   },
   buttonText: {
     color: '#fff',
     fontWeight: '600',
   },
   uploadbutton: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: Colors.light.red,
     color: 'white',
     borderRadius: 8,
     marginVertical: vs(3),

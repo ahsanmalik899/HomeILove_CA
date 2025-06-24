@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import SafeAreaView from './SafeAreaView';
 import ScrollView from './ScrollView';
 import StyleSheet from './StyleSheet';
@@ -6,3 +7,4 @@ import TouchableOpacity from './TouchableOpacity';
 import View from './View';
 
 export { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View };
+

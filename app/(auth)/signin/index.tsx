@@ -3,20 +3,27 @@
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/function-component-definition */
+// eslint-disable-next-line import/order
+import { useSigninMutation } from '@/store/api/user/Authapi';
 import Logo from '@assets/logo/logo-black.svg';
-import backgroundimage from '@assets/signupbg/bg.png';
+import backgroundimage from '@assets/signinicon/Background.png';
+import Google from '@assets/signinicon/Google logo.svg';
+import Appple from '@assets/signinicon/apple.svg';
+import Facebook from '@assets/signinicon/facbook.svg';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '@src/constants/Colors';
+import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
+import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Formik } from 'formik';
 import { useState } from 'react';
-import { Alert, Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import * as Yup from 'yup';
 
 export default function SignInScreen() {
   const [showPassword, setShowPassword] = useState(false);
-
+const [signin,{isLoading}]=useSigninMutation();
   const SignInSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Email is required'),
     password: Yup.string().min(6, 'Incorrect password').required('Password is required'),
@@ -27,14 +34,10 @@ export default function SignInScreen() {
       source={backgroundimage}
       style={styles.backgroundImage}
       resizeMode="cover"
+
     >
-      <LinearGradient
-        colors={[Colors.light.backgroundcolor, '#FFFFFF']}
-        style={styles.colordbackground}
-        start={{ x: 0.6, y: 0 }}
-        end={{ x: 0.6, y: 0.3 }}
-      >
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+  
+     <ScrollView   style={{ flex: 1 }}  contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <View className="flex-1">
             <View style={styles.topSection}>
               <View style={styles.logoContainer}>
@@ -45,15 +48,21 @@ export default function SignInScreen() {
             <View style={styles.formContainer}>
               <Text style={styles.title}>Sign in.</Text>
               <Text style={styles.subtitle}>
-                Sign in to find your perfect home or service.
+                Sign in to find your perfect home or {'\n'}service.
               </Text>
 
               <Formik
                 initialValues={{ email: '', password: '' }}
                 validationSchema={SignInSchema}
-                onSubmit={values => {
-                  console.log('Form submitted:', values);
-                  Alert.alert('Login Success', 'Welcome back to HomeiLove!');
+                onSubmit={async values => {
+              try{
+                const res = await signin(values);
+               renderToastSuccess(res?.message||"Log in sucessfuly")
+               console.log(res);
+              }
+              catch(err){
+              renderToastError(err?.data.message||"Faild to log in ")
+              }
                 }}
               >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
@@ -83,7 +92,7 @@ export default function SignInScreen() {
                       />
                       <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                         <Ionicons
-                          name={showPassword ? 'eye' : 'eye-off'}
+                          name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                           size={20}
                           color="#999"
                         />
@@ -100,9 +109,7 @@ export default function SignInScreen() {
                     </View>
 
                     {/* Sign In Button */}
-                    <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-                      <Text style={styles.buttonText}>Sign In</Text>
-                    </TouchableOpacity>
+                  <LargeButton handleSubmit={handleSubmit} text='Sign in'/>
 
                     {/* OR Separator */}
                     <View style={styles.orContainer}>
@@ -113,22 +120,15 @@ export default function SignInScreen() {
 
                     {/* Social Login */}
                     <View style={styles.socialIcons}>
-                      <Image
-                        source={{
-                          uri: 'https://img.icons8.com/color/48/000000/google-logo.png'
-                        }}
-                        style={styles.socialIcon}
-                      />
-                      <Image
-                        source={{
-                          uri: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png',
-                        }}
-                        style={styles.socialIcon}
-                      />
-                      <Image
-                        source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/mac-os.png' }}
-                        style={styles.socialIcon}
-                      />
+                      <TouchableOpacity>
+                   <Google/>
+                   </TouchableOpacity>
+                    <TouchableOpacity>
+                   <Facebook/>
+                    </TouchableOpacity>
+                     <TouchableOpacity>
+                   <Appple/>
+                   </TouchableOpacity>
                     </View>
 
                     {/* Register Link */}
@@ -143,9 +143,9 @@ export default function SignInScreen() {
               </Formik>
             </View>
           </View>
-          
-        </ScrollView>
-      </LinearGradient>
+          <Loading text='Loging in...' isLoading={isLoading}/>
+     </ScrollView>
+     
     </ImageBackground>
   );
 }
@@ -155,15 +155,13 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
   },
-  colordbackground: {
-    flex: 1,
-  },
+
   topSection: {
     flex: 0.25,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: vs(70),
-    marginBottom: vs(50),
+    paddingTop: vs(60),
+    marginBottom: vs(70),
   },
   logoContainer: {
     alignItems: 'center',
@@ -171,26 +169,27 @@ const styles = StyleSheet.create({
   formContainer: {
     paddingHorizontal: hs(20),
     borderTopLeftRadius: ms(50),
-    borderTopRightRadius: ms(40),
-    borderRadius: ms(30),
-    backgroundColor: '#FFFFFF',
+    borderTopRightRadius: ms(50),
+    paddingBottom:vs(20),
+     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     overflow: 'hidden',
+ 
   },
   title: {
     fontSize: ms(37),
-    fontWeight: '600',
+    fontWeight: '400',
     color: 'black',
     marginTop: vs(35),
   },
   subtitle: {
-    fontSize: ms(18),
+    fontSize: ms(16),
     color: 'black',
-    fontWeight: '400',
-    marginTop: vs(15),
+    fontWeight: '500',
+    marginTop: vs(10),
     lineHeight: vs(20),
   },
   input: {
-    height: vs(48),
+    height: vs(60),
     borderWidth: 1,
     borderColor: '#E0E0E0',
     borderRadius: ms(8),
@@ -211,7 +210,7 @@ const styles = StyleSheet.create({
     borderRadius: ms(8),
     paddingHorizontal: hs(15),
     backgroundColor: '#FFFFFF',
-    height: vs(48),
+    height: vs(60),
     marginBottom: vs(15),
   },
   passwordInput: {
@@ -221,7 +220,9 @@ const styles = StyleSheet.create({
   },
   forgotContainer: {
     alignItems: 'flex-end',
+    marginTop:vs(10),
     marginBottom: vs(25),
+    
   },
   forgotText: {
     fontSize: ms(14),
@@ -248,6 +249,7 @@ const styles = StyleSheet.create({
   orContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop:vs(30),
     marginVertical: vs(20),
   },
   orText: {
@@ -263,8 +265,10 @@ const styles = StyleSheet.create({
   },
   socialIcons: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: vs(20),
+  justifyContent: 'space-between',
+  alignItems:'center',
+  marginTop:vs(20),
+  marginHorizontal:hs(100),
   },
   socialIcon: {
     width: 40,
@@ -274,7 +278,8 @@ const styles = StyleSheet.create({
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: vs(25),
+    marginTop:vs(20),
+    paddingBottom:vs(20),
   },
   loginTextBlack: {
     fontSize: ms(14),

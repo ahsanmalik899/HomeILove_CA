@@ -8,6 +8,7 @@ import {
   REHYDRATE,
   persistReducer,
 } from 'redux-persist';
+import { Authapi } from './api/user/Authapi';
 import reduxStorage from './mmkv/mmkvStorage';
 import { rootReducer } from './rootReducer';
 
@@ -27,7 +28,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat([Authapi.middleware]),
 });
 
 export default store;
