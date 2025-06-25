@@ -15,6 +15,7 @@ import LargeButton from '@src/components/globals/LaregeButton';
 import Loading from '@src/components/globals/Loading';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
+import { router } from 'expo-router';
 import { Formik } from 'formik';
 import { useState } from 'react';
 import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -104,7 +105,9 @@ const [signin,{isLoading}]=useSigninMutation();
 
                     {/* Forgot Password */}
                     <View style={styles.forgotContainer}>
+                      <TouchableOpacity onPress={()=>router.push('/(auth)/forgot')}>
                       <Text style={styles.forgotText}>Forgot Password?</Text>
+                      </TouchableOpacity>
                       <View style={styles.forgotLine} />
                     </View>
 
@@ -136,7 +139,9 @@ const [signin,{isLoading}]=useSigninMutation();
                       <Text style={styles.loginTextBlack}>
                         Don’t have an account?{' '}
                       </Text>
+                      <TouchableOpacity onPress={()=>router.push('/(auth)/signup')}>
                       <Text style={styles.loginTextGreen}>Register Now</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 )}

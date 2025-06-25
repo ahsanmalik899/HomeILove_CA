@@ -71,6 +71,7 @@ export default function SignUpScreen() {
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [open, setOpen] = useState(false);
+
   return (
     <LinearGradient
       colors={[Colors.light.backgroundcolor, '#FFFFFF']}

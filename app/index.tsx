@@ -7,8 +7,9 @@ const Index = () => {
     (state: RootState) => state.onboarding.isOnboarding,
   );
   if (isonboarding) {
-    return <Redirect href="/(auth)/signup" />;
+    return <Redirect href="/(auth)/signin" />;
   }
+
   return <Redirect href="/(auth)/welcome" />;
 };
 export default Index;

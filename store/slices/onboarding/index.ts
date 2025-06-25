@@ -1,4 +1,6 @@
+/* eslint-disable import/order */
 /* eslint-disable no-param-reassign */
+import { RootState } from '@/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface onboarding {
@@ -18,4 +20,5 @@ const onboardingsclice = createSlice({
 });
 export const { setonboarding } = onboardingsclice.actions;
 
+export const selectUserState = (state: RootState) => state.onboarding;
 export default onboardingsclice.reducer;
