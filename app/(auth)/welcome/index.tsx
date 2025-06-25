@@ -1,3 +1,5 @@
+/* eslint-disable import/order */
+import { setonboarding } from '@/store/slices/onboarding';
 import Arrow from '@assets/onboarding/arrow.svg';
 import { hs, ms, vs } from '@utils/design/design';
 import { router } from 'expo-router';
@@ -10,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
 import backgroundImage from '../../../assets/onboarding/bgimage.png';
 import onboarding1 from '../../../assets/onboarding/onboarding1.png';
 import onboarding2 from '../../../assets/onboarding/onboarding2.png';
@@ -20,7 +23,7 @@ import onboarding5 from '../../../assets/onboarding/onboarding5.png';
 const Welcome = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const totalScreens = 5;
-
+  const dispatch = useDispatch();
   const screens = [
     {
       title: 'Change the way you\nlove homing.',
@@ -140,6 +143,7 @@ const Welcome = () => {
             onPress={() => {
               if (currentIndex === totalScreens - 1) {
                 router.replace('/(auth)/signup');
+                dispatch(setonboarding(true));
               }
               setCurrentIndex(currentIndex + 1);
             }}

@@ -119,7 +119,12 @@ export default function SignUpScreen() {
 
                     router.replace('/signin');
                   } catch (err) {
-                    renderToastError(err?.data.message || 'Signup failed');
+                    const message =
+                      err?.data?.message ||
+                      err?.message ||
+                      (typeof err === 'string' ? err : null) ||
+                      'Network error: Check your connection';
+                    renderToastError(message);
                   }
                 }}
               >

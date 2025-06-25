@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const Authapi = createApi({
   reducerPath: 'Authapi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.37:3000/api/users/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.34:3000/api/users/' }),
   endpoints: builder => ({
     Signup: builder.mutation({
       query: userdata => ({
