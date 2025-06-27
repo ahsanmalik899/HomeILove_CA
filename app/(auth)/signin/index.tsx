@@ -1,10 +1,13 @@
+/* eslint-disable import/order */
 /* eslint-disable react/jsx-no-undef */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/function-component-definition */
 // eslint-disable-next-line import/order
+import { RootState } from '@/store';
 import { useSigninMutation } from '@/store/api/user/Authapi';
+import { setusedata } from '@/store/slices/user';
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signinicon/Background.png';
 import Google from '@assets/signinicon/Google logo.svg';
@@ -13,6 +16,7 @@ import Facebook from '@assets/signinicon/facbook.svg';
 import { Ionicons } from '@expo/vector-icons';
 import LargeButton from '@src/components/globals/LaregeButton';
 import Loading from '@src/components/globals/Loading';
+import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import { router } from 'expo-router';
@@ -20,6 +24,7 @@ import { Formik } from 'formik';
 import { useState } from 'react';
 import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 
 export default function SignInScreen() {
@@ -29,7 +34,8 @@ const [signin,{isLoading}]=useSigninMutation();
     email: Yup.string().email('Invalid email').required('Email is required'),
     password: Yup.string().min(6, 'Incorrect password').required('Password is required'),
   });
-
+const dispatch = useDispatch()
+    const selecter = useAppSelector((state: RootState) => state.user);
   return (
     <ImageBackground
       source={backgroundimage}
@@ -56,13 +62,33 @@ const [signin,{isLoading}]=useSigninMutation();
                 initialValues={{ email: '', password: '' }}
                 validationSchema={SignInSchema}
                 onSubmit={async values => {
+              
+              
+              
               try{
                 const res = await signin(values);
-               renderToastSuccess(res?.message||"Log in sucessfuly")
-               console.log(res);
+                if(res?.data?.message==='Login successful'){
+                  renderToastSuccess("Log in sucessfuly")
+                  dispatch(setusedata(res?.data?.userData))
+                  
+
+                }
+                else{
+                  const message =
+      res?.data?.message ||
+      res?.error?.data?.message ||
+      res?.error?.message ||
+      (typeof res?.error === 'string' ? res.error : null) ||
+      'Network error: Check your connection';
+
+    renderToastError(message);
+                }
+              
+         
               }
               catch(err){
               renderToastError(err?.data.message||"Faild to log in ")
+              console.log(err)
               }
                 }}
               >

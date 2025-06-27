@@ -15,7 +15,7 @@ import { rootReducer } from './rootReducer';
 const persistConfig = {
   key: 'root',
   storage: reduxStorage,
-  whitelist: ['user', 'onboarding'],
+  whitelist: ['user', 'onboarding', 'user'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -12,6 +12,10 @@ export default {
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
     backgroundcolor: '#A1E4E4',
+    circleblue: '#012868',
+    circlewhite: '#F4F4F4',
+    circlegreen: '#01696F',
+    circlelightgrnn: '#349E9E',
     theme: {
       yellow: '#FFF7C6',
       darkYellow: '#FDEEA4',

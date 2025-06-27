@@ -1,11 +1,16 @@
-import { Text, View } from 'react-native';
+/* eslint-disable import/order */
+import { resetUserData } from '@/store/slices/user';
+import { Button, Text, View } from 'react-native';
+import { useDispatch } from 'react-redux';
 
-const index = () => {
+const Index = () => {
+  const dispatch = useDispatch();
   return (
     <View>
-      <Text>index</Text>
+      <Text>Home</Text>
+      <Button title="Log out " onPress={() => dispatch(resetUserData())} />
     </View>
   );
 };
 
-export default index;
+export default Index;
