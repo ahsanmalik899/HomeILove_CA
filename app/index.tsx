@@ -107,7 +107,7 @@ const Index = () => {
       if (isLogin) {
         router.replace('/(main)/Home');
       } else if (isOnboarding) {
-        router.replace('/(auth)/signin');
+        router.replace('/(auth)/CreateNewpass');
       } else {
         router.replace('/(auth)/welcome');
       }
