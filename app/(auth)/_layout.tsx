@@ -8,6 +8,10 @@ const Layout = () => {
     >
       <Stack.Screen name="signin/index" />
       <Stack.Screen name="signup/index" />
+      <Stack.Screen name="Verifyacc/index" />
+      <Stack.Screen name="forgot/index" />
+      <Stack.Screen name="Account/index" />
+      <Stack.Screen name="PassReset/index" />
     </Stack>
   );
 };

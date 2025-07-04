@@ -1,16 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+/* eslint-disable import/order */
+/* eslint-disable no-param-reassign */
+import { siginresponce } from '@/store/type/user';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface userdata {
-  sweetghar_user_id: number;
-  name: string;
-  email: string;
-  mobile: string;
-  city: string;
-  user_type: string;
-  logo: string;
-  status: string;
-}
-const initialState: userdata = {
+const initialState: siginresponce = {
   sweetghar_user_id: 0,
   name: '',
   email: '',
@@ -25,13 +18,16 @@ const userdataSclice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setusedata(state, action: PayloadAction<userdata>) {
+    setusedata(state, action) {
       return action.payload;
+    },
+    setemail(state, action) {
+      state.email = action.payload;
     },
     resetUserData() {
       return initialState;
     },
   },
 });
-export const { setusedata, resetUserData } = userdataSclice.actions;
+export const { setusedata, resetUserData, setemail } = userdataSclice.actions;
 export default userdataSclice.reducer;

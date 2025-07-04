@@ -7,21 +7,19 @@
 import Fireworks from '@assets/Accountcreated/feed 8.png';
 import Logo from '@assets/logo/logo-black.svg';
 import Illustration from '@assets/passwordchange/feed 15.png';
+import TickIcon from '@assets/passwordchange/feed 16.png';
+import ThumbIcon from '@assets/passwordchange/feed 17.png';
 import BackgroundImage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
 
-// ✅ NEW Imports
-import TickIcon from '@assets/passwordchange/feed 16.png'; // e.g. 3b6b16f3...
-import ThumbIcon from '@assets/passwordchange/feed 17.png'; // e.g. aaac25fe...
-
 import { hs, ms, vs } from '@utils/design/design';
 import {
-    Image,
-    ImageBackground,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
 export default function PasswordChangedScreen() {

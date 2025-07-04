@@ -1,12 +1,13 @@
 {
   "expo": {
+        "scheme": "homeilove",
     "name": "Home-I-Love",
     "slug": "home-i-love",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo/logo.png",
     "newArchEnabled": true,
-    "scheme": "template",
+    "deepLinking":true,
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/logo/logo.png",
@@ -24,13 +25,43 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bilal3981a.expoTemplate"
+      "bundleIdentifier": "com.revnosoft.homeilove",
+       "associatedDomains": ["applinks:homeilove.app"]
     },
     "android": {
+         "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo/logo.png",
-        "backgroundColor": "#ffffff"
-      },
+        "backgroundColor": "#ffffff",
+          },
+        
+      "intentFilters": [
+        {
+          "action": "VIEW",
+           "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "homeilove.us",
+              "pathPrefix": "/CreateNewpass"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        },
+         {
+    "action": "VIEW",
+    "autoVerify": true,
+    "data": [
+      {
+        "scheme": "https",
+        "host": "homeilove.us",
+        "pathPrefix": "/Account"
+      }
+    ],
+    "category": ["BROWSABLE", "DEFAULT"]
+  }
+      ],
+    
       "package": "com.revnosoft.homeilove"
     },
     "web": {

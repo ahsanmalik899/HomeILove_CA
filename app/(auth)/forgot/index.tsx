@@ -1,18 +1,41 @@
+/* eslint-disable import/order */
 /* eslint-disable global-require */
 /* eslint-disable react/jsx-no-undef */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/function-component-definition */
+import { useResetpassMutation } from '@/store/api/user/Authapi';
+import { setemail } from '@/store/slices/user';
+import { resetpass } from '@/store/type/user';
 import Logo from '@assets/logo/logo-black.svg';
+import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
+import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-
+import { ImageBackground, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useDispatch } from 'react-redux';
+ 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
-
+  const dispatch = useDispatch();
+  const [resetpassword,{isLoading}]=useResetpassMutation();
+ const forgotpassword=async ()=>{
+  dispatch(setemail(email));
+  try{
+const res = await resetpassword({ email } as resetpass).unwrap();
+renderToastSuccess(res?.message);
+router.replace('/(auth)/PassReset');
+  }
+  catch(err){
+    console.log(err)
+    const message = err?.data?.error|| err?.error ||"Network Error";
+    renderToastError(message);
+  }
+ }
+ 
   return (
     <ImageBackground
       source={require('@assets/signinicon/Background.png')} 
@@ -20,7 +43,7 @@ export default function ForgotPasswordScreen() {
       resizeMode="cover"
       onError={(error) => console.log('Image load error:', error.nativeEvent.error)} 
     >
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+ 
         <View className="flex-1">
           <View style={styles.topSection}>
             <View style={styles.logoContainer}>
@@ -29,11 +52,11 @@ export default function ForgotPasswordScreen() {
           </View>
 
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Forgot Password.</Text>
+            <Text style={styles.title}>Forgot {'\n'}Password.</Text>
             <Text style={styles.subtitle}>Sign in in to find your perfect home or service.</Text>
 
             <View style={styles.form}>
-              {/* Email Input */}
+             
               <TextInput
                 style={styles.input}
                 placeholder="Email Address"
@@ -42,14 +65,12 @@ export default function ForgotPasswordScreen() {
                 onChangeText={setEmail}
               />
 
-              {/* Sign In Button */}
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Sign in</Text>
-              </TouchableOpacity>
+            
             </View>
+            <LargeButton text='signin' handleSubmit={forgotpassword}/>
           </View>
         </View>
-      </ScrollView>
+   <Loading isLoading={isLoading} text="Sernding Mail...." />
     </ImageBackground>
   );
 }
@@ -64,7 +85,7 @@ const styles = StyleSheet.create({
     flex: 0.25,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: vs(70), 
+    paddingTop: vs(100), 
     marginBottom: vs(50), 
   },
   logoContainer: {
@@ -75,6 +96,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: ms(50), 
     borderTopRightRadius: ms(50), 
     paddingBottom: vs(500), 
+    marginTop:vs(40),
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     overflow: 'hidden',
   },
@@ -88,7 +110,7 @@ const styles = StyleSheet.create({
     fontSize: ms(18), 
     color: 'black',
     fontWeight: '500',
-    marginTop: vs(15), 
+    marginTop: vs(20), 
     lineHeight: vs(20), 
   },
   input: {
@@ -103,20 +125,10 @@ const styles = StyleSheet.create({
     fontSize: ms(14), 
     color: '#333',
   },
-  button: {
-    backgroundColor: '#D32F2F',
-    padding: ms(15), 
-    borderRadius: ms(8),
-    alignItems: 'center',
-    marginTop: vs(200
- ), 
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: ms(16), 
-  },
+
+
   form: {
     marginTop: vs(20), 
+    marginBottom:vs(210),
   },
 });

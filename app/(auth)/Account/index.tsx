@@ -1,31 +1,52 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable import/order */
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/function-component-definition */
+import { useVerifyaccountMutation } from '@/store/api/user/Authapi';
 import VerificationIllustration from '@assets/Accountcreated/feed 13.png';
 import Fireworks from '@assets/Accountcreated/feed 8.png';
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
+import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect } from 'react';
 import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 
 export default function VerifyAccountScreen() {
   const handleContinue = () => {
-    console.log('Continuing...');
+   router.replace('/(auth)/signin')
   };
+const [verify,{isLoading}] = useVerifyaccountMutation();
+ const { token } = useLocalSearchParams();
+ const safeToken = Array.isArray(token) ? token[0] : token;
+ const verifyAccount = async () => {
+  try {
+    const result = await verify({ token: safeToken }).unwrap();
+    renderToastSuccess(result.message);
+  } catch (error) {
+    console.log('Verification failed:', error);
+    renderToastError(error?.data?.error || 'Verification failed');
+  }
+};
+useEffect(() => {
+
+
+  if (token) {
+    verifyAccount();
+  }
+}, []);
 
   return (
     <ImageBackground source={backgroundimage} style={styles.backgroundImage} resizeMode="cover">
-      {/* 🎆 Fireworks Overlay */}
+    
       <Image source={Fireworks} style={styles.fireworksOverlay} resizeMode="contain" />
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      >
+   
         <View className="flex-1">
           <View style={styles.topSection}>
             <View style={styles.logoContainer}>
@@ -49,12 +70,13 @@ export default function VerifyAccountScreen() {
               />
             </View>
 
-            <View style={{ marginTop: vs(60) }}>
+            <View style={{ marginTop: vs(80) }}>
               <LargeButton handleSubmit={handleContinue} text="Continue" />
             </View>
           </View>
         </View>
-      </ScrollView>
+     
+      <Loading text="Verifying Account...." isLoading={isLoading} />
     </ImageBackground>
   );
 }
@@ -66,39 +88,33 @@ const styles = StyleSheet.create({
   },
   fireworksOverlay: {
     position: 'absolute',
-    top: '60%',
-    // Vertical center
+    top: vs(500),
     left: '50%',
     transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
-     
     width: '80%',
     height: '80%',
-    // zIndex: -1, // behind all content
-    opacity: 4, // adjust as needed
+    opacity: 4, 
   },
   topSection: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: vs(60),
-    marginBottom: vs(95),
+  marginTop:vs(60),
+
   },
   logoContainer: {
     alignItems: 'center',
   },
   formContainer: {
     paddingHorizontal: hs(20),
-    paddingBottom: vs(40),
-    paddingTop: vs(40),
-    marginTop: vs(-40),
+
   },
   title: {
-    fontSize: ms(37),
+    marginTop:vs(60),
+    fontSize: ms(47),
     fontWeight: '400',
     color: 'black',
-    lineHeight: vs(44),
     textAlign: 'left',
-    marginTop: vs(-15),
+  
   },
   subtitle: {
     fontSize: ms(16),
@@ -110,12 +126,12 @@ const styles = StyleSheet.create({
   },
   illustrationContainer: {
     height: vs(200),
-    marginTop: vs(80),
+    marginTop: vs(95),
     justifyContent: 'center',
     alignItems: 'center',
   },
   illustrationImage: {
-    width: ms(250),
-    height: vs(180),
+    width: ms(260),
+    height: vs(400),
   },
 });

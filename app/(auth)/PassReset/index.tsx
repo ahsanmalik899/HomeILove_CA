@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable global-require */
 /* eslint-disable react/jsx-no-undef */
@@ -6,11 +7,17 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/function-component-definition */
 
+import { useResendResetpaawordMutation } from '@/store/api/user/Authapi';
+import { userdata } from '@/store/slices/selector/user';
 import Logo from '@assets/logo/logo-black.svg';
 import VerificationIllustration from '@assets/Resetscreen/feed 14.png';
 import backgroundimage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
+import { useAppSelector } from '@src/hooks/useReduxHooks';
+import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
+import Timer from '@utils/timer/timer';
 import { useState } from 'react';
 import {
   Image,
@@ -18,16 +25,25 @@ import {
   Linking,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 
 export default function ForgotPasswordScreen() {
+  const [resend,{isLoading}]= useResendResetpaawordMutation();
+  const {timeLeft,start} =Timer({ initialSeconds: 60});
   const [countdown, setCountdown] = useState(59);
-
-  const handleResendLink = () => {
-    setCountdown(59);
-    console.log('Resending verification link...');
+ const {email}= useAppSelector(userdata);
+  const handleResendLink = async() => {
+       try{
+      
+         const response =await resend({email}) 
+             start()
+             renderToastSuccess(response?.data?.message)
+       }
+       catch(error){
+         renderToastError(error.error)
+       }
   };
 
   const handleOpenGmail = () => {
@@ -38,11 +54,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <ImageBackground source={backgroundimage} style={styles.backgroundImage} resizeMode="cover">
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      >
+    
         <View className="flex-1">
           <View style={styles.topSection}>
             <View style={styles.logoContainer}>
@@ -60,10 +72,9 @@ export default function ForgotPasswordScreen() {
             {/* Subtitle */}
             <Text style={styles.subtitle}>
               Password Reset Link has been send to {'\n'}
-              <Text style={styles.emailText}>Alexdoe@gmail.com.</Text>
+              <Text style={styles.emailText}>{email}</Text>
             </Text>
 
-            {/* Illustration */}
             <View style={styles.illustrationContainer}>
               <Image
                 source={VerificationIllustration}
@@ -75,25 +86,27 @@ export default function ForgotPasswordScreen() {
             {/* Resend Link */}
             <View style={styles.resendContainer}>
               <Text style={styles.resendText}>
-  Didn’t Receive Reset Link?{' '}
-  <Text style={styles.resendLinkText} onPress={handleResendLink}>
-    Resend Again
-  </Text>
-</Text>
+                 Didn’t Receive Reset Link?{' '}
+                 <TouchableOpacity onPress={handleResendLink} disabled={timeLeft>0}>
+                    <Text style={styles.resendLinkText} >
+                      Resend Again
+                                   </Text>
+                                   </TouchableOpacity>
+                              </Text>
 
               <Text style={styles.resendText}>
                 <Text style={styles.againText}> </Text> Resend Link in{' '}
-                <Text style={styles.countdownText}>00:{countdown.toString().padStart(2, '0')}</Text>
+                <Text style={styles.countdownText}>00:{timeLeft}</Text>
               </Text>
             </View>
 
-            {/* Open Gmail */}
-            <View style={{ marginTop: vs(5) }}>
+         
+            <View style={{ marginTop: vs(30) }}>
               <LargeButton handleSubmit={handleOpenGmail} text="Open Gmail" />
             </View>
           </View>
-        </View>
-      </ScrollView>
+     </View>
+     <Loading text="Sending Mail..." isLoading={isLoading} />
     </ImageBackground>
   );
 }
@@ -103,7 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topSection: {
-    flex: 1,
+   
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: vs(60),
@@ -117,20 +130,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: hs(20),
     borderTopLeftRadius: ms(50),
     borderTopRightRadius: ms(50),
-    paddingBottom: vs(40), // 🆕 slightly more bottom space
+    paddingBottom: vs(40), 
   paddingTop: vs(40),  
   marginTop: vs(-40),
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     overflow: 'hidden',
   },
   title: {
-    fontSize: ms(37),
+    fontSize: ms(40),
     fontWeight: '400',
     color: 'black',
-    marginTop: vs(-2),
-     paddingTop: vs(-20),
-
-    lineHeight: vs(44), // keeps “Verify” & “Account.” evenly spaced
+    marginTop: vs(15),
+   
   },
   subtitle: {
     fontSize: ms(16),
@@ -144,15 +155,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   illustrationContainer: {
-    height: vs(200),
-    marginTop: vs(30),
-    marginBottom: vs(0),
+  marginTop:vs(10),
     justifyContent: 'center',
     alignItems: 'center',
   },
   illustrationImage: {
-    width: ms(250),
-    height: vs(180),
+    width: ms(270),
+    height: vs(200),
   },
   resendContainer: {
     alignItems: 'center',

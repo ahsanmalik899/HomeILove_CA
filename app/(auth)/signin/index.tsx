@@ -5,7 +5,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/function-component-definition */
 // eslint-disable-next-line import/order
-import { RootState } from '@/store';
 import { useSigninMutation } from '@/store/api/user/Authapi';
 import { setusedata } from '@/store/slices/user';
 import Logo from '@assets/logo/logo-black.svg';
@@ -16,7 +15,6 @@ import Facebook from '@assets/signinicon/facbook.svg';
 import { Ionicons } from '@expo/vector-icons';
 import LargeButton from '@src/components/globals/LaregeButton';
 import Loading from '@src/components/globals/Loading';
-import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import { router } from 'expo-router';
@@ -35,7 +33,7 @@ const [signin,{isLoading}]=useSigninMutation();
     password: Yup.string().min(6, 'Incorrect password').required('Password is required'),
   });
 const dispatch = useDispatch()
-    const selecter = useAppSelector((state: RootState) => state.user);
+    
   return (
     <ImageBackground
       source={backgroundimage}
@@ -70,7 +68,7 @@ const dispatch = useDispatch()
                 if(res?.data?.message==='Login successful'){
                   renderToastSuccess("Log in sucessfuly")
                   dispatch(setusedata(res?.data?.userData))
-                  
+                  router.replace('/(main)/Home')
 
                 }
                 else{
@@ -129,7 +127,6 @@ const dispatch = useDispatch()
                       <Text style={styles.error}>{errors.password}</Text>
                     )}
 
-                    {/* Forgot Password */}
                     <View style={styles.forgotContainer}>
                       <TouchableOpacity onPress={()=>router.push('/(auth)/forgot')}>
                       <Text style={styles.forgotText}>Forgot Password?</Text>
@@ -137,17 +134,16 @@ const dispatch = useDispatch()
                       <View style={styles.forgotLine} />
                     </View>
 
-                    {/* Sign In Button */}
+               
                   <LargeButton handleSubmit={handleSubmit} text='Sign in'/>
 
-                    {/* OR Separator */}
+                  
                     <View style={styles.orContainer}>
                       <View style={styles.line} />
                       <Text style={styles.orText}>or</Text>
                       <View style={styles.line} />
                     </View>
 
-                    {/* Social Login */}
                     <View style={styles.socialIcons}>
                       <TouchableOpacity>
                    <Google/>
@@ -160,7 +156,7 @@ const dispatch = useDispatch()
                    </TouchableOpacity>
                     </View>
 
-                    {/* Register Link */}
+                  
                     <View style={styles.registerContainer}>
                       <Text style={styles.loginTextBlack}>
                         Don’t have an account?{' '}

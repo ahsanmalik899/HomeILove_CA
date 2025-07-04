@@ -1,3 +1,6 @@
+/* eslint-disable import/order */
+import { Onboarding } from '@/store/slices/selector/OnBoarding';
+import { userdata } from '@/store/slices/selector/user';
 import Logo from '@assets/splash/logo.svg';
 import splashbg from '@assets/splash/splashbackground.png';
 import Colors from '@src/constants/Colors';
@@ -15,8 +18,8 @@ import Animated, {
 
 const Index = () => {
   const router = useRouter();
-  const isLogin = useAppSelector(state => state.user.sweetghar_user_id);
-  const isOnboarding = useAppSelector(state => state.onboarding.isOnboarding);
+  const user = useAppSelector(userdata);
+  const isOnboarding = useAppSelector(Onboarding);
   const translateX1 = useSharedValue(0);
   const translateY1 = useSharedValue(0);
   const translateX2 = useSharedValue(0);
@@ -104,10 +107,10 @@ const Index = () => {
       withTiming(SCREEN_WIDTH / 2 - 700, { duration: 2000 }),
     );
     const timeout = setTimeout(() => {
-      if (isLogin) {
+      if (user.sweetghar_user_id) {
         router.replace('/(main)/Home');
-      } else if (isOnboarding) {
-        router.replace('/(auth)/CreateNewpass');
+      } else if (isOnboarding.isOnboarding) {
+        router.replace('/(auth)/signin');
       } else {
         router.replace('/(auth)/welcome');
       }

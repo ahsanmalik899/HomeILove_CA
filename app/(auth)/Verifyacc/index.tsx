@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable global-require */
 /* eslint-disable react/jsx-no-undef */
@@ -5,37 +6,63 @@
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/function-component-definition */
-
+import { useResendVaerificationMutation } from '@/store/api/user/Authapi';
+import { userdata } from '@/store/slices/selector/user';
 import VerificationIllustration from '@assets/Vacc/feed 12.png';
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
+import { useAppSelector } from '@src/hooks/useReduxHooks';
+import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
-import { useState } from 'react';
+import Timer from '@utils/timer/timer';
+import { useLocalSearchParams } from 'expo-router';
 import {
   Image,
   ImageBackground,
   Linking,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function VerifyAccountScreen() {
-  const [countdown, setCountdown] = useState(59);
 
-  const handleResendLink = () => {
-    setCountdown(59);
-    console.log('Resending verification link...');
-  };
 
-  const handleOpenGmail = () => {
-    Linking.openURL('mailto:').catch(() => {
-      Linking.openURL('https://gmail.com');
-    });
-  };
+const {timeLeft,start} =Timer({ initialSeconds: 60});
+const user= useAppSelector(userdata)
+const [resend,{isLoading}]= useResendVaerificationMutation();
+  const handleResendLink =async () => {
+    try{
+      const {email} = user;
+      const response =await resend({email}) 
+          start()
+          renderToastSuccess(response?.data?.message)
+    }
+    catch(error){
+      renderToastError(error.error)
+    }
+    };
+
+const handleOpenGmail = async () => {
+ const appURL = 'googlegmail://inbox';
+  const fallbackWebURL = 'https://mail.google.com/mail/u/0/#inbox';
+
+  if (Platform.OS === 'android') {
+    const supported = await Linking.canOpenURL(appURL);
+    if (supported) {
+      await Linking.openURL(appURL);
+    } else {
+      await Linking.openURL(fallbackWebURL);
+    }
+  } else {
+    await Linking.openURL(fallbackWebURL);
+  }
+};
 
   return (
     <ImageBackground source={backgroundimage} style={styles.backgroundImage} resizeMode="cover">
@@ -61,7 +88,7 @@ export default function VerifyAccountScreen() {
             {/* Subtitle */}
             <Text style={styles.subtitle}>
               Verification Link has been send to{'\n'}
-              <Text style={styles.emailText}>Alexdoe@gmail.com.</Text>
+              <Text style={styles.emailText}>{user.email}</Text>
             </Text>
 
             {/* Illustration */}
@@ -72,18 +99,17 @@ export default function VerifyAccountScreen() {
                 resizeMode="contain"
               />
             </View>
-
             {/* Resend Link */}
             <View style={styles.resendContainer}>
               <Text style={styles.resendText}>
                 Didn't Receive Verification Link?{' '}
-                <TouchableOpacity onPress={handleResendLink} style={styles.resendLinkButton}>
+                <TouchableOpacity disabled={timeLeft>0} onPress={handleResendLink} style={styles.resendLinkButton}>
                   <Text style={styles.resendLinkText}>Resend</Text>
                 </TouchableOpacity>
               </Text>
               <Text style={styles.resendText}>
                 <Text style={styles.againText}>Again</Text> Resend Link in{' '}
-                <Text style={styles.countdownText}>00:{countdown.toString().padStart(2, '0')}</Text>
+                <Text style={styles.countdownText}>00:{timeLeft}</Text>
               </Text>
             </View>
 
@@ -94,6 +120,7 @@ export default function VerifyAccountScreen() {
           </View>
         </View>
       </ScrollView>
+          <Loading isLoading={isLoading} text="Sending Mail...." />
     </ImageBackground>
   );
 }

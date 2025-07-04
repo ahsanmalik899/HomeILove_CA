@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 /* eslint-disable global-require */
 /* eslint-disable react/style-prop-object */
 /* eslint-disable react/function-component-definition */
@@ -25,15 +26,18 @@ import {
 
 // eslint-disable-next-line import/order
 import { useSignupMutation } from '@/store/api/user/Authapi';
+import { setemail } from '@/store/slices/user';
 import LargeButton from '@src/components/globals/LaregeButton';
 import Loading from '@src/components/globals/Loading';
 import { router } from 'expo-router';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 // Assuming the logo is a local asset (replace with your logo path)
 
 export default function SignUpScreen() {
   const [signup, { isLoading }] = useSignupMutation();
+  const dispatch = useDispatch();
   const [imagename, setimagename] = useState('');
   const SignupSchema = Yup.object().shape({
     name: Yup.string().min(2, 'Too Short!').required('Name is required'),
@@ -117,8 +121,8 @@ export default function SignUpScreen() {
                     const res = await signup(values).unwrap();
 
                     renderToastSuccess(res.message || 'Signup successful');
-
-                    router.replace('/signin');
+                    dispatch(setemail(values.email));
+                    router.replace('/(auth)/Verifyacc');
                   } catch (err) {
                     const message =
                       err?.data?.message ||
