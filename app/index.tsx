@@ -110,7 +110,7 @@ const Index = () => {
       if (user.sweetghar_user_id) {
         router.replace('/(main)/Home');
       } else if (isOnboarding.isOnboarding) {
-        router.replace('/(auth)/CreateNewpass');
+        router.replace('/(auth)/PassChanged');
       } else {
         router.replace('/(auth)/welcome');
       }

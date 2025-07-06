@@ -7,14 +7,12 @@ import { Formik } from 'formik';
 import { useState } from 'react';
 import {
   ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import * as Yup from 'yup';
 
@@ -22,6 +20,7 @@ import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
 import { hs, ms, vs } from '@utils/design/design';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -39,11 +38,7 @@ export default function CreateNewPasswordScreen() {
   return (
     <ImageBackground source={backgroundimage} style={styles.background} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardAvoidingView}
-          keyboardVerticalOffset={20} // Adjusted for better visibility
-        >
+      <ScrollView >
           <View style={styles.container}>
             <View style={styles.logoContainer}>
               <Logo />
@@ -52,7 +47,7 @@ export default function CreateNewPasswordScreen() {
             <View style={styles.formContainer}>
               <Text style={styles.title}>Create New{'\n'}Password.</Text>
               <Text style={styles.subtitle}>
-                Please enter and confirm your new password.
+                Please enter and confirm your new {'\n'}password.
               </Text>
 
               <Formik
@@ -123,10 +118,12 @@ export default function CreateNewPasswordScreen() {
                   </>
                 )}
               </Formik>
+                     
             </View>
           </View>
-        </KeyboardAvoidingView>
+  </ScrollView>
       </SafeAreaView>
+    
     </ImageBackground>
   );
 }
@@ -148,16 +145,16 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    paddingTop: vs(70),
-    marginBottom: vs(36),
+    paddingTop: vs(60),
+    marginBottom: vs(70),
   },
   formContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     borderTopLeftRadius: ms(40),
     borderTopRightRadius: ms(40),
     paddingHorizontal: hs(20),
-    paddingTop: vs(70),
-    paddingBottom: vs(180),
+    paddingTop: vs(90),
+    paddingBottom: vs(40),
     flex: 1,
   },
   title: {

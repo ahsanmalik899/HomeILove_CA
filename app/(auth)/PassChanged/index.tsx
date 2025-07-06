@@ -33,7 +33,7 @@ export default function PasswordChangedScreen() {
       style={styles.background}
       resizeMode="cover"
     >
-      {/* 🎆 Fireworks background */}
+     
       <Image source={Fireworks} style={styles.fireworks} resizeMode="contain" />
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
@@ -65,8 +65,7 @@ export default function PasswordChangedScreen() {
             />
           </View>
 
-          {/* Continue Button */}
-          <View style={{ marginTop: vs(18) }}>
+          <View style={{ marginTop: vs(10) }}>
             <LargeButton handleSubmit={handleContinue} text="Continue" />
           </View>
         </View>
@@ -95,7 +94,7 @@ const styles = StyleSheet.create({
     color: 'black',
     lineHeight: vs(44),
     marginBottom: vs(20),
-    marginTop: vs(30),
+    marginTop: vs(50),
   },
   subtitle: {
     fontSize: ms(16),
@@ -109,23 +108,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: vs(20),
-    marginTop: vs(90),
+    marginTop: vs(80),
   },
   illustration: {
     width: ms(250),
-    height: vs(200),
+    height: vs(250),
   },
   tickIcon: {
     position: 'absolute',
-    top: vs(20),
+    top: vs(50),
     right: hs(70),
-    left: hs(180),
+    left: hs(190),
     width: ms(124),
     height: ms(170),
   },
   thumbIcon: {
     position: 'absolute',
-    top: vs(-10),
+    top: vs(10),
     left: hs(105),
     width: ms(35),
     height: ms(35),
