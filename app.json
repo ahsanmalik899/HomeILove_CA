@@ -1,13 +1,13 @@
 {
   "expo": {
-        "scheme": "homeilove",
+    "scheme": "homeilove",
     "name": "Home-I-Love",
     "slug": "home-i-love",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo/logo.png",
     "newArchEnabled": true,
-    "deepLinking":true,
+    "deepLinking": true,
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/logo/logo.png",
@@ -26,19 +26,20 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.revnosoft.homeilove",
-       "associatedDomains": ["applinks:homeilove.app"]
+      "associatedDomains": [
+        "applinks:homeilove.app"
+      ]
     },
     "android": {
-         "softwareKeyboardLayoutMode": "pan",
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo/logo.png",
-        "backgroundColor": "#ffffff",
-          },
-        
+        "backgroundColor": "#ffffff"
+      },
       "intentFilters": [
         {
           "action": "VIEW",
-           "autoVerify": true,
+          "autoVerify": true,
           "data": [
             {
               "scheme": "https",
@@ -46,22 +47,27 @@
               "pathPrefix": "/CreateNewpass"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         },
-         {
-    "action": "VIEW",
-    "autoVerify": true,
-    "data": [
-      {
-        "scheme": "https",
-        "host": "homeilove.us",
-        "pathPrefix": "/Account"
-      }
-    ],
-    "category": ["BROWSABLE", "DEFAULT"]
-  }
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "homeilove.us",
+              "pathPrefix": "/Account"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
       ],
-    
       "package": "com.revnosoft.homeilove"
     },
     "web": {
@@ -71,7 +77,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-asset"
+      "expo-asset",
+      "expo-web-browser"
     ],
     "extra": {
       "router": {
