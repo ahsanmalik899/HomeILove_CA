@@ -120,7 +120,7 @@ export default function SignUpScreen() {
                   try {
                     const res = await signup(values).unwrap();
 
-                    renderToastSuccess(res.message || 'Signup successful');
+                    renderToastSuccess(res?.message || 'Signup successful');
                     dispatch(setemail(values.email));
                     router.replace('/(auth)/Verifyacc');
                   } catch (err) {
@@ -273,7 +273,9 @@ export default function SignUpScreen() {
                       <Text style={styles.loginTextBlack}>
                         Already have an account?{' '}
                       </Text>
-                      <TouchableOpacity onPress={() => router.push('/signin')}>
+                      <TouchableOpacity
+                        onPress={() => router.push('/(auth)/signin')}
+                      >
                         {' '}
                         <Text style={styles.loginTextGreen}>Login</Text>
                       </TouchableOpacity>
@@ -388,7 +390,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden',
     marginTop: vs(35),
-    backgroundImage: backgroundimage,
     borderTopLeftRadius: ms(40),
     borderTopRightRadius: ms(40),
   },

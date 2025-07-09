@@ -50,11 +50,7 @@ const ReduxWrapper = () => {
 
   return (
     <>
-      <Slot
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
+      <Slot />
       <StatusBar />
     </>
   );

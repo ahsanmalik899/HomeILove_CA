@@ -56,7 +56,7 @@ const Welcome = () => {
     },
   ];
 
-  const currentScreen = screens[currentIndex];
+  const currentScreen = screens[currentIndex] ?? screens[0];
 
   const dots = Array.from({ length: totalScreens }, (_, index) => (
     <View
@@ -121,11 +121,13 @@ const Welcome = () => {
             <Text className="text-black-700 ">Skip</Text>
           </TouchableOpacity>
         </View>
-        <Image
-          source={currentScreen.image}
-          style={styles.iamge}
-          resizeMode="contain"
-        />
+        {currentScreen?.image && (
+          <Image
+            source={currentScreen.image}
+            style={styles.iamge}
+            resizeMode="contain"
+          />
+        )}
         <View style={styles.heading}>
           {renderTitle()}
           <Text className="text-xl " style={styles.discription}>
