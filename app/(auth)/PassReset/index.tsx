@@ -18,11 +18,13 @@ import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import Timer from '@utils/timer/timer';
+import * as IntentLauncher from 'expo-intent-launcher';
 import { useState } from 'react';
 import {
+  Alert,
   Image,
   ImageBackground,
-  Linking,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -32,6 +34,7 @@ import {
 export default function ForgotPasswordScreen() {
   const [resend,{isLoading}]= useResendResetpaawordMutation();
   const {timeLeft,start} =Timer({ initialSeconds: 60});
+    const [packageName, setPackageName] = useState('com.google.android.gm');
   const [countdown, setCountdown] = useState(59);
  const {email}= useAppSelector(userdata);
   const handleResendLink = async() => {
@@ -45,12 +48,23 @@ export default function ForgotPasswordScreen() {
          renderToastError(error.error)
        }
   };
+const handleOpenGmail = async () => {
+  if (Platform.OS === 'android') {
+    try {
+      await IntentLauncher.openApplication(packageName);
+        await IntentLauncher.getApplicationIconAsync('com.google.android.gm');
+    } catch (error) {
+      Alert.alert(
+        'Gmail not found',
+        'Gmail app is not installed on this device. Please open your email manually.'
+      );
+    }
+  } else {
+    Alert.alert('Android only', 'This feature is only available on Android.');
+  }
+};
 
-  const handleOpenGmail = () => {
-    Linking.openURL('mailto:').catch(() => {
-      Linking.openURL('https://gmail.com');
-    });
-  };
+
 
   return (
     <ImageBackground source={backgroundimage} style={styles.backgroundImage} resizeMode="cover">

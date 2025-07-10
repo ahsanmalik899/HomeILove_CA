@@ -42,7 +42,7 @@ const dispatch = useDispatch()
 
     >
   
-     <ScrollView   style={{ flex: 1 }}  contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+     <ScrollView   style={{ flex: 1 }}  keyboardShouldPersistTaps="handled">
           <View className="flex-1">
             <View style={styles.topSection}>
               <View style={styles.logoContainer}>
@@ -170,7 +170,7 @@ const dispatch = useDispatch()
               </Formik>
             </View>
           </View>
-          <Loading text='Loging in...' isLoading={isLoading}/>
+          <Loading text='Loging in...' isLoading={isLoading} />
      </ScrollView>
      
     </ImageBackground>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     flex: 0.25,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: vs(60),
+    paddingTop: vs(50),
     marginBottom: vs(70),
   },
   logoContainer: {
@@ -311,13 +311,13 @@ const styles = StyleSheet.create({
   loginTextBlack: {
     fontSize: ms(14),
     color: '#666',
-    marginTop: vs(10),
+ 
   },
   loginTextGreen: {
     fontSize: ms(14),
     color: '#4A90A4',
     fontWeight: '600',
-    marginTop: vs(10),
+   
   },
   error: {
     color: 'red',

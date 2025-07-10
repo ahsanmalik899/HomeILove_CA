@@ -12,6 +12,8 @@ const Layout = () => {
       <Stack.Screen name="forgot/index" />
       <Stack.Screen name="Account/index" />
       <Stack.Screen name="PassReset/index" />
+      <Stack.Screen name="PasswordChange/index" />
+      <Stack.Screen name="CreateNewpass/index" />
     </Stack>
   );
 };
