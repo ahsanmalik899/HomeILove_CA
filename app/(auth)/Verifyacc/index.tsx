@@ -17,12 +17,10 @@ import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import Timer from '@utils/timer/timer';
-import { useLocalSearchParams } from 'expo-router';
 import {
   Image,
   ImageBackground,
   Linking,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -40,8 +38,13 @@ const [resend,{isLoading}]= useResendVaerificationMutation();
     try{
       const {email} = user;
       const response =await resend({email}) 
+      if(response?.data?.sucess){
           start()
           renderToastSuccess(response?.data?.message)
+      }
+      else{
+        renderToastError(response?.data?.message)
+      }
     }
     catch(error){
       renderToastError(error.error)
@@ -49,19 +52,11 @@ const [resend,{isLoading}]= useResendVaerificationMutation();
     };
 
 const handleOpenGmail = async () => {
- const appURL = 'googlegmail://inbox';
-  const fallbackWebURL = 'https://mail.google.com/mail/u/0/#inbox';
+    Linking.openURL('mailto:').catch(() => {
+      Linking.openURL('https://gmail.com');
+    });
 
-  if (Platform.OS === 'android') {
-    const supported = await Linking.canOpenURL(appURL);
-    if (supported) {
-      await Linking.openURL(appURL);
-    } else {
-      await Linking.openURL(fallbackWebURL);
-    }
-  } else {
-    await Linking.openURL(fallbackWebURL);
-  }
+
 };
 
   return (

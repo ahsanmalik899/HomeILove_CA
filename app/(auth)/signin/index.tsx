@@ -65,7 +65,7 @@ const dispatch = useDispatch()
               
               try{
                 const res = await signin(values);
-                if(res?.data?.message==='Login successful'){
+                if(res?.data?.sucess){
                   renderToastSuccess("Log in sucessfuly")
                   dispatch(setusedata(res?.data?.userData))
                   router.replace('/(main)/Home')
