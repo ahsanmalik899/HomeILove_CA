@@ -120,9 +120,18 @@ export default function SignUpScreen() {
                   try {
                     const res = await signup(values).unwrap();
 
-                    renderToastSuccess(res?.message || 'Signup successful');
-                    dispatch(setemail(values.email));
-                    router.replace('/(auth)/Verifyacc');
+                    if (res?.sucess) {
+                      renderToastSuccess(res?.message || 'Signup successful');
+                      dispatch(setemail(values.email));
+                      router.replace('/(auth)/Verifyacc');
+                    } else {
+                      const message =
+                        res?.data?.message ||
+                        res?.message ||
+                        (typeof err === 'string' ? err : null) ||
+                        'Network error: Check your connection';
+                      renderToastError(message);
+                    }
                   } catch (err) {
                     const message =
                       err?.data?.message ||

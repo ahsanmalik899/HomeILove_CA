@@ -27,7 +27,11 @@ const [verify,{isLoading}] = useVerifyaccountMutation();
  const verifyAccount = async () => {
   try {
     const result = await verify({ token: safeToken }).unwrap();
-    renderToastSuccess(result.message);
+    if(result.sucess){    renderToastSuccess(result.message);}
+    else{
+      renderToastError(result.message);
+    }
+
   } catch (error) {
     console.log('Verification failed:', error);
     renderToastError(error?.data?.error || 'Verification failed');

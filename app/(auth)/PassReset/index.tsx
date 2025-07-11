@@ -41,8 +41,13 @@ export default function ForgotPasswordScreen() {
        try{
       
          const response =await resend({email}) 
-             start()
-             renderToastSuccess(response?.data?.message)
+         if(response?.data?.sucess){ 
+          start()
+             renderToastSuccess(response?.data?.message)}
+             else {
+               renderToastError(response?.data?.message)
+             }
+            
        }
        catch(error){
          renderToastError(error.error)

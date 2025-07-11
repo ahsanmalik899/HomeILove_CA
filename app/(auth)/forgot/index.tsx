@@ -26,8 +26,16 @@ export default function ForgotPasswordScreen() {
   dispatch(setemail(email));
   try{
 const res = await resetpassword({ email } as resetpass).unwrap();
-renderToastSuccess(res?.message);
-router.replace('/(auth)/PassReset');
+
+if(res?.sucss){
+  renderToastSuccess(res?.message);
+  router.replace('/(auth)/PassReset');}
+else{
+   
+    const message = res?.message|| err?.error ||"Network Error";
+    renderToastError(message);
+}
+
   }
   catch(err){
     console.log(err)
