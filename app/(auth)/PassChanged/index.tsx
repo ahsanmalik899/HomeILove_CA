@@ -13,6 +13,7 @@ import BackgroundImage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
 
 import { hs, ms, vs } from '@utils/design/design';
+import { router } from 'expo-router';
 import {
   Image,
   ImageBackground,
@@ -22,9 +23,11 @@ import {
   View,
 } from 'react-native';
 
+
 export default function PasswordChangedScreen() {
-  const handleContinue = () => {
-    console.log('Continue pressed');
+
+  const handleContinue =async () => {
+  router.replace('/(auth)/signin')
   };
 
   return (

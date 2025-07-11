@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen() {
   try{
 const res = await resetpassword({ email } as resetpass).unwrap();
 
-if(res?.sucss){
+if(res?.sucess){
   renderToastSuccess(res?.message);
   router.replace('/(auth)/PassReset');}
 else{

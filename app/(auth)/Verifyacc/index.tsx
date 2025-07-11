@@ -17,10 +17,13 @@ import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import Timer from '@utils/timer/timer';
+import * as IntentLauncher from 'expo-intent-launcher';
+import { useState } from 'react';
 import {
+  Alert,
   Image,
   ImageBackground,
-  Linking,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -30,7 +33,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 export default function VerifyAccountScreen() {
 
-
+   const [packageName, setPackageName] = useState('com.google.android.gm');
 const {timeLeft,start} =Timer({ initialSeconds: 60});
 const user= useAppSelector(userdata)
 const [resend,{isLoading}]= useResendVaerificationMutation();
@@ -52,9 +55,19 @@ const [resend,{isLoading}]= useResendVaerificationMutation();
     };
 
 const handleOpenGmail = async () => {
-    Linking.openURL('mailto:').catch(() => {
-      Linking.openURL('https://gmail.com');
-    });
+     if (Platform.OS === 'android') {
+       try {
+         await IntentLauncher.openApplication(packageName);
+           await IntentLauncher.getApplicationIconAsync('com.google.android.gm');
+       } catch (error) {
+         Alert.alert(
+           'Gmail not found',
+           'Gmail app is not installed on this device. Please open your email manually.'
+         );
+       }
+     } else {
+       Alert.alert('Android only', 'This feature is only available on Android.');
+     }
 
 
 };

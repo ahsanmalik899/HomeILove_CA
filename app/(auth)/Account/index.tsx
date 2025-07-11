@@ -30,11 +30,13 @@ const [verify,{isLoading}] = useVerifyaccountMutation();
     if(result.sucess){    renderToastSuccess(result.message);}
     else{
       renderToastError(result.message);
+      router.replace('/(auth)/Verifyacc')
     }
 
   } catch (error) {
     console.log('Verification failed:', error);
     renderToastError(error?.data?.error || 'Verification failed');
+    router.replace('/(auth)/Verifyacc')
   }
 };
 useEffect(() => {

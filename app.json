@@ -32,6 +32,9 @@
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "QUERY_ALL_PACKAGES"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo/logo.png",
         "backgroundColor": "#ffffff"

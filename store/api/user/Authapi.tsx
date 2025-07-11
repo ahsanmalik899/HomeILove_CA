@@ -72,4 +72,5 @@ export const {
   useResendResetpaawordMutation,
   useVerifyaccountMutation,
   useSetpasswordMutation,
+  useVerifyResetPassMutation,
 } = Authapi;
