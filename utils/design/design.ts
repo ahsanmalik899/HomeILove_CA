@@ -7,6 +7,7 @@ const guidelineBaseWidth = 375;
 const guidelineBaseHeight = 812;
 
 // Horizontally scale the font size
+
 // Example: width, marginLeft, marginRight etc.
 const hs = (size: number) => (width / guidelineBaseWidth) * size;
 // Vertically scale the font size
