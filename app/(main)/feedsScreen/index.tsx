@@ -479,7 +479,7 @@ const FeedScreen = () => {
         <View
           style={[
             styles.redIndicatorLine,
-            { left: tabPositions[setActiveTab], width: tabWidth, transform: [{ translateX: -hs(16) / 4 }] },
+            { left: tabPositions[setActiveTab], width: tabWidth},
           ]}
         />
       </View>
