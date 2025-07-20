@@ -1,17 +1,22 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable import/order */
 /* eslint-disable global-require */
 /* eslint-disable react/style-prop-object */
 /* eslint-disable react/function-component-definition */
+import { useSignupMutation } from '@/store/api/user/Authapi';
+import { setemail } from '@/store/slices/user';
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signupbg/bg.png';
 import Uploadlogo from '@assets/signupbg/solar_upload-bold-duotone.svg';
 import { Ionicons } from '@expo/vector-icons';
+import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
 import Colors from '@src/constants/Colors';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
-// import * as ImagePicker from 'expo-image-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { Formik } from 'formik';
 import { useState } from 'react';
 import {
@@ -23,17 +28,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
-// eslint-disable-next-line import/order
-import { useSignupMutation } from '@/store/api/user/Authapi';
-import { setemail } from '@/store/slices/user';
-import LargeButton from '@src/components/globals/LaregeButton';
-import Loading from '@src/components/globals/Loading';
-import { router } from 'expo-router';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
-// Assuming the logo is a local asset (replace with your logo path)
 
 export default function SignUpScreen() {
   const [signup, { isLoading }] = useSignupMutation();
@@ -66,13 +63,12 @@ export default function SignUpScreen() {
     });
     if (!result.canceled) {
       const selectedImage = result.assets[0].uri;
-      setimagename(result.assets[0].fileName);
+      setimagename(result.assets[0].fileName || 'Uploaded Logo');
       setFieldValue('logo', selectedImage);
     }
   };
 
   const [showPassword, setShowPassword] = useState(true);
-
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [open, setOpen] = useState(false);
 
@@ -146,7 +142,6 @@ export default function SignUpScreen() {
                   handleChange,
                   handleBlur,
                   handleSubmit,
-
                   setFieldValue,
                   values,
                   errors,
@@ -156,6 +151,7 @@ export default function SignUpScreen() {
                     <TextInput
                       style={styles.input}
                       placeholder="Name"
+                      placeholderTextColor="#9A9A9A"
                       onChangeText={handleChange('name')}
                       onBlur={handleBlur('name')}
                       value={values.name}
@@ -167,6 +163,7 @@ export default function SignUpScreen() {
                     <TextInput
                       style={styles.input}
                       placeholder="Mobile"
+                      placeholderTextColor="#9A9A9A"
                       keyboardType="phone-pad"
                       onChangeText={handleChange('mobile')}
                       onBlur={handleBlur('mobile')}
@@ -178,7 +175,8 @@ export default function SignUpScreen() {
 
                     <TextInput
                       style={styles.input}
-                      placeholder="Email"
+                      placeholder="Email Address"
+                      placeholderTextColor="#9A9A9A"
                       keyboardType="email-address"
                       onChangeText={handleChange('email')}
                       onBlur={handleBlur('email')}
@@ -191,6 +189,7 @@ export default function SignUpScreen() {
                       <TextInput
                         style={styles.passwordInput}
                         placeholder="Password"
+                        placeholderTextColor="#9A9A9A"
                         secureTextEntry={showPassword}
                         onChangeText={handleChange('password')}
                         onBlur={handleBlur('password')}
@@ -212,11 +211,11 @@ export default function SignUpScreen() {
                       <Text style={styles.error}>{errors.password}</Text>
                     )}
 
-                    {/* Confirm Password Field */}
                     <View style={styles.passwordContainer}>
                       <TextInput
                         style={styles.passwordInput}
                         placeholder="Confirm Password"
+                        placeholderTextColor="#9A9A9A"
                         secureTextEntry={showConfirmPassword}
                         onChangeText={handleChange('confirmPassword')}
                         onBlur={handleBlur('confirmPassword')}
@@ -227,6 +226,7 @@ export default function SignUpScreen() {
                           setShowConfirmPassword(!showConfirmPassword)
                         }
                       >
+                       [keyboardType]: #9A9A9A
                         <Ionicons
                           name={
                             showConfirmPassword
@@ -264,12 +264,14 @@ export default function SignUpScreen() {
                       <Text style={styles.error}>{errors.busenessType}</Text>
                     )}
                     <View style={styles.input}>
-                      <Text style={styles.textview}>{imagename}</Text>
+                      <Text style={styles.textview}>
+                        {imagename || 'Upload logo(image)'}
+                      </Text>
                       <TouchableOpacity
-                        className="absolute right-0  "
+                        className="absolute right-0"
                         onPress={() => pickImage(setFieldValue)}
                       >
-                        <View className="flex-row " style={styles.uploadbutton}>
+                        <View className="flex-row" style={styles.uploadbutton}>
                           <Uploadlogo />
                           <Text style={styles.buttonText}>Upload Logo</Text>
                         </View>
@@ -285,11 +287,10 @@ export default function SignUpScreen() {
                       <TouchableOpacity
                         onPress={() => router.push('/(auth)/signin')}
                       >
-                        {' '}
                         <Text style={styles.loginTextGreen}>Login</Text>
                       </TouchableOpacity>
                     </View>
-                    <LargeButton handleSubmit={handleSubmit} text="Sign up " />
+                    <LargeButton handleSubmit={handleSubmit} text="Sign up" />
                   </View>
                 )}
               </Formik>
@@ -307,7 +308,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: vs(20),
   },
-
   topSection: {
     flex: 0.25,
     justifyContent: 'center',
@@ -318,12 +318,12 @@ const styles = StyleSheet.create({
   loginTextContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-
-    marginTop: vs(10),
+    marginTop: vs(-8),
   },
   loginTextBlack: {
     fontSize: ms(14),
     color: '#666',
+  
   },
   loginTextGreen: {
     fontSize: ms(14),
@@ -340,20 +340,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: hs(15),
     backgroundColor: '#FFFFFF',
   },
-
   passwordInput: {
     flex: 1,
     height: vs(48),
     fontSize: ms(14),
     color: '#333',
   },
-
   logoContainer: {
     alignItems: 'center',
   },
-
+  
   formContainer: {
     paddingHorizontal: hs(20),
+     marginTop: vs(-20),
+    
   },
   title: {
     fontSize: ms(30),
@@ -383,7 +383,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: hs(15),
     backgroundColor: '#FFFFFF',
     fontSize: ms(14),
-
     color: '#333',
   },
   textview: {
@@ -412,6 +411,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginVertical: vs(15),
+    marginTop: vs(10),
   },
   buttonText: {
     color: '#fff',
