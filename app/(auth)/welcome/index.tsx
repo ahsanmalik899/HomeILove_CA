@@ -170,11 +170,11 @@ const styles = StyleSheet.create({
     height: vs(250),
   },
   header: {
-    marginTop: vs(50),
+    marginTop: vs(40),
     paddingHorizontal: hs(20),
   },
   heading: {
-    marginTop: vs(120),
+    marginTop: vs(90),
     marginHorizontal: hs(20),
   },
   headingtext: {

@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
@@ -16,10 +17,13 @@ import {
 } from 'react-native';
 import * as Yup from 'yup';
 
+import { useSetpasswordMutation } from '@/store/api/user/Authapi';
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
+import Loading from '@src/components/globals/Loading';
 import { hs, ms, vs } from '@utils/design/design';
+import { useLocalSearchParams } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const validationSchema = Yup.object().shape({
@@ -34,7 +38,9 @@ const validationSchema = Yup.object().shape({
 export default function CreateNewPasswordScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
+  const [setpassword,{isLoading}]= useSetpasswordMutation();
+  const token = useLocalSearchParams();
+   const safeToken = Array.isArray(token) ? token[0] : token;
   return (
     <ImageBackground source={backgroundimage} style={styles.background} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -53,8 +59,17 @@ export default function CreateNewPasswordScreen() {
               <Formik
                 initialValues={{ password: '', confirmPassword: '' }}
                 validationSchema={validationSchema}
-                onSubmit={(values) => {
-                  console.log('Form values:', values);
+                onSubmit={async (values) => {
+                  try{
+                    console.log(safeToken)
+                    const result = await setpassword({token:safeToken.token , password:values.password})
+                    
+                    console.log(result)
+                    
+                  }
+                  catch(error){
+console.log(error)
+                  }
                 }}
               >
                 {({
@@ -112,7 +127,7 @@ export default function CreateNewPasswordScreen() {
                       <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                     )}
 
-                    <View style={{ marginTop: vs(160) }}>
+                    <View style={{ marginTop: vs(120) }}>
                       <LargeButton text="Confirm New Password" handleSubmit={handleSubmit} />
                     </View>
                   </>
@@ -123,7 +138,7 @@ export default function CreateNewPasswordScreen() {
           </View>
   </ScrollView>
       </SafeAreaView>
-    
+    <Loading text='Changing password' isLoading={isLoading}/>
     </ImageBackground>
   );
 }

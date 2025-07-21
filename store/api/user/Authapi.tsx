@@ -10,7 +10,7 @@ import {
 
 export const Authapi = createApi({
   reducerPath: 'Authapi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.9:3000/api/users/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.11:3000/api/users/' }),
   endpoints: builder => ({
     Signup: builder.mutation<unknown, signuppost>({
       query: userdata => ({
@@ -72,5 +72,4 @@ export const {
   useResendResetpaawordMutation,
   useVerifyaccountMutation,
   useSetpasswordMutation,
-  useVerifyResetPassMutation,
 } = Authapi;

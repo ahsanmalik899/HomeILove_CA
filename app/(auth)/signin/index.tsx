@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   forgotContainer: {
     alignItems: 'flex-end',
     marginTop:vs(10),
-    marginBottom: vs(25),
+    marginBottom: vs(20),
     
   },
   forgotText: {
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   orContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop:vs(30),
+    marginTop:vs(20),
     marginVertical: vs(20),
   },
   orText: {
@@ -294,7 +294,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems:'center',
-  marginTop:vs(20),
   marginHorizontal:hs(100),
   },
   socialIcon: {

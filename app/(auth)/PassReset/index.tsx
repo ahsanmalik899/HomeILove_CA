@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   resendContainer: {
     alignItems: 'center',
     marginTop: vs(10),
-    marginBottom: vs(30),
+    marginBottom: vs(10),
   },
   resendText: {
     fontSize: ms(14),

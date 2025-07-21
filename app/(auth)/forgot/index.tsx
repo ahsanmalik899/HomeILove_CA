@@ -137,6 +137,6 @@ const styles = StyleSheet.create({
 
   form: {
     marginTop: vs(20), 
-    marginBottom:vs(210),
+    marginBottom:vs(160),
   },
 });
