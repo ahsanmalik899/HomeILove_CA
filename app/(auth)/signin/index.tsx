@@ -42,7 +42,7 @@ const dispatch = useDispatch()
 
     >
   
-     <ScrollView   style={{ flex: 1 }}  keyboardShouldPersistTaps="handled">
+     <ScrollView   style={{ flex: 1 }}  contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <View className="flex-1">
             <View style={styles.topSection}>
               <View style={styles.logoContainer}>
@@ -170,7 +170,7 @@ const dispatch = useDispatch()
               </Formik>
             </View>
           </View>
-          <Loading text='Loging in...' isLoading={isLoading} />
+          <Loading text='Loging in...' isLoading={isLoading}/>
      </ScrollView>
      
     </ImageBackground>
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: vs(50),
-    marginBottom: vs(70),
+    marginBottom: vs(60),
   },
   logoContainer: {
     alignItems: 'center',
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   forgotContainer: {
     alignItems: 'flex-end',
     marginTop:vs(10),
-    marginBottom: vs(20),
+    marginBottom: vs(25),
     
   },
   forgotText: {
@@ -294,6 +294,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems:'center',
+  marginTop:vs(10),
   marginHorizontal:hs(100),
   },
   socialIcon: {
@@ -304,19 +305,19 @@ const styles = StyleSheet.create({
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop:vs(20),
+    marginTop:vs(10),
     paddingBottom:vs(20),
   },
   loginTextBlack: {
     fontSize: ms(14),
     color: '#666',
- 
+    marginTop: vs(10),
   },
   loginTextGreen: {
     fontSize: ms(14),
     color: '#4A90A4',
     fontWeight: '600',
-   
+    marginTop: vs(10),
   },
   error: {
     color: 'red',

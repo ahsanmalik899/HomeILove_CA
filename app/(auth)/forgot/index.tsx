@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen() {
   try{
 const res = await resetpassword({ email } as resetpass).unwrap();
 
-if(res?.sucess){
+if(res?.sucss){
   renderToastSuccess(res?.message);
   router.replace('/(auth)/PassReset');}
 else{
@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: ms(8), 
     marginBottom: vs(15), 
-
     paddingHorizontal: hs(15), 
     backgroundColor: '#FFFFFF',
     fontSize: ms(14), 
@@ -137,6 +136,6 @@ const styles = StyleSheet.create({
 
   form: {
     marginTop: vs(20), 
-    marginBottom:vs(160),
+    marginBottom:vs(190),
   },
 });
