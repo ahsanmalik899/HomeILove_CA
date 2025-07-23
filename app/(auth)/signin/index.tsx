@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
     flex: 0.25,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: vs(60),
-    marginBottom: vs(70),
+    paddingTop: vs(50),
+    marginBottom: vs(60),
   },
   logoContainer: {
     alignItems: 'center',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   orContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop:vs(30),
+    marginTop:vs(20),
     marginVertical: vs(20),
   },
   orText: {
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems:'center',
-  marginTop:vs(20),
+  marginTop:vs(10),
   marginHorizontal:hs(100),
   },
   socialIcon: {
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop:vs(20),
+    marginTop:vs(10),
     paddingBottom:vs(20),
   },
   loginTextBlack: {

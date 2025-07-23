@@ -112,7 +112,7 @@ export default function CreateNewPasswordScreen() {
                       <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                     )}
 
-                    <View style={{ marginTop: vs(160) }}>
+                    <View style={{ marginTop: vs(130) }}>
                       <LargeButton text="Confirm New Password" handleSubmit={handleSubmit} />
                     </View>
                   </>

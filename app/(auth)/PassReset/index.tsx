@@ -106,7 +106,7 @@ export default function ForgotPasswordScreen() {
             </View>
 
          
-            <View style={{ marginTop: vs(30) }}>
+            <View style={{ marginTop: vs(10) }}>
               <LargeButton handleSubmit={handleOpenGmail} text="Open Gmail" />
             </View>
           </View>

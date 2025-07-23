@@ -74,7 +74,7 @@ useEffect(() => {
               />
             </View>
 
-            <View style={{ marginTop: vs(80) }}>
+            <View style={{ marginTop: vs(60) }}>
               <LargeButton handleSubmit={handleContinue} text="Continue" />
             </View>
           </View>
@@ -92,17 +92,17 @@ const styles = StyleSheet.create({
   },
   fireworksOverlay: {
     position: 'absolute',
-    top: vs(500),
-    left: '50%',
+    top: vs(450),
+    left: hs(200),
     transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
-    width: '80%',
-    height: '80%',
+    width: hs(300),
+    height: vs(300),
     opacity: 4, 
   },
   topSection: {
     justifyContent: 'center',
     alignItems: 'center',
-  marginTop:vs(60),
+  marginTop:vs(50),
 
   },
   logoContainer: {
