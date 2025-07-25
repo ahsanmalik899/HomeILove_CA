@@ -38,13 +38,14 @@ const validationSchema = Yup.object().shape({
 export default function CreateNewPasswordScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [setpassword,{isLoading}]= useSetpasswordMutation();
+  const [setpassword, { isLoading }] = useSetpasswordMutation();
   const token = useLocalSearchParams();
-   const safeToken = Array.isArray(token) ? token[0] : token;
+  const safeToken = Array.isArray(token) ? token[0] : token;
+
   return (
     <ImageBackground source={backgroundimage} style={styles.background} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
-      <ScrollView >
+        <ScrollView>
           <View style={styles.container}>
             <View style={styles.logoContainer}>
               <Logo />
@@ -60,15 +61,12 @@ export default function CreateNewPasswordScreen() {
                 initialValues={{ password: '', confirmPassword: '' }}
                 validationSchema={validationSchema}
                 onSubmit={async (values) => {
-                  try{
-                    console.log(safeToken)
-                    const result = await setpassword({token:safeToken.token , password:values.password})
-                    
-                    console.log(result)
-                    
-                  }
-                  catch(error){
-console.log(error)
+                  try {
+                    console.log(safeToken);
+                    const result = await setpassword({ token: safeToken.token, password: values.password });
+                    console.log(result);
+                  } catch (error) {
+                    console.log(error);
                   }
                 }}
               >
@@ -85,6 +83,7 @@ console.log(error)
                     <View style={styles.inputWrapper}>
                       <TextInput
                         placeholder="Enter New Password"
+                        placeholderTextColor="#999"
                         secureTextEntry={!showPassword}
                         onChangeText={handleChange('password')}
                         onBlur={handleBlur('password')}
@@ -109,6 +108,7 @@ console.log(error)
                     <View style={[styles.inputWrapper, { marginTop: vs(15) }]}>
                       <TextInput
                         placeholder="Confirm New Password"
+                        placeholderTextColor="#999"
                         secureTextEntry={!showConfirm}
                         onChangeText={handleChange('confirmPassword')}
                         onBlur={handleBlur('confirmPassword')}
@@ -133,12 +133,11 @@ console.log(error)
                   </>
                 )}
               </Formik>
-                     
             </View>
           </View>
-  </ScrollView>
+        </ScrollView>
       </SafeAreaView>
-    <Loading text='Changing password' isLoading={isLoading}/>
+      <Loading text='Changing password' isLoading={isLoading} />
     </ImageBackground>
   );
 }
