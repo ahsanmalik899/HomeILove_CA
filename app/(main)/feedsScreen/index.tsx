@@ -7,8 +7,8 @@
 /* eslint-disable global-require */
 /* eslint-disable react/jsx-no-comment-textnodes */
 /* eslint-disable prettier/prettier */
-import { useNavigation } from '@react-navigation/native';
 import { hs, ms, vs } from '@utils/design/design'; // Import design utilities
+import { useRouter } from 'expo-router'; // Replace useNavigation with useRouter
 import { useEffect, useState } from 'react';
 import {
   Dimensions,
@@ -106,6 +106,7 @@ const ReportModal = ({ visible, onClose, onSubmit }: ReportModalProps) => {
 };
 
 const FeedScreen = () => {
+  const router = useRouter(); // Use expo-router's router
   const [postText, setPostText] = useState('');
   const [menuVisible, setMenuVisible] = useState<string | null>(null);
   const [createPostMenuVisible, setCreatePostMenuVisible] = useState(false);
@@ -174,7 +175,6 @@ const FeedScreen = () => {
       showUndo: false,
     },
   ]);
-  const navigation = useNavigation();
 
   const handleHidePost = (postId: string) => {
     setPosts((prevPosts) =>
@@ -227,7 +227,15 @@ const FeedScreen = () => {
 
   const handleTabPress = (tab: string) => {
     setActiveTab(tab);
-    console.log(`Switched to tab: ${tab}`);
+    if (tab === 'Your Posts') {
+      router.push('/(main)/yourposts'); // Navigate to PostScreen when "Your Posts" is clicked
+    } else {
+      console.log(`Switched to tab: ${tab}`);
+    }
+  };
+
+  const handleBackPress = () => {
+    router.back(); // Navigate back to previous screen
   };
 
   const tabWidth = width / 4;
@@ -425,7 +433,7 @@ const FeedScreen = () => {
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={handleBackPress}
           accessibilityLabel="Go back"
           accessible
         >
@@ -479,7 +487,7 @@ const FeedScreen = () => {
         <View
           style={[
             styles.redIndicatorLine,
-            { left: tabPositions[setActiveTab], width: tabWidth},
+            { left: tabPositions[activeTab], width: tabWidth },
           ]}
         />
       </View>
