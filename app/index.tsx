@@ -40,7 +40,6 @@ const Index = () => {
   const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
   useEffect(() => {
-    // Total: move slightly → back → then to center of screen
     translateX1.value = withSequence(
       withTiming(SCREEN_WIDTH / 2 - 250, { duration: 2000 }),
       withTiming(SCREEN_WIDTH / 2 + 650, { duration: 2000 }),
@@ -63,7 +62,6 @@ const Index = () => {
     );
     translateY5.value = withSequence(
       withTiming(0, { duration: 2000 }),
-
       withTiming(SCREEN_HEIGHT / 2 - 2300, { duration: 2000 }),
     );
     translateX5.value = withSequence(
@@ -110,11 +108,11 @@ const Index = () => {
       if (user.sweetghar_user_id) {
         router.replace('/(main)/Home');
       } else if (isOnboarding.isOnboarding) {
-        router.replace('/(auth)/signin');
+        router.replace('/(auth)/signup');
       } else {
         router.replace('/(auth)/welcome');
       }
-    }, 5000); // 2 seconds splash delay
+    }, 5000);
 
     return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,7 +193,7 @@ const Index = () => {
       <Animated.View
         className="rounded-full"
         style={[Styles.circle1, animatedStyle1]}
-      />{' '}
+      />
       <Animated.View
         className="rounded-full"
         style={[Styles.circle2, animatedStyle2]}
@@ -245,7 +243,7 @@ const Index = () => {
   );
 };
 const shadowStyle = {
-  shadowColor: '#000', // black shadow
+  shadowColor: '#000',
   shadowOffset: { width: 0, height: 4 },
   shadowOpacity: 0.25,
   shadowRadius: 4,
@@ -256,21 +254,20 @@ const Styles = StyleSheet.create({
   circle1: {
     ...shadowStyle,
     width: hs(260),
-    height: vs(300),
+    height: hs(260), // Equal width and height for perfect circle
     position: 'absolute',
     left: hs(-20),
     zIndex: 11,
     overflow: 'visible',
-    borderRadius: hs(180),
-
+    borderRadius: hs(130), // Half of width/height
     backgroundColor: Colors.light.circleblue,
   },
   circle2: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(110), // Half of width/height
     width: hs(220),
-    height: vs(250),
+    height: hs(220), // Equal width and height
     position: 'absolute',
     top: vs(230),
     right: hs(-10),
@@ -280,9 +277,9 @@ const Styles = StyleSheet.create({
   circle3: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(90), // Half of width/height
     width: hs(180),
-    height: vs(200),
+    height: hs(180), // Equal width and height
     position: 'absolute',
     top: vs(170),
     left: hs(-15),
@@ -292,9 +289,9 @@ const Styles = StyleSheet.create({
   circle4: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(155), // Half of width/height
     width: hs(310),
-    height: vs(370),
+    height: hs(310), // Equal width and height
     position: 'absolute',
     top: vs(-40),
     left: hs(-30),
@@ -304,9 +301,9 @@ const Styles = StyleSheet.create({
   circle5: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(135), // Half of width/height
     width: hs(270),
-    height: vs(300),
+    height: hs(270), // Equal width and height
     position: 'absolute',
     bottom: vs(30),
     left: hs(-60),
@@ -316,9 +313,9 @@ const Styles = StyleSheet.create({
   circle6: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(100), // Half of width/height
     width: hs(200),
-    height: vs(230),
+    height: hs(200), // Equal width and height
     position: 'absolute',
     bottom: vs(-40),
     left: hs(-10),
@@ -328,9 +325,9 @@ const Styles = StyleSheet.create({
   circle7: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(125), // Half of width/height
     width: hs(250),
-    height: vs(280),
+    height: hs(250), // Equal width and height
     position: 'absolute',
     bottom: vs(-60),
     right: hs(-10),
@@ -340,9 +337,9 @@ const Styles = StyleSheet.create({
   circle8: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(90), // Half of width/height
     width: hs(180),
-    height: vs(210),
+    height: hs(180), // Equal width and height
     position: 'absolute',
     bottom: vs(150),
     right: hs(-50),
@@ -352,9 +349,9 @@ const Styles = StyleSheet.create({
   circle9: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(90), // Half of width/height
     width: hs(180),
-    height: vs(210),
+    height: hs(180), // Equal width and height
     position: 'absolute',
     bottom: vs(160),
     right: hs(60),
@@ -364,9 +361,9 @@ const Styles = StyleSheet.create({
   circle10: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(90), // Half of width/height
     width: hs(180),
-    height: vs(210),
+    height: hs(180), // Equal width and height
     position: 'absolute',
     bottom: vs(250),
     right: hs(-10),
@@ -376,21 +373,21 @@ const Styles = StyleSheet.create({
   circle11: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(125), // Half of width/height
     width: hs(250),
-    height: vs(280),
+    height: hs(250), // Equal width and height
     position: 'absolute',
-    top: vs(60),
-    right: hs(-40),
+    top: vs(0),
+    right: hs(-50),
     zIndex: 1,
     backgroundColor: Colors.light.circlegreen,
   },
   circle12: {
     ...shadowStyle,
     overflow: 'visible',
-    borderRadius: hs(180),
+    borderRadius: hs(90), // Half of width/height
     width: hs(180),
-    height: vs(210),
+    height: hs(180), // Equal width and height
     position: 'absolute',
     top: vs(-50),
     right: hs(-10),

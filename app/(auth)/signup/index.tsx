@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable import/order */
 /* eslint-disable global-require */
 /* eslint-disable react/style-prop-object */
@@ -63,13 +62,13 @@ export default function SignUpScreen() {
     });
     if (!result.canceled) {
       const selectedImage = result.assets[0].uri;
-      setimagename(result.assets[0].fileName || 'Uploaded Logo');
+      setimagename(result.assets[0].fileName);
       setFieldValue('logo', selectedImage);
     }
   };
 
-  const [showPassword, setShowPassword] = useState(true);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false); // false means password is hidden (eye-off)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // false means confirm password is hidden (eye-off)
   const [open, setOpen] = useState(false);
 
   return (
@@ -115,7 +114,6 @@ export default function SignUpScreen() {
                 onSubmit={async values => {
                   try {
                     const res = await signup(values).unwrap();
-
                     if (res?.sucess) {
                       renderToastSuccess(res?.message || 'Signup successful');
                       dispatch(setemail(values.email));
@@ -150,8 +148,8 @@ export default function SignUpScreen() {
                   <View style={styles.form}>
                     <TextInput
                       style={styles.input}
-                      placeholder="Name"
-                      placeholderTextColor="#9A9A9A"
+                      placeholder="Enter your name"
+                      placeholderTextColor="#999"
                       onChangeText={handleChange('name')}
                       onBlur={handleBlur('name')}
                       value={values.name}
@@ -162,8 +160,8 @@ export default function SignUpScreen() {
 
                     <TextInput
                       style={styles.input}
-                      placeholder="Mobile"
-                      placeholderTextColor="#9A9A9A"
+                      placeholder="Enter your mobile number"
+                      placeholderTextColor="#999"
                       keyboardType="phone-pad"
                       onChangeText={handleChange('mobile')}
                       onBlur={handleBlur('mobile')}
@@ -175,8 +173,8 @@ export default function SignUpScreen() {
 
                     <TextInput
                       style={styles.input}
-                      placeholder="Email Address"
-                      placeholderTextColor="#9A9A9A"
+                      placeholder="Enter your email address"
+                      placeholderTextColor="#999"
                       keyboardType="email-address"
                       onChangeText={handleChange('email')}
                       onBlur={handleBlur('email')}
@@ -185,12 +183,13 @@ export default function SignUpScreen() {
                     {touched.email && errors.email && (
                       <Text style={styles.error}>{errors.email}</Text>
                     )}
+
                     <View style={styles.passwordContainer}>
                       <TextInput
                         style={styles.passwordInput}
-                        placeholder="Password"
-                        placeholderTextColor="#9A9A9A"
-                        secureTextEntry={showPassword}
+                        placeholder="Enter your password"
+                        placeholderTextColor="#999"
+                        secureTextEntry={!showPassword} // true shows password, false hides it
                         onChangeText={handleChange('password')}
                         onBlur={handleBlur('password')}
                         value={values.password}
@@ -214,9 +213,9 @@ export default function SignUpScreen() {
                     <View style={styles.passwordContainer}>
                       <TextInput
                         style={styles.passwordInput}
-                        placeholder="Confirm Password"
-                        placeholderTextColor="#9A9A9A"
-                        secureTextEntry={showConfirmPassword}
+                        placeholder="Confirm your password"
+                        placeholderTextColor="#999"
+                        secureTextEntry={!showConfirmPassword} // true shows password, false hides it
                         onChangeText={handleChange('confirmPassword')}
                         onBlur={handleBlur('confirmPassword')}
                         value={values.confirmPassword}
@@ -226,7 +225,6 @@ export default function SignUpScreen() {
                           setShowConfirmPassword(!showConfirmPassword)
                         }
                       >
-                       [keyboardType]: #9A9A9A
                         <Ionicons
                           name={
                             showConfirmPassword
@@ -263,9 +261,10 @@ export default function SignUpScreen() {
                     {touched.busenessType && errors.busenessType && (
                       <Text style={styles.error}>{errors.busenessType}</Text>
                     )}
+
                     <View style={styles.input}>
                       <Text style={styles.textview}>
-                        {imagename || 'Upload logo(image)'}
+                        {imagename || 'Upload logo (image)'}
                       </Text>
                       <TouchableOpacity
                         className="absolute right-0"
@@ -273,13 +272,14 @@ export default function SignUpScreen() {
                       >
                         <View className="flex-row" style={styles.uploadbutton}>
                           <Uploadlogo />
-                          <Text style={styles.buttonText}>Upload Logo</Text>
+                          <Text style={styles.buttonText}>Upload</Text>
                         </View>
                       </TouchableOpacity>
                     </View>
                     {touched.logo && errors.logo && (
                       <Text style={styles.error}>{errors.logo}</Text>
                     )}
+
                     <View style={styles.loginTextContainer}>
                       <Text style={styles.loginTextBlack}>
                         Already have an account?{' '}
@@ -318,12 +318,11 @@ const styles = StyleSheet.create({
   loginTextContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: vs(-8),
+    marginTop: vs(10),
   },
   loginTextBlack: {
     fontSize: ms(14),
     color: '#666',
-  
   },
   loginTextGreen: {
     fontSize: ms(14),
@@ -349,11 +348,8 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
   },
-  
   formContainer: {
     paddingHorizontal: hs(20),
-     marginTop: vs(-20),
-    
   },
   title: {
     fontSize: ms(30),
@@ -411,7 +407,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginVertical: vs(15),
-    marginTop: vs(10),
   },
   buttonText: {
     color: '#fff',
@@ -423,7 +418,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: vs(3),
     paddingVertical: vs(10),
-    paddingHorizontal: hs(5),
+    paddingHorizontal: hs(20),
     alignItems: 'center',
   },
   signUpButtonText: {
