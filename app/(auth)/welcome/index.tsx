@@ -144,7 +144,7 @@ const Welcome = () => {
             className="p-3 bg-white-700 "
             onPress={() => {
               if (currentIndex === totalScreens - 1) {
-                router.replace('/(auth)/signup');
+                router.replace('/(main)/home/');
                 dispatch(setonboarding(true));
               }
               setCurrentIndex(currentIndex + 1);

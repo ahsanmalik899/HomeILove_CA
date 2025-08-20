@@ -63,7 +63,7 @@ export default function SignInScreen() {
                   if (res?.data?.sucess) {
                     renderToastSuccess("Log in sucessfuly");
                     dispatch(setusedata(res?.data?.userData));
-                    router.replace('/(main)/Home');
+                    router.replace('/(main)/home');
                   } else {
                     const message =
                       res?.data?.message ||

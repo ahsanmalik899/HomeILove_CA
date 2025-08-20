@@ -1,12 +1,91 @@
-import { Stack } from 'expo-router';
-
-// eslint-disable-next-line no-underscore-dangle
+import Back from '@assets/icons/BackArrow.svg';
+import Notoficatns from "@assets/icons/Notofication.svg";
+import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap } from "@react-navigation/material-top-tabs";
+import { ParamListBase, TabNavigationState } from "@react-navigation/native";
+import Colors from "@src/constants/Colors";
+import { hs, ms, vs } from "@utils/design/design";
+import { withLayoutContext } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+const {Navigator}= createMaterialTopTabNavigator()
+export const MateralTopTabs= withLayoutContext<MaterialTopTabNavigationEventMap, typeof Navigator,TabNavigationState<ParamListBase>,MaterialTopTabNavigationEventMap>(Navigator)
 const _layout = () => {
+    
   return (
-    <Stack>
-      <Stack.Screen name="./(main)/Home" />
-    </Stack>
+    <View style={styles.container}>
+      <View className='flex-row justify-between' style={styles.topbar}>
+        <TouchableOpacity> <Back/></TouchableOpacity>
+       
+        <Text style={styles.topBarText}>Feed</Text>
+        <TouchableOpacity> <Notoficatns/></TouchableOpacity>
+       
+      </View>
+       <MateralTopTabs
+     screenOptions={({ route }) => ({
+      lazy:true,
+      lazyPreloadDistance:100,
+  tabBarActiveTintColor: Colors.light.red,
+  tabBarInactiveTintColor: 'black',
+  tabBarIndicatorStyle: {
+    backgroundColor: Colors.light.red,
+    height: vs(3),
+  
+  },
+    tabBarItemStyle: {
+      width: 'auto',
+    },
+tabBarLabel: ({ focused, color }) => {
+  let label = route.name;
+  switch (route.name) {
+    case 'YourPosts':
+      label = 'Yours Posts';
+      break;
+    case 'ContentFeed':
+      label = 'Content';
+      break;
+    case 'NewsFeed':
+      label = 'News Feeds';
+      break;
+    case 'NewsFeedPreference':
+      label = 'NewsFeed Preferences';
+      break;
+  }
+
+  return (
+    <Text style={{ color,fontSize:ms(12), fontWeight: focused ? 'bold' : 'normal' }}>
+      {label}
+    </Text>
   );
-};
+},
+
+  tabBarLabelStyle: {
+    fontWeight: 'bold',
+    
+  },
+  tabBarStyle: {
+    backgroundColor: '#fff',
+    paddingHorizontal:hs(5),
+  },
+})}
+
+      />
+    </View>
+  )
+}
 
 export default _layout;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor:'#ffffff'
+  },
+topbar:{
+marginTop:vs(40),
+marginBottom:vs(20),
+marginHorizontal:hs(20),
+},
+  topBarText: {
+    color: "black",
+    fontSize: ms(16),
+    fontWeight: "bold",
+  },
+});
