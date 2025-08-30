@@ -24,6 +24,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@legendapp/list": "^1.1.4",
+    "@react-native-community/netinfo": "11.4.1",
     "@react-navigation/bottom-tabs": "^7.0.0",
     "@react-navigation/drawer": "^7.0.0",
     "@react-navigation/material-bottom-tabs": "^6.2.17",
@@ -107,9 +108,9 @@
       "pre-commit": "lint-staged"
     }
   },
-"lint-staged": {
-  "*.{ts,tsx}": "eslint --fix"
-},
+  "lint-staged": {
+    "*.{ts,tsx}": "eslint --fix"
+  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

@@ -13,6 +13,7 @@ import Google from '@assets/signinicon/Google logo.svg';
 import Appple from '@assets/signinicon/apple.svg';
 import Facebook from '@assets/signinicon/facbook.svg';
 import { Ionicons } from '@expo/vector-icons';
+import NetInfo from '@react-native-community/netinfo';
 import LargeButton from '@src/components/globals/LaregeButton';
 import Loading from '@src/components/globals/Loading';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
@@ -59,6 +60,7 @@ export default function SignInScreen() {
               validationSchema={SignInSchema}
               onSubmit={async values => {
                 try {
+                  const connection =await  NetInfo.fetch();
                   const res = await signin(values);
                   if (res?.data?.sucess) {
                     renderToastSuccess("Log in sucessfuly");
