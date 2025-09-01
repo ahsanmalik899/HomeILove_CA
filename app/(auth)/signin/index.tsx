@@ -61,11 +61,15 @@ export default function SignInScreen() {
               onSubmit={async values => {
                 try {
                   const connection =await  NetInfo.fetch();
+                  if(!connection.isConnected){
+                     renderToastError("No internet connection. Please check your network.");
+                     return;
+                  }
                   const res = await signin(values);
                   if (res?.data?.sucess) {
                     renderToastSuccess("Log in sucessfuly");
                     dispatch(setusedata(res?.data?.userData));
-                    router.replace('/(main)/home');
+                    router.replace('/(main)/Home');
                   } else {
                     const message =
                       res?.data?.message ||
@@ -79,6 +83,7 @@ export default function SignInScreen() {
                   renderToastError(err?.data.message || "Faild to log in ");
                   console.log(err);
                 }
+                
               }}
             >
               {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (

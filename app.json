@@ -27,8 +27,12 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.revnosoft.homeilove",
       "associatedDomains": [
+        "applinks:homeilove.app",
         "applinks:homeilove.app"
-      ]
+      ],
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",

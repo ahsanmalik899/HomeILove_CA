@@ -106,9 +106,9 @@ const Index = () => {
     );
     const timeout = setTimeout(() => {
       if (user.sweetghar_user_id) {
-        router.replace('/(main)/home');
+        router.replace('/(main)/Home');
       } else if (isOnboarding.isOnboarding) {
-        router.replace('/(auth)/signup');
+        router.replace('/(auth)/signin');
       } else {
         router.replace('/(auth)/welcome');
       }
