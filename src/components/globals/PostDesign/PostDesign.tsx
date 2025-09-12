@@ -12,19 +12,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CircleImage from '../CircleImage/CircleImage';
 import CreatePost from '../CreatePost/createPost';
 import LableImage from '../LabelImage/LableImage';
+import { postDataType } from './type';
 
-const PostDesign = () => {
-    const items = [
-  { id: "1", username:"Ahsan",UserType:"Agent",time:"3hour",Like:"8",Commint:"20",discription:"this is my post like share and comment this paost" },
-  { id: "2", username:"Ahsan",UserType:"Agent",time:"3hour",Like:"8",Commint:"20",discription:"this is my post like share and comment this paost" },
-    { id: "3", username:"Ahsan",UserType:"Agent",time:"3hour",Like:"8",Commint:"20",discription:"this is my post like share and comment this paost" },
-      { id: "4", username:"Ahsan",UserType:"Agent",time:"3hour",Like:"8",Commint:"20",discription:"this is my post like share and comment this paost" },
-        { id: "5", username:"Ahsan",UserType:"Agent",time:"3hour",Like:"8",Commint:"20",discription:"this is my post like share and comment this paost" },
-          { id: "6", username:"Ahsan",UserType:"Agent",time:"3hour",Like:"8",Commint:"20",discription:"this is my post like share and comment this paost" },
-];
+const PostDesign = ({data}:postDataType) => {
+   
 const insets =useSafeAreaInsets();
   
 const renderItem=({item})=>{
+   
     return(
         <View className='bg-white' style={styles.card}>
           
@@ -33,10 +28,10 @@ const renderItem=({item})=>{
                 <CircleImage source={image} Size={'Medium'}/>
                 <View  style={styles.uperSection}>
                     <View className='flex-row'>
-                    <Text style={styles.name}>{item.username}</Text>
-                    <Text> ({item.UserType})</Text>
+                    <Text style={styles.name}>{item.userData.name}</Text>
+                    <Text> ({item.userData.business_type||item.userData.user_type})</Text>
                     </View>
-                    <Text>{item.time}</Text>
+                    <Text>{item.extraData.post_created_date}</Text>
                 </View>
                 </View>
                 <TouchableOpacity >
@@ -45,7 +40,7 @@ const renderItem=({item})=>{
                  
              </View>
              <View >
-                <Text style={styles.description}>{item.discription}</Text>
+                <Text style={styles.description}>{item.property_details}</Text>
               <LableImage source={image}/>
               <View className='flex-row justify-between' style={{marginTop:vs(20),marginBottom:vs(10)}}>
                 <View className='flex-row'>
@@ -82,9 +77,9 @@ const renderItem=({item})=>{
         <LegendList
 
         className="flex-1 bg-red"
-      data={items}
+      data={data}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.post_id.toString()}
       recycleItems
       ListHeaderComponent={<CreatePost/>}
     />

@@ -31,3 +31,6 @@ export interface changepassword {
   token: string;
   password: string;
 }
+export interface MYPostType{
+  id:number;
+}

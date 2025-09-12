@@ -4,7 +4,7 @@ import { View } from 'react-native';
 const NewsFeeds = () => {
   return (
     <View>
-     <PostDesign/>
+     <PostDesign data={[]}/>
     </View>
   )
 }
