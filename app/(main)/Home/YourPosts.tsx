@@ -10,10 +10,10 @@ const YourPosts = () => {
   const limit = 10;
   const user = useAppSelector(userdata);
   
-  // Use the actual user ID from Redux instead of hardcoding
-  const { data, isFetching, isError, error } = useGetYourpostQuery(491);
+  const { data, isFetching, isError, error } = useGetYourpostQuery(698);
 
   return (
+
     <View>
       <PostDesign data={data?.result?.posts} />
     </View>

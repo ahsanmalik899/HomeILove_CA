@@ -10,7 +10,7 @@ import {
 
 export const Authapi = createApi({
   reducerPath: 'Authapi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.100.112:3000/api/users/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.3:3000/api/users/' }),
   endpoints: builder => ({
     Signup: builder.mutation<unknown, signuppost>({
       query: userdata => ({

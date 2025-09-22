@@ -28,10 +28,10 @@ const renderItem=({item})=>{
                 <CircleImage source={image} Size={'Medium'}/>
                 <View  style={styles.uperSection}>
                     <View className='flex-row'>
-                    <Text style={styles.name}>{item.userData.name}</Text>
-                    <Text> ({item.userData.business_type||item.userData.user_type})</Text>
+                    <Text style={styles.name}>{item.UserData.name}</Text>
+                    <Text> ({item.business_type||item.UserData.user_type})</Text>
                     </View>
-                    <Text>{item.extraData.post_created_date}</Text>
+                    <Text>{item.post_created_date||item.created_date}</Text>
                 </View>
                 </View>
                 <TouchableOpacity >
@@ -41,7 +41,7 @@ const renderItem=({item})=>{
              </View>
              <View >
                 <Text style={styles.description}>{item.property_details}</Text>
-              <LableImage source={image}/>
+              <LableImage price={item.UserData.asking_price} title={item.property_title} source={image}/>
               <View className='flex-row justify-between' style={{marginTop:vs(20),marginBottom:vs(10)}}>
                 <View className='flex-row'>
 
@@ -75,8 +75,7 @@ const renderItem=({item})=>{
     <View style={{paddingBottom:insets.bottom}} >
   
         <LegendList
-
-        className="flex-1 bg-red"
+      className="flex-1 bg-red"
       data={data}
       renderItem={renderItem}
       keyExtractor={(item) => item.post_id.toString()}

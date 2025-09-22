@@ -43,7 +43,7 @@ tabBarLabel: ({ focused, color }) => {
       label = 'Content';
       break;
     case 'NewsFeed':
-      label = 'News Feeds';
+      label = 'Home Feeds';
       break;
     case 'NewsFeedPreference':
       label = 'NewsFeed Preferences';
