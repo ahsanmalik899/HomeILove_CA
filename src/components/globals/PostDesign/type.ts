@@ -1,3 +1,5 @@
 export type postDataType= {
-    data :any[];
+    data :[];
+    setPage: React.Dispatch<React.SetStateAction<number>>;
+    isfetching:boolean;
 }

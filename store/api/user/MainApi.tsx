@@ -1,15 +1,28 @@
-import { MYPostType } from "@/store/type/user";
+
+import { ContentPostType, FeedResponse, GetPostType } from "@/store/type/user";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-
 
 export const MainApi = createApi({
   reducerPath: 'MainApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.3:3000/api/users/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.18.72:3000/api/users/' }),
   endpoints: (builder) => ({
-    getYourpost: builder.query< MYPostType,unknown>({
-      query: (id) => ({
-        url: `getYourFeeds/?id=${id}`,
+    getYourpost: builder.query< FeedResponse,GetPostType>({
+      query: ({userid,page}) => ({
+        url: `getYourFeeds/?userid=${userid}&page=${page}`,
+        method: 'GET',
+        
+      }),
+    }),
+       getHomepost: builder.query< FeedResponse,GetPostType>({
+      query: ({userid,page}) => ({
+        url: `getHomeFeeds/?userid=${userid}&page=${page}`,
+        method: 'GET',
+        
+      }),
+    }),
+     getContentpost: builder.query< FeedResponse,ContentPostType>({
+      query: ({userid,page,type}) => ({
+        url: `getContentFeeds/?userid=${userid}&page=${page}&type=${type}`,
         method: 'GET',
         
       }),
@@ -18,4 +31,7 @@ export const MainApi = createApi({
 });
 
 
-export const { useGetYourpostQuery } = MainApi;
+export const { useGetYourpostQuery ,
+  useGetContentpostQuery,
+  useGetHomepostQuery,
+} = MainApi;

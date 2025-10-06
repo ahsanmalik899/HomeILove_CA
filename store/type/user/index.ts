@@ -31,6 +31,32 @@ export interface changepassword {
   token: string;
   password: string;
 }
-export interface MYPostType{
-  id:number;
+export interface ContentPostType{
+  userid:number;
+  page:number;
+  type:string;
+}
+export interface GetPostType{
+  userid:number;
+  page:number;
+}
+export interface FeedItem {
+  id: number;
+  type: string; 
+  name: string | null;
+  created_date: string; 
+  connection_type: string | null;
+  descripition: string; 
+  title: string;
+  price: number;
+  likes: number;
+  business_name: string | null;
+  image_1: string | null;
+  dealing_areas: string | null;
+}
+
+export interface FeedResponse {
+  feed: FeedItem[];
+  totalPages: number;
+  currentPage: number;
 }

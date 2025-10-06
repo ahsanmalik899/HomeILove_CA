@@ -1,10 +1,11 @@
-import PostDesign from '@src/components/globals/PostDesign/PostDesign';
+import PrefrenceCard from '@src/components/globals/PrefrenceCard';
 import { View } from 'react-native';
 
 const NewsFeedPreference = () => {
+  
   return (
-    <View>
-     <PostDesign/>
+    <View className='flex-1'>
+    <PrefrenceCard/>
     </View>
   )
 }
