@@ -33,7 +33,7 @@ const PostDesign = ({ data,setPage,isfetching,setposts }: postDataType) => {
       <View className="bg-white" style={styles.card}>
         <View className="flex-row items-center justify-between">
           <View className="flex-row">
-            <CircleImage source={image} Size={"Medium"} />
+            <CircleImage source={image} Size={40} />
             <View style={styles.uperSection}>
               <View className="flex-row">
                 <Text style={styles.name}>{item.name}</Text>
@@ -88,7 +88,7 @@ const PostDesign = ({ data,setPage,isfetching,setposts }: postDataType) => {
       <View className="bg-white" style={styles.card}>
         <View className="flex-row items-center justify-between">
           <View className="flex-row">
-            <CircleImage source={image} Size={"Medium"} />
+            <CircleImage source={image} Size={40} />
             <View style={styles.uperSection}>
               <View className="flex-row">
                 <Text style={styles.name}>{item.name}</Text>

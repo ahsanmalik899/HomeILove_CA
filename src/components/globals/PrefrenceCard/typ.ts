@@ -1,3 +1,8 @@
+import { ComponentType } from "react";
+
 export type PrefrenceCardprops = {
-    Svg:imaHeading,BtnText
+    Svg: ComponentType;
+    Heading:string;
+    BtnText:string;
+    OnSubmit:()=>void;
 }

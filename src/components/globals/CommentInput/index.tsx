@@ -8,7 +8,7 @@ import CircleImage from '../CircleImage/CircleImage';
 const index = () => {
   return (
     <View className='flex-row items-center' >
-        <CircleImage source={image} Size={'Small'} />
+        <CircleImage source={image} Size={30} />
         <View className='flex-row items-center' style={{marginLeft:hs(5),borderRadius:ms(18),paddingVertical:vs(5),width:hs(285),backgroundColor:Colors.light.LightGreen,paddingHorizontal:hs(5)}}>
       <TextInput
 

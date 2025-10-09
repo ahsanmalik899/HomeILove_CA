@@ -41,8 +41,6 @@ refetch()
 
   return (
     <View>
-     
-
      <PostDesign data={Posts} setPage={setpage} isfetching={isFetching}/>
     </View>
   )
