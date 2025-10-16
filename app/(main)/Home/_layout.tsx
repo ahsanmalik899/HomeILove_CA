@@ -28,7 +28,7 @@ const _layout = () => {
       }}
     >
       <Tabs.Screen
-        name="Home"
+        name="HomeInner"
         
         options={{
           

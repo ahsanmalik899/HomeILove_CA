@@ -4,7 +4,6 @@ import HomeLogo from "@assets/Home/homeliogo.svg";
 import NotificatioOutline from "@assets/Home/notificationOutline.svg";
 import SidebarIcon from "@assets/Home/sideMenueIcon.svg";
 import { MaterialIcons } from "@expo/vector-icons";
-import SideBarBuseness from "@src/components/globals/SideBarBuseness";
 import SideBarUser from "@src/components/globals/SideBarUser";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -50,12 +49,12 @@ const user = useAppSelector(userdata);
         drawerType: "slide",
         drawerStyle: {
           backgroundColor: "#fff",
-         width: user.user_type !== 'Business' ? hs(200) : '100%',
+         width:hs(200) 
 
 
         },
       }}
-       drawerContent={(props) => user.user_type ==='Business'?(<SideBarBuseness/>):(<SideBarUser/>)}
+       drawerContent={(props) => <SideBarUser/>}
     >
       <Drawer.Screen
         name="index"

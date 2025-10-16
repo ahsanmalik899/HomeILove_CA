@@ -10,10 +10,10 @@ const index = () => {
               borderBottomRightRadius:ms(20),}}className='flex-1 bg-white'>
     <SidebarLogo/>
     <View style={{marginTop:vs(20)}}>
-    <SideBarButtons text='Business Profiles' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Business Profiles' onPress={()=>router.navigate('/(main)/BusenessProfiles')}/>
         </View>
         <View style={{marginTop:vs(5)}}>
-    <SideBarButtons text='Your Ads' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Your Ads' onPress={()=>router.navigate('/(main)/YouAds')}/>
         </View>
            <View style={{marginTop:vs(5)}}>
     <SideBarButtons text='Inquiries' onPress={()=>router.navigate('/(auth)/Account')}/>

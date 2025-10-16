@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const MainApi = createApi({
   reducerPath: 'MainApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.10:3000/api/users/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.11:3000/api/users/' }),
   endpoints: (builder) => ({
     getYourpost: builder.query< FeedResponse,GetPostType>({
       query: ({userid,page}) => ({
