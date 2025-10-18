@@ -1,4 +1,3 @@
-import { FormikErrors, FormikTouched, FormikValues } from "formik";
 
 export type FormikInputProps = {
   title: string;
@@ -6,9 +5,10 @@ export type FormikInputProps = {
   onChangeText: (text: string) => void;
   onBlur: (e: any) => void;
   value: string;
-  touched: FormikTouched<FormikValues>;
-  errors: FormikErrors<FormikValues>;
+  touched: boolean;
+  errors: boolean;
   additonalText?:String;
   required:boolean;
   errorText:any;
+  multiline?:boolean;
 };

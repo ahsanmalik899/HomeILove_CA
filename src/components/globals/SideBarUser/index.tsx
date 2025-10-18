@@ -16,22 +16,22 @@ const index = () => {
     <SideBarButtons text='Your Ads' onPress={()=>router.navigate('/(main)/YouAds')}/>
         </View>
            <View style={{marginTop:vs(5)}}>
-    <SideBarButtons text='Inquiries' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Inquiries' onPress={()=>router.navigate('/(main)/Inquires')}/>
         </View>
          <View style={{marginTop:vs(5)}}>
-    <SideBarButtons text='Buy Credit' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Buy Credit' onPress={()=>router.navigate('/BuyCredit')}/>
         </View>
          <View style={{marginTop:vs(5)}}>
-    <SideBarButtons text='Advertise' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Advertise' onPress={()=>router.navigate('/Advertise')}/>
         </View>
          <View style={{marginTop:vs(5)}}>
-    <SideBarButtons text='Your Promotions' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Your Promotions' onPress={()=>router.navigate('/YourPromotions')}/>
         </View>
          <View style={{marginTop:vs(5)}}>
-    <SideBarButtons text='Set Alerts' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Set Alerts' onPress={()=>router.navigate('/SetAlerts')}/>
         </View>
          <View style={{marginTop:vs(5)}}>
-    <SideBarButtons text='Reviews' onPress={()=>router.navigate('/(auth)/Account')}/>
+    <SideBarButtons text='Reviews' onPress={()=>router.navigate('/Reviews')}/>
         </View>
         <View style={{marginTop:'auto', marginBottom:vs(60)}}>
         <LargeButton text='Delete Account' handleSubmit={()=>router.navigate('/(auth)/Account')}/>

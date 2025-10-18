@@ -7,40 +7,37 @@ import Painter from '@assets/SideBar/painter.svg'
 import Plumber from '@assets/SideBar/plumber.svg'
 import HeaderWithBack from '@src/components/globals/HeaderWithBack'
 import SideBarCard from '@src/components/globals/SideBarCard'
-import { hs, ms, vs } from '@utils/design/design'
-import { Text, View } from 'react-native'
+import { hs, vs } from '@utils/design/design'
+import { View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 const index = () => {
     const insets = useSafeAreaInsets()
     const bottom = insets.bottom
+    
   return (
     <View className='bg-white flex-1'>
-      <HeaderWithBack  />
-      <View >
-        <View style={{marginHorizontal:hs(20)}}>
-        <Text style={{fontSize:ms(18),fontWeight:600,marginVertical:vs(20)}}>Business Profiles</Text>
-        
-        </View>
-        <ScrollView  style={{paddingHorizontal:hs(20),paddingTop:vs(5),marginBottom:bottom+vs(150)}}>
+      <HeaderWithBack title='Business Profiles'/>
+     
+        <ScrollView  style={{paddingHorizontal:hs(20),paddingTop:vs(10)}}>
         <View className='flex-row justify-between'>
-            <SideBarCard text='Electrician Profile' Svg={Electrician}/>
-            <SideBarCard text='Builder Profile' Svg={Builder}/>
+            <SideBarCard text='Electrician Profile' Svg={Electrician} type='busenessProfile' />
+            <SideBarCard text='Builder Profile' Svg={Builder} type='busenessProfile'/>
         </View>
           <View className='flex-row justify-between'>
-            <SideBarCard text='Mortgage Profile' Svg={Mortgagae}/>
-            <SideBarCard text='Decor Profile' Svg={Decore}/>
+            <SideBarCard text='Mortgage Profile' Svg={Mortgagae} type='busenessProfile'/>
+            <SideBarCard text='Decor Profile' Svg={Decore} type='busenessProfile'/>
         </View>
           <View className='flex-row justify-between'>
-            <SideBarCard text='Plumber Profile' Svg={Plumber}/>
-            <SideBarCard text='Painter Profile' Svg={Painter}/>
+            <SideBarCard text='Plumber Profile' Svg={Plumber} type='busenessProfile'/>
+            <SideBarCard text='Painter Profile' Svg={Painter} type='busenessProfile'/>
         </View>
           <View className='flex-row justify-between'>
-            <SideBarCard text='Investor Profile' Svg={Investor}/>
+            <SideBarCard text='Investor Profile' Svg={Investor} type='busenessProfile'/>
         </View>
         </ScrollView>
       </View>
-    </View>
+    
   )
 }
 

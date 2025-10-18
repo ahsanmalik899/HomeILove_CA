@@ -8,6 +8,7 @@ import SideBarUser from "@src/components/globals/SideBarUser";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, vs } from "@utils/design/design";
+import { router } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 
 const _layout = () => {
@@ -34,7 +35,7 @@ const user = useAppSelector(userdata);
             <View style={{ marginTop: vs(-10) }}>
               <HomeLogo />
             </View>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>router.navigate('/CurrentAlerts')}>
               <NotificatioOutline />
             </TouchableOpacity>
           </View>
