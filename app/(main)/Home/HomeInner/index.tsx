@@ -34,32 +34,32 @@ const Home = () => {
         <ScrollView style={{ paddingTop: vs(10) }}>
           <HomeCard
             title="Buy"
-            onpress={() => router.navigate("/(auth)/signin")}
+            onpress={() => router.navigate("/Buy")}
           />
           <HomeCard
             title="Rent"
-            onpress={() => router.navigate("/(auth)/signin")}
+            onpress={() => router.navigate("/Rent")}
           />
           <HomeCard
             title="New Home"
-            onpress={() => router.navigate("/(auth)/signin")}
+            onpress={() => router.navigate("/NewHome")}
           />
           <HomeCard
             title="Home Value"
-            onpress={() => router.navigate("/(auth)/signin")}
+            onpress={() => router.navigate("/HomeValue")}
           />
         
           <HomeCard
             title="Get Help"
-            onpress={() => router.navigate("/(auth)/signin")}
+            onpress={() => router.navigate("/GetHelp")}
           />
           <HomeCard
             title="Home Romance"
-            onpress={() => router.navigate("/(auth)/signin")}
+            onpress={() => router.navigate("/HomeRomance")}
           />
        <HomeCard
             title="Sell Property"
-            onpress={() => router.navigate("/(auth)/signin")}
+            onpress={() => router.navigate("/SellProperty")}
           />
         </ScrollView>
       </View>

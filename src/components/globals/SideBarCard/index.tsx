@@ -8,7 +8,7 @@ import { SideBarCardprops } from "./type";
 const index = ({ Svg, text, type, totalPosts,onPress }: SideBarCardprops) => {
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card,{height:type==='Buy'?vs(160):vs(140)}]}
 
       onPress={() => { type === "busenessProfile"
     ? router.navigate({
@@ -30,7 +30,7 @@ const index = ({ Svg, text, type, totalPosts,onPress }: SideBarCardprops) => {
 
       <View className="items-center self-center ">
         <Svg />
-        <Text style={{ marginTop: vs(15), fontWeight: 600 }}>{text}</Text>
+        <Text style={{ marginTop: vs(15), fontWeight: 600 ,paddingHorizontal:hs(5),textAlign:'center'}}>{text}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -40,7 +40,6 @@ export default index;
 
 const styles = StyleSheet.create({
   card: {
-    height: vs(140),
     width: hs(160),
     backgroundColor: "white",
     elevation: 5,

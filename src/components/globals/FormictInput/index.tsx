@@ -52,6 +52,7 @@ export const FormikInput = ({
         placeholderTextColor={Colors.light.DarkGreen}
         style={[
           multiline ? styles.inputdes : styles.input,
+          
           { color: Colors.light.DarkGreen },
         ]}
       />

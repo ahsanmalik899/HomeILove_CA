@@ -3,6 +3,7 @@ import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FormikInput } from "@src/components/globals/FormictInput";
+import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import SelecteAdType from "@src/components/globals/TablikeButton";
@@ -16,41 +17,138 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import * as Yup from "yup";
-
+interface ProfileConfig {
+  title: string;
+  serviceTitle: string;
+  serviceDefault: string;
+  serviceOption: string[];
+  isService: Boolean;
+  isLicenceIssue: Boolean;
+  isInvestor: Boolean;
+}
 const index = () => {
-  let title = "";
-
+  let dataAccordingType: ProfileConfig = {
+    title: "Profile",
+    serviceTitle: "",
+    serviceDefault: "",
+    serviceOption: [],
+    isService: false,
+    isLicenceIssue: true,
+    isInvestor: false,
+  };
   const user = useAppSelector(userdata);
   const { type } = useLocalSearchParams();
   console.log(type);
+
   switch (type) {
     case "Builder Profile":
-      title = "Builder";
+      dataAccordingType = {
+        title: "Builder",
+        serviceTitle: "Services for",
+        serviceDefault: "All type of developments",
+        serviceOption: [
+          "All type of developments",
+          "Home developments",
+          "Commercial developments",
+          "Housing estates developments",
+          "Home renovation",
+          "Home re-build",
+          "Home extensions",
+          "Other",
+        ],
+        isLicenceIssue: true,
+        isService: true,
+        isInvestor: false,
+      };
       break;
+
     case "Mortgage Profile":
-      title = "MORTGAGE ADVISOR ";
+      dataAccordingType = {
+        title: "Mortgage Advisor",
+        serviceTitle: "Serving as ",
+        serviceDefault: "",
+        isService: true,
+        serviceOption: ["Loan officer", "Mortgage broker", "Mortgage lender"],
+        isLicenceIssue: false,
+        isInvestor: false,
+      };
       break;
+
     case "Decor Profile":
-      title = "Home Decor";
+      dataAccordingType = {
+        title: "Home Decor",
+        serviceTitle: "",
+        serviceDefault: "",
+        isService: false,
+        serviceOption: [],
+        isLicenceIssue: true,
+        isInvestor: false,
+      };
       break;
+
     case "Plumber Profile":
-      title = "Plumber";
+      dataAccordingType = {
+        title: "Plumber",
+        serviceTitle: "",
+        serviceDefault: "",
+        isService: false,
+        serviceOption: [],
+        isLicenceIssue: true,
+        isInvestor: false,
+      };
       break;
+
     case "Painter Profile":
-      title = "Painter";
+      dataAccordingType = {
+        title: "Painter",
+        serviceTitle: "",
+        serviceDefault: "",
+        isService: false,
+        serviceOption: [],
+        isLicenceIssue: true,
+        isInvestor: false,
+      };
       break;
+
     case "Investor Profile":
-      title = "Investor";
+      dataAccordingType = {
+        title: "Investor",
+        serviceTitle: "",
+        serviceDefault: "",
+        isService: false,
+        serviceOption: [],
+        isLicenceIssue: true,
+        isInvestor: true,
+      };
       break;
+
     case "Electrician Profile":
-      title = "Electrician";
+      dataAccordingType = {
+        title: "Electrician",
+        serviceTitle: "",
+        serviceDefault: "",
+        isService: false,
+        serviceOption: [],
+        isLicenceIssue: true,
+        isInvestor: false,
+      };
       break;
+
     default:
-      title = "Profile";
+      dataAccordingType = {
+        title: "Profile",
+        serviceTitle: "",
+        serviceDefault: "",
+        isService: false,
+        serviceOption: [],
+        isLicenceIssue: true,
+        isInvestor: false,
+      };
       break;
   }
   const ProfileSchema = Yup.object().shape({
@@ -85,14 +183,31 @@ const index = () => {
 
     latitude: Yup.number().nullable(),
     longitude: Yup.number().nullable(),
-
-    investor_type: Yup.string().nullable(),
-    invest_in: Yup.string().nullable(),
     issuing_authority: Yup.string().nullable(),
-    min_invest: Yup.number().min(0, "Invalid amount").nullable(),
-    max_invest: Yup.number()
-      .min(Yup.ref("min_invest"), "Must be greater than min investment")
-      .nullable(),
+    investor_type: dataAccordingType.isInvestor
+      ? Yup.string().required("Please select investor type")
+      : Yup.string().nullable(),
+
+    invest_in: dataAccordingType.isInvestor
+      ? Yup.string().required("Please select where you invest")
+      : Yup.string().nullable(),
+
+    min_invest: dataAccordingType.isInvestor
+      ? Yup.number()
+          .typeError("Minimum investment must be a number")
+          .required("Please enter minimum investment")
+          .positive("Must be a positive number")
+      : Yup.number().nullable(),
+
+    max_invest: dataAccordingType.isInvestor
+      ? Yup.number()
+          .typeError("Maximum investment must be a number")
+          .required("Please enter maximum investment")
+          .moreThan(
+            Yup.ref("min_invest"),
+            "Must be greater than minimum investment"
+          )
+      : Yup.number().nullable(),
 
     advisory_service: Yup.string().required(
       "Please select whether you offer advisory service"
@@ -108,12 +223,14 @@ const index = () => {
     post_type: Yup.string().required("Please select add type"),
     logo: Yup.mixed().nullable(),
     cover: Yup.mixed().nullable(),
+    services: dataAccordingType.isService
+      ? Yup.string().required("Please select a service")
+      : Yup.string().nullable(),
   });
   return (
     <View className="bg-white flex-1">
       <ScrollView>
         <HeaderWithBack />
-
         <Text
           style={{
             marginTop: vs(30),
@@ -122,7 +239,10 @@ const index = () => {
             fontWeight: 500,
           }}
         >
-          Create your <Text style={{ color: Colors.light.red }}>{title}</Text>{" "}
+          Create your{" "}
+          <Text style={{ color: Colors.light.red }}>
+            {dataAccordingType.title}
+          </Text>{" "}
           profile
         </Text>
 
@@ -153,6 +273,7 @@ const index = () => {
               advisory_service: "",
               remarks: "",
               youtube_link: "",
+              services: dataAccordingType.serviceDefault,
               users_id: user.sweetghar_user_id,
               post_type: "Normal",
               logo: null,
@@ -171,6 +292,84 @@ const index = () => {
               touched,
             }) => (
               <>
+                {dataAccordingType.isInvestor && (
+                  <>
+                    <FormikDropdown
+                      title={"Investor Type"}
+                      placeholder={"Nothing selected"}
+                      value={values.investor_type}
+                      options={[
+                        "Private investor",
+                        "REIT",
+                        "Institude",
+                        "Crowd fund",
+                        "Others",
+                      ]}
+                      onSelect={(val) => setFieldValue("investor_type", val)}
+                      touched={!!touched.investor_type}
+                      errors={!!errors.investor_type}
+                      errorText={errors.investor_type}
+                      required
+                    />
+                    <FormikDropdown
+                      title={"Invest in"}
+                      placeholder={"Nothing selected"}
+                      value={values.invest_in}
+                      options={[
+                        "Residential",
+                        "Commercial",
+                        "Institude",
+                        "Residential & Commercial",
+                        "Land",
+                        "Community development",
+                        "Others",
+                      ]}
+                      onSelect={(val) => setFieldValue("invest_in", val)}
+                      touched={!!touched.invest_in}
+                      errors={!!errors.invest_in}
+                      errorText={errors.invest_in}
+                      required
+                    />
+                    <View className="flex-row justify-between">
+                      <View className="flex-1" style={{marginRight:hs(5)}}>
+                      <FormikDropdown
+                        title={"Investment amount"}
+                        placeholder={"From"}
+                        value={values.min_invest}
+                        options={[
+                          "Any",
+                          "from 1 million",
+                          "from 20 million",
+                          "from 50 million",
+                          "from 60 million",
+                        ]}
+                        onSelect={(val) => setFieldValue("min_invest", val)}
+                        touched={!!touched.min_invest}
+                        errors={!!errors.min_invest}
+                        errorText={errors.min_invest}
+                        required
+                      />
+                      </View>
+                      <View className="flex-1" style={{marginLeft:hs(5)}}>
+                      <FormikDropdown
+                        title={""}
+                        placeholder={"To"}
+                        value={values.max_invest}
+                        options={[
+                          "upto 1 million",
+                          "upto 20 million",
+                          "upto 50 million",
+                          "upto 60 million",
+                        ]}
+                        onSelect={(val) => setFieldValue("max_invest", val)}
+                        touched={!!touched.max_invest}
+                        errors={!!errors.max_invest}
+                        errorText={errors.max_invest}
+                      />
+                      </View>
+                    </View>
+                  </>
+                )}
                 <FormikInput
                   title="Display name"
                   placeholder="Name"
@@ -183,6 +382,19 @@ const index = () => {
                   required
                   errorText={errors.business_name}
                 />
+                {dataAccordingType.isService && (
+                  <FormikDropdown
+                    title={dataAccordingType.serviceTitle}
+                    placeholder={dataAccordingType.serviceTitle}
+                    value={values.services}
+                    options={dataAccordingType.serviceOption}
+                    onSelect={(val) => setFieldValue("services", val)}
+                    touched={!!touched.services}
+                    errors={!!errors.services}
+                    errorText={errors.services}
+                    required
+                  />
+                )}
                 <FormikInput
                   title="Contact No"
                   placeholder="Contact"
@@ -208,41 +420,44 @@ const index = () => {
                 <FormikInput
                   title="State"
                   placeholder="Enter state"
-                  onChangeText={handleChange("city")}
-                  onBlur={handleBlur("city")}
-                  value={values.city}
-                  touched={!!touched.city}
-                  errors={!!errors.city}
+                  onChangeText={handleChange("state")}
+                  onBlur={handleBlur("state")}
+                  value={values.state}
+                  touched={!!touched.state}
+                  errors={!!errors.state}
                   required
-                  errorText={errors.city}
+                  errorText={errors.state}
                 />
-                <View
-                  className="flex-row "
-                  style={{ justifyContent: "space-between" }}
-                >
-                  <FormikInput
-                    title="City"
-                    placeholder="Enter Location"
-                    onChangeText={handleChange("state")}
-                    onBlur={handleBlur("state")}
-                    value={values.state}
-                    touched={!!touched.state}
-                    errors={!!errors.state}
-                    required
-                    errorText={errors.state}
-                  />
-                  <FormikInput
-                    title="Zip"
-                    placeholder="Enter zip"
-                    onChangeText={handleChange("zip")}
-                    onBlur={handleBlur("zip")}
-                    value={values.zip}
-                    touched={!!touched.zip}
-                    errors={!!errors.zip}
-                    required
-                    errorText={errors.zip}
-                  />
+                <View className="flex-row justify-between items-start gap-3">
+                  <View className="flex-1">
+                    <FormikInput
+                      title="City"
+                      placeholder="Enter Location"
+                      onChangeText={handleChange("state")}
+                      onBlur={handleBlur("state")}
+                      value={values.state}
+                      touched={!!touched.state}
+                      errors={!!errors.state}
+                      required
+                      errorText={errors.state}
+                    />
+                  </View>
+
+                  <View className="flex-1">
+                    <FormikInput
+                      title="Zip"
+                      placeholder="Enter zip"
+                      onChangeText={handleChange("zip")}
+                      onBlur={handleBlur("zip")}
+                      value={values.zip}
+                      touched={!!touched.zip}
+                      errors={!!errors.zip}
+                      required
+                      errorText={errors.zip}
+                    />
+                  </View>
                 </View>
+
                 <FormikInput
                   title="Web Address"
                   placeholder="Enter Location"
@@ -257,23 +472,27 @@ const index = () => {
                 <View
                   style={{
                     height: vs(1),
+                    marginTop: vs(20),
                     marginBottom: vs(10),
                     backgroundColor: Colors.light.textGray,
                     opacity: 0.2,
                   }}
                 />
-                <FormikInput
-                  title="License Issuing authority"
-                  placeholder="License"
-                  additonalText="If any-optional"
-                  onChangeText={handleChange("issuing_authority")}
-                  onBlur={handleBlur("issuing_authority")}
-                  value={values.issuing_authority}
-                  touched={!!touched.issuing_authority}
-                  errors={!!errors.issuing_authority}
-                  required={false}
-                  errorText={errors.issuing_authority}
-                />
+                {dataAccordingType.isLicenceIssue && (
+                  <FormikInput
+                    title="License Issuing authority"
+                    placeholder="License"
+                    additonalText="If any-optional"
+                    onChangeText={handleChange("issuing_authority")}
+                    onBlur={handleBlur("issuing_authority")}
+                    value={values.issuing_authority}
+                    touched={!!touched.issuing_authority}
+                    errors={!!errors.issuing_authority}
+                    required={false}
+                    errorText={errors.issuing_authority}
+                  />
+                )}
+
                 <FormikInput
                   title="License No"
                   placeholder="License number"
@@ -285,18 +504,73 @@ const index = () => {
                   required
                   errorText={errors.license_no}
                 />
-                <FormikInput
-                  title="Dealing areas"
-                  placeholder="Please enter City,Status or Zip Code"
-                  onChangeText={handleChange("dealing_areas")}
-                  onBlur={handleBlur("dealing_areas")}
-                  value={values.dealing_areas}
-                  touched={!!touched.dealing_areas}
-                  errors={!!errors.dealing_areas}
-                  required
-                  errorText={errors.dealing_areas}
-                />
-                <Text style={{ width: hs(250) }}>
+                <View style={{ marginTop: vs(10) }}>
+                  <View className="flex-row" style={{ marginBottom: vs(10) }}>
+                    <Text style={styles.title}>Dealing areas</Text>
+
+                    <Text
+                      style={{
+                        color: Colors.light.red,
+                      }}
+                    >
+                      {" "}
+                      *
+                    </Text>
+                  </View>
+                  <View className="flex-row ">
+                    <TouchableOpacity
+                      onPress={() =>
+                        setFieldValue(
+                          "dealing_areas",
+                          values.dealing_areas === "Nationwide"
+                            ? ""
+                            : "Nationwide"
+                        )
+                      }
+                    >
+                      <MaterialIcons
+                        size={18}
+                        color={Colors.light.DarkGreen}
+                        name={
+                          values.dealing_areas === "Nationwide"
+                            ? "check-box"
+                            : "check-box-outline-blank"
+                        }
+                      />
+                    </TouchableOpacity>
+                    <Text style={{ marginLeft: hs(5) }}>Nationwide</Text>
+                  </View>
+
+                  <View
+                    style={{
+                      borderRadius: ms(18),
+                      paddingVertical: vs(5),
+                      backgroundColor: Colors.light.LightGreen,
+                      paddingHorizontal: hs(5),
+                      marginTop: vs(5),
+                    }}
+                  >
+                    <TextInput
+                      placeholder={"Please enter City,Status or Zip Code"}
+                      value={values.dealing_areas}
+                      onChangeText={handleChange("dealing_areas")}
+                      onBlur={handleBlur("dealing_areas")}
+                      editable={
+                        values.dealing_areas === "Nationwide" ? false : true
+                      }
+                      cursorColor={Colors.light.DarkGreen}
+                      placeholderTextColor={Colors.light.DarkGreen}
+                      style={{ color: Colors.light.DarkGreen }}
+                    />
+                  </View>
+                  {touched.dealing_areas && errors.dealing_areas && (
+                    <Text style={{ color: Colors.light.red }}>
+                      {errors.dealing_areas}
+                    </Text>
+                  )}
+                </View>
+
+                <Text style={{ width: hs(250), marginTop: vs(10) }}>
                   Do you provide advisory services in your locality?
                 </Text>
                 <View
@@ -371,6 +645,7 @@ const index = () => {
                 <View
                   style={{
                     height: vs(1),
+                    marginTop: vs(20),
                     marginBottom: vs(10),
                     backgroundColor: Colors.light.textGray,
                     opacity: 0.2,
@@ -402,48 +677,58 @@ const index = () => {
                   required={false}
                   errorText={errors.youtube_link}
                 />
-                <View style={{marginTop:vs(10)}}>
-                <SelecteAdType
-                  title1="Select Ad "
-                  title2="Type"
-                  btnTxt1="Normal Ad"
-                  btnTxt2="Trending Ad"
-                  btn1value="Normal"
-                  btn2value="Promoted"
-                  Componet1={
-                    <Text
-                      style={{
-                        marginTop: vs(10),
-                        fontSize: ms(11),
-                        color: Colors.light.textGray,
-                      }}
-                    >
-                      Post your ad for free.You can upgrade your ad to trending
-                      from your dashboard any time to make deal done more
-                      quickly
-                    </Text>
-                  }
-                  Componet2={
-                    <Text
-                      style={{
-                        marginTop: vs(10),
-                        fontSize: ms(11),
-                        color: Colors.light.textGray,
-                      }}
-                    >
-                      Post your ad for free.You can upgrade your ad to trending
-                      from your dashboard any time to make deal done more
-                      quickly
-                    </Text>
-                  }
-                  value={values.post_type}
-                  onPress={(selected) => setFieldValue("post_type", selected)}
+                <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
                 />
+                <View style={{ marginTop: vs(10) }}>
+                  <SelecteAdType
+                    title1="Select Ad "
+                    title2="Type"
+                    btnTxt1="Normal Ad"
+                    btnTxt2="Trending Ad"
+                    btn1value="Normal"
+                    btn2value="Promoted"
+                    Componet1={
+                      <Text
+                        style={{
+                          marginTop: vs(10),
+                          fontSize: ms(11),
+                          color: Colors.light.textGray,
+                        }}
+                      >
+                        Post your ad for free.You can upgrade your ad to
+                        trending from your dashboard any time to make deal done
+                        more quickly
+                      </Text>
+                    }
+                    Componet2={
+                      <Text
+                        style={{
+                          marginTop: vs(10),
+                          fontSize: ms(11),
+                          color: Colors.light.textGray,
+                        }}
+                      >
+                        Post your ad for free.You can upgrade your ad to
+                        trending from your dashboard any time to make deal done
+                        more quickly
+                      </Text>
+                    }
+                    value={values.post_type}
+                    onPress={(selected) => setFieldValue("post_type", selected)}
+                  />
                 </View>
                 <View
                   style={{
                     height: vs(1),
-                    marginVertical: vs(10),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
                     backgroundColor: Colors.light.textGray,
                     opacity: 0.2,
                   }}
