@@ -59,7 +59,7 @@ const Home = () => {
           />
        <HomeCard
             title="Sell Property"
-            onpress={() => router.navigate("/SellProperty")}
+            onpress={() => router.navigate("/(main)/PostProperty")}
           />
         </ScrollView>
       </View>

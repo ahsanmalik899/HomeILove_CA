@@ -26,13 +26,14 @@ export const FormikDropdown = ({
   return (
     <View style={{ marginTop: vs(10), zIndex: open ? 1000 : 1 }}>
       {/* Label */}
+      {title &&(
       <View className="flex-row" style={{ marginBottom: vs(10) }}>
         <Text style={styles.title}>{title}</Text>
         {required && <Text style={{ color: Colors.light.red }}> *</Text>}
         {additonalText && (
           <Text style={{ paddingLeft: hs(5) }}>{`(${additonalText})`}</Text>
         )}
-      </View>
+      </View>)}
 
       <DropDownPicker
         open={open}

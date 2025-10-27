@@ -18,6 +18,7 @@ const index = () => {
   return (
     <View className="flex-back">
       <ScrollView>
+        <View>
       <HeaderWithBack title="Buy Credits" />
       <View style={{ marginTop: vs(10), marginHorizontal: hs(20) }}>
         <Text style={{ fontWeight: 600 }}>Bundles</Text>
@@ -110,12 +111,12 @@ const index = () => {
           />
         </View>
         <View
-        className="items-center"
+        
           style={{
             marginTop:vs(10),
             elevation: 5,
             borderRadius:5,
-            width:'100%',
+           
           }}
         >
           <Text  style={{ marginTop: vs(10) }}>
@@ -125,6 +126,7 @@ const index = () => {
           <Text>$355.00</Text>
           <LargeButton text="Add Credits" handleSubmit={()=>{}}/>
         </View>
+      </View>
       </View>
       </ScrollView>
     </View>

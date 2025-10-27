@@ -1,0 +1,65 @@
+import Commercial from '@assets/icons/PostProperty/commercials.svg'
+import Farm from '@assets/icons/PostProperty/farm-land.svg'
+import Home from '@assets/icons/PostProperty/home.svg'
+import Colors from '@src/constants/Colors'
+import { hs, ms, vs } from '@utils/design/design'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RentAndSaleProps } from '../SelectRentAndSale/type'
+const index = ({value,onPress}:RentAndSaleProps) => {
+  return (
+    <View className="flex-row justify-between">
+         <TouchableOpacity className="items-center"
+           style={[value === "House" ? styles.activeButton : styles.Button]}
+           onPress={()=>onPress('House')}
+         >
+          <Home/>
+           <Text style={[value === "House" ? styles.TextActive : styles.Text]}>For Sale</Text>
+         </TouchableOpacity>
+   
+         <TouchableOpacity
+         className="items-center"
+           style={[value === "Commercial" ? styles.activeButton : styles.Button]}
+          onPress={()=>onPress('Commercial')}
+         >
+          <Commercial/>
+           <Text style={[value === "Commercial" ? styles.TextActive : styles.Text]}>Commercials</Text>
+         </TouchableOpacity>
+          <TouchableOpacity
+         className="items-center"
+           style={[value === "Farm" ? styles.activeButton : styles.Button]}
+          onPress={()=>onPress('Farm')}
+         >
+          <Farm/>
+           <Text style={[value === "Farm" ? styles.TextActive : styles.Text]}>Farm/Land</Text>
+         </TouchableOpacity>
+       </View>
+  )
+}
+
+export default index
+
+const styles = StyleSheet.create({
+    activeButton: {
+    backgroundColor: Colors.light.textGray,
+    width: hs(100),
+    paddingVertical: vs(5),
+    borderRadius:8,
+  },
+  Button: {
+    borderWidth: ms(0.5),
+    width: hs(100),
+    paddingVertical: vs(5),
+    borderColor:Colors.light.textGray,
+    borderRadius:8,
+  },
+
+  TextActive: {
+    fontWeight: 500,
+    color: Colors.light.red,
+    marginTop:vs(5)
+  },
+  Text: {
+    fontWeight: 400,
+     marginTop:vs(5)
+  },
+})

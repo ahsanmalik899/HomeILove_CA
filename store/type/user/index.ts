@@ -54,7 +54,49 @@ export interface FeedItem {
   image_1: string | null;
   dealing_areas: string | null;
 }
+export interface CreateProfileType{
+              business_name:string,
+              contact:string,
+              address:string,
+              city: string,
+              state: string,
+              zip: string,
+              user_lat: string,
+              user_lng: string,
+              web: string,
+              license_no: string,
+              lic_state: string,
+              lic_expiry: string,
+              dealing_areas:string,
+              dealing_city: string,
+              latitude: string,
+              longitude: string,
+              investor_type: string,
+              invest_in: string,
+              issuing_authority: string,
+              min_invest: string,
+              max_invest: string,
+              advisory_service: string,
+              remarks: string,
+              youtube_link: string,
+              services: string,
+              users_id: number,
+              post_type: string,
+              logo: string,
+              cover: string,
+}
+export interface CreateProfilePostType{
+  profileType:string,
+  data:CreateProfileType,
 
+}
+export interface GetMyPostsOnly{
+type:string,
+userid:number,
+page?:string,
+limit?:string
+
+}
 export interface FeedResponse {
   feed: FeedItem[];
   totalPages: number;

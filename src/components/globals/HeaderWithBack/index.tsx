@@ -5,9 +5,9 @@ import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { HeaderProps } from "./type";
-const index = ({title}:HeaderProps) => {
+const index = ({ title, header }: HeaderProps) => {
   return (
-    <View >
+    <View>
       <View
         className="flex-row justify-between items-center "
         style={{ marginTop: vs(50), marginHorizontal: hs(20) }}
@@ -15,24 +15,32 @@ const index = ({title}:HeaderProps) => {
         <TouchableOpacity onPress={() => router.back()}>
           <Back />
         </TouchableOpacity>
-        <View style={{ marginTop: vs(-20) }}>
-          <HomeLogo />
-        </View>
-        <TouchableOpacity onPress={()=>router.navigate('/CurrentAlerts')}>
+
+        {header ? (
+          <Text style={{ fontSize: ms(20), fontWeight: 600 }}>{header}</Text>
+        ) : (
+          <View style={{ marginTop: vs(-20) }}>
+            
+            <HomeLogo />
+          </View>
+        )}
+
+        <TouchableOpacity onPress={() => router.navigate("/CurrentAlerts")}>
           <NotificatioOutline />
         </TouchableOpacity>
       </View>
-      {title &&(<Text
-        style={{
-          marginTop: vs(40),
-          fontSize: ms(18),
-          fontWeight: 600,
-          marginLeft: hs(20),
-        }}
-      >
-       {title}
-      </Text>)}
-    
+      {title && (
+        <Text
+          style={{
+            marginTop: vs(40),
+            fontSize: ms(18),
+            fontWeight: 600,
+            marginLeft: hs(20),
+          }}
+        >
+          {title}
+        </Text>
+      )}
     </View>
   );
 };

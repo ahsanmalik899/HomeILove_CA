@@ -1,3 +1,4 @@
+import { useCreateProfileMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
@@ -6,12 +7,14 @@ import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
+import Loading from "@src/components/globals/Loading";
 import SelecteAdType from "@src/components/globals/TablikeButton";
 import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import {
   ScrollView,
@@ -23,6 +26,7 @@ import {
 } from "react-native";
 import * as Yup from "yup";
 interface ProfileConfig {
+  profileType: string;
   title: string;
   serviceTitle: string;
   serviceDefault: string;
@@ -33,6 +37,7 @@ interface ProfileConfig {
 }
 const index = () => {
   let dataAccordingType: ProfileConfig = {
+    profileType: "",
     title: "Profile",
     serviceTitle: "",
     serviceDefault: "",
@@ -48,6 +53,7 @@ const index = () => {
   switch (type) {
     case "Builder Profile":
       dataAccordingType = {
+        profileType: "Builder",
         title: "Builder",
         serviceTitle: "Services for",
         serviceDefault: "All type of developments",
@@ -69,6 +75,7 @@ const index = () => {
 
     case "Mortgage Profile":
       dataAccordingType = {
+        profileType: "Mortgage",
         title: "Mortgage Advisor",
         serviceTitle: "Serving as ",
         serviceDefault: "",
@@ -81,6 +88,7 @@ const index = () => {
 
     case "Decor Profile":
       dataAccordingType = {
+        profileType: "Decore",
         title: "Home Decor",
         serviceTitle: "",
         serviceDefault: "",
@@ -93,6 +101,7 @@ const index = () => {
 
     case "Plumber Profile":
       dataAccordingType = {
+        profileType: "Plumber",
         title: "Plumber",
         serviceTitle: "",
         serviceDefault: "",
@@ -105,6 +114,7 @@ const index = () => {
 
     case "Painter Profile":
       dataAccordingType = {
+        profileType: "Painter",
         title: "Painter",
         serviceTitle: "",
         serviceDefault: "",
@@ -117,6 +127,7 @@ const index = () => {
 
     case "Investor Profile":
       dataAccordingType = {
+        profileType: "Investor",
         title: "Investor",
         serviceTitle: "",
         serviceDefault: "",
@@ -129,6 +140,7 @@ const index = () => {
 
     case "Electrician Profile":
       dataAccordingType = {
+        profileType: "Electrician",
         title: "Electrician",
         serviceTitle: "",
         serviceDefault: "",
@@ -141,6 +153,7 @@ const index = () => {
 
     default:
       dataAccordingType = {
+        profileType: "Builder",
         title: "Profile",
         serviceTitle: "",
         serviceDefault: "",
@@ -151,6 +164,7 @@ const index = () => {
       };
       break;
   }
+  const [createprofile,{isLoading}] = useCreateProfileMutation();
   const ProfileSchema = Yup.object().shape({
     business_name: Yup.string()
       .min(2, "Too short!")
@@ -255,8 +269,8 @@ const index = () => {
               city: "",
               state: "",
               zip: "",
-              user_lat: "",
-              user_lng: "",
+              user_lat: 1,
+              user_lng: 1,
               web: "",
               license_no: "",
               lic_state: "",
@@ -276,11 +290,38 @@ const index = () => {
               services: dataAccordingType.serviceDefault,
               users_id: user.sweetghar_user_id,
               post_type: "Normal",
-              logo: null,
-              cover: null,
+              logo: "",
+              cover: "",
             }}
             validationSchema={ProfileSchema}
-            onSubmit={async (values) => console.log("values", values)}
+            onSubmit={async(values) => {
+              try {
+                const res = await createprofile({
+                  profileType: dataAccordingType.profileType,
+                  data: values,
+                }).unwrap();
+                console.log(res)
+                if (res?.success) {
+                  renderToastSuccess(res?.message || "Profile Created successfully");
+                 
+                  router.replace("/BusenessProfiles");
+                } else {
+                  const message =
+                    res?.data?.message ||
+                    res?.message ||
+                    (typeof err === "string" ? err : null) ||
+                    "Network error: Check your connection";
+                  renderToastError(message);
+                }
+              } catch {
+                const message =
+                  err?.data?.message ||
+                  err?.message ||
+                  (typeof err === "string" ? err : null) ||
+                  "Network error: Check your connection";
+                renderToastError(message);
+              }
+            }}
           >
             {({
               handleChange,
@@ -331,41 +372,41 @@ const index = () => {
                       required
                     />
                     <View className="flex-row justify-between">
-                      <View className="flex-1" style={{marginRight:hs(5)}}>
-                      <FormikDropdown
-                        title={"Investment amount"}
-                        placeholder={"From"}
-                        value={values.min_invest}
-                        options={[
-                          "Any",
-                          "from 1 million",
-                          "from 20 million",
-                          "from 50 million",
-                          "from 60 million",
-                        ]}
-                        onSelect={(val) => setFieldValue("min_invest", val)}
-                        touched={!!touched.min_invest}
-                        errors={!!errors.min_invest}
-                        errorText={errors.min_invest}
-                        required
-                      />
+                      <View className="flex-1" style={{ marginRight: hs(5) }}>
+                        <FormikDropdown
+                          title={"Investment amount"}
+                          placeholder={"From"}
+                          value={values.min_invest}
+                          options={[
+                            "Any",
+                            "from 1 million",
+                            "from 20 million",
+                            "from 50 million",
+                            "from 60 million",
+                          ]}
+                          onSelect={(val) => setFieldValue("min_invest", val)}
+                          touched={!!touched.min_invest}
+                          errors={!!errors.min_invest}
+                          errorText={errors.min_invest}
+                          required
+                        />
                       </View>
-                      <View className="flex-1" style={{marginLeft:hs(5)}}>
-                      <FormikDropdown
-                        title={""}
-                        placeholder={"To"}
-                        value={values.max_invest}
-                        options={[
-                          "upto 1 million",
-                          "upto 20 million",
-                          "upto 50 million",
-                          "upto 60 million",
-                        ]}
-                        onSelect={(val) => setFieldValue("max_invest", val)}
-                        touched={!!touched.max_invest}
-                        errors={!!errors.max_invest}
-                        errorText={errors.max_invest}
-                      />
+                      <View className="flex-1" style={{ marginLeft: hs(5) }}>
+                        <FormikDropdown
+                          title={""}
+                          placeholder={"To"}
+                          value={values.max_invest}
+                          options={[
+                            "upto 1 million",
+                            "upto 20 million",
+                            "upto 50 million",
+                            "upto 60 million",
+                          ]}
+                          onSelect={(val) => setFieldValue("max_invest", val)}
+                          touched={!!touched.max_invest}
+                          errors={!!errors.max_invest}
+                          errorText={errors.max_invest}
+                        />
                       </View>
                     </View>
                   </>
@@ -433,13 +474,13 @@ const index = () => {
                     <FormikInput
                       title="City"
                       placeholder="Enter Location"
-                      onChangeText={handleChange("state")}
-                      onBlur={handleBlur("state")}
-                      value={values.state}
-                      touched={!!touched.state}
-                      errors={!!errors.state}
+                      onChangeText={handleChange("city")}
+                      onBlur={handleBlur("city")}
+                      value={values.city}
+                      touched={!!touched.city}
+                      errors={!!errors.city}
                       required
-                      errorText={errors.state}
+                      errorText={errors.city}
                     />
                   </View>
 
@@ -739,6 +780,7 @@ const index = () => {
           </Formik>
         </View>
       </ScrollView>
+      <Loading isLoading={isLoading} text={`Creating ${type}....`}/>
     </View>
   );
 };

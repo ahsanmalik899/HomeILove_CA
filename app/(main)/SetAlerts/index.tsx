@@ -14,7 +14,7 @@ const index = () => {
          Svg={AddAlerts}
          type=''
          text='Add New Alerts'
-         onPress={()=>{}}
+         onPress={()=>{router.navigate('/AddNewAlerts')}}
          />
             <SideBarCard
          Svg={Currentalerts}

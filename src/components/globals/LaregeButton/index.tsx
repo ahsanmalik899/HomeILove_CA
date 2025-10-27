@@ -8,7 +8,7 @@ interface ButtonProps {
 }
 const LargeButton = ({ handleSubmit, text }: ButtonProps) => {
   return (
-    <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+    <TouchableOpacity  style={styles.button} onPress={() => handleSubmit()}>
       <Text style={styles.buttonText}>{text}</Text>
     </TouchableOpacity>
   );
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 8,
     alignItems: 'center',
-    marginVertical: vs(15),
+  
   },
   buttonText: {
     color: '#fff',

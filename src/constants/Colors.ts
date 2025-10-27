@@ -6,6 +6,7 @@ export default {
     text: '#000',
     textYellow: '#FFF7C6',
     textGray: '#636362',
+    cardgreenLight:'#006A7021',
     background: '#20201F',
     tint: tintColorLight,
     red: '#BF0A30',
