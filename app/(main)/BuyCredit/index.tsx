@@ -1,3 +1,7 @@
+import PayLater from "@assets/SideBar/pay-later.svg";
+import Paypal from "@assets/SideBar/paypal-icon.svg";
+import PowerdByPayPal from "@assets/SideBar/Powered by PayPal.svg";
+import Volit from '@assets/SideBar/volit-white.svg';
 import { MaterialIcons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
@@ -16,118 +20,138 @@ const index = () => {
   ];
   const [adType, setAdtype] = useState("");
   return (
-    <View className="flex-back">
+    <View className="flex-1 bg-white">
       <ScrollView>
         <View>
-      <HeaderWithBack title="Buy Credits" />
-      <View style={{ marginTop: vs(10), marginHorizontal: hs(20) }}>
-        <Text style={{ fontWeight: 600 }}>Bundles</Text>
-        <Text style={{ fontSize: ms(20), fontWeight: 600 }}>
-          Have more
-          <Text style={{color:Colors.light.red}}> PROPERTIES & BUSINESS </Text>
-          to market?
-        </Text>
-        <View>
-          <Text style={styles.text}>
-            If you are looking to advertise more ads or boost your business?
-            Then buy bundles to get extra discounts.
-          </Text>
-          <Text style={styles.text}>
-            Simply select the bundle that best suits your financial & marketing
-            needs and get extra discounts.
-          </Text>
-          <Text style={styles.text}>
-            No time limits to consume credit balance means use it when you need
-            it.
-          </Text>
-          <TouchableOpacity style={{ marginVertical: vs(20) }}>
-            <Text style={{ color: Colors.light.DarkGreen, fontWeight: 600 }}>
-              One place to boost your businesss
+          <HeaderWithBack title="Buy Credits" />
+          <View style={{ marginTop: vs(10), marginHorizontal: hs(20) }}>
+            <Text style={{ fontWeight: 600 }}>Bundles</Text>
+            <Text style={{ fontSize: ms(20), fontWeight: 600 }}>
+              Have more
+              <Text style={{ color: Colors.light.red }}>
+                {" "}
+                PROPERTIES & BUSINESS{" "}
+              </Text>
+              to market?
             </Text>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            borderLeftWidth: 1,
-            borderBottomWidth: 1,
-            borderRightWidth: 1,
-            borderColor: Colors.light.textGray,
-            borderRadius: ms(5),
-          }}
-        >
-          <LegendList
-            data={bundlesData}
-            keyExtractor={(item) => item.id}
-            estimatedItemSize={50}
-            ListHeaderComponent={
-              <View
-                className="flex-row justify-between items-center"
-                style={{
-                  borderTopWidth: 1,
-                  borderBottomWidth: 1,
-                  borderColor: Colors.light.textGray,
-                  borderRadius: ms(5),
-                  paddingHorizontal: hs(10),
-                  paddingVertical: vs(10),
-                }}
-              >
-                <Text>Bundles</Text>
-                <Text>{"  "}Bundle price</Text>
-                <Text>{"  "}Amount you get</Text>
-              </View>
-            }
-            renderItem={({ item }) => (
-              <View
-                className="flex-row justify-between items-center"
-                style={{
-                  paddingHorizontal: hs(10),
-                  paddingVertical: vs(10),
-                }}
-              >
-                <View className="flex-row items-center ">
-                  <TouchableOpacity
-                    onPress={() =>
-                      setAdtype(adType === item.type ? "" : item.type)
-                    }
-                  >
-                    <MaterialIcons
-                      size={18}
-                      color={Colors.light.DarkGreen}
-                      name={
-                        adType === item.type
-                          ? "check-box"
-                          : "check-box-outline-blank"
-                      }
-                    />
-                  </TouchableOpacity>
-                  <Text style={{ marginLeft: hs(10) }}>{item.type}</Text>
-                </View>
-                <Text>
-                  {item.price}
+            <View>
+              <Text style={styles.text}>
+                If you are looking to advertise more ads or boost your business?
+                Then buy bundles to get extra discounts.
+              </Text>
+              <Text style={styles.text}>
+                Simply select the bundle that best suits your financial &
+                marketing needs and get extra discounts.
+              </Text>
+              <Text style={styles.text}>
+                No time limits to consume credit balance means use it when you
+                need it.
+              </Text>
+              <TouchableOpacity style={{ marginVertical: vs(20) }}>
+                <Text
+                  style={{ color: Colors.light.DarkGreen, fontWeight: 600 }}
+                >
+                  One place to boost your businesss
                 </Text>
-                <Text>{item.amount}</Text>
-              </View>
-            )}
-          />
-        </View>
-        <View
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                borderLeftWidth: 1,
+                borderBottomWidth: 1,
+                borderRightWidth: 1,
+                borderColor: Colors.light.textGray,
+                borderRadius: ms(5),
+              }}
+            >
+              <LegendList
+                data={bundlesData}
+                keyExtractor={(item) => item.id}
+                estimatedItemSize={50}
+                ListHeaderComponent={
+                  <View
+                    className="flex-row justify-between items-center"
+                    style={{
+                      borderTopWidth: 1,
+                      borderBottomWidth: 1,
+                      borderColor: Colors.light.textGray,
+                      borderRadius: ms(5),
+                      paddingHorizontal: hs(10),
+                      paddingVertical: vs(10),
+                    }}
+                  >
+                    <Text>Bundles</Text>
+                    <Text>{"  "}Bundle price</Text>
+                    <Text>{"  "}Amount you get</Text>
+                  </View>
+                }
+                renderItem={({ item }) => (
+                  <View
+                    className="flex-row justify-between items-center"
+                    style={{
+                      paddingHorizontal: hs(10),
+                      paddingVertical: vs(10),
+                    }}
+                  >
+                    <View className="flex-row items-center ">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setAdtype(adType === item.type ? "" : item.type)
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            adType === item.type
+                              ? "check-box"
+                              : "check-box-outline-blank"
+                          }
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(10) }}>{item.type}</Text>
+                    </View>
+                    <Text>{item.price}</Text>
+                    <Text>{item.amount}</Text>
+                  </View>
+                )}
+              />
+            </View>
+          </View>
+         
+    <View style={styles.card}>
+      <Text style={styles.title}>Your Homeilove Account Balance</Text>
+
+ 
+        <Text style={styles.amountLabel}>Amount</Text>
+        <Text style={styles.amountValue}>$355.00</Text>
+     
+
+      <LargeButton text="Add Credits" handleSubmit={() => {}} />
+
+      <View style={styles.paymentOptions}>
+        <TouchableOpacity style={[styles.paymentButton, { backgroundColor: Colors.light.Yellow }]}>
+          <View className="mt-2">
+             <Paypal />
+          </View>
+         
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.paymentButton, { backgroundColor:Colors.light.Yellow}]}>
+          <PayLater />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.paymentButton, { backgroundColor: "#2C2C2C" }]}>
+          <Volit  />
+          <Text style={styles.paymentText}>Debit or Credit Card</Text>
+        </TouchableOpacity>
         
-          style={{
-            marginTop:vs(10),
-            elevation: 5,
-            borderRadius:5,
-           
-          }}
-        >
-          <Text  style={{ marginTop: vs(10) }}>
-            Your Homeilove account balance
-          </Text>
-          <Text>Amount</Text>
-          <Text>$355.00</Text>
-          <LargeButton text="Add Credits" handleSubmit={()=>{}}/>
+      </View>
+      <View className="self-center mt-4">
+      <PowerdByPayPal/>
+      </View>
+    </View>
         </View>
-      </View>
-      </View>
       </ScrollView>
     </View>
   );
@@ -138,5 +162,57 @@ export default index;
 const styles = StyleSheet.create({
   text: {
     marginTop: vs(20),
+  },
+   card: {
+    marginVertical: vs(20),
+    marginHorizontal: hs(15),
+    backgroundColor: 'white',
+    borderRadius: ms(8),
+    elevation: 5,
+    paddingVertical: vs(10),
+    paddingHorizontal: hs(15),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+  },
+  title: {
+    fontSize: ms(14),
+    textAlign: "center",
+    fontWeight:'500',
+    marginBottom: vs(15),
+  },
+
+  amountLabel: {
+    fontSize: ms(16),
+    fontWeight: "600",
+     marginBottom: vs(5),
+    color: Colors.light.text,
+  },
+  amountValue: {
+    marginTop: vs(5),
+    paddingVertical: vs(10),
+    paddingHorizontal: hs(10),
+    backgroundColor: Colors.light.LightGreen,
+    borderRadius: ms(10), 
+    marginBottom:vs(20),   
+    color:Colors.light.DarkGreen
+  },
+  paymentOptions: {
+    marginTop: vs(30),
+  },
+  paymentButton: {
+    flexDirection: "row",
+    borderRadius: ms(8),
+    alignItems:'center',
+    justifyContent:'center',
+    height:vs(40),
+    marginBottom: vs(10),
+  },
+  paymentText: {
+    color: "white",
+    fontSize: ms(14),
+    fontWeight: "600",
+    marginLeft: hs(8),
   },
 });

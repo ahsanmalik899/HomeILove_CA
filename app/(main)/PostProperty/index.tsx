@@ -384,6 +384,26 @@ const index = () => {
                       errorText={errors.land_area}
                     />
                   </View>
+                     <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
+                />  
+                <Text></Text>
+                
+                 <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
+                />
                   
               </>
             )}

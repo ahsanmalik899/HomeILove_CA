@@ -13,6 +13,7 @@ export default {
     tabIconDefault: '#ccc',
     DarkGreen: '#006A70',
     LightGreen: '#006A7021',
+    Yellow:'#FFC439',
     tabIconSelected: tintColorLight,
     backgroundcolor: '#A1E4E4',
     circleblue: '#012868',

@@ -5,14 +5,14 @@ import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { HeaderProps } from "./type";
-const index = ({ title, header }: HeaderProps) => {
+const index = ({ title, header,onBackpress }: HeaderProps) => {
   return (
     <View>
       <View
         className="flex-row justify-between items-center "
         style={{ marginTop: vs(50), marginHorizontal: hs(20) }}
       >
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => onBackpress|| router.back()}>
           <Back />
         </TouchableOpacity>
 
