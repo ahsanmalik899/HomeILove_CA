@@ -1,5 +1,4 @@
 import { userdata } from "@/store/slices/selector/user";
-
 import Image from "@assets/test/test.jpeg";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HomeCard from "@src/components/globals/HomeCard";
@@ -9,12 +8,11 @@ import { ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-const Home = () => {
+const Account = () => {
   const user = useAppSelector(userdata);
   return (
     <View className="flex-1 bg-white">
-     
-      <View style={{ marginTop: vs(10) }} className="items-center">
+      <View style={{ marginTop: vs(20) }} className="items-center">
         <CircleImage source={Image} Size={70} />
         <Text
           style={{
@@ -26,47 +24,51 @@ const Home = () => {
         >
           {user.name}
         </Text>
-        <Text style={{ marginTop: vs(5), color: Colors.light.textGray }}>
-          Let’s find your perfect home today
-        </Text>
+       
       </View>
       <View>
-        <ScrollView style={{ paddingTop: vs(10) }}>
+        <ScrollView style={{ paddingTop: vs(45) }}>
           <HomeCard
-            title="Buy"
-            onpress={() => router.navigate("/Buy")}
-          />
-          <HomeCard
-            title="Rent"
-            onpress={() => router.navigate("/Rent")}
+            title="Business Profiles"
+            onpress={() => router.navigate("/(main)/BusenessProfiles")}
           />
           <HomeCard
-            title="New Home"
-            onpress={() => router.navigate("/NewHome")}
+            title="Your Ads"
+            onpress={() => router.navigate("/(main)/YouAds")}
+          />
+
+          <HomeCard
+            title="Inquiries"
+            onpress={() => router.navigate("/(main)/Inquires")}
           />
           <HomeCard
-            title="Home Value"
-            onpress={() => router.navigate("/HomeValue")}
+            title="Buy Credit"
+            onpress={() => router.navigate("/BuyCredit")}
           />
-        
+
           <HomeCard
-            title="Get Help"
-            onpress={() => router.navigate("/GetHelp")}
+            title="Advertise"
+            onpress={() => router.navigate("/Advertise")}
           />
           <HomeCard
-            title="Home Romance"
-            onpress={() => router.navigate("/HomeRomance")}
+            title="Your Promotions"
+            onpress={() => router.navigate("/YourPromotions")}
           />
-       <HomeCard
-            title="Sell Property"
-            onpress={() => router.navigate("/(main)/PostProperty")}
+          <HomeCard
+            title="Set Alerts"
+            onpress={() => router.navigate("/SetAlerts")}
           />
+          <HomeCard
+            title="Reviews"
+            onpress={() => router.navigate("/Reviews")}
+          />
+         
         </ScrollView>
       </View>
     </View>
   );
 };
 
-export default Home;
+export default Account;
 
 const styles = StyleSheet.create({});

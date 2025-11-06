@@ -1,17 +1,16 @@
 /* eslint-disable import/order */
 /* eslint-disable no-param-reassign */
-import { siginresponce } from '@/store/type/user';
+import { SignInResponse } from '@/store/type/user';
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState: siginresponce = {
-  sweetghar_user_id: 0,
-  name: '',
-  email: '',
-  mobile: '',
-  city: '',
-  user_type: '',
-  logo: '',
-  status: '',
+const initialState: SignInResponse = {
+        id:0,
+        email: "",
+        user_type: "",
+        name: "",
+        mobile: "",
+        logo: "",
+        status: ""
 };
 
 const userdataSclice = createSlice({

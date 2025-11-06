@@ -1,6 +1,7 @@
 
 export type TabLikeButtonProps={
-
+    title1?:string,
+    title2?:string,
     btnTxt1:string, 
     btnTxt2:string,
      btnTxt3?:string,

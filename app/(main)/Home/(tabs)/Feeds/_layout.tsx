@@ -1,24 +1,15 @@
-import Back from '@assets/icons/BackArrow.svg';
-import Notoficatns from "@assets/icons/Notofication.svg";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap } from "@react-navigation/material-top-tabs";
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { withLayoutContext } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 const {Navigator}= createMaterialTopTabNavigator()
 export const MateralTopTabs= withLayoutContext<MaterialTopTabNavigationEventMap, typeof Navigator,TabNavigationState<ParamListBase>,MaterialTopTabNavigationEventMap>(Navigator)
 const _layout = () => {
     
   return (
     <View style={styles.container}>
-      <View className='flex-row justify-between' style={styles.topbar}>
-        <TouchableOpacity> <Back/></TouchableOpacity>
-       
-        <Text style={styles.topBarText}>Feed</Text>
-        <TouchableOpacity> <Notoficatns/></TouchableOpacity>
-       
-      </View>
        <MateralTopTabs
      screenOptions={({ route }) => ({
       lazy:true,

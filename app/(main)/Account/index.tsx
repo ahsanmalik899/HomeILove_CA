@@ -12,8 +12,8 @@ import { Formik } from "formik";
 import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
-const Account = () => {
-  const user = useAppSelector(userdata);
+const index = () => {
+      const user = useAppSelector(userdata);
   const profileschemea = Yup.object().shape({
     name: Yup.string().min(2, "Too Short!").required("Name is required"),
     mobile: Yup.string()
@@ -32,7 +32,7 @@ const Account = () => {
       .required("Please re-enter new password"),
   });
   return (
-    <View className="bg-white flex-1">
+     <View className="bg-white flex-1">
       <ScrollView>
         <HeaderWithBack title="Account Profile" />
         <View style={{ marginHorizontal: hs(20), marginTop: vs(10), paddingBottom:vs(70)}}>
@@ -167,9 +167,9 @@ const Account = () => {
         </View>
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
-export default Account;
+export default index
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({})

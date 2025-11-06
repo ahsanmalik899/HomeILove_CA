@@ -1,10 +1,17 @@
 import Map from "@assets/icons/PostProperty/map.svg";
+import PayLater from "@assets/SideBar/pay-later.svg";
+import Paypal from "@assets/SideBar/paypal-icon.svg";
+import PowerdByPayPal from "@assets/SideBar/Powered by PayPal.svg";
+import Volit from "@assets/SideBar/volit-white.svg";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import LargeButton from "@src/components/globals/LaregeButton";
 import PropertyType from "@src/components/globals/PropertyType";
+import RadioButton from "@src/components/globals/RadioButton";
 import SelectRentAndSale from "@src/components/globals/SelectRentAndSale";
+import SelecteAdType from "@src/components/globals/TablikeButton";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { Formik } from "formik";
@@ -28,11 +35,12 @@ const index = () => {
     bedrooms: Yup.string().required("Bedrooms field is required"),
     bathrooms: Yup.string().required("Bathrooms field is required"),
     property_details: Yup.string().required("Property details are required"),
+    advatize_time: Yup.string(),
   });
   return (
     <ScrollView className="bg-white flex-1">
       <HeaderWithBack header="Sell Property" />
-      <View style={{ marginHorizontal: hs(10), marginTop: vs(20) }}>
+      <View style={{ marginHorizontal: hs(10), marginVertical: vs(20) }}>
         <Text style={{ fontWeight: 600, fontSize: ms(15) }}>
           Great! In simple steps
           <Text style={{ color: Colors.light.red }}> ADVERTISE </Text>
@@ -51,7 +59,7 @@ const index = () => {
           <Formik
             initialValues={{
               property_for: "",
-              sale_type: "",
+              sale_type: "Normal",
               property_type: "",
               property_sub_type: "",
               address: "",
@@ -87,6 +95,7 @@ const index = () => {
               user_id: 0,
               user_type: "",
               payment_method: "",
+              advatize_time: "",
               ad_life: "",
               post_created_date: "",
               post_updated_date: "",
@@ -367,35 +376,26 @@ const index = () => {
                       errorText={errors.land_area}
                     />
                   </View>
-                 
                 </View>
-                 <View>
-                    <Text>Add main features</Text>
-                    <Text>{`(Type property feature and hit + sign. To add more features repeat process)`}</Text>
-                    <FormikInput
-                      title=""
-                      placeholder="e.g Garden, Parking, Pool etc"
-                      onChangeText={handleChange("land_area")}
-                      onBlur={handleBlur("land_area")}
-                      value={values.land_area}
-                      touched={!!touched.land_area}
-                      errors={!!errors.land_area}
-                      required={false}
-                      errorText={errors.land_area}
-                    />
-                  </View>
-                     <View
-                  style={{
-                    height: vs(1),
-                    marginTop: vs(20),
-                    marginBottom: vs(10),
-                    backgroundColor: Colors.light.textGray,
-                    opacity: 0.2,
-                  }}
-                />  
-                <Text></Text>
-                
-                 <View
+                <View>
+                  <Text>Add main features</Text>
+                  <Text>
+                    (Type property feature and hit + sign. To add more features
+                    repeat process)
+                  </Text>
+                  <FormikInput
+                    title=""
+                    placeholder="e.g Garden, Parking, Pool etc"
+                    onChangeText={handleChange("land_area")}
+                    onBlur={handleBlur("land_area")}
+                    value={values.land_area}
+                    touched={!!touched.land_area}
+                    errors={!!errors.land_area}
+                    required={false}
+                    errorText={errors.land_area}
+                  />
+                </View>
+                <View
                   style={{
                     height: vs(1),
                     marginTop: vs(20),
@@ -404,7 +404,181 @@ const index = () => {
                     opacity: 0.2,
                   }}
                 />
-                  
+                <Text className="font-bold">Advertise as</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setFieldValue(
+                      "ad_by",
+                      values.ad_by === "Agent" ? "" : "Agent"
+                    );
+                  }}
+                >
+                  <View className="flex-row mt-4 items-center">
+                    <MaterialIcons
+                      size={18}
+                      color={Colors.light.DarkGreen}
+                      name={
+                        values.ad_by === "Agent"
+                          ? "check-box"
+                          : "check-box-outline-blank"
+                      }
+                    />
+                    <Text style={{ marginLeft: hs(5), fontWeight: "500" }}>
+                      Agent
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
+                />
+                <SelecteAdType
+                  title1="Select Ad Type"
+                  title2=""
+                  btnTxt1="Free Ad"
+                  btnTxt2="Trending Ad"
+                  btn1value="Normal"
+                  btn2value="Trending"
+              
+                  Componet1={
+                    <Text
+                      style={{
+                        marginTop: vs(10),
+                        color: Colors.light.textGray,
+                      }}
+                    >
+                      Post your ad for free.You can upgrade your ad to trending
+                      from your dashboard any time to make deal done more
+                      quickly
+                    </Text>
+                  }
+                  Componet2={
+                    <View>
+                      <View className="flex-row justify-between items-center mt-4">
+                        <RadioButton
+                          onPress={(value) =>
+                            setFieldValue("advatize_time", value)
+                          }
+                          checkedValue="15 Days"
+                          text="For 15 days"
+                          value={values.advatize_time}
+                        />
+                        <Text>$50</Text>
+                      </View>
+                      <View className="flex-row justify-between items-center">
+                        <RadioButton
+                          onPress={(value) =>
+                            setFieldValue("advatize_time", value)
+                          }
+                          checkedValue="30 Days"
+                          text="For 30 days"
+                          value={values.advatize_time}
+                        />
+                        <Text>$100</Text>
+                      </View>
+                      <View className="flex-row justify-between items-center">
+                        <RadioButton
+                          onPress={(value) =>
+                            setFieldValue("advatize_time", value)
+                          }
+                          checkedValue="60 Days"
+                          text="For 60 days"
+                          value={values.advatize_time}
+                        />
+                        <Text>$150</Text>
+                      </View>
+                      <View
+                        style={{
+                          height: vs(1),
+                          marginTop: vs(20),
+                          marginBottom: vs(10),
+                          backgroundColor: Colors.light.textGray,
+                          opacity: 0.2,
+                        }}
+                      />
+                      <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+                        Select your payment method
+                      </Text>
+                      <View style={styles.card} className="items-center">
+                        <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+                          Your Homeilove account balance
+                        </Text>
+                        <Text
+                          style={{ marginVertical:vs(10),color: Colors.light.red, fontSize: ms(15),fontWeight:'600' }}
+                        >
+                          $ 0
+                        </Text>
+                        <Text className="text-center" style={{color:Colors.light.textGray}}>
+                          Have more ads to post then buy bundle and get extra
+                          discount. You’ can use credit any time means no
+                          expiry!
+                        </Text>
+                        <View>
+                          
+                        </View>
+                      </View>
+                      <View>
+                        <View style={styles.card}>
+                          <Text style={styles.title}>
+                            Your Homeilove account Balance
+                          </Text>
+
+                          <LargeButton
+                            text="Add Credits"
+                            handleSubmit={() => {}}
+                          />
+
+                          <View style={styles.paymentOptions}>
+                            <TouchableOpacity
+                              style={[
+                                styles.paymentButton,
+                                { backgroundColor: Colors.light.Yellow },
+                              ]}
+                            >
+                              <View className="mt-2">
+                                <Paypal />
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              style={[
+                                styles.paymentButton,
+                                { backgroundColor: Colors.light.Yellow },
+                              ]}
+                            >
+                              <PayLater />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              style={[
+                                styles.paymentButton,
+                                { backgroundColor: "#2C2C2C" },
+                              ]}
+                            >
+                              <Volit />
+                              <Text style={styles.paymentText}>
+                                Debit or Credit Card
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View className="self-center mt-4">
+                            <PowerdByPayPal />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  }
+                  value={values.sale_type}
+                  onPress={(selected) => setFieldValue("sale_type", selected)}
+                />
+                <View className="my-4">
+                <LargeButton handleSubmit={()=>{}} text="Submit Ad"/>
+                  </View>
               </>
             )}
           </Formik>
@@ -416,4 +590,41 @@ const index = () => {
 
 export default index;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  card: {
+    marginVertical: vs(20),
+    backgroundColor: "white",
+    borderRadius: ms(8),
+    elevation: 5,
+    paddingVertical: vs(10),
+    paddingHorizontal: hs(15),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+  },
+  title: {
+    fontSize: ms(14),
+    textAlign: "center",
+    fontWeight: "500",
+    marginBottom: vs(15),
+  },
+
+  paymentOptions: {
+    marginTop: vs(30),
+  },
+  paymentButton: {
+    flexDirection: "row",
+    borderRadius: ms(8),
+    alignItems: "center",
+    justifyContent: "center",
+    height: vs(40),
+    marginBottom: vs(10),
+  },
+  paymentText: {
+    color: "white",
+    fontSize: ms(14),
+    fontWeight: "600",
+    marginLeft: hs(8),
+  },
+});

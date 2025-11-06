@@ -7,16 +7,16 @@ export interface signuppost {
   logo: string;
   status: string;
 }
-export interface siginresponce {
-  sweetghar_user_id: number;
-  name: string;
+export interface SignInResponse {
+  id: number;
   email: string;
-  mobile: string;
-  city: string;
   user_type: string;
-  logo: string;
-  status: string;
+  name: string;
+  mobile?: string;
+  logo?: string;
+  status:  string;
 }
+
 export interface siginpost {
   email: string;
   password: string;

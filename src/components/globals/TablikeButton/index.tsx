@@ -9,6 +9,8 @@ const index = ({
   btnTxt1,
   btnTxt2,
   btnTxt3,
+  title1,
+  title2,
   btn1value,
   btn2value,
   btn3value,
@@ -20,6 +22,12 @@ const index = ({
 }:TabLikeButtonProps) => {
   return (
     <View className=" bg-white" >
+          {title1 &&(
+            <Text style={{ fontSize: ms(14), fontWeight: 600 }}>
+        {title1}
+        <Text style={{ color: Colors.light.red }}>{title2}</Text>
+      </Text>
+          )}  
       <View className="flex-row justify-between" style={{ marginTop: vs(10),gap:hs(10) }}>
         <TouchableOpacity
           style={[styles.btn, value === btn1value && styles.btnselected,{flex:1}]}

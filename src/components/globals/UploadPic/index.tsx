@@ -14,7 +14,7 @@ const index = ({
 }: UploadPic) => {
   return (
     <View style={{marginBottom:vs(20)}}>
-      <View className="flex-row">
+      <View className="flex-row ">
       <Text style={{ fontSize: ms(15), fontWeight: 600 }}>
         {text1}
         <Text style={{ color: Colors.light.red }}>{text2}</Text>

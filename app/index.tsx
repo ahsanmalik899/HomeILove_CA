@@ -105,7 +105,7 @@ const Index = () => {
       withTiming(SCREEN_WIDTH / 2 - 700, { duration: 2000 }),
     );
     const timeout = setTimeout(() => {
-      if (user.sweetghar_user_id) {
+      if (user.id) {
         router.replace('/(main)/Home');
       } else if (isOnboarding.isOnboarding) {
         router.replace('/(auth)/signin');

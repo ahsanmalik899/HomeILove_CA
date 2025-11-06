@@ -3,14 +3,14 @@ import {
   changepassword,
   resetpass,
   siginpost,
-  siginresponce,
+  SignInResponse,
   signuppost,
   verifyuser,
 } from '@store/type/user/index';
 
 export const Authapi = createApi({
   reducerPath: 'Authapi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.1.11:3000/api/users/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://homeilove.us/api/' }),
   endpoints: builder => ({
     Signup: builder.mutation<unknown, signuppost>({
       query: userdata => ({
@@ -26,10 +26,14 @@ export const Authapi = createApi({
         body: email,
       }),
     }),
-    Signin: builder.mutation<siginresponce, siginpost>({
+    Signin: builder.mutation<SignInResponse, siginpost>({
       query: userdata => ({
-        url: 'signin/',
+        url: 'signin',
         method: 'POST',
+          headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
         body: userdata,
       }),
     }),

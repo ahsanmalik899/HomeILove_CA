@@ -1,59 +1,94 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Drawer } from "@/layouts/drawer";
+import HomeLogo from "@assets/Home/homeliogo.svg";
+import NotificatioOutline from "@assets/Home/notificationOutline.svg";
+import SidebarIcon from "@assets/Home/sideMenueIcon.svg";
+import Connection from "@assets/icons/bottom-tabs/connectio_icon.svg";
+import { MaterialIcons } from "@expo/vector-icons";
+import SideBarUser from "@src/components/globals/SideBarUser";
 import Colors from "@src/constants/Colors";
-import { hs, ms, vs } from "@utils/design/design";
-import { Tabs } from "expo-router";
-import { Platform } from "react-native";
-
+import { hs, vs } from "@utils/design/design";
+import { router } from "expo-router";
+import { TouchableOpacity, View } from "react-native";
 const _layout = () => {
   return (
-    <Tabs
+      <Drawer
       screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor:Colors.light.DarkGreen,
-        tabBarInactiveTintColor:Colors.light.LightGreen,
-        tabBarStyle: {
-          position: "absolute",
-          bottom: Platform.OS === "ios" ? vs(15) : vs(10),
-          elevation: 10,
-          backgroundColor: "white",
-          borderRadius: ms(50),
-          height: vs(60),
-          marginHorizontal:hs(10),
-          alignItems:'center',
-          paddingTop:vs(5)
+        header: ({ navigation }) => (
+         <View
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: vs(45),
+    paddingHorizontal: hs(20),
+    backgroundColor: "#fff",
+    paddingVertical: vs(10),
+  }}
+>
+  {/* Left section */}
+  <View style={{ flex: 1, alignItems: "flex-start" }}>
+    <TouchableOpacity onPress={() => navigation.openDrawer()}>
+      <SidebarIcon />
+    </TouchableOpacity>
+  </View>
+
+  {/* Center section */}
+  <View style={{ flex: 1, alignItems: "center" }}>
+    <View style={{ marginTop: vs(-10) }}>
+      <HomeLogo />
+    </View>
+  </View>
+
+  {/* Right section */}
+  <View
+    style={{
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+    }}
+  >
+    <TouchableOpacity
+      style={{ marginRight: hs(10) }}
+      onPress={() => router.navigate("/CurrentAlerts")}
+    >
+      <Connection />
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => router.navigate("/CurrentAlerts")}>
+      <NotificatioOutline />
+    </TouchableOpacity>
+  </View>
+</View>
+
+        ),
+
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: "#fff", 
+        },
+        drawerActiveTintColor: Colors.light.DarkGreen,
+        drawerInactiveTintColor: "gray",
+        drawerType: "slide",
+        drawerStyle: {
+          backgroundColor: "#fff",
+         width:hs(200) 
+
 
         },
-        
-       
       }}
+       drawerContent={(props) => <SideBarUser/>}
     >
-      <Tabs.Screen
-        name="HomeInner"
-        
+        <Drawer.Screen
+        name="(tabs)"
         options={{
-          
-          tabBarIcon: ({ color, size }) => (
+          title: "Home",
+          drawerIcon: ({ color, size }) => (
             <MaterialIcons name="home-filled" size={size} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
-        name="Message"
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubble" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="Account"
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="person" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+   
+    </Drawer>
   );
 };
 
