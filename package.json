@@ -73,6 +73,7 @@
     "redux": "^4.2.0",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^3.1.0",
+    "yarn": "^1.22.22",
     "yup": "^1.6.1"
   },
   "devDependencies": {
