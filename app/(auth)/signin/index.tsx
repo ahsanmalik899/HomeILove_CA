@@ -9,9 +9,6 @@ import { useSigninMutation } from '@/store/api/user/Authapi';
 import { setusedata } from '@/store/slices/user';
 import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signinicon/Background.png';
-import Google from '@assets/signinicon/Google logo.svg';
-import Appple from '@assets/signinicon/apple.svg';
-import Facebook from '@assets/signinicon/facbook.svg';
 import { Ionicons } from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
 import LargeButton from '@src/components/globals/LaregeButton';
@@ -141,17 +138,7 @@ export default function SignInScreen() {
                     <View style={styles.line} />
                   </View>
 
-                  <View style={styles.socialIcons}>
-                    <TouchableOpacity>
-                      <Google />
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                      <Facebook />
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                      <Appple />
-                    </TouchableOpacity>
-                  </View>
+                 
 
                   <View style={styles.registerContainer}>
                     <Text style={styles.loginTextBlack}>
@@ -175,13 +162,15 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
+  
   },
   topSection: {
-    flex: 0.25,
+    
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: vs(50),
-    marginBottom: vs(60),
+    flex:1,
+    
   },
   logoContainer: {
     alignItems: 'center',

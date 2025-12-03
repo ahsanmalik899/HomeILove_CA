@@ -11,7 +11,7 @@ const NewsFeedPreference = () => {
         BtnText="Continue"
         Heading="For Property"
         Svg={Community}
-        OnSubmit={() => router.navigate("/(auth)/forgot")}
+        OnSubmit={() => router.navigate("/(main)/SetPrefrence")}
       />
       </View>
       <View className="mt-2 ml-2 mr-2">
@@ -19,7 +19,7 @@ const NewsFeedPreference = () => {
         BtnText="Continue"
         Heading="For Community"
         Svg={Property}
-        OnSubmit={() => router.navigate("/(auth)/forgot")}
+        OnSubmit={() => router.navigate("/(main)/SetPrefrence")}
       />
       </View>
     </View>

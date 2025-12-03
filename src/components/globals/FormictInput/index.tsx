@@ -18,7 +18,7 @@ export const FormikInput = ({
 }: FormikInputProps) => (
   <View style={{ marginTop: vs(10) }}>
     <View className="flex-row" style={{ marginBottom: vs(10) }}>
-      <Text style={styles.title}>{title}</Text>
+      {title && <Text style={styles.title}>{title}</Text>}
       {required && (
         <Text
           style={{
@@ -52,7 +52,7 @@ export const FormikInput = ({
         placeholderTextColor={Colors.light.DarkGreen}
         style={[
           multiline ? styles.inputdes : styles.input,
-          
+
           { color: Colors.light.DarkGreen },
         ]}
       />

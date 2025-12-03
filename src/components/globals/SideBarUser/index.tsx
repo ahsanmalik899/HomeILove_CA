@@ -1,7 +1,7 @@
 import SidebarLogo from '@assets/SideBar/sideBarLogo.svg'
 import { hs, ms, vs } from '@utils/design/design'
 import { router } from 'expo-router'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import SideBarButtons from '../SideBarButtons'
 const index = () => {
   return (
@@ -34,7 +34,7 @@ const index = () => {
         </View>
          <View style={{marginTop:vs(5)}}>
     <SideBarButtons text="Sell Property"
-                onPress={() => router.navigate("/(main)/PostProperty")}/>
+                onPress={() => router.navigate("/(main)/SellProperty")}/>
         </View>
          <View style={{marginTop:vs(5)}}>
     <SideBarButtons text='Account' onPress={()=>router.navigate('/Account')}/>
@@ -46,4 +46,3 @@ const index = () => {
 
 export default index
 
-const styles = StyleSheet.create({})

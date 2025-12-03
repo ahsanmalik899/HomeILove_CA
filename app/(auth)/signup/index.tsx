@@ -318,7 +318,8 @@ const styles = StyleSheet.create({
   loginTextContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: vs(10),
+    marginVertical: vs(10),
+    
   },
   loginTextBlack: {
     fontSize: ms(14),
@@ -388,7 +389,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   form: {
-    marginTop: vs(10),
+    marginVertical: vs(10),
   },
   bottomSection: {
     flex: 1,

@@ -136,7 +136,7 @@ const Welcome = () => {
         </View>
         <View className="flex-1" />
         <View
-          className="flex-row justify-between  text-center items-center w-full px-5 mt-2"
+          className="flex-row justify-between  text-center items-center w-full px-5 "
           style={styles.bottom}
         >
           <View className="flex-row ">{dots}</View>
