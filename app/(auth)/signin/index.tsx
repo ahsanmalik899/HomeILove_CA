@@ -63,7 +63,8 @@ export default function SignInScreen() {
                      return;
                   }
                   const res = await signin(values);
-                  console.log("data",res.data?.success);
+
+                  console.log("data",res);
                   if (res?.data?.success) {
                     renderToastSuccess("Log in sucessfuly");
                     dispatch(setusedata(res?.data?.user));

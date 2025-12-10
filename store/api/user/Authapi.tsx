@@ -10,12 +10,16 @@ import {
 
 export const Authapi = createApi({
   reducerPath: 'Authapi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://homeilove.us/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.18.123:8000/api/' }),
   endpoints: builder => ({
     Signup: builder.mutation<unknown, signuppost>({
       query: userdata => ({
-        url: 'signup/',
+        url: 'signup',
         method: 'POST',
+           headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
         body: userdata,
       }),
     }),

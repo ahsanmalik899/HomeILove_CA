@@ -2,7 +2,7 @@ import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { useLocalSearchParams } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 const index = () => {
   const { type } = useLocalSearchParams();
@@ -24,6 +24,12 @@ const index = () => {
             <Text style={styles.subHeading}>
               Search experienced Electricians
             </Text>
+            <TextInput
+              placeholder="Search by name"
+              cursorColor={Colors.light.DarkGreen}
+              placeholderTextColor={Colors.light.DarkGreen}
+              style={[]}
+            />
           </View>
         </View>
       );

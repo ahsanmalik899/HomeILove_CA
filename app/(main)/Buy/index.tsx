@@ -12,7 +12,7 @@ import { StyleSheet, View } from "react-native";
 const index = () => {
   return (
     <View className="bg-white flex-1">
-      <HeaderWithBack title="Buy" />
+      <HeaderWithBack title="Buy" buttonTitile='Raise query to Buy'/>
       <View style={{ marginHorizontal: hs(20), marginTop: vs(30) }}>
         <View className="flex-row justify-between">
           <SideBarCard

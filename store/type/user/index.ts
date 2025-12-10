@@ -2,12 +2,11 @@ export interface signuppost {
   name: string;
   email: string;
   mobile: string;
-  city: string;
   user_type: string;
-  logo: string;
-  status: string;
+  business_logo: string;
 }
 export interface SignInResponse {
+  sweetghar_user_id: unknown;
   id: number;
   email: string;
   user_type: string;

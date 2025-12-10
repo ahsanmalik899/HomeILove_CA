@@ -8,7 +8,7 @@ import { StyleSheet, View } from 'react-native';
 const index = () => {
   return (
     <View className='flex-1 bg-white '>
-     <HeaderWithBack title='New Home'/>
+     <HeaderWithBack title='New Home' buttonTitile="Raise query for new Love"/>
      <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
         <View className="flex-row justify-between">
           <SideBarCard Svg={Homes} text="New Home" onPress={() => {

@@ -2,5 +2,8 @@
 export type HeaderProps={
 title?:string;
 header?:string;
-onBackpress?:()=>void
+buttonTitile?:string;
+onBackpress?:()=>void;
+onButtonPress?:()=>void;
+redButton?:boolean;
 }

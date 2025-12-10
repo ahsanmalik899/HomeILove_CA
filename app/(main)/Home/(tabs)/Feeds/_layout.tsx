@@ -22,7 +22,7 @@ const _layout = () => {
   
   },
     tabBarItemStyle: {
-      width: 'auto',
+      flex:1,
     },
 tabBarLabel: ({ focused, color }) => {
   let label = route.name;
@@ -30,14 +30,11 @@ tabBarLabel: ({ focused, color }) => {
     case 'YourPosts':
       label = 'Yours Posts';
       break;
-    case 'ContentFeed':
-      label = 'Content';
-      break;
     case 'NewsFeed':
       label = 'Home Feeds';
       break;
     case 'NewsFeedPreference':
-      label = 'NewsFeed Preferences';
+      label = 'Feed Preferences';
       break;
   }
 
@@ -54,7 +51,8 @@ tabBarLabel: ({ focused, color }) => {
   },
   tabBarStyle: {
     backgroundColor: '#fff',
-    paddingHorizontal:hs(5),
+   justifyContent:"center",
+   
   },
 })}
 

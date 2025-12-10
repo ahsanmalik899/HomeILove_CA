@@ -8,7 +8,7 @@ import { View } from "react-native";
 const index = () => {
   return (
     <View className="bg-white flex-1">
-      <HeaderWithBack title="Rent" />
+      <HeaderWithBack title="Rent" buttonTitile="Raise query to Rent" />
       <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
         <View className="flex-row justify-between">
           <SideBarCard Svg={Homes} text="Homes" onPress={() => {router.navigate({

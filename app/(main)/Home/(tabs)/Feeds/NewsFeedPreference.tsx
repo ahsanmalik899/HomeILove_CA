@@ -1,17 +1,24 @@
 import Community from "@assets/Home/Community.svg";
+import Connection from "@assets/Home/Conection.svg";
 import Property from "@assets/Home/Property.svg";
 import PrefrenceCard from "@src/components/globals/PrefrenceCard";
 import { router } from "expo-router";
 import { View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 const NewsFeedPreference = () => {
   return (
-    <View className="flex-1">
-      <View className="mt-5 ml-2 mr-2">
+     <ScrollView>
+    <View className="flex-1 ">
+     
+      <View className="mt-2 ml-2 mr-2">
       <PrefrenceCard
         BtnText="Continue"
         Heading="For Property"
         Svg={Community}
-        OnSubmit={() => router.navigate("/(main)/SetPrefrence")}
+        OnSubmit={() => router.navigate({
+          pathname:"/(main)/SetPrefrence",
+          params:{type:"Property"}
+        })}
       />
       </View>
       <View className="mt-2 ml-2 mr-2">
@@ -19,10 +26,26 @@ const NewsFeedPreference = () => {
         BtnText="Continue"
         Heading="For Community"
         Svg={Property}
-        OnSubmit={() => router.navigate("/(main)/SetPrefrence")}
+        OnSubmit={() => router.navigate({
+          pathname:"/(main)/SetPrefrence",
+          params:{type:"Community"}
+        })}
+      />
+      
+      </View>
+      <View className="mt-2 ml-2 mr-2">
+        <PrefrenceCard
+        BtnText="Continue"
+        Heading="For Connection"
+        Svg={Connection}
+        OnSubmit={() => router.navigate({
+          pathname:"/(main)/SetPrefrence",
+          params:{type:"Connection"}
+        })}
       />
       </View>
     </View>
+    </ScrollView>
   );
 };
 

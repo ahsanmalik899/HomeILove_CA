@@ -9,7 +9,7 @@ import { View } from "react-native";
 const index = () => {
   return (
     <View className="flex-1 bg-white ">
-      <HeaderWithBack title="Get Help" />
+      <HeaderWithBack title="Get Help"buttonTitile="Raise query to Local Experts for free" />
       <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
         <View className="flex-row justify-between">
           <SideBarCard

@@ -10,28 +10,36 @@ const YourPosts = () => {
   const limit = 10;
   const [Posts, setPosts] = useState<[]>([]);
   const user = useAppSelector(userdata);
-  const { data, isFetching,refetch, isError, error } = useGetYourpostQuery({ userid:475, page, });
-  useEffect(()=>{
-refetch()
-  },[page])
-     useEffect(()=>{
- if (!data?.result?.feed) return;
+ 
 
-  setPosts((prev) => {
-    if (page === 1) {
-     
-      return data?.result?.feed;
-    } else {
-    
-      return [...prev, ...data?.result?.feed];
-    }
+  const { data, isFetching, refetch, isError, error } = useGetYourpostQuery({
+    userid: 475,
+    page,
   });
-    },[data])
+  useEffect(() => {
+    refetch();
+  }, [page]);
+  useEffect(() => {
+    if (!data?.result?.feed) return;
+
+    setPosts((prev) => {
+      if (page === 1) {
+        return data?.result?.feed;
+      } else {
+        return [...prev, ...data?.result?.feed];
+      }
+    });
+  }, [data]);
 
   return (
-
     <View>
-      <PostDesign data={Posts} isfetching={isFetching} setPage={setPage} />
+   
+      <PostDesign
+        data={Posts}
+        isfetching={isFetching}
+        setPage={setPage}
+        withCreatePost
+      />
     </View>
   );
 };

@@ -45,11 +45,11 @@ export default function SignUpScreen() {
     confirmPassword: Yup.string()
       .oneOf([Yup.ref('password')], 'Passwords must match')
       .required('Confirm password is required'),
-    busenessType: Yup.string().notOneOf(
+    user_type: Yup.string().notOneOf(
       ['Select Business Type'],
       'Please select business type',
     ),
-    logo: Yup.string().required('Please upload a logo'),
+     business_logo: Yup.string().nonNullable(),
   });
   const pickImage = async (
     setFieldValue: (field: string, value: string) => void,
@@ -107,20 +107,21 @@ export default function SignUpScreen() {
                   email: '',
                   password: '',
                   confirmPassword: '',
-                  busenessType: 'Select Business Type',
-                  logo: '',
+                  user_type: 'Select Business Type',
+                  business_logo: '',
                 }}
                 validationSchema={SignupSchema}
                 onSubmit={async values => {
                   try {
                     const res = await signup(values).unwrap();
-                    if (res?.sucess) {
+                    console.log(res)
+                    if (res?.sucess ==='success') {
                       renderToastSuccess(res?.message || 'Signup successful');
                       dispatch(setemail(values.email));
                       router.replace('/(auth)/Verifyacc');
                     } else {
                       const message =
-                        res?.data?.message ||
+                        res?.message ||
                         res?.message ||
                         (typeof err === 'string' ? err : null) ||
                         'Network error: Check your connection';
@@ -242,7 +243,7 @@ export default function SignUpScreen() {
 
                     <DropDownPicker
                       open={open}
-                      value={values.busenessType}
+                      value={values.user_type}
                       items={[
                         { label: 'Business', value: 'Business' },
                         { label: 'Private', value: 'Private' },
@@ -250,16 +251,16 @@ export default function SignUpScreen() {
                       setOpen={setOpen}
                       setValue={val => {
                         const selectedValue = val();
-                        setFieldValue('busenessType', selectedValue);
+                        setFieldValue('user_type', selectedValue);
                       }}
                       placeholder="Select Business Type"
                       style={{
                         marginBottom:
-                          touched.busenessType && errors.busenessType ? 0 : 15,
+                          touched.user_type && errors.user_type ? 0 : 15,
                       }}
                     />
-                    {touched.busenessType && errors.busenessType && (
-                      <Text style={styles.error}>{errors.busenessType}</Text>
+                    {touched.user_type && errors.user_type && (
+                      <Text style={styles.error}>{errors.user_type}</Text>
                     )}
 
                     <View style={styles.input}>
@@ -276,8 +277,8 @@ export default function SignUpScreen() {
                         </View>
                       </TouchableOpacity>
                     </View>
-                    {touched.logo && errors.logo && (
-                      <Text style={styles.error}>{errors.logo}</Text>
+                    {touched.business_logo && errors.business_logo && (
+                      <Text style={styles.error}>{errors.business_logo}</Text>
                     )}
 
                     <View style={styles.loginTextContainer}>

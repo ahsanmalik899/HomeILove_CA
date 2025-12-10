@@ -25,10 +25,7 @@ const index = () => {
           Svg={Commercial}
           text="Post Community"
           onPress={() => {
-            router.navigate({
-              pathname: "/(main)/BuyListing",
-              params: { type: "Community" },
-            });
+            router.navigate("/(main)/postCommunity");
           }}
           type={"Buy"}
         />

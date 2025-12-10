@@ -34,7 +34,7 @@ const index = () => {
   return (
      <View className="bg-white flex-1">
       <ScrollView>
-        <HeaderWithBack title="Account Profile" />
+        <HeaderWithBack title="Account Profile" redButton buttonTitile="Delete Account" />
         <View style={{ marginHorizontal: hs(20), marginTop: vs(10), paddingBottom:vs(70)}}>
           <Text style={{ fontSize: ms(20), fontWeight: 600 }}>
             Awesome! Right place to{" "}

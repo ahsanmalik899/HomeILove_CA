@@ -50,7 +50,7 @@ const _layout = () => {
   >
     <TouchableOpacity
       style={{ marginRight: hs(10) }}
-      onPress={() => router.navigate("/CurrentAlerts")}
+      onPress={() => router.navigate("/(main)/Connection")}
     >
       <Connection />
     </TouchableOpacity>
@@ -71,7 +71,7 @@ const _layout = () => {
         drawerType: "slide",
         drawerStyle: {
           backgroundColor: "#fff",
-         width:hs(200) 
+         width:hs(250) 
 
 
         },

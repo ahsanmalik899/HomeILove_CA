@@ -11,7 +11,7 @@ import { ScrollView, View } from "react-native";
 const index = () => {
   return (
     <View className="flex-1 bg-white ">
-      <HeaderWithBack title="Home Romance" />
+      <HeaderWithBack title="Home Romance" buttonTitile='Raise query to Local Experts for free'/>
       <ScrollView style={{ paddingHorizontal: hs(20), paddingTop: vs(30) }}>
         <View className="flex-row justify-between">
           <SideBarCard
