@@ -63,10 +63,10 @@ const index = ({
                 borderRadius: ms(5),
               }}
               onPress={() => {
-                onButtonPress;
+                onButtonPress();
               }}
             >
-              <Text className="text-white">{buttonTitile}</Text>
+              <Text className="text-white" style={{fontSize:ms(10)}}>{buttonTitile}</Text>
             </TouchableOpacity>
           )}
         </View>

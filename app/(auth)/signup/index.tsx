@@ -2,22 +2,22 @@
 /* eslint-disable global-require */
 /* eslint-disable react/style-prop-object */
 /* eslint-disable react/function-component-definition */
-import { useSignupMutation } from '@/store/api/user/Authapi';
-import { setemail } from '@/store/slices/user';
-import Logo from '@assets/logo/logo-black.svg';
-import backgroundimage from '@assets/signupbg/bg.png';
-import Uploadlogo from '@assets/signupbg/solar_upload-bold-duotone.svg';
-import { Ionicons } from '@expo/vector-icons';
-import LargeButton from '@src/components/globals/LaregeButton';
-import Loading from '@src/components/globals/Loading';
-import Colors from '@src/constants/Colors';
-import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
-import { hs, ms, vs } from '@utils/design/design';
-import * as ImagePicker from 'expo-image-picker';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { Formik } from 'formik';
-import { useState } from 'react';
+import { useSignupMutation } from "@/store/api/user/Authapi";
+import { setemail } from "@/store/slices/user";
+import Logo from "@assets/logo/logo-black.svg";
+import backgroundimage from "@assets/signupbg/bg.png";
+import Uploadlogo from "@assets/signupbg/solar_upload-bold-duotone.svg";
+import { Ionicons } from "@expo/vector-icons";
+import LargeButton from "@src/components/globals/LaregeButton";
+import Loading from "@src/components/globals/Loading";
+import Colors from "@src/constants/Colors";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
+import { hs, ms, vs } from "@utils/design/design";
+import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { Formik } from "formik";
+import { useState } from "react";
 import {
   ImageBackground,
   ScrollView,
@@ -26,44 +26,52 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { useDispatch } from 'react-redux';
-import * as Yup from 'yup';
+} from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
+import { useDispatch } from "react-redux";
+import * as Yup from "yup";
 
 export default function SignUpScreen() {
   const [signup, { isLoading }] = useSignupMutation();
   const dispatch = useDispatch();
-  const [imagename, setimagename] = useState('');
+  const [imagename, setimagename] = useState("");
   const SignupSchema = Yup.object().shape({
-    name: Yup.string().min(2, 'Too Short!').required('Name is required'),
+    name: Yup.string().min(2, "Too Short!").required("Name is required"),
     mobile: Yup.string()
-      .matches(/^\+?[\d\s-]{10,}$/, 'Invalid mobile number')
-      .required('Mobile is required'),
-    email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string().min(6, 'Too short').required('Password is required'),
+      .matches(/^\+?[\d\s-]{10,}$/, "Invalid mobile number")
+      .required("Mobile is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string().min(6, "Too short").required("Password is required"),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password')], 'Passwords must match')
-      .required('Confirm password is required'),
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Confirm password is required"),
     user_type: Yup.string().notOneOf(
-      ['Select Business Type'],
-      'Please select business type',
+      ["Select Business Type"],
+      "Please select business type"
     ),
-     business_logo: Yup.string().nonNullable(),
+    business_logo: Yup.mixed().nullable(),
+
   });
-  const pickImage = async (
-    setFieldValue: (field: string, value: string) => void,
-  ) => {
+  const pickImage = async (setFieldValue: any) => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
+
     if (!result.canceled) {
-      const selectedImage = result.assets[0].uri;
-      setimagename(result.assets[0].fileName);
-      setFieldValue('logo', selectedImage);
+      const asset = result.assets[0];
+      const uri = asset.uri;
+      const filename = uri.split("/").pop();
+      const ext = filename?.split(".").pop();
+
+      setimagename(filename);
+
+      setFieldValue("business_logo", {
+        uri,
+        name: filename,
+        type: `image/${ext}`,
+      });
     }
   };
 
@@ -73,7 +81,7 @@ export default function SignUpScreen() {
 
   return (
     <LinearGradient
-      colors={[Colors.light.backgroundcolor, '#FFFFFF']}
+      colors={[Colors.light.backgroundcolor, "#FFFFFF"]}
       style={styles.colordbackground}
       start={{ x: 0.6, y: 0 }}
       end={{ x: 0.65, y: 0.4 }}
@@ -93,7 +101,7 @@ export default function SignUpScreen() {
             style={styles.bottomSection}
           >
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Create{'\n'}Account.</Text>
+              <Text style={styles.title}>Create{"\n"}Account.</Text>
               <Text style={styles.subtitle}>
                 Join HomeLove to discover homes & trusted services tailored for
                 you.
@@ -102,38 +110,41 @@ export default function SignUpScreen() {
               <Text style={styles.label}>Fill in the Details</Text>
               <Formik
                 initialValues={{
-                  name: '',
-                  mobile: '',
-                  email: '',
-                  password: '',
-                  confirmPassword: '',
-                  user_type: 'Select Business Type',
-                  business_logo: '',
+                  name: "",
+                  mobile: "",
+                  email: "",
+                  password: "",
+                  confirmPassword: "",
+                  user_type: "Select Business Type",
+                  business_logo: "",
                 }}
                 validationSchema={SignupSchema}
-                onSubmit={async values => {
+                onSubmit={async (values) => {
                   try {
-                    const res = await signup(values).unwrap();
-                    console.log(res)
-                    if (res?.sucess ==='success') {
-                      renderToastSuccess(res?.message || 'Signup successful');
+                    const formData = new FormData();
+
+                    Object.keys(values).forEach((key) => {
+                      if (key === "business_logo" && values.business_logo) {
+                        formData.append("business_logo", values.business_logo);
+                      } else {
+                        formData.append(key, values[key]);
+                      }
+                    });
+
+                    const res = await signup(formData).unwrap();
+                    console.log(res);
+
+                    if (res?.status === "success") {
+                      renderToastSuccess(res?.message);
                       dispatch(setemail(values.email));
-                      router.replace('/(auth)/Verifyacc');
+                      router.replace("/(auth)/Verifyacc");
                     } else {
-                      const message =
-                        res?.message ||
-                        res?.message ||
-                        (typeof err === 'string' ? err : null) ||
-                        'Network error: Check your connection';
-                      renderToastError(message);
+                      renderToastError(res?.message || "Signup failed");
                     }
                   } catch (err) {
-                    const message =
-                      err?.data?.message ||
-                      err?.message ||
-                      (typeof err === 'string' ? err : null) ||
-                      'Network error: Check your connection';
-                    renderToastError(message);
+                    renderToastError(
+                      err?.data?.message || err?.message || "Network error"
+                    );
                   }
                 }}
               >
@@ -151,8 +162,8 @@ export default function SignUpScreen() {
                       style={styles.input}
                       placeholder="Enter your name"
                       placeholderTextColor="#999"
-                      onChangeText={handleChange('name')}
-                      onBlur={handleBlur('name')}
+                      onChangeText={handleChange("name")}
+                      onBlur={handleBlur("name")}
                       value={values.name}
                     />
                     {touched.name && errors.name && (
@@ -164,8 +175,8 @@ export default function SignUpScreen() {
                       placeholder="Enter your mobile number"
                       placeholderTextColor="#999"
                       keyboardType="phone-pad"
-                      onChangeText={handleChange('mobile')}
-                      onBlur={handleBlur('mobile')}
+                      onChangeText={handleChange("mobile")}
+                      onBlur={handleBlur("mobile")}
                       value={values.mobile}
                     />
                     {touched.mobile && errors.mobile && (
@@ -177,8 +188,8 @@ export default function SignUpScreen() {
                       placeholder="Enter your email address"
                       placeholderTextColor="#999"
                       keyboardType="email-address"
-                      onChangeText={handleChange('email')}
-                      onBlur={handleBlur('email')}
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
                       value={values.email}
                     />
                     {touched.email && errors.email && (
@@ -191,8 +202,8 @@ export default function SignUpScreen() {
                         placeholder="Enter your password"
                         placeholderTextColor="#999"
                         secureTextEntry={!showPassword} // true shows password, false hides it
-                        onChangeText={handleChange('password')}
-                        onBlur={handleBlur('password')}
+                        onChangeText={handleChange("password")}
+                        onBlur={handleBlur("password")}
                         value={values.password}
                       />
                       <TouchableOpacity
@@ -200,7 +211,7 @@ export default function SignUpScreen() {
                       >
                         <Ionicons
                           name={
-                            showPassword ? 'eye-outline' : 'eye-off-outline'
+                            showPassword ? "eye-outline" : "eye-off-outline"
                           }
                           size={20}
                           color="#9A9A9A"
@@ -217,8 +228,8 @@ export default function SignUpScreen() {
                         placeholder="Confirm your password"
                         placeholderTextColor="#999"
                         secureTextEntry={!showConfirmPassword} // true shows password, false hides it
-                        onChangeText={handleChange('confirmPassword')}
-                        onBlur={handleBlur('confirmPassword')}
+                        onChangeText={handleChange("confirmPassword")}
+                        onBlur={handleBlur("confirmPassword")}
                         value={values.confirmPassword}
                       />
                       <TouchableOpacity
@@ -229,8 +240,8 @@ export default function SignUpScreen() {
                         <Ionicons
                           name={
                             showConfirmPassword
-                              ? 'eye-outline'
-                              : 'eye-off-outline'
+                              ? "eye-outline"
+                              : "eye-off-outline"
                           }
                           size={20}
                           color="#9A9A9A"
@@ -245,13 +256,13 @@ export default function SignUpScreen() {
                       open={open}
                       value={values.user_type}
                       items={[
-                        { label: 'Business', value: 'Business' },
-                        { label: 'Private', value: 'Private' },
+                        { label: "Business", value: "Business" },
+                        { label: "Private", value: "Private" },
                       ]}
                       setOpen={setOpen}
-                      setValue={val => {
+                      setValue={(val) => {
                         const selectedValue = val();
-                        setFieldValue('user_type', selectedValue);
+                        setFieldValue("user_type", selectedValue);
                       }}
                       placeholder="Select Business Type"
                       style={{
@@ -265,7 +276,7 @@ export default function SignUpScreen() {
 
                     <View style={styles.input}>
                       <Text style={styles.textview}>
-                        {imagename || 'Upload logo (image)'}
+                        {imagename || "Upload logo (image)"}
                       </Text>
                       <TouchableOpacity
                         className="absolute right-0"
@@ -283,10 +294,10 @@ export default function SignUpScreen() {
 
                     <View style={styles.loginTextContainer}>
                       <Text style={styles.loginTextBlack}>
-                        Already have an account?{' '}
+                        Already have an account?{" "}
                       </Text>
                       <TouchableOpacity
-                        onPress={() => router.push('/(auth)/signin')}
+                        onPress={() => router.push("/(auth)/signin")}
                       >
                         <Text style={styles.loginTextGreen}>Login</Text>
                       </TouchableOpacity>
@@ -311,44 +322,43 @@ const styles = StyleSheet.create({
   },
   topSection: {
     flex: 0.25,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingTop: vs(70),
     marginBottom: vs(20),
   },
   loginTextContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     marginVertical: vs(10),
-    
   },
   loginTextBlack: {
     fontSize: ms(14),
-    color: '#666',
+    color: "#666",
   },
   loginTextGreen: {
     fontSize: ms(14),
-    color: '#4A90A4',
-    fontWeight: '600',
+    color: "#4A90A4",
+    fontWeight: "600",
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: ms(8),
     marginBottom: vs(15),
     paddingHorizontal: hs(15),
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   passwordInput: {
     flex: 1,
     height: vs(48),
     fontSize: ms(14),
-    color: '#333',
+    color: "#333",
   },
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   formContainer: {
     paddingHorizontal: hs(20),
@@ -357,34 +367,34 @@ const styles = StyleSheet.create({
     fontSize: ms(30),
     fontWeight: 400,
     marginTop: vs(50),
-    color: 'black',
+    color: "black",
   },
   subtitle: {
     fontSize: ms(15),
-    color: 'black',
-    fontWeight: '500',
+    color: "black",
+    fontWeight: "500",
     marginTop: vs(10),
     marginBottom: vs(20),
     lineHeight: vs(20),
   },
   label: {
     fontSize: ms(14),
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
   input: {
     height: vs(48),
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: ms(8),
     marginBottom: vs(15),
     paddingHorizontal: hs(15),
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     fontSize: ms(14),
-    color: '#333',
+    color: "#333",
   },
   textview: {
-    marginVertical: 'auto',
+    marginVertical: "auto",
   },
   container: {
     padding: 20,
@@ -394,38 +404,38 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     flex: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginTop: vs(35),
     borderTopLeftRadius: ms(40),
     borderTopRightRadius: ms(40),
   },
   error: {
-    color: 'red',
+    color: "red",
     marginBottom: 5,
   },
   button: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: "#D32F2F",
     padding: ms(15),
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: vs(15),
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   uploadbutton: {
     backgroundColor: Colors.light.red,
-    color: 'white',
+    color: "white",
     borderRadius: 8,
     marginVertical: vs(3),
     paddingVertical: vs(10),
     paddingHorizontal: hs(20),
-    alignItems: 'center',
+    alignItems: "center",
   },
   signUpButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: ms(16),
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

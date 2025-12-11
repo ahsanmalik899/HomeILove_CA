@@ -26,16 +26,16 @@ export default function ForgotPasswordScreen() {
     dispatch(setemail(email));
     try {
       const res = await resetpassword({ email } as resetpass).unwrap();
-      if (res?.sucss) {
+      if (res?.status==="success") {
         renderToastSuccess(res?.message);
         router.replace('/(auth)/PassReset');
       } else {
-        const message = res?.message || err?.error || "Network Error";
+        const message = res?.data?.message || err?.error || "Network Error";
         renderToastError(message);
       }
     } catch (err) {
       console.log(err);
-      const message = err?.data?.error || err?.error || "Network Error";
+      const message = err?.data?.message || err?.error || "Network Error";
       renderToastError(message);
     }
   };

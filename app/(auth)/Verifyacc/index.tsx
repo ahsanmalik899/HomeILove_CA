@@ -41,7 +41,8 @@ const [resend,{isLoading}]= useResendVaerificationMutation();
     try{
       const {email} = user;
       const response =await resend({email}) 
-      if(response?.data?.sucess){
+      console.log(response);
+      if(response?.data?.status==="success"){
           start()
           renderToastSuccess(response?.data?.message)
       }

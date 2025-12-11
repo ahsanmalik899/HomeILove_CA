@@ -4,29 +4,31 @@ import {
   resetpass,
   siginpost,
   SignInResponse,
-  signuppost,
-  verifyuser,
+  verifyuser
 } from '@store/type/user/index';
 
 export const Authapi = createApi({
   reducerPath: 'Authapi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.18.123:8000/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://homeilove.us/api/' }),
   endpoints: builder => ({
-    Signup: builder.mutation<unknown, signuppost>({
-      query: userdata => ({
+    Signup: builder.mutation<unknown, FormData>({
+      query: formData => ({
         url: 'signup',
         method: 'POST',
            headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
       },
-        body: userdata,
+        body: formData,
       }),
     }),
     Resetpass: builder.mutation<unknown, resetpass>({
       query: email => ({
-        url: 'forgotpassword/',
+        url: 'sendForgotMail',
         method: 'Post',
+                headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
         body: email,
       }),
     }),
@@ -43,29 +45,45 @@ export const Authapi = createApi({
     }),
     ResendVaerification: builder.mutation<undefined, resetpass>({
       query: email => ({
-        url: 'resendverficationmail',
+        url: 'reSendVerifyAccount',
         method: 'POST',
+                headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
         body: email,
       }),
     }),
     ResendResetpaaword: builder.mutation<undefined, resetpass>({
       query: email => ({
-        url: 'resendResetpasswordmail',
+        url: 'sendForgotMail',
         method: 'POST',
+                headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
         body: email,
       }),
     }),
     Verifyaccount: builder.mutation<undefined, verifyuser>({
       query: token => ({
-        url: 'verify',
+        url: `verifyAccount?token=${token}`,
         method: 'POST',
-        body: token,
+                headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+       
       }),
     }),
     Setpassword: builder.mutation<undefined, changepassword>({
       query: data => ({
-        url: 'verifyresetpass',
+        url: 'resetPassByLink',
         method: 'POST',
+                headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
         body: data,
       }),
     }),

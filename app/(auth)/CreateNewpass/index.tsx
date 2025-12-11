@@ -22,8 +22,9 @@ import Logo from '@assets/logo/logo-black.svg';
 import backgroundimage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
 import Loading from '@src/components/globals/Loading';
+import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const validationSchema = Yup.object().shape({
@@ -62,11 +63,21 @@ export default function CreateNewPasswordScreen() {
                 validationSchema={validationSchema}
                 onSubmit={async (values) => {
                   try {
-                    console.log(safeToken);
+                  
                     const result = await setpassword({ token: safeToken.token, password: values.password });
-                    console.log(result);
-                  } catch (error) {
-                    console.log(error);
+                    if(result?.data?.status==="success"){
+                      const message = result?.data?.message  || "Network Error";
+                              renderToastSuccess(message);
+                              router.replace('/signin')
+                    }
+                    else {
+                       const message = result?.error?.data?.message  || "Network Error";
+                              renderToastError(message);
+                              console.log(result)
+                    }
+                  } catch (err) {
+                   const message = err?.data?.message || err?.error || "Network Error";
+                         renderToastError(message);
                   }
                 }}
               >

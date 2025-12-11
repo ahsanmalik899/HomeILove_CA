@@ -23,19 +23,18 @@ export default function VerifyAccountScreen() {
   };
 const [verify,{isLoading}] = useVerifyaccountMutation();
  const { token } = useLocalSearchParams();
- const safeToken = Array.isArray(token) ? token[0] : token;
  const verifyAccount = async () => {
   try {
-    const result = await verify({ token: safeToken }).unwrap();
-    if(result.sucess){    renderToastSuccess(result.message);}
+    const result = await verify(token).unwrap();
+    if(result?.status==="success"){    renderToastSuccess(result?.message);}
     else{
-      renderToastError(result.message);
+      renderToastError(result?.data?.message);
       router.replace('/(auth)/Verifyacc')
     }
 
   } catch (error) {
     console.log('Verification failed:', error);
-    renderToastError(error?.data?.error || 'Verification failed');
+    renderToastError(error?.data?.message || 'Verification failed');
     router.replace('/(auth)/Verifyacc')
   }
 };

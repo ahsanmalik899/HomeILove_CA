@@ -1,14 +1,19 @@
+import Electrician from "@assets/HomeRomance/electricianinfo.svg";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import InputMiles from "@src/components/globals/InputMiles";
+import LeadingList from "@src/components/globals/LeadingList";
+import SerchBar from "@src/components/globals/SerchBar";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, Text, TextInput, View } from "react-native";
-
+import { ScrollView } from "react-native-gesture-handler";
 const index = () => {
   const { type } = useLocalSearchParams();
   switch (type) {
     case "Electricians":
       return (
+        <ScrollView>
         <View className="bg-white flex-1">
           <HeaderWithBack />
           <View style={{ marginHorizontal: hs(20) }}>
@@ -26,12 +31,28 @@ const index = () => {
             </Text>
             <TextInput
               placeholder="Search by name"
-              cursorColor={Colors.light.DarkGreen}
-              placeholderTextColor={Colors.light.DarkGreen}
-              style={[]}
+              cursorColor={Colors.light.textGray}
+              placeholderTextColor={Colors.light.textGray}
+              style={{
+                borderWidth: ms(1),
+                borderRadius: ms(5),
+                borderColor: Colors.light.textGray,
+                marginVertical: vs(10),
+              }}
             />
+            <SerchBar />
+            <View style={{ marginVertical: vs(10) }}>
+              <InputMiles />
+            </View>
+            <Electrician />
+            <Text style={styles.mainHeading}>
+              Leading
+              <Text style={{ color: Colors.light.red }}>ELECTRICIANS</Text>
+            </Text>
+            <LeadingList/>
           </View>
         </View>
+        </ScrollView>
       );
       break;
     case "Plumbers":
@@ -48,6 +69,21 @@ const index = () => {
               local plumbers around you.
             </Text>
             <Text style={styles.subHeading}>Search experienced Plumbers</Text>
+            <TextInput
+              placeholder="Search by name"
+              cursorColor={Colors.light.textGray}
+              placeholderTextColor={Colors.light.textGray}
+              style={{
+                borderWidth: ms(1),
+                borderRadius: ms(5),
+                borderColor: Colors.light.textGray,
+                marginVertical: vs(10),
+              }}
+            />
+            <SerchBar />
+            <View style={{ marginVertical: vs(10) }}>
+              <InputMiles />
+            </View>
           </View>
         </View>
       );
@@ -69,6 +105,21 @@ const index = () => {
             <Text style={styles.subHeading}>
               Search shining Interior Decors
             </Text>
+            <TextInput
+              placeholder="Search by name"
+              cursorColor={Colors.light.textGray}
+              placeholderTextColor={Colors.light.textGray}
+              style={{
+                borderWidth: ms(1),
+                borderRadius: ms(5),
+                borderColor: Colors.light.textGray,
+                marginVertical: vs(10),
+              }}
+            />
+            <SerchBar />
+            <View style={{ marginVertical: vs(10) }}>
+              <InputMiles />
+            </View>
           </View>
         </View>
       );
@@ -90,6 +141,21 @@ const index = () => {
               Search experienced{" "}
               <Text style={{ color: Colors.light.red }}>Painters</Text>
             </Text>
+            <TextInput
+              placeholder="Search by name"
+              cursorColor={Colors.light.textGray}
+              placeholderTextColor={Colors.light.textGray}
+              style={{
+                borderWidth: ms(1),
+                borderRadius: ms(5),
+                borderColor: Colors.light.textGray,
+                marginVertical: vs(10),
+              }}
+            />
+            <SerchBar />
+            <View style={{ marginVertical: vs(10) }}>
+              <InputMiles />
+            </View>
           </View>
         </View>
       );
@@ -112,6 +178,21 @@ const index = () => {
               Search experienced{" "}
               <Text style={{ color: Colors.light.red }}>Home Builders</Text>
             </Text>
+            <TextInput
+              placeholder="Search by name"
+              cursorColor={Colors.light.textGray}
+              placeholderTextColor={Colors.light.textGray}
+              style={{
+                borderWidth: ms(1),
+                borderRadius: ms(5),
+                borderColor: Colors.light.textGray,
+                marginVertical: vs(10),
+              }}
+            />
+            <SerchBar />
+            <View style={{ marginVertical: vs(10) }}>
+              <InputMiles />
+            </View>
           </View>
         </View>
       );

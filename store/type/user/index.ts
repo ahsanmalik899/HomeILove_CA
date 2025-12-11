@@ -3,7 +3,11 @@ export interface signuppost {
   email: string;
   mobile: string;
   user_type: string;
-  business_logo: string;
+  business_logo?: {
+    uri: string;
+    name: string;
+    type: string;
+  } | null; // optional because user may not upload
 }
 export interface SignInResponse {
   sweetghar_user_id: unknown;
