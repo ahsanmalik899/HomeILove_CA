@@ -1,10 +1,13 @@
+import { resetUserData } from "@/store/slices/user";
 import SidebarLogo from "@assets/SideBar/sideBarLogo.svg";
 import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { View } from "react-native";
+import { useDispatch } from "react-redux";
 import LargeButton from "../LaregeButton";
 import SideBarButtons from "../SideBarButtons";
 const index = () => {
+  const dispatch = useDispatch();
   return (
     <View
       style={{
@@ -58,8 +61,14 @@ const index = () => {
           onPress={() => router.navigate("/Account")}
         />
       </View>
-      <View style={{ marginTop: vs(20),width:hs(150) }}>
-        <LargeButton handleSubmit={() => {}} text="Logout" />
+      <View style={{ marginTop: vs(20), width: hs(150) }}>
+        <LargeButton
+          handleSubmit={async()=> {
+            dispatch(resetUserData());
+            router.replace("/(auth)/signin")
+          }}
+          text="Logout"
+        />
       </View>
     </View>
   );

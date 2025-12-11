@@ -83,13 +83,13 @@ export default function SignInScreen() {
                     return;
                   }
                   const res = await signin(values);
-
+                   console
                   if (res?.data?.success) {
                     renderToastSuccess("Log in sucessfuly");
                     dispatch(setusedata(res?.data?.user));
                     router.replace("/(main)/Home");
                   }
-                  if (res?.error?.status === 403) {
+                  else if (res?.error?.status === 403) {
                     const message = res.error?.data?.error;
                     renderToastError(message);
 
@@ -106,8 +106,10 @@ export default function SignInScreen() {
                       renderToastError(error.error);
                     }
                   } else {
+                    
                     const message =
                       res?.data?.message ||
+                      res?.error?.data?.error||
                       res?.error?.data?.message ||
                       res?.error?.message ||
                       (typeof res?.error === "string" ? res.error : null) ||
