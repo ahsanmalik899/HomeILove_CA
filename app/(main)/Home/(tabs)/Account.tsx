@@ -6,7 +6,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 const Account = () => {
   const user = useAppSelector(userdata);
@@ -69,4 +69,4 @@ const Account = () => {
 
 export default Account;
 
-const styles = StyleSheet.create({});
+

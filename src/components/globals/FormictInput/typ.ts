@@ -1,4 +1,3 @@
-
 export type FormikInputProps = {
   title: string;
   placeholder?: string;
@@ -7,9 +6,11 @@ export type FormikInputProps = {
   value: string;
   touched: boolean;
   errors: boolean;
-  additonalText?:String;
-  required:boolean;
-  errorText:any;
-  multiline?:boolean;
-  mulipleFields?:boolean;
+  additonalText?: String;
+  required: boolean;
+  errorText: any;
+  multiline?: boolean;
+  mulipleFields?: boolean;
+  name?: string;
+  setValue?: (field: string, value: string) => void;
 };

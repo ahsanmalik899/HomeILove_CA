@@ -41,10 +41,11 @@ export const MainApi = createApi({
       getMYPosts: builder.query< any,GetMyPostsOnly>({
       query: ({page,limit,type,userid}) => ({
         url: `getSinglePost?type=${type}&userid=${userid}&page=${page}&limit=${limit}`,
-        method: 'GEt',
+        method: 'GET',
       
       }),
     }),
+   
   }),
 });
 

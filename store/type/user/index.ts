@@ -105,3 +105,46 @@ export interface FeedResponse {
   totalPages: number;
   currentPage: number;
 }
+export interface AddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
+
+export interface Location {
+  lat: number;
+  lng: number;
+}
+
+export interface Viewport {
+  northeast: Location;
+  southwest: Location;
+}
+
+export interface Geometry {
+  location: Location;
+  location_type: string;
+  viewport: Viewport;
+}
+
+export interface NavigationPoint {
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  restricted_travel_modes: string[];
+}
+
+export interface Result {
+  address_components: AddressComponent[];
+  formatted_address: string;
+  geometry: Geometry;
+  navigation_points?: NavigationPoint[];
+  place_id: string;
+  types: string[];
+}
+
+export interface FeedResponse {
+  results: Result[];
+  status: string;
+}

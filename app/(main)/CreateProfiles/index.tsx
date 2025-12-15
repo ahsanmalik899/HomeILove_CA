@@ -3,6 +3,8 @@ import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import { MaterialIcons } from "@expo/vector-icons";
+import { AdressInput } from "@src/components/globals/AddressInput";
+
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
@@ -21,7 +23,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import * as Yup from "yup";
 interface ProfileConfig {
@@ -33,8 +35,9 @@ interface ProfileConfig {
   isService: Boolean;
   isLicenceIssue: Boolean;
   isInvestor: Boolean;
+  servingas: boolean;
 }
-const index = () => {
+const Index = () => {
   let dataAccordingType: ProfileConfig = {
     profileType: "",
     title: "Profile",
@@ -44,6 +47,7 @@ const index = () => {
     isService: false,
     isLicenceIssue: true,
     isInvestor: false,
+    servingas: false,
   };
   const user = useAppSelector(userdata);
   const { type } = useLocalSearchParams();
@@ -69,6 +73,7 @@ const index = () => {
         isLicenceIssue: true,
         isService: true,
         isInvestor: false,
+        servingas: true,
       };
       break;
 
@@ -82,6 +87,7 @@ const index = () => {
         serviceOption: ["Loan officer", "Mortgage broker", "Mortgage lender"],
         isLicenceIssue: false,
         isInvestor: false,
+        servingas: false,
       };
       break;
 
@@ -95,6 +101,7 @@ const index = () => {
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
+        servingas: false,
       };
       break;
 
@@ -108,6 +115,7 @@ const index = () => {
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
+        servingas: false,
       };
       break;
 
@@ -121,6 +129,7 @@ const index = () => {
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
+        servingas: false,
       };
       break;
 
@@ -134,6 +143,7 @@ const index = () => {
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: true,
+        servingas: false,
       };
       break;
 
@@ -147,8 +157,9 @@ const index = () => {
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
+        servingas: false,
       };
-        case "Agent Profile":
+    case "Agent Profile":
       dataAccordingType = {
         profileType: "Agent",
         title: "Agent",
@@ -158,6 +169,7 @@ const index = () => {
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
+        servingas: false,
       };
       break;
 
@@ -171,10 +183,11 @@ const index = () => {
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
+        servingas: false,
       };
       break;
   }
-  const [createprofile,{isLoading}] = useCreateProfileMutation();
+  const [createprofile, { isLoading }] = useCreateProfileMutation();
   const ProfileSchema = Yup.object().shape({
     business_name: Yup.string()
       .min(2, "Too short!")
@@ -304,16 +317,19 @@ const index = () => {
               cover: "",
             }}
             validationSchema={ProfileSchema}
-            onSubmit={async(values) => {
+            onSubmit={async (values) => {
               try {
                 const res = await createprofile({
                   profileType: dataAccordingType.profileType,
-                  data: values,zzz
+                  data: values,
+                  zzz,
                 }).unwrap();
-                console.log(res)
+                console.log(res);
                 if (res?.success) {
-                  renderToastSuccess(res?.message || "Profile Created successfully");
-                 
+                  renderToastSuccess(
+                    res?.message || "Profile Created successfully"
+                  );
+
                   router.replace("/BusenessProfiles");
                 } else {
                   const message =
@@ -362,6 +378,7 @@ const index = () => {
                       errorText={errors.investor_type}
                       required
                     />
+                    
                     <FormikDropdown
                       title={"Invest in"}
                       placeholder={"Nothing selected"}
@@ -401,6 +418,7 @@ const index = () => {
                           required
                         />
                       </View>
+                      
                       <View className="flex-1" style={{ marginLeft: hs(5) }}>
                         <FormikDropdown
                           title={""}
@@ -421,6 +439,9 @@ const index = () => {
                     </View>
                   </>
                 )}
+               <AdressInput city={""} address={""} zip={""} value={values.address} title={""}  onSelect={function (value: string): void {
+                  throw new Error("Function not implemented.");
+                } }/>
                 <FormikInput
                   title="Display name"
                   placeholder="Name"
@@ -444,6 +465,9 @@ const index = () => {
                     errors={!!errors.services}
                     errorText={errors.services}
                     required
+                    multipleFields={dataAccordingType.servingas}
+                    name="services"
+                    setValue={setFieldValue}
                   />
                 )}
                 <FormikInput
@@ -554,6 +578,8 @@ const index = () => {
                   errors={!!errors.license_no}
                   required
                   mulipleFields
+                  name="license_no"
+                  setValue={setFieldValue}
                   errorText={errors.license_no}
                 />
                 <View style={{ marginTop: vs(10) }}>
@@ -593,18 +619,20 @@ const index = () => {
                     <Text style={{ marginLeft: hs(5) }}>Nationwide</Text>
                   </View>
 
- <FormikInput
-                  title=""
-                  placeholder="Please enter City,Status or Zip Code"
-                  onChangeText={handleChange("dealing_areas")}
-                  onBlur={handleBlur("dealing_areas")}
-                  value={values.dealing_areas}
-                  touched={!!touched.dealing_areas}
-                  errors={!!errors.dealing_areas}
-                  required={false}
-                  mulipleFields
-                  errorText={errors.dealing_areas}
-                />
+                  <FormikInput
+                    title=""
+                    placeholder="Please enter City,Status or Zip Code"
+                    onChangeText={handleChange("dealing_areas")}
+                    onBlur={handleBlur("dealing_areas")}
+                    value={values.dealing_areas}
+                    touched={!!touched.dealing_areas}
+                    errors={!!errors.dealing_areas}
+                    required={false}
+                    mulipleFields
+                    name="dealing_areas"
+                    setValue={setFieldValue}
+                    errorText={errors.dealing_areas}
+                  />
                 </View>
 
                 <Text style={{ width: hs(250), marginTop: vs(10) }}>
@@ -776,12 +804,12 @@ const index = () => {
           </Formik>
         </View>
       </ScrollView>
-      <Loading isLoading={isLoading} text={`Creating ${type}....`}/>
+      <Loading isLoading={isLoading} text={`Creating ${type}....`} />
     </View>
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   title: { fontSize: ms(14), fontWeight: 600 },

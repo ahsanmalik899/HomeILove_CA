@@ -9,4 +9,7 @@ export interface FormikDropdownProps {
   errorText?: string;
   required?: boolean;
   additonalText?: string;
+  multipleFields?:boolean;
+ name?: string;
+  setValue?: (field: string, value: string) => void;
 }
