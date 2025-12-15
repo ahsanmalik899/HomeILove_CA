@@ -20,9 +20,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import * as Yup from "yup";
 interface ProfileConfig {
@@ -142,6 +141,17 @@ const index = () => {
       dataAccordingType = {
         profileType: "Electrician",
         title: "Electrician",
+        serviceTitle: "",
+        serviceDefault: "",
+        isService: false,
+        serviceOption: [],
+        isLicenceIssue: true,
+        isInvestor: false,
+      };
+        case "Agent Profile":
+      dataAccordingType = {
+        profileType: "Agent",
+        title: "Agent",
         serviceTitle: "",
         serviceDefault: "",
         isService: false,
@@ -298,7 +308,7 @@ const index = () => {
               try {
                 const res = await createprofile({
                   profileType: dataAccordingType.profileType,
-                  data: values,
+                  data: values,zzz
                 }).unwrap();
                 console.log(res)
                 if (res?.success) {
@@ -543,6 +553,7 @@ const index = () => {
                   touched={!!touched.license_no}
                   errors={!!errors.license_no}
                   required
+                  mulipleFields
                   errorText={errors.license_no}
                 />
                 <View style={{ marginTop: vs(10) }}>
@@ -582,33 +593,18 @@ const index = () => {
                     <Text style={{ marginLeft: hs(5) }}>Nationwide</Text>
                   </View>
 
-                  <View
-                    style={{
-                      borderRadius: ms(18),
-                      paddingVertical: vs(5),
-                      backgroundColor: Colors.light.LightGreen,
-                      paddingHorizontal: hs(5),
-                      marginTop: vs(5),
-                    }}
-                  >
-                    <TextInput
-                      placeholder={"Please enter City,Status or Zip Code"}
-                      value={values.dealing_areas}
-                      onChangeText={handleChange("dealing_areas")}
-                      onBlur={handleBlur("dealing_areas")}
-                      editable={
-                        values.dealing_areas === "Nationwide" ? false : true
-                      }
-                      cursorColor={Colors.light.DarkGreen}
-                      placeholderTextColor={Colors.light.DarkGreen}
-                      style={{ color: Colors.light.DarkGreen }}
-                    />
-                  </View>
-                  {touched.dealing_areas && errors.dealing_areas && (
-                    <Text style={{ color: Colors.light.red }}>
-                      {errors.dealing_areas}
-                    </Text>
-                  )}
+ <FormikInput
+                  title=""
+                  placeholder="Please enter City,Status or Zip Code"
+                  onChangeText={handleChange("dealing_areas")}
+                  onBlur={handleBlur("dealing_areas")}
+                  value={values.dealing_areas}
+                  touched={!!touched.dealing_areas}
+                  errors={!!errors.dealing_areas}
+                  required={false}
+                  mulipleFields
+                  errorText={errors.dealing_areas}
+                />
                 </View>
 
                 <Text style={{ width: hs(250), marginTop: vs(10) }}>

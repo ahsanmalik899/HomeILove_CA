@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const MainApi = createApi({
   reducerPath: 'MainApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.100.112:3000/api/users/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://homeilove.us/api/' }),
   endpoints: (builder) => ({
     getYourpost: builder.query< FeedResponse,GetPostType>({
       query: ({userid,page}) => ({
@@ -29,8 +29,12 @@ export const MainApi = createApi({
     }),
       createProfile: builder.mutation< any,CreateProfilePostType>({
       query: (data) => ({
-        url: `CreateProfile/`,
+        url: `createProfile`,
         method: 'POST',
+              headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
         body:data,
       }),
     }),

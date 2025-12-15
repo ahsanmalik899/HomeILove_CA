@@ -11,4 +11,5 @@ export type FormikInputProps = {
   required:boolean;
   errorText:any;
   multiline?:boolean;
+  mulipleFields?:boolean;
 };

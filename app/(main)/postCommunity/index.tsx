@@ -4,13 +4,13 @@ import Paypal from "@assets/SideBar/paypal-icon.svg";
 import PowerdByPayPal from "@assets/SideBar/Powered by PayPal.svg";
 import Volit from "@assets/SideBar/volit-white.svg";
 import { MaterialIcons } from "@expo/vector-icons";
+import CommunityType from "@src/components/globals/CommunityType";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import PropertyType from "@src/components/globals/PropertyType";
 import RadioButton from "@src/components/globals/RadioButton";
-import SelectRentAndSale from "@src/components/globals/SelectRentAndSale";
 import SelecteAdType from "@src/components/globals/TablikeButton";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
@@ -48,7 +48,7 @@ const index = () => {
       <View style={{ marginHorizontal: hs(10), marginVertical: vs(20) }}>
         <Text style={{ fontWeight: 600, fontSize: ms(15) }}>
           Market your
-          <Text style={{ color: Colors.light.red }}> COMMUNITY PROJECT</Text>
+          <Text style={{ color: Colors.light.red }}> COMMUNITY PROJECT </Text>
           smartly across the US
         </Text>
         <View
@@ -126,7 +126,7 @@ const index = () => {
               touched,
             }) => (
               <>
-                <SelectRentAndSale
+                <CommunityType
                   value={values.property_for}
                   onPress={(value) => {
                     setFieldValue("property_for", value);

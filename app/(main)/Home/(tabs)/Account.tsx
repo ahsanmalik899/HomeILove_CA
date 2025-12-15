@@ -1,10 +1,10 @@
 import { userdata } from "@/store/slices/selector/user";
-import Image from "@assets/test/test.jpeg";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HomeCard from "@src/components/globals/HomeCard";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { ms, vs } from "@utils/design/design";
+import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -13,7 +13,7 @@ const Account = () => {
   return (
     <View className="flex-1 bg-white">
       <View style={{ marginTop: vs(20) }} className="items-center">
-        <CircleImage source={Image} Size={70} />
+        <CircleImage  source={{uri:ImageFormater(user?.logo)}} Size={70} />
         <Text
           style={{
             marginTop: vs(5),
@@ -24,7 +24,6 @@ const Account = () => {
         >
           {user.name}
         </Text>
-       
       </View>
       <View>
         <ScrollView style={{ paddingTop: vs(45) }}>
@@ -62,7 +61,6 @@ const Account = () => {
             title="Reviews"
             onpress={() => router.navigate("/Reviews")}
           />
-         
         </ScrollView>
       </View>
     </View>

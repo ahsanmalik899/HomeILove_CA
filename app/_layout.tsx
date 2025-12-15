@@ -1,7 +1,18 @@
 /* eslint-disable import/extensions */
 // Tailwind CSS must be imported first
 import '@/global.css'; // 👈 add this line at the top
+import { Text, TextInput } from "react-native"; // 👈 add this
+const _Text: any = Text;
+const _TextInput: any = TextInput;
 
+if (_Text.defaultProps == null) _Text.defaultProps = {};
+if (_TextInput.defaultProps == null) _TextInput.defaultProps = {};
+
+_Text.defaultProps.allowFontScaling = false;
+_TextInput.defaultProps.allowFontScaling = false;
+
+_Text.defaultProps.maxFontSizeMultiplier = 1;
+_TextInput.defaultProps.maxFontSizeMultiplier = 1;
 // eslint-disable-next-line import/extensions
 import SpaceMonoFont from '@assets/fonts/SpaceMono-Regular.ttf';
 import store from '@store/index';
