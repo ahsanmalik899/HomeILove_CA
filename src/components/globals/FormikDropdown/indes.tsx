@@ -71,6 +71,7 @@ export const FormikDropdown = ({
       value={currentValue}
       items={items}
       setOpen={setOpen}
+      maxHeight={400}
       setValue={(callback) => {
         const val = callback(currentValue);
         setCurrentValue(val);
@@ -81,6 +82,7 @@ export const FormikDropdown = ({
         }
       }}
       setItems={setItems}
+      listMode="SCROLLVIEW"
       placeholder={placeholder}
       style={{
         backgroundColor: Colors.light.LightGreen,
@@ -126,12 +128,12 @@ export const FormikDropdown = ({
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
             <View
-              style={{
+              style={[styles.card,{
                 padding: ms(8),
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-              }}
+              }]}
             >
               <View className="flex-row gap-3 items-center">
                 <Heart />
@@ -141,6 +143,7 @@ export const FormikDropdown = ({
                     color: Colors.light.DarkGreen,
                     fontSize: ms(15),
                     fontWeight: "500",
+                    width:hs(250)
                   }}
                 >
                   {item}
@@ -163,4 +166,15 @@ export const FormikDropdown = ({
 
 const styles = StyleSheet.create({
   title: { fontSize: ms(14), fontWeight: "600" },
+    card: {
+    backgroundColor: "#fff",
+    borderRadius: ms(10),
+    marginVertical: vs(6),
+    marginHorizontal: hs(3),
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
 });

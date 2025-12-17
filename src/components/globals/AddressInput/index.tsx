@@ -1,8 +1,11 @@
-import { useGetAddressSuggestionsQuery } from "@/store/api/user/Google";
-import Add from "@assets/CreateProfile/Vector.svg";
+import {
+  useGetAddressSuggestionsQuery,
+  useLazyGetPlaceDetailsQuery,
+} from "@/store/api/user/Google";
 import Colors from "@src/constants/Colors";
+import { renderToastError } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -16,6 +19,8 @@ import { AddressInputProps } from "./type";
 
 export const AdressInput = ({
   title,
+  zip,
+  city,
   value,
   onSelect,
   touched,
@@ -24,46 +29,66 @@ export const AdressInput = ({
   required,
   additonalText,
   multipleFields,
+  state,
   setValue = () => {},
   name = "name",
 }: AddressInputProps) => {
   const [currentValue, setCurrentValue] = useState<string>(
     value?.toString() || ""
   );
-  const [selectedData, setSelectedData] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState(false);
 
+  const [selectedData, setSelectedData] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
+  const [getPlaceDetails, { isFetching: isDetailsLoading }] =
+    useLazyGetPlaceDetailsQuery();
   const { data: googleData, isFetching } = useGetAddressSuggestionsQuery(
     { input: currentValue },
     { skip: currentValue.length < 3 }
   );
 
-  useEffect(() => {
-    setShowSuggestions(currentValue.length > 2);
-  }, [currentValue]);
-  const handleSelectSuggestion = (address: string) => {
+  const handleSelectSuggestion = async (address: string, id: string) => {
     setCurrentValue(address);
     onSelect?.(address);
-    setValue(name,address);
+    setValue(name, address);
     setShowSuggestions(false);
-  };
 
-  const handleAdd = () => {
-    if (!currentValue) return;
-    if (selectedData.includes(currentValue)) return;
-    const updated = [...selectedData, currentValue];
-    setSelectedData(updated);
-    setValue(name, updated.join(","));
-  };
+    try {
+      const result = await getPlaceDetails({ placeId: id }).unwrap();
 
-  const handleRemove = (index: number) => {
-    const updated = selectedData.filter((_, i) => i !== index);
-    setSelectedData(updated);
-    setValue(name, updated.join(","));
+      const components = result?.result?.address_components || [];
+
+      const findComponent = (type: string) =>
+        components.find((c: any) => c.types.includes(type));
+
+      const cety =
+        findComponent("locality")?.long_name ||
+        findComponent("administrative_area_level_2")?.long_name ||
+        "";
+
+      const stateCode =
+        findComponent("administrative_area_level_1")?.short_name || "";
+
+      const zipCode = findComponent("postal_code")?.long_name || "";
+
+      const country = findComponent("country")?.long_name || "";
+
+      const latitude = result?.result?.geometry?.location?.lat ?? null;
+
+      const longitude = result?.result?.geometry?.location?.lng ?? null;
+
+      setValue(city, cety);
+      setValue(state, stateCode);
+      setValue(zip, zipCode);
+      setValue("user_lat", latitude);
+      setValue("user_lng", longitude);
+    } catch (err: any) {
+      renderToastError(err?.message || "Failed to fetch place details");
+    }
   };
 
   return (
-    <View style={{ marginTop: vs(10), zIndex: 1000 }}>
+    <View style={{ marginTop: vs(10) }}>
       {title && (
         <View style={{ flexDirection: "row", marginBottom: vs(10) }}>
           <Text style={styles.title}>{title}</Text>
@@ -77,7 +102,13 @@ export const AdressInput = ({
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <TextInput
           value={currentValue}
-          onChangeText={setCurrentValue}
+          onChangeText={(val) => {
+            setCurrentValue(val);
+            setValue(name, "");
+            setShowSuggestions(true);
+          }}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 1000)}
           placeholder="Enter address..."
           style={{
             flex: 1,
@@ -87,23 +118,6 @@ export const AdressInput = ({
             height: vs(45),
           }}
         />
-
-        {multipleFields && (
-          <TouchableOpacity
-            style={{
-              marginLeft: hs(8),
-              backgroundColor: Colors.light.LightGreen,
-              borderRadius: ms(8),
-              paddingHorizontal: hs(12),
-              height: vs(45),
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onPress={handleAdd}
-          >
-            <Add />
-          </TouchableOpacity>
-        )}
       </View>
 
       <View
@@ -126,36 +140,40 @@ export const AdressInput = ({
             <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
             <Text style={{ marginTop: vs(5) }}>Loading...</Text>
           </View>
-        ) 
-      } 
-        {googleData?.predictions.length && showSuggestions && (
-          <FlatList
-            data={googleData.predictions}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => handleSelectSuggestion(item.description)}
+        )}
+        {showSuggestions && isFocused && (
+          <View>
+            <FlatList
+              data={googleData?.predictions}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    handleSelectSuggestion(item.description, item.place_id)
+                  }
+                  style={{
+                    padding: vs(10),
+                    borderBottomWidth: 0.5,
+                    borderColor: Colors.light.lightGray,
+                  }}
+                >
+                  <Text>{item.description}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            {!googleData?.predictions.length && (
+              <View
                 style={{
                   padding: vs(10),
-                  borderBottomWidth: 0.5,
-                  borderColor: Colors.light.lightGray,
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <Text>{item.description}</Text>
-              </TouchableOpacity>
+                <Text style={{ color: Colors.light.DarkGreen }}>
+                  No addresses found
+                </Text>
+              </View>
             )}
-          />
-        ) }{!googleData?.predictions.length && showSuggestions && (
-          <View
-            style={{
-              padding: vs(10),
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={{ color: Colors.light.DarkGreen }}>
-              No addresses found
-            </Text>
           </View>
         )}
       </View>
@@ -165,12 +183,10 @@ export const AdressInput = ({
           {errorText}
         </Text>
       )}
-
-  
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600" },
+  title: { fontSize: ms(14), fontWeight: "600",zIndex:0 },
 });

@@ -12,5 +12,6 @@ export type FormikInputProps = {
   multiline?: boolean;
   mulipleFields?: boolean;
   name?: string;
+  editable?:boolean;
   setValue?: (field: string, value: string) => void;
 };

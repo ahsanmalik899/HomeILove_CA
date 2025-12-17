@@ -3,8 +3,9 @@ import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import { MaterialIcons } from "@expo/vector-icons";
-import { AdressInput } from "@src/components/globals/AddressInput";
 
+import { AdressInput } from "@src/components/globals/AddressInput";
+import { DealingAreas } from "@src/components/globals/DealingAreas";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
@@ -16,8 +17,10 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
+
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
+import { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -30,17 +33,25 @@ interface ProfileConfig {
   profileType: string;
   title: string;
   serviceTitle: string;
+  licenceNoTitle: string;
   serviceDefault: string;
   serviceOption: string[];
   isService: Boolean;
   isLicenceIssue: Boolean;
   isInvestor: Boolean;
   servingas: boolean;
+  institution: boolean;
+  licExpiry: boolean;
+  licState: boolean;
+  valuation: boolean;
+  licence: boolean;
+  multilicence: boolean;
 }
 const Index = () => {
   let dataAccordingType: ProfileConfig = {
     profileType: "",
     title: "Profile",
+    licenceNoTitle: "License No",
     serviceTitle: "",
     serviceDefault: "",
     serviceOption: [],
@@ -48,16 +59,28 @@ const Index = () => {
     isLicenceIssue: true,
     isInvestor: false,
     servingas: false,
+    institution: false,
+    licExpiry: false,
+    licState: false,
+    valuation: false,
+    multilicence: true,
+    licence: true,
   };
+  const investmentOptionsmin = [
+  { label: "Up to 1 million", value: 1_000_000 },
+  { label: "Up to 20 million", value: 20_000_000 },
+  { label: "Up to 50 million", value: 50_000_000 },
+  { label: "Up to 60 million", value: 60_000_000 },
+];
   const user = useAppSelector(userdata);
   const { type } = useLocalSearchParams();
-  console.log(type);
-
+  const [valuationFor, setValuationFor] = useState(false);
   switch (type) {
     case "Builder Profile":
       dataAccordingType = {
         profileType: "Builder",
         title: "Builder",
+        licenceNoTitle: "License No",
         serviceTitle: "Services for",
         serviceDefault: "All type of developments",
         serviceOption: [
@@ -70,10 +93,16 @@ const Index = () => {
           "Home extensions",
           "Other",
         ],
+        multilicence: true,
         isLicenceIssue: true,
         isService: true,
         isInvestor: false,
         servingas: true,
+        institution: false,
+        licExpiry: false,
+        licState: false,
+        valuation: false,
+        licence: true,
       };
       break;
 
@@ -86,8 +115,15 @@ const Index = () => {
         isService: true,
         serviceOption: ["Loan officer", "Mortgage broker", "Mortgage lender"],
         isLicenceIssue: false,
+        licenceNoTitle: "NMLS License No",
         isInvestor: false,
         servingas: false,
+        institution: true,
+        licExpiry: false,
+        multilicence: false,
+        licState: false,
+        licence: true,
+        valuation: false,
       };
       break;
 
@@ -98,10 +134,17 @@ const Index = () => {
         serviceTitle: "",
         serviceDefault: "",
         isService: false,
+        licenceNoTitle: "License No",
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
         servingas: false,
+        multilicence: true,
+        institution: false,
+        licExpiry: false,
+        licence: true,
+        licState: false,
+        valuation: false,
       };
       break;
 
@@ -111,11 +154,18 @@ const Index = () => {
         title: "Plumber",
         serviceTitle: "",
         serviceDefault: "",
+        licenceNoTitle: "License No",
         isService: false,
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
         servingas: false,
+        multilicence: true,
+        licence: true,
+        institution: false,
+        licExpiry: false,
+        licState: false,
+        valuation: false,
       };
       break;
 
@@ -125,11 +175,18 @@ const Index = () => {
         title: "Painter",
         serviceTitle: "",
         serviceDefault: "",
+        licenceNoTitle: "License No",
         isService: false,
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
         servingas: false,
+        multilicence: true,
+        institution: false,
+        licExpiry: false,
+        licence: true,
+        licState: false,
+        valuation: false,
       };
       break;
 
@@ -139,11 +196,18 @@ const Index = () => {
         title: "Investor",
         serviceTitle: "",
         serviceDefault: "",
+        licenceNoTitle: "License No",
         isService: false,
         serviceOption: [],
-        isLicenceIssue: true,
+        isLicenceIssue: false,
         isInvestor: true,
         servingas: false,
+        licence: false,
+        institution: false,
+        multilicence: true,
+        licExpiry: false,
+        licState: false,
+        valuation: false,
       };
       break;
 
@@ -153,23 +217,45 @@ const Index = () => {
         title: "Electrician",
         serviceTitle: "",
         serviceDefault: "",
+        licenceNoTitle: "License No",
         isService: false,
+        licence: true,
         serviceOption: [],
         isLicenceIssue: true,
         isInvestor: false,
         servingas: false,
+        multilicence: true,
+        institution: false,
+        licExpiry: false,
+        licState: false,
+        valuation: false,
       };
+      break;
     case "Agent Profile":
       dataAccordingType = {
         profileType: "Agent",
         title: "Agent",
-        serviceTitle: "",
+        serviceTitle: "Services for",
         serviceDefault: "",
-        isService: false,
-        serviceOption: [],
-        isLicenceIssue: true,
+        licenceNoTitle: "License No",
+        isService: true,
+        licence: true,
+        serviceOption: [
+          "Listing agent",
+          "Letting agent",
+          "Relocation",
+          "Foreclosure",
+          "Short sale",
+          "Consulting",
+        ],
+        isLicenceIssue: false,
         isInvestor: false,
-        servingas: false,
+        servingas: true,
+        institution: false,
+        licExpiry: true,
+        multilicence: false,
+        licState: true,
+        valuation: true,
       };
       break;
 
@@ -181,9 +267,16 @@ const Index = () => {
         serviceDefault: "",
         isService: false,
         serviceOption: [],
+        licenceNoTitle: "License No",
         isLicenceIssue: true,
         isInvestor: false,
         servingas: false,
+        licence: true,
+        institution: false,
+        multilicence: true,
+        licExpiry: false,
+        licState: false,
+        valuation: false,
       };
       break;
   }
@@ -205,21 +298,27 @@ const Index = () => {
 
     zip: Yup.string()
       .matches(/^[0-9]+$/, "Invalid ZIP code")
-      .required("ZIP code is required"),
+      .nonNullable(),
 
-    user_lat: Yup.number().nullable(),
-    user_lng: Yup.number().nullable(),
+    user_lat: Yup.number().required("Latituted is required"),
+    user_lng: Yup.number().nullable("Longitude is required"),
 
-    web: Yup.string().url("Invalid website URL").required(),
-    license_no: Yup.string().required("License no is required"),
-    lic_state: Yup.string().nullable(),
-    lic_expiry: Yup.date().nullable(),
+    web: Yup.string().url("Invalid website URL").nullable(),
+    license_no: dataAccordingType.licence
+      ? Yup.string().required("License no is required")
+      : Yup.string().nullable(),
+    lic_state: dataAccordingType.licState
+      ? Yup.string().required("License state is required")
+      : Yup.string().nullable(),
+    lic_expiry: dataAccordingType.licExpiry
+      ? Yup.string().required("License expiry is required")
+      : Yup.string().nullable(),
 
     dealing_areas: Yup.string().required("Dealing areas are required"),
     dealing_city: Yup.string().nullable(),
 
-    latitude: Yup.number().nullable(),
-    longitude: Yup.number().nullable(),
+    latitude: Yup.string().nullable(),
+    longitude: Yup.string().nullable(),
     issuing_authority: Yup.string().nullable(),
     investor_type: dataAccordingType.isInvestor
       ? Yup.string().required("Please select investor type")
@@ -234,7 +333,7 @@ const Index = () => {
           .typeError("Minimum investment must be a number")
           .required("Please enter minimum investment")
           .positive("Must be a positive number")
-      : Yup.number().nullable(),
+      : Yup.number().required("minimum invest is required"),
 
     max_invest: dataAccordingType.isInvestor
       ? Yup.number()
@@ -244,22 +343,29 @@ const Index = () => {
             Yup.ref("min_invest"),
             "Must be greater than minimum investment"
           )
-      : Yup.number().nullable(),
+      : Yup.number().required("maximum invest is required"),
 
-    advisory_service: Yup.string().required(
-      "Please select whether you offer advisory service"
-    ),
+    advisory_service: dataAccordingType.valuation
+      ? Yup.string().required(
+          "Please select whether you offer valuation service"
+        )
+      : Yup.string().required(
+          "Please select whether you offer advisory service"
+        ),
 
     remarks: Yup.string()
       .nullable()
       .max(5000, "Maximum 5000 characters allowed"),
 
     youtube_link: Yup.string().url("Invalid YouTube URL").nullable(),
-
+    institution: Yup.string().nullable(),
     users_id: Yup.number(),
     post_type: Yup.string().required("Please select add type"),
     logo: Yup.mixed().nullable(),
     cover: Yup.mixed().nullable(),
+    valuation_for: valuationFor
+      ? Yup.string().required("Valuation for is required")
+      : Yup.string().nullable(),
     services: dataAccordingType.isService
       ? Yup.string().required("Please select a service")
       : Yup.string().nullable(),
@@ -300,8 +406,8 @@ const Index = () => {
               lic_expiry: "",
               dealing_areas: "",
               dealing_city: "",
-              latitude: "",
-              longitude: "",
+              latitude: null,
+              longitude: null,
               investor_type: "",
               invest_in: "",
               issuing_authority: "",
@@ -311,41 +417,70 @@ const Index = () => {
               remarks: "",
               youtube_link: "",
               services: dataAccordingType.serviceDefault,
-              users_id: user.sweetghar_user_id,
+              users_id: user.id,
               post_type: "Normal",
-              logo: "",
-              cover: "",
+              logo: null,
+              cover: null,
+              institution: "",
+              valuation_for: "",
             }}
             validationSchema={ProfileSchema}
             onSubmit={async (values) => {
               try {
-                const res = await createprofile({
-                  profileType: dataAccordingType.profileType,
-                  data: values,
-                  zzz,
-                }).unwrap();
-                console.log(res);
+                const formData = new FormData();
+
+                // Append profile type
+                formData.append("profileType", dataAccordingType.profileType);
+
+                // Append all fields except files
+                Object.entries(values).forEach(([key, value]) => {
+                  if (
+                    key !== "logo" &&
+                    key !== "cover" &&
+                    value != null &&
+                    value !== ""
+                  ) {
+                    if (key === "services" && type === "Agent Profile") {
+                      formData.append("agent_for", String(value));
+                    } else {
+                      formData.append(key, String(value));
+                    }
+                  }
+                });
+
+                // Append logo if selected
+                if (values.logo?.uri) {
+                  formData.append("logo", {
+                    uri: values.logo.uri,
+                    type: values.logo.type || "image/jpeg",
+                    name: values.logo.name || "logo.jpg",
+                  } as any);
+                }
+
+                // Append cover if selected
+                if (values.cover?.uri) {
+                  formData.append("cover", {
+                    uri: values.cover.uri,
+                    type: values.cover.type || "image/jpeg",
+                    name: values.cover.name || "cover.jpg",
+                  } as any);
+                }
+
+                // Call RTK Query mutation
+                const res = await createprofile(formData).unwrap();
+
                 if (res?.success) {
                   renderToastSuccess(
-                    res?.message || "Profile Created successfully"
+                    res?.message || "Profile created successfully"
                   );
-
                   router.replace("/BusenessProfiles");
                 } else {
-                  const message =
-                    res?.data?.message ||
-                    res?.message ||
-                    (typeof err === "string" ? err : null) ||
-                    "Network error: Check your connection";
-                  renderToastError(message);
+                  renderToastError(res?.message || "Profile creation failed");
                 }
-              } catch {
-                const message =
-                  err?.data?.message ||
-                  err?.message ||
-                  (typeof err === "string" ? err : null) ||
-                  "Network error: Check your connection";
-                renderToastError(message);
+              } catch (err: any) {
+                renderToastError(
+                  err?.data?.message || err?.message || "Network error"
+                );
               }
             }}
           >
@@ -359,6 +494,7 @@ const Index = () => {
               touched,
             }) => (
               <>
+                <Text>{errors.longitude}</Text>
                 {dataAccordingType.isInvestor && (
                   <>
                     <FormikDropdown
@@ -376,9 +512,10 @@ const Index = () => {
                       touched={!!touched.investor_type}
                       errors={!!errors.investor_type}
                       errorText={errors.investor_type}
+                      multipleFields
                       required
                     />
-                    
+
                     <FormikDropdown
                       title={"Invest in"}
                       placeholder={"Nothing selected"}
@@ -396,6 +533,7 @@ const Index = () => {
                       touched={!!touched.invest_in}
                       errors={!!errors.invest_in}
                       errorText={errors.invest_in}
+                      multipleFields
                       required
                     />
                     <View className="flex-row justify-between">
@@ -418,8 +556,11 @@ const Index = () => {
                           required
                         />
                       </View>
-                      
-                      <View className="flex-1" style={{ marginLeft: hs(5) }}>
+
+                      <View
+                        className="flex-1"
+                        style={{ marginLeft: hs(5), marginTop: vs(30) }}
+                      >
                         <FormikDropdown
                           title={""}
                           placeholder={"To"}
@@ -433,15 +574,14 @@ const Index = () => {
                           onSelect={(val) => setFieldValue("max_invest", val)}
                           touched={!!touched.max_invest}
                           errors={!!errors.max_invest}
+                          required
                           errorText={errors.max_invest}
                         />
                       </View>
                     </View>
                   </>
                 )}
-               <AdressInput city={""} address={""} zip={""} value={values.address} title={""}  onSelect={function (value: string): void {
-                  throw new Error("Function not implemented.");
-                } }/>
+
                 <FormikInput
                   title="Display name"
                   placeholder="Name"
@@ -455,20 +595,35 @@ const Index = () => {
                   errorText={errors.business_name}
                 />
                 {dataAccordingType.isService && (
-                  <FormikDropdown
-                    title={dataAccordingType.serviceTitle}
-                    placeholder={dataAccordingType.serviceTitle}
-                    value={values.services}
-                    options={dataAccordingType.serviceOption}
-                    onSelect={(val) => setFieldValue("services", val)}
-                    touched={!!touched.services}
-                    errors={!!errors.services}
-                    errorText={errors.services}
-                    required
-                    multipleFields={dataAccordingType.servingas}
-                    name="services"
-                    setValue={setFieldValue}
-                  />
+                  <>
+                    <FormikDropdown
+                      title={dataAccordingType.serviceTitle}
+                      placeholder={dataAccordingType.serviceTitle}
+                      value={values.services}
+                      options={dataAccordingType.serviceOption}
+                      onSelect={(val) => setFieldValue("services", val)}
+                      touched={!!touched.services}
+                      errors={!!errors.services}
+                      errorText={errors.services}
+                      required
+                      multipleFields={dataAccordingType.servingas}
+                      name="services"
+                      setValue={setFieldValue}
+                    />
+                    {values.services === "Loan officer" && (
+                      <FormikInput
+                        title="Institution"
+                        placeholder="institution"
+                        onChangeText={handleChange("institution")}
+                        onBlur={handleBlur("institution")}
+                        value={values.institution}
+                        touched={!!touched.institution}
+                        errors={!!errors.institution}
+                        required={false}
+                        errorText={errors.institution}
+                      />
+                    )}
+                  </>
                 )}
                 <FormikInput
                   title="Contact No"
@@ -481,57 +636,21 @@ const Index = () => {
                   required
                   errorText={errors.contact}
                 />
-                <FormikInput
+                <AdressInput
+                  city={"city"}
+                  zip={"zip"}
+                  state={"state"}
+                  name="address"
+                  setValue={setFieldValue}
+                  onSelect={() => {}}
                   title="Address"
                   placeholder="Enter Location"
-                  onChangeText={handleChange("address")}
-                  onBlur={handleBlur("address")}
                   value={values.address}
                   touched={!!touched.address}
                   errors={!!errors.address}
                   required
                   errorText={errors.address}
                 />
-                <FormikInput
-                  title="State"
-                  placeholder="Enter state"
-                  onChangeText={handleChange("state")}
-                  onBlur={handleBlur("state")}
-                  value={values.state}
-                  touched={!!touched.state}
-                  errors={!!errors.state}
-                  required
-                  errorText={errors.state}
-                />
-                <View className="flex-row justify-between items-start gap-3">
-                  <View className="flex-1">
-                    <FormikInput
-                      title="City"
-                      placeholder="Enter Location"
-                      onChangeText={handleChange("city")}
-                      onBlur={handleBlur("city")}
-                      value={values.city}
-                      touched={!!touched.city}
-                      errors={!!errors.city}
-                      required
-                      errorText={errors.city}
-                    />
-                  </View>
-
-                  <View className="flex-1">
-                    <FormikInput
-                      title="Zip"
-                      placeholder="Enter zip"
-                      onChangeText={handleChange("zip")}
-                      onBlur={handleBlur("zip")}
-                      value={values.zip}
-                      touched={!!touched.zip}
-                      errors={!!errors.zip}
-                      required
-                      errorText={errors.zip}
-                    />
-                  </View>
-                </View>
 
                 <FormikInput
                   title="Web Address"
@@ -541,7 +660,7 @@ const Index = () => {
                   value={values.web}
                   touched={!!touched.web}
                   errors={!!errors.web}
-                  required
+                  required={false}
                   errorText={errors.web}
                 />
                 <View
@@ -567,76 +686,74 @@ const Index = () => {
                     errorText={errors.issuing_authority}
                   />
                 )}
-
-                <FormikInput
-                  title="License No"
-                  placeholder="License number"
-                  onChangeText={handleChange("license_no")}
-                  onBlur={handleBlur("license_no")}
-                  value={values.license_no}
-                  touched={!!touched.license_no}
-                  errors={!!errors.license_no}
-                  required
-                  mulipleFields
-                  name="license_no"
-                  setValue={setFieldValue}
-                  errorText={errors.license_no}
-                />
-                <View style={{ marginTop: vs(10) }}>
-                  <View className="flex-row" style={{ marginBottom: vs(10) }}>
-                    <Text style={styles.title}>Dealing areas</Text>
-
-                    <Text
-                      style={{
-                        color: Colors.light.red,
-                      }}
-                    >
-                      {" "}
-                      *
-                    </Text>
-                  </View>
-                  <View className="flex-row ">
-                    <TouchableOpacity
-                      onPress={() =>
-                        setFieldValue(
-                          "dealing_areas",
-                          values.dealing_areas === "Nationwide"
-                            ? ""
-                            : "Nationwide"
-                        )
-                      }
-                    >
-                      <MaterialIcons
-                        size={18}
-                        color={Colors.light.DarkGreen}
-                        name={
-                          values.dealing_areas === "Nationwide"
-                            ? "check-box"
-                            : "check-box-outline-blank"
-                        }
-                      />
-                    </TouchableOpacity>
-                    <Text style={{ marginLeft: hs(5) }}>Nationwide</Text>
-                  </View>
-
+                {dataAccordingType.licence && (
                   <FormikInput
-                    title=""
-                    placeholder="Please enter City,Status or Zip Code"
-                    onChangeText={handleChange("dealing_areas")}
-                    onBlur={handleBlur("dealing_areas")}
-                    value={values.dealing_areas}
-                    touched={!!touched.dealing_areas}
-                    errors={!!errors.dealing_areas}
-                    required={false}
-                    mulipleFields
-                    name="dealing_areas"
+                    title={dataAccordingType.licenceNoTitle}
+                    placeholder="License number"
+                    onChangeText={handleChange("license_no")}
+                    onBlur={handleBlur("license_no")}
+                    value={values.license_no}
+                    touched={!!touched.license_no}
+                    errors={!!errors.license_no}
+                    required
+                    mulipleFields={dataAccordingType.multilicence}
+                    name="license_no"
                     setValue={setFieldValue}
-                    errorText={errors.dealing_areas}
+                    errorText={errors.license_no}
                   />
-                </View>
+                )}
+
+                {!dataAccordingType.multilicence && (
+                  <View className="flex-row justify-between">
+                    <View className="flex-1" style={{ marginRight: hs(5) }}>
+                      <FormikInput
+                        title="State"
+                        placeholder="License State"
+                        onChangeText={handleChange("lic_state")}
+                        onBlur={handleBlur("lic_state")}
+                        value={values.lic_state}
+                        touched={!!touched.lic_state}
+                        errors={!!errors.lic_state}
+                        required
+                        errorText={errors.lic_state}
+                      />
+                    </View>
+                    {dataAccordingType?.licExpiry && (
+                      <View className="flex-1" style={{ marginLeft: hs(5) }}>
+                        <FormikInput
+                          title="License Expiry"
+                          placeholder="License Expiry"
+                          onChangeText={handleChange("lic_expiry")}
+                          onBlur={handleBlur("lic_expiry")}
+                          value={values.lic_expiry}
+                          touched={!!touched.lic_expiry}
+                          errors={!!errors.lic_expiry}
+                          required
+                          errorText={errors.lic_expiry}
+                        />
+                      </View>
+                    )}
+                  </View>
+                )}
+                <DealingAreas
+                  city="dealing_city"
+                  onSelect={() => {}}
+                  state="state"
+                  title="Dealin Areas"
+                  value={values.dealing_areas}
+                  touched={!!touched.dealing_areas}
+                  errors={!!errors.dealing_areas}
+                  name="dealing_areas"
+                  zip="zip code"
+                  setValue={setFieldValue}
+                  errorText={errors.dealing_areas}
+                  placeholder="Please enter City, State or Zip code"
+                />
 
                 <Text style={{ width: hs(250), marginTop: vs(10) }}>
-                  Do you provide advisory services in your locality?
+                  {dataAccordingType.valuation
+                    ? "Do you provide valuaition services in your locality?"
+                    : "Do you provide advisory services in your locality?"}
                 </Text>
                 <View
                   className="flex-row"
@@ -644,12 +761,13 @@ const Index = () => {
                 >
                   <View className="flex-row items-center">
                     <TouchableOpacity
-                      onPress={() =>
+                      onPress={() => {
                         setFieldValue(
                           "advisory_service",
                           values.advisory_service === "Yes" ? "" : "Yes"
-                        )
-                      }
+                        );
+                        setValuationFor(true);
+                      }}
                     >
                       <MaterialIcons
                         size={18}
@@ -668,12 +786,13 @@ const Index = () => {
                     style={{ marginLeft: hs(20) }}
                   >
                     <TouchableOpacity
-                      onPress={() =>
+                      onPress={() => {
                         setFieldValue(
                           "advisory_service",
                           values.advisory_service === "No" ? "" : "No"
-                        )
-                      }
+                        );
+                        setValuationFor(false);
+                      }}
                     >
                       <MaterialIcons
                         size={18}
@@ -694,6 +813,26 @@ const Index = () => {
                     {errors.advisory_service}
                   </Text>
                 )}
+                {valuationFor && (
+                  <FormikDropdown
+                    title="Valuation for"
+                    placeholder="Valuation for"
+                    value={values.valuation_for}
+                    options={[
+                      "Home buying/selling valuation",
+                      "Home rent valuation",
+                    ]}
+                    onSelect={(val) => setFieldValue("valuation_for", val)}
+                    touched={!!touched.valuation_for}
+                    errors={!!errors.valuation_for}
+                    errorText={errors.valuation_for}
+                    required
+                    multipleFields={true}
+                    name="valuation_for"
+                    setValue={setFieldValue}
+                  />
+                )}
+
                 <FormikInput
                   title="More Description"
                   placeholder="Write here (Upto 5000 characters)"
@@ -716,12 +855,16 @@ const Index = () => {
                     opacity: 0.2,
                   }}
                 />
+
                 <UploadPic
                   Logo={Profilelogo}
                   text1="Upload "
                   text2="Logo/Pic"
-                  onPress={() => {}}
+                  value={values.logo}
+                  name="logo"
+                  setValue={setFieldValue}
                 />
+
                 <UploadPic
                   Logo={ImageUpload}
                   text1="Upload "
@@ -729,7 +872,9 @@ const Index = () => {
                   text3="Image "
                   additionalText="Recommended size 760x300"
                   border
-                  onPress={() => {}}
+                  setValue={setFieldValue}
+                  name={"cover"}
+                  value={values.cover}
                 />
                 <FormikInput
                   title="Provide youtube video link"

@@ -32,4 +32,4 @@ export const Google = createApi({
   }),
 });
 
-export const { useGetAddressSuggestionsQuery,useGetPlaceDetailsQuery } = Google;
+export const { useGetAddressSuggestionsQuery,useGetPlaceDetailsQuery,useLazyGetPlaceDetailsQuery } = Google;

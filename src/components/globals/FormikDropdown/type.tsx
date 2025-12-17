@@ -1,7 +1,7 @@
 export interface FormikDropdownProps {
   title: string;
   value: string;
-  options: string[];
+  options: string[]|{labe:string,value:number}[];
   placeholder?: string;
   onSelect: (value: string) => void;
   touched?: boolean;

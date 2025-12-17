@@ -29,11 +29,14 @@ export const FormikInput = ({
   mulipleFields,
   setValue=()=>{},
   name="name",
+  editable=true,
 }: FormikInputProps) => {
   const [selectedData, setSelectedData] = useState<string[]>([]);
   const [multivariable, setMultivariable] = useState("");
   const handleAdd = () => {
-    if (!multivariable.trim()) return;
+     const trimmedValue = multivariable.trim();
+    if (!trimmedValue) return;
+    if (selectedData.includes(trimmedValue)) return; 
 
     const updated = [...selectedData, multivariable.trim()];
 
@@ -83,6 +86,7 @@ export const FormikInput = ({
             value={mulipleFields ? multivariable : value}
             onChangeText={mulipleFields ? setMultivariable : onChangeText}
             onBlur={onBlur}
+            editable={editable}
             multiline={multiline}
             cursorColor={Colors.light.DarkGreen}
             placeholderTextColor={Colors.light.DarkGreen}
@@ -113,12 +117,12 @@ export const FormikInput = ({
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) => (
               <View
-                style={{
+                style={[styles.card,{
                   padding: ms(8),
                   flexDirection: "row",
                   alignItems:'center',
                   justifyContent: "space-between",
-                }}
+                }]}
               >
                 <View className="flex-row gap-3 items-center">
                   <Heart />
@@ -128,6 +132,7 @@ export const FormikInput = ({
                       color: Colors.light.DarkGreen,
                       fontSize: ms(15),
                       fontWeight: "500",
+                      width:hs(250)
                     }}
                   >
                     {item}
@@ -160,4 +165,15 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: "transparent",
   },
+      card: {
+      backgroundColor: "#fff",
+      borderRadius: ms(10),
+      marginVertical: vs(6),
+      marginHorizontal: hs(3),
+      elevation: 4,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 4,
+    },
 });

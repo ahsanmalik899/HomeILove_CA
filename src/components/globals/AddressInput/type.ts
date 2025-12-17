@@ -1,6 +1,6 @@
 export interface AddressInputProps {
   city: string;
-  address: string;
+  state: string;
   zip: string;
   value:string;
  title:string,

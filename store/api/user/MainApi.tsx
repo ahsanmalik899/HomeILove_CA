@@ -1,5 +1,5 @@
 
-import { ContentPostType, CreateProfilePostType, FeedResponse, GetMyPostsOnly, GetPostType } from "@/store/type/user";
+import { ContentPostType, FeedResponse, GetMyPostsOnly, GetPostType } from "@/store/type/user";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const MainApi = createApi({
@@ -27,15 +27,12 @@ export const MainApi = createApi({
         
       }),
     }),
-      createProfile: builder.mutation< any,CreateProfilePostType>({
-      query: (data) => ({
+      createProfile: builder.mutation< any,FormData>({
+      query: (formatData) => ({
         url: `createProfile`,
         method: 'POST',
-              headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-        body:data,
+     
+        body:formatData,
       }),
     }),
       getMYPosts: builder.query< any,GetMyPostsOnly>({
