@@ -30,6 +30,8 @@ export const AdressInput = ({
   additonalText,
   multipleFields,
   state,
+  lat,
+  long,
   setValue = () => {},
   name = "name",
 }: AddressInputProps) => {
@@ -80,8 +82,8 @@ export const AdressInput = ({
       setValue(city, cety);
       setValue(state, stateCode);
       setValue(zip, zipCode);
-      setValue("user_lat", latitude);
-      setValue("user_lng", longitude);
+      setValue(lat, latitude);
+      setValue(long, longitude);
     } catch (err: any) {
       renderToastError(err?.message || "Failed to fetch place details");
     }
@@ -145,6 +147,12 @@ export const AdressInput = ({
           <View>
             <FlatList
               data={googleData?.predictions}
+              keyboardShouldPersistTaps="handled"
+              removeClippedSubviews={false}
+              nestedScrollEnabled
+              scrollEnabled
+              showsVerticalScrollIndicator={true}
+              initialNumToRender={10}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -155,6 +163,7 @@ export const AdressInput = ({
                     padding: vs(10),
                     borderBottomWidth: 0.5,
                     borderColor: Colors.light.lightGray,
+                    maxHeight: vs(400),
                   }}
                 >
                   <Text>{item.description}</Text>
@@ -188,5 +197,5 @@ export const AdressInput = ({
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600",zIndex:0 },
+  title: { fontSize: ms(14), fontWeight: "600", zIndex: 0 },
 });

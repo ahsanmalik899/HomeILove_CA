@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { FormikInput } from "@src/components/globals/FormictInput";
+import { DealingAreas } from "@src/components/globals/DealingAreas";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Colors from "@src/constants/Colors";
@@ -116,18 +116,36 @@ const index = () => {
                   touched,
                 }) => (
                   <>
-                    <FormikInput
-                      title="Address"
-                      placeholder="Enter Location"
-                      onChangeText={handleChange("address")}
-                      onBlur={handleBlur("address")}
-                      value={values.location}
-                      touched={!!touched.location}
-                      errors={!!errors.location}
-                      required
-                      errorText={errors.location}
+                  <DealingAreas
+                                    city="dealing_city"
+                                    onSelect={() => {}}
+                                    state="state"
+                                    title="Dealin Areas"
+                                    value={values.dealing_areas}
+                                    touched={!!touched.dealing_areas}
+                                    errors={!!errors.dealing_areas}
+                                    name="dealing_areas"
+                                    zip="zip code"
+                                    setValue={setFieldValue}
+                                    errorText={errors.dealing_areas}
+                                    placeholder="Please enter City, State or Zip code"
+                                  />
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
                     />
-                    <Text style={{ width: hs(250), marginTop: vs(10) }}>
+                    <Text
+                      style={{
+                        width: hs(250),
+                        fontWeight: 500,
+                        marginTop: vs(10),
+                      }}
+                    >
                       Property for
                     </Text>
                     <View
@@ -186,6 +204,15 @@ const index = () => {
                         {errors.property_for}
                       </Text>
                     )}
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
+                    />
                     <View className="flex-1">
                       <FormikDropdown
                         title="Property Type"
@@ -194,6 +221,7 @@ const index = () => {
                         touched={!!touched.property_type}
                         errors={!!errors.property_type}
                         required
+                        multipleFields
                         errorText={errors.property_type}
                         options={["House", "1/2/3", "1/2/3"]}
                         onSelect={(value) =>
@@ -201,6 +229,15 @@ const index = () => {
                         }
                       />
                     </View>
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
+                    />
                     <View className="flex-1">
                       <FormikDropdown
                         title="Property Conditions"
@@ -209,6 +246,7 @@ const index = () => {
                         touched={!!touched.property_type}
                         errors={!!errors.property_type}
                         required
+                        multipleFields
                         errorText={errors.property_type}
                         options={["House", "1/2/3", "1/2/3"]}
                         onSelect={(value) =>
@@ -216,6 +254,16 @@ const index = () => {
                         }
                       />
                     </View>
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
+                    />
+                    <Text style={{ fontWeight: 500 }}>Price Range (Sale)</Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdown
@@ -249,6 +297,18 @@ const index = () => {
                         />
                       </View>
                     </View>
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
+                    />
+                    <Text style={{ fontWeight: 500 }}>
+                      Property size (sqft)
+                    </Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdown
@@ -282,6 +342,17 @@ const index = () => {
                         />
                       </View>
                     </View>
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
+                    />
+                    <Text style={{ fontWeight: 500 }}>Lot size (acres)</Text>
+
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdown
@@ -315,6 +386,16 @@ const index = () => {
                         />
                       </View>
                     </View>
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
+                    />
+                    <Text style={{ fontWeight: 500 }}>Home age</Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdown
@@ -383,16 +464,28 @@ const index = () => {
                   touched,
                 }) => (
                   <>
-                    <FormikInput
-                      title="Address"
-                      placeholder="Enter Location"
-                      onChangeText={handleChange("address")}
-                      onBlur={handleBlur("address")}
-                      value={values.location}
-                      touched={!!touched.location}
-                      errors={!!errors.location}
-                      required
-                      errorText={errors.location}
+                    <DealingAreas
+                                    city="dealing_city"
+                                    onSelect={() => {}}
+                                    state="state"
+                                    title="Dealin Areas"
+                                    value={values.dealing_areas}
+                                    touched={!!touched.dealing_areas}
+                                    errors={!!errors.dealing_areas}
+                                    name="dealing_areas"
+                                    zip="zip code"
+                                    setValue={setFieldValue}
+                                    errorText={errors.dealing_areas}
+                                    placeholder="Please enter City, State or Zip code"
+                                  />
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
                     />
                     <Text style={{ width: hs(250), marginTop: vs(10) }}>
                       Property for
@@ -453,9 +546,15 @@ const index = () => {
                         {errors.property_for}
                       </Text>
                     )}
-
-
-
+                    <View
+                      style={{
+                        height: vs(1),
+                        marginTop: vs(20),
+                        marginBottom: vs(10),
+                        backgroundColor: Colors.light.textGray,
+                        opacity: 0.2,
+                      }}
+                    />
                     <Text style={{ width: hs(250), marginTop: vs(10) }}>
                       Development Stage
                     </Text>
@@ -468,7 +567,9 @@ const index = () => {
                           onPress={() =>
                             setFieldValue(
                               "development_stage",
-                              values.development_stage === "Completed" ? "" : "Completed"
+                              values.development_stage === "Completed"
+                                ? ""
+                                : "Completed"
                             )
                           }
                         >
@@ -492,7 +593,9 @@ const index = () => {
                           onPress={() =>
                             setFieldValue(
                               "development_stage",
-                              values.development_stage === "Constructed" ? "" : "Constructed"
+                              values.development_stage === "Constructed"
+                                ? ""
+                                : "Constructed"
                             )
                           }
                         >
@@ -509,12 +612,14 @@ const index = () => {
                       </View>
 
                       <Text style={{ marginLeft: hs(5) }}>Constructed</Text>
-                       <View className="flex-row items-center">
+                      <View className="flex-row items-center">
                         <TouchableOpacity
                           onPress={() =>
                             setFieldValue(
                               "property_for",
-                              values.development_stage === "Inplanning" ? "" : "Inplanning"
+                              values.development_stage === "Inplanning"
+                                ? ""
+                                : "Inplanning"
                             )
                           }
                         >
@@ -536,6 +641,16 @@ const index = () => {
                         {errors.property_for}
                       </Text>
                     )}
+                     <View
+                        style={{
+                          height: vs(1),
+                          marginTop: vs(20),
+                          marginBottom: vs(10),
+                          backgroundColor: Colors.light.textGray,
+                          opacity: 0.2,
+                        }}
+                      />
+                      <Text style={{fontWeight:500 }}>Price Range (Sale)</Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdown
@@ -552,7 +667,7 @@ const index = () => {
                           }}
                         />
                       </View>
-
+                     
                       <View className="flex-1">
                         <FormikDropdown
                           title="Maximun"
@@ -604,169 +719,178 @@ const index = () => {
                   touched,
                 }) => (
                   <>
-                    <FormikInput
-                      title="Address"
-                      placeholder="Enter Location"
-                      onChangeText={handleChange("address")}
-                      onBlur={handleBlur("address")}
-                      value={values.location}
-                      touched={!!touched.location}
-                      errors={!!errors.location}
-                      required
-                      errorText={errors.location}
-                    />
+                   <DealingAreas
+                                    city="dealing_city"
+                                    onSelect={() => {}}
+                                    state="state"
+                                    title="Dealin Areas"
+                                    value={values.dealing_areas}
+                                    touched={!!touched.dealing_areas}
+                                    errors={!!errors.dealing_areas}
+                                    name="dealing_areas"
+                                    zip="zip code"
+                                    setValue={setFieldValue}
+                                    errorText={errors.dealing_areas}
+                                    placeholder="Please enter City, State or Zip code"
+                                  />
                     <Text style={{ width: hs(250), marginTop: vs(10) }}>
                       Property for
                     </Text>
                     <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFieldValue(
-                              "property_for",
-                              values.property_for === "Electricians" ? "" : "Electricians"
-                            )
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFieldValue(
+                            "property_for",
+                            values.property_for === "Electricians"
+                              ? ""
+                              : "Electricians"
+                          )
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            values.property_for === "Electricians"
+                              ? "check-box"
+                              : "check-box-outline-blank"
                           }
-                        >
-                          <MaterialIcons
-                            size={18}
-                            color={Colors.light.DarkGreen}
-                            name={
-                              values.property_for === "Electricians"
-                                ? "check-box"
-                                : "check-box-outline-blank"
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}>Electricians</Text>
-                      </View>
-                       <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFieldValue(
-                              "property_for",
-                              values.property_for === "Builder" ? "" : "Builder"
-                            )
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(5) }}>Electricians</Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFieldValue(
+                            "property_for",
+                            values.property_for === "Builder" ? "" : "Builder"
+                          )
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            values.property_for === "Builder"
+                              ? "check-box"
+                              : "check-box-outline-blank"
                           }
-                        >
-                          <MaterialIcons
-                            size={18}
-                            color={Colors.light.DarkGreen}
-                            name={
-                              values.property_for === "Builder"
-                                ? "check-box"
-                                : "check-box-outline-blank"
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}>Builder</Text>
-                      </View>
-                       <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFieldValue(
-                              "property_for",
-                              values.property_for === "Property agents" ? "" : "Property agents"
-                            )
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(5) }}>Builder</Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFieldValue(
+                            "property_for",
+                            values.property_for === "Property agents"
+                              ? ""
+                              : "Property agents"
+                          )
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            values.property_for === "Property agents"
+                              ? "check-box"
+                              : "check-box-outline-blank"
                           }
-                        >
-                          <MaterialIcons
-                            size={18}
-                            color={Colors.light.DarkGreen}
-                            name={
-                              values.property_for === "Property agents"
-                                ? "check-box"
-                                : "check-box-outline-blank"
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}>Property agents</Text>
-                      </View>
-                       <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFieldValue(
-                              "property_for",
-                              values.property_for === "Plumbers" ? "" : "Plumbers"
-                            )
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(5) }}>Property agents</Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFieldValue(
+                            "property_for",
+                            values.property_for === "Plumbers" ? "" : "Plumbers"
+                          )
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            values.property_for === "Plumbers"
+                              ? "check-box"
+                              : "check-box-outline-blank"
                           }
-                        >
-                          <MaterialIcons
-                            size={18}
-                            color={Colors.light.DarkGreen}
-                            name={
-                              values.property_for === "Plumbers"
-                                ? "check-box"
-                                : "check-box-outline-blank"
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}>Plumbers</Text>
-                      </View>
-                       <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFieldValue(
-                              "property_for",
-                              values.property_for === "Mortgage Advisors" ? "" : "Mortgage Advisors"
-                            )
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(5) }}>Plumbers</Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFieldValue(
+                            "property_for",
+                            values.property_for === "Mortgage Advisors"
+                              ? ""
+                              : "Mortgage Advisors"
+                          )
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            values.property_for === "Mortgage Advisors"
+                              ? "check-box"
+                              : "check-box-outline-blank"
                           }
-                        >
-                          <MaterialIcons
-                            size={18}
-                            color={Colors.light.DarkGreen}
-                            name={
-                              values.property_for === "Mortgage Advisors"
-                                ? "check-box"
-                                : "check-box-outline-blank"
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}>Mortgage Advisors</Text>
-                      </View>
-                       <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFieldValue(
-                              "property_for",
-                              values.property_for === "Decors" ? "" : "Decors"
-                            )
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(5) }}>
+                        Mortgage Advisors
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFieldValue(
+                            "property_for",
+                            values.property_for === "Decors" ? "" : "Decors"
+                          )
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            values.property_for === "Decors"
+                              ? "check-box"
+                              : "check-box-outline-blank"
                           }
-                        >
-                          <MaterialIcons
-                            size={18}
-                            color={Colors.light.DarkGreen}
-                            name={
-                              values.property_for === "Decors"
-                                ? "check-box"
-                                : "check-box-outline-blank"
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}>Decors</Text>
-                      </View>
-                       <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFieldValue(
-                              "property_for",
-                              values.property_for === "Painters" ? "" : "Painters"
-                            )
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(5) }}>Decors</Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFieldValue(
+                            "property_for",
+                            values.property_for === "Painters" ? "" : "Painters"
+                          )
+                        }
+                      >
+                        <MaterialIcons
+                          size={18}
+                          color={Colors.light.DarkGreen}
+                          name={
+                            values.property_for === "Painters"
+                              ? "check-box"
+                              : "check-box-outline-blank"
                           }
-                        >
-                          <MaterialIcons
-                            size={18}
-                            color={Colors.light.DarkGreen}
-                            name={
-                              values.property_for === "Painters"
-                                ? "check-box"
-                                : "check-box-outline-blank"
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}>Painters</Text>
-                      </View>
-
-                   
+                        />
+                      </TouchableOpacity>
+                      <Text style={{ marginLeft: hs(5) }}>Painters</Text>
+                    </View>
                   </>
                 )}
               </Formik>
@@ -782,10 +906,12 @@ export default index;
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
+    marginTop: vs(20),
     elevation: 5,
-    borderRadius: ms(10),
-    paddingHorizontal: hs(5),
-    paddingBottom: vs(10),
+    marginHorizontal: hs(10),
+    borderRadius: ms(30),
+    paddingHorizontal: hs(10),
+    paddingVertical: vs(10),
     marginBottom: vs(10),
   },
 });

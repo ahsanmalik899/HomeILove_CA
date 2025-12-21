@@ -20,7 +20,11 @@ const index = () => {
     <View className="bg-white flex-1">
       <HeaderWithBack title="Business Profiles" />
 
-      <ScrollView style={{ paddingHorizontal: hs(20), paddingTop: vs(10) }}>
+      <ScrollView
+        style={{ paddingHorizontal: hs(20), paddingTop: vs(10) }}
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled"
+      >
         <View className="flex-row justify-between">
           <SideBarCard
             text="Mortgage Profile"

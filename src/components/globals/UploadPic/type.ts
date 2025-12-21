@@ -14,5 +14,7 @@ export type UploadPic = {
   border?: boolean;
   setValue: (name: string, value: ImageValue|null) => void;
   name: string;
+   withCircule?:boolean;
   value: ImageValue|null;
+  limt:number,
 };

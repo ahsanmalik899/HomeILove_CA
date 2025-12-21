@@ -5,9 +5,11 @@ import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { AdressInput } from "@src/components/globals/AddressInput";
+import DatePickerField from "@src/components/globals/DatePickerField";
 import { DealingAreas } from "@src/components/globals/DealingAreas";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
+import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
@@ -66,12 +68,6 @@ const Index = () => {
     multilicence: true,
     licence: true,
   };
-  const investmentOptionsmin = [
-  { label: "Up to 1 million", value: 1_000_000 },
-  { label: "Up to 20 million", value: 20_000_000 },
-  { label: "Up to 50 million", value: 50_000_000 },
-  { label: "Up to 60 million", value: 60_000_000 },
-];
   const user = useAppSelector(userdata);
   const { type } = useLocalSearchParams();
   const [valuationFor, setValuationFor] = useState(false);
@@ -129,7 +125,7 @@ const Index = () => {
 
     case "Decor Profile":
       dataAccordingType = {
-        profileType: "Decore",
+        profileType: "Decor",
         title: "Home Decor",
         serviceTitle: "",
         serviceDefault: "",
@@ -333,7 +329,7 @@ const Index = () => {
           .typeError("Minimum investment must be a number")
           .required("Please enter minimum investment")
           .positive("Must be a positive number")
-      : Yup.number().required("minimum invest is required"),
+      : Yup.number().nullable(),
 
     max_invest: dataAccordingType.isInvestor
       ? Yup.number()
@@ -343,7 +339,7 @@ const Index = () => {
             Yup.ref("min_invest"),
             "Must be greater than minimum investment"
           )
-      : Yup.number().required("maximum invest is required"),
+      : Yup.number().nullable(),
 
     advisory_service: dataAccordingType.valuation
       ? Yup.string().required(
@@ -371,8 +367,8 @@ const Index = () => {
       : Yup.string().nullable(),
   });
   return (
-    <View className="bg-white flex-1">
-      <ScrollView>
+    <View className="bg-white flex-1 ">
+      <ScrollView >
         <HeaderWithBack />
         <Text
           style={{
@@ -389,7 +385,7 @@ const Index = () => {
           profile
         </Text>
 
-        <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
+        <View style={{ marginHorizontal: hs(20), marginTop: vs(20), marginBottom:vs(20)}}>
           <Formik
             initialValues={{
               business_name: "",
@@ -424,8 +420,10 @@ const Index = () => {
               institution: "",
               valuation_for: "",
             }}
+           
             validationSchema={ProfileSchema}
             onSubmit={async (values) => {
+             
               try {
                 const formData = new FormData();
 
@@ -499,6 +497,7 @@ const Index = () => {
                   <>
                     <FormikDropdown
                       title={"Investor Type"}
+                      setValue={setFieldValue}
                       placeholder={"Nothing selected"}
                       value={values.investor_type}
                       options={[
@@ -508,6 +507,7 @@ const Index = () => {
                         "Crowd fund",
                         "Others",
                       ]}
+                      name="investor_type"
                       onSelect={(val) => setFieldValue("investor_type", val)}
                       touched={!!touched.investor_type}
                       errors={!!errors.investor_type}
@@ -520,6 +520,8 @@ const Index = () => {
                       title={"Invest in"}
                       placeholder={"Nothing selected"}
                       value={values.invest_in}
+                      name="invest_in"
+                      setValue={setFieldValue}
                       options={[
                         "Residential",
                         "Commercial",
@@ -538,16 +540,16 @@ const Index = () => {
                     />
                     <View className="flex-row justify-between">
                       <View className="flex-1" style={{ marginRight: hs(5) }}>
-                        <FormikDropdown
+                        <FormikDropdownwithjson
                           title={"Investment amount"}
                           placeholder={"From"}
                           value={values.min_invest}
                           options={[
-                            "Any",
-                            "from 1 million",
-                            "from 20 million",
-                            "from 50 million",
-                            "from 60 million",
+                            { label: "Any", value: 1 },
+                            { label: "from 1 million", value: 1000000 },
+                            { label: "from 20 million", value: 2000000 },
+                            { label: "from 50 million", value: 5000000 },
+                            { label: "from 60 million", value: 6000000 },
                           ]}
                           onSelect={(val) => setFieldValue("min_invest", val)}
                           touched={!!touched.min_invest}
@@ -561,15 +563,16 @@ const Index = () => {
                         className="flex-1"
                         style={{ marginLeft: hs(5), marginTop: vs(30) }}
                       >
-                        <FormikDropdown
+                        <FormikDropdownwithjson
                           title={""}
                           placeholder={"To"}
                           value={values.max_invest}
                           options={[
-                            "upto 1 million",
-                            "upto 20 million",
-                            "upto 50 million",
-                            "upto 60 million",
+                            { label: "upto 1 million", value: 1000000 },
+                            { label: "upto 20 million", value: 2000000 },
+                            { label: "upto 50 million", value: 5000000 },
+                            { label: "upto 60 million", value: 6000000 },
+                             { label: "Above 60 million", value: 60000001 },
                           ]}
                           onSelect={(val) => setFieldValue("max_invest", val)}
                           touched={!!touched.max_invest}
@@ -641,6 +644,8 @@ const Index = () => {
                   zip={"zip"}
                   state={"state"}
                   name="address"
+                  lat="user_lat"    
+                  long="user_lng"
                   setValue={setFieldValue}
                   onSelect={() => {}}
                   title="Address"
@@ -720,16 +725,17 @@ const Index = () => {
                     </View>
                     {dataAccordingType?.licExpiry && (
                       <View className="flex-1" style={{ marginLeft: hs(5) }}>
-                        <FormikInput
-                          title="License Expiry"
-                          placeholder="License Expiry"
-                          onChangeText={handleChange("lic_expiry")}
-                          onBlur={handleBlur("lic_expiry")}
-                          value={values.lic_expiry}
-                          touched={!!touched.lic_expiry}
-                          errors={!!errors.lic_expiry}
-                          required
+                        <DatePickerField
                           errorText={errors.lic_expiry}
+                          name="lic_expiry"
+                          required
+                          value={values.lic_expiry}
+                          editable
+                          setValue={setFieldValue}
+                          title="Licence Expiry"
+                          placeholder="Expiry Date"
+                          touched={!!touched}
+                          errors={!!errors}
                         />
                       </View>
                     )}
@@ -766,7 +772,9 @@ const Index = () => {
                           "advisory_service",
                           values.advisory_service === "Yes" ? "" : "Yes"
                         );
+                        if(type==="Agent Profile"){
                         setValuationFor(true);
+                        }
                       }}
                     >
                       <MaterialIcons
@@ -846,6 +854,7 @@ const Index = () => {
                   multiline
                   errorText={errors.remarks}
                 />
+
                 <View
                   style={{
                     height: vs(1),
@@ -861,6 +870,8 @@ const Index = () => {
                   text1="Upload "
                   text2="Logo/Pic"
                   value={values.logo}
+                  withCircule
+                  limt={1}
                   name="logo"
                   setValue={setFieldValue}
                 />
@@ -870,6 +881,7 @@ const Index = () => {
                   text1="Upload "
                   text2="Cover "
                   text3="Image "
+                  limt={1}
                   additionalText="Recommended size 760x300"
                   border
                   setValue={setFieldValue}
@@ -943,7 +955,7 @@ const Index = () => {
                     opacity: 0.2,
                   }}
                 />
-                <LargeButton text="Submit Ad" handleSubmit={handleSubmit} />
+                <LargeButton  text="Submit Ad" handleSubmit={()=>{handleSubmit()}} />
               </>
             )}
           </Formik>

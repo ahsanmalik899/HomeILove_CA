@@ -5,21 +5,22 @@ import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SideBarCardprops } from "./type";
-const index = ({ Svg, text, type, totalPosts,onPress }: SideBarCardprops) => {
+const index = ({ Svg, text, type, totalPosts, onPress }: SideBarCardprops) => {
   return (
     <TouchableOpacity
-      style={[styles.card,{height:type==='Buy'?vs(160):vs(140)}]}
-
-      onPress={() => { type === "busenessProfile"
-    ? router.navigate({
-        pathname: "/(main)/CreateProfiles",
-        params: { type: text },
-      })
-    : onPress()}}
+      style={[styles.card, { height: type === "Buy" ? vs(160) : vs(140) }]}
+      onPress={() => {
+        type === "busenessProfile"
+          ? router.navigate({
+              pathname: "/(main)/CreateProfiles",
+              params: { type: text },
+            })
+          : onPress();
+      }}
     >
       {type === "busenessProfile" ? (
-        <View style={{marginTop: vs(10)}}>
-        <Add />
+        <View style={{ marginTop: vs(10) }}>
+          <Add />
         </View>
       ) : (
         <View className="flex-row justify-between items-center">
@@ -30,7 +31,16 @@ const index = ({ Svg, text, type, totalPosts,onPress }: SideBarCardprops) => {
 
       <View className="items-center self-center ">
         <Svg />
-        <Text style={{ marginTop: vs(15), fontWeight: 600 ,paddingHorizontal:hs(5),textAlign:'center'}}>{text}</Text>
+        <Text
+          style={{
+            marginTop: vs(10),
+            fontWeight: 600,
+            paddingHorizontal: hs(5),
+            textAlign: "center",
+          }}
+        >
+          {text}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -45,7 +55,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: ms(10),
     paddingHorizontal: hs(5),
-    paddingBottom:vs(10),
+    paddingBottom: vs(10),
     marginBottom: vs(10),
   },
 });

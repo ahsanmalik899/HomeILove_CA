@@ -17,7 +17,7 @@ const _layout = () => {
           elevation: 10,
           backgroundColor: "white",
           borderRadius: ms(50),
-          height: vs(60),
+          height: vs(65),
           marginHorizontal: hs(10),
           alignItems: "center",
           paddingTop: vs(5),
@@ -32,6 +32,7 @@ const _layout = () => {
               style={{
                 color: focused? Colors.light.red:Colors.light.DarkGreen,
                 fontWeight: focused ? "600" : "400",
+                fontSize:ms(12)
               }}
             >
               Home Feed
@@ -50,6 +51,7 @@ const _layout = () => {
               style={{
                color: focused? Colors.light.red:Colors.light.DarkGreen,
                 fontWeight: focused ? "600" : "400",
+                fontSize:ms(12)
               }}
             >
               Message
@@ -68,6 +70,7 @@ const _layout = () => {
               style={{
                 color: focused? Colors.light.red:Colors.light.DarkGreen,
                 fontWeight: focused ? "600" : "400",
+                fontSize:ms(12)
               }}
             >
               Dashboard

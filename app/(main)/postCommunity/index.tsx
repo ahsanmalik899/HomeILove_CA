@@ -1,20 +1,26 @@
+import Broucher from "@assets/CreateProfile/broucher.svg";
+import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
+import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import Map from "@assets/icons/PostProperty/map.svg";
 import PayLater from "@assets/SideBar/pay-later.svg";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import PowerdByPayPal from "@assets/SideBar/Powered by PayPal.svg";
 import Volit from "@assets/SideBar/volit-white.svg";
 import { MaterialIcons } from "@expo/vector-icons";
+import CommunitySatatus from "@src/components/globals/CommunitySatatus";
 import CommunityType from "@src/components/globals/CommunityType";
+import DatePickerField from "@src/components/globals/DatePickerField";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
-import PropertyType from "@src/components/globals/PropertyType";
 import RadioButton from "@src/components/globals/RadioButton";
 import SelecteAdType from "@src/components/globals/TablikeButton";
+import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { Formik } from "formik";
+import { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -42,6 +48,7 @@ const index = () => {
     property_details: Yup.string().required("Property details are required"),
     advatize_time: Yup.string(),
   });
+   const [visit, setVisit] = useState("");
   return (
     <ScrollView className="bg-white flex-1">
       <HeaderWithBack header="Sell Property" />
@@ -151,13 +158,25 @@ const index = () => {
                 >
                   Property <Text>STATUS</Text>
                 </Text>
-                <PropertyType
+                <CommunitySatatus
                   onPress={(value) => {
                     setFieldValue("property_type", value);
                   }}
                   value={values.property_type}
                 />
-
+                <DatePickerField
+                  errorText={errors.lic_expiry}
+                  name=""
+                  value={values.lic_expiry}
+                  editable
+                
+                  setValue={setFieldValue}
+                  title="Expected Delievery date"
+                  placeholder="mm/dd/yy"
+                  touched={!!touched}
+                  errors={!!errors}
+                  required
+                />
                 <View
                   style={{
                     height: vs(1),
@@ -212,7 +231,7 @@ const index = () => {
                 />
                 <FormikInput
                   title="Add main features"
-                  additonalText="Type property feature and hit + sign. To add more features repeat process"
+                  additonalText={`Type property feature and \nhit + sign. To add more features \n repeat process`}
                   placeholder="e.g Garden, Parking, Pool etc"
                   onChangeText={handleChange("land_area")}
                   onBlur={handleBlur("land_area")}
@@ -220,6 +239,7 @@ const index = () => {
                   touched={!!touched.land_area}
                   errors={!!errors.land_area}
                   required
+                  mulipleFields
                   errorText={errors.land_area}
                 />
                 <FormikInput
@@ -254,7 +274,7 @@ const index = () => {
                   Add Community{" "}
                   <Text style={{ color: Colors.light.red }}>PROPERTIES</Text>{" "}
                 </Text>
-                 <FormikInput
+                <FormikInput
                   title="Title"
                   placeholder="Title"
                   onChangeText={handleChange("land_area")}
@@ -378,6 +398,110 @@ const index = () => {
                     errorText={errors.land_area}
                   />
                 </View>
+                  <Text style={{ fontWeight: 600 }}>Property Visit options</Text>
+                                <Text>Buyer can visit property physically?</Text>
+                                <View
+                                  className="flex-row"
+                                  style={{ marginTop: vs(10), marginBottom: vs(20) }}
+                                >
+                                  <View className="flex-row items-center">
+                                    <TouchableOpacity
+                                      onPress={() => {
+                                        setVisit(visit === "Yes" ? "" : "Yes");
+                                      }}
+                                    >
+                                      <MaterialIcons
+                                        size={18}
+                                        color={Colors.light.DarkGreen}
+                                        name={
+                                          visit === "Yes"
+                                            ? "check-box"
+                                            : "check-box-outline-blank"
+                                        }
+                                      />
+                                    </TouchableOpacity>
+                                    <Text style={{ marginLeft: hs(5) }}>Yes</Text>
+                                  </View>
+                                  <View
+                                    className="flex-row items-center"
+                                    style={{ marginLeft: hs(20) }}
+                                  >
+                                    <TouchableOpacity
+                                      onPress={() => {
+                                        setVisit(visit === "No" ? "" : "No");
+                                      }}
+                                    >
+                                      <MaterialIcons
+                                        size={18}
+                                        color={Colors.light.DarkGreen}
+                                        name={
+                                          visit === "No"
+                                            ? "check-box"
+                                            : "check-box-outline-blank"
+                                        }
+                                      />
+                                    </TouchableOpacity>
+                                  </View>
+                
+                                  <Text style={{ marginLeft: hs(5) }}>No</Text>
+                                </View>
+                                    <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
+                />
+                <UploadPic
+                  Logo={Profilelogo}
+                  text1="Upload IMAGES"
+                  text2=""
+                  additionalText={`Upload upto 30 images.\n More images get more attractions`}
+                  value={values.logo}
+                  name="logo"
+                  border
+                  setValue={setFieldValue}
+                />
+                    <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
+                />
+                <UploadPic
+                  Logo={ImageUpload}
+                  text1="Upload IMAGES"
+                  text2=""
+                  additionalText={`Upload upto 30 images.\n More images get more attractions`}
+                  value={values.logo}
+                  name="logo"
+                  border
+                  setValue={setFieldValue}
+                />
+                    <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
+                />
+                <UploadPic
+                  Logo={Broucher}
+                  text1="Upload IMAGES"
+                  text2=""
+                  additionalText={`Upload upto 30 images.\n More images get more attractions`}
+                  value={values.logo}
+                  name="logo"
+                  border
+                  setValue={setFieldValue}
+                />
                 <View
                   style={{
                     height: vs(1),
@@ -386,6 +510,31 @@ const index = () => {
                     backgroundColor: Colors.light.textGray,
                     opacity: 0.2,
                   }}
+                />
+                  <FormikInput
+                  title="Provide youtube video link"
+                  placeholder="Enter link"
+                  onChangeText={handleChange("youtube_link")}
+                  onBlur={handleBlur("youtube_link")}
+                  value={values.youtube_link}
+                  touched={!!touched.youtube_link}
+                  errors={!!errors.youtube_link}
+                  required={false}
+                    additonalText={"Youtube, Vimeo or Daily motion"}
+                  errorText={errors.youtube_link}
+                />
+                <Text style={{fontWeight:500}}>About DEVELOPER</Text>
+                   <FormikInput
+                  title="Developer Name"
+                  placeholder=""
+                  onChangeText={handleChange("youtube_link")}
+                  onBlur={handleBlur("youtube_link")}
+                  value={values.youtube_link}
+                  touched={!!touched.youtube_link}
+                
+                  errors={!!errors.youtube_link}
+                  required={false}
+                  errorText={errors.youtube_link}
                 />
                 <Text className="font-bold">Advertise as</Text>
                 <TouchableOpacity

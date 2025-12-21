@@ -37,7 +37,9 @@ export const DealingAreas = ({
   setValue = () => {},
   name = "name",
 }: AddressInputProps) => {
-  const [currentValue, setCurrentValue] = useState<string>(value?.toString() || "");
+  const [currentValue, setCurrentValue] = useState<string>(
+    value?.toString() || ""
+  );
   const [currentCity, setCurrentCity] = useState<string>("");
   const [currentlat, setCurrentlat] = useState<number | null>(null);
   const [currentlong, setCurrentlong] = useState<number | null>(null);
@@ -48,7 +50,8 @@ export const DealingAreas = ({
   const [selectedlat, setSelectedlat] = useState<number[]>([]);
   const [selectedlog, setSelectedlong] = useState<number[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
-
+const normalize = (str: string) =>
+  str.replace(/,/g, "").replace(/\s+/g, " ").trim();
   const [getPlaceDetails] = useLazyGetPlaceDetailsQuery();
   const { data: googleData, isFetching } = useGetAddressSuggestionsQuery(
     { input: currentValue },
@@ -56,7 +59,7 @@ export const DealingAreas = ({
   );
 
   const handleSelectSuggestion = async (address: string, id: string) => {
-    setCurrentValue(address);
+  setCurrentValue(address.replace(/,/g, ""));
     setShowSuggestions(false);
 
     try {
@@ -84,7 +87,11 @@ export const DealingAreas = ({
 
   const handleAdd = () => {
     if (!currentValue) return;
-    if (!googleData?.predictions.some((p) => p.description === currentValue)) return;
+     const isValid = googleData?.predictions.some(
+    (p) => normalize(p.description) === normalize(currentValue)
+  );
+
+  if (!isValid) return;
     if (selectedData.includes(currentValue)) return;
 
     const updatedData = [...selectedData, currentValue];
@@ -100,7 +107,7 @@ export const DealingAreas = ({
     // Update Formik values
     setValue(name, updatedData.join(","));
     setValue(city, updatedCity.join(","));
-     setValue("latitude", updatedLat.join(","));
+    setValue("latitude", updatedLat.join(","));
     setValue("longitude", updatedLong.join(","));
 
     // Reset current input
@@ -138,9 +145,9 @@ export const DealingAreas = ({
     } else {
       setCurrentValue("Nationwide");
       setValue(name, "Nationwide");
-    setValue(city, "");
-    setValue("latitude","");
-    setValue("longitude","");
+      setValue(city, "");
+      setValue("latitude", "");
+      setValue("longitude", "");
     }
   };
 
@@ -150,7 +157,9 @@ export const DealingAreas = ({
         <View style={{ flexDirection: "row", marginBottom: vs(10) }}>
           <Text style={styles.title}>{title}</Text>
           {required && <Text style={{ color: Colors.light.red }}> *</Text>}
-          {additonalText && <Text style={{ paddingLeft: hs(5) }}>({additonalText})</Text>}
+          {additonalText && (
+            <Text style={{ paddingLeft: hs(5) }}>({additonalText})</Text>
+          )}
         </View>
       )}
 
@@ -160,14 +169,22 @@ export const DealingAreas = ({
           <MaterialIcons
             size={18}
             color={Colors.light.DarkGreen}
-            name={value === "Nationwide" ? "check-box" : "check-box-outline-blank"}
+            name={
+              value === "Nationwide" ? "check-box" : "check-box-outline-blank"
+            }
           />
         </TouchableOpacity>
         <Text style={{ marginLeft: hs(5) }}>Nationwide</Text>
       </View>
 
       {/* Input + Add Button */}
-      <View style={{ flexDirection: "row", alignItems: "center", marginTop: vs(10) }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: vs(10),
+        }}
+      >
         <TextInput
           value={currentValue}
           onChangeText={(val) => {
@@ -213,7 +230,13 @@ export const DealingAreas = ({
         }}
       >
         {isFetching && (
-          <View style={{ padding: vs(10), alignItems: "center", justifyContent: "center" }}>
+          <View
+            style={{
+              padding: vs(10),
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
             <Text style={{ marginTop: vs(5) }}>Loading...</Text>
           </View>
@@ -222,11 +245,19 @@ export const DealingAreas = ({
         {showSuggestions && isFocused && (
           <FlatList
             data={googleData?.predictions}
+            nestedScrollEnabled
+              scrollEnabled
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => handleSelectSuggestion(item.description, item.place_id)}
-                style={{ padding: vs(10), borderBottomWidth: 0.5, borderColor: Colors.light.lightGray }}
+                onPress={() =>
+                  handleSelectSuggestion(item.description, item.place_id)
+                }
+                style={{
+                  padding: vs(10),
+                  borderBottomWidth: 0.5,
+                  borderColor: Colors.light.lightGray,
+                }}
               >
                 <Text>{item.description}</Text>
               </TouchableOpacity>
@@ -235,8 +266,16 @@ export const DealingAreas = ({
         )}
 
         {!googleData?.predictions?.length && showSuggestions && isFocused && (
-          <View style={{ padding: vs(10), alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ color: Colors.light.DarkGreen }}>No addresses found</Text>
+          <View
+            style={{
+              padding: vs(10),
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: Colors.light.DarkGreen }}>
+              No addresses found
+            </Text>
           </View>
         )}
       </View>
@@ -247,18 +286,28 @@ export const DealingAreas = ({
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <View
-        
-            style={[styles.card,{
-              padding: ms(8),
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }]}
+            style={[
+              styles.card,
+              {
+                padding: ms(8),
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              },
+            ]}
           >
             <View className="flex-row gap-3 items-center">
               <Heart />
-              <Text  numberOfLines={1}
-  ellipsizeMode="tail" style={{ color: Colors.light.DarkGreen,width:hs(250), fontSize: ms(15), fontWeight: "500" }}>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{
+                  color: Colors.light.DarkGreen,
+                  width: hs(250),
+                  fontSize: ms(15),
+                  fontWeight: "500",
+                }}
+              >
                 {item}
               </Text>
             </View>
@@ -270,7 +319,9 @@ export const DealingAreas = ({
       />
 
       {touched && errors && (
-        <Text style={{ color: Colors.light.red, marginTop: vs(5) }}>{errorText}</Text>
+        <Text style={{ color: Colors.light.red, marginTop: vs(5) }}>
+          {errorText}
+        </Text>
       )}
     </View>
   );
@@ -278,7 +329,7 @@ export const DealingAreas = ({
 
 const styles = StyleSheet.create({
   title: { fontSize: ms(14), fontWeight: "600" },
-    card: {
+  card: {
     backgroundColor: "#fff",
     borderRadius: ms(10),
     marginVertical: vs(6),
