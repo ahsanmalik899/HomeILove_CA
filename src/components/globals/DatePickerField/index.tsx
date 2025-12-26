@@ -14,6 +14,8 @@ export default function FormikDatePicker({
   errors,
   errorText,
   required,
+  placeholder,
+  editable,
   
 }: FormikDatepicker) {
   const [show, setShow] = useState(false);
@@ -43,7 +45,8 @@ export default function FormikDatePicker({
               )}
             
             </View>
-      <TouchableOpacity
+            {editable?(
+                <TouchableOpacity
         onPress={() => setShow(true)}
         style={{
           borderRadius: ms(18),
@@ -56,14 +59,32 @@ export default function FormikDatePicker({
         <Text>
           {value
             ? new Date(value).toDateString()
-            : "Select date"}
+            : placeholder}
         </Text>
       </TouchableOpacity>
+            ):(
+                <TouchableOpacity
+        onPress={()=>{}}
+        style={{
+          borderRadius: ms(18),
+          paddingVertical: vs(14),
+          backgroundColor: Colors.light.LightGreen,
+          paddingHorizontal: hs(12),
+          width: "100%",
+        }}
+      >
+        <Text>
+        {placeholder}
+        </Text>
+      </TouchableOpacity>
+            )}
+    
 
       {show && (
         <DateTimePicker
           value={dateValue}
           mode="date"
+          textColor={Colors.light.DarkGreen}
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={onChange}
         />

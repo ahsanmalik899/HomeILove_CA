@@ -276,6 +276,9 @@ const Index = () => {
       };
       break;
   }
+
+
+
   const [createprofile, { isLoading }] = useCreateProfileMutation();
   const ProfileSchema = Yup.object().shape({
     business_name: Yup.string()
@@ -394,8 +397,8 @@ const Index = () => {
               city: "",
               state: "",
               zip: "",
-              user_lat: 1,
-              user_lng: 1,
+              user_lat: null,
+              user_lng: null,
               web: "",
               license_no: "",
               lic_state: "",
@@ -644,6 +647,8 @@ const Index = () => {
                   zip={"zip"}
                   state={"state"}
                   name="address"
+                  latValue={values.user_lat}
+                  longValue={values.user_lng}
                   lat="user_lat"    
                   long="user_lng"
                   setValue={setFieldValue}

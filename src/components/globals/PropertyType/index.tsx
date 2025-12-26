@@ -5,8 +5,9 @@ import Colors from '@src/constants/Colors'
 import { hs, ms, vs } from '@utils/design/design'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RentAndSaleProps } from '../SelectRentAndSale/type'
-const index = ({value,onPress}:RentAndSaleProps) => {
+const index = ({value,onPress,errorText}:RentAndSaleProps) => {
   return (
+    <>
     <View className="flex-row justify-between">
          <TouchableOpacity className="items-center"
            style={[value === "House" ? styles.activeButton : styles.Button]}
@@ -18,21 +19,28 @@ const index = ({value,onPress}:RentAndSaleProps) => {
    
          <TouchableOpacity
          className="items-center"
-           style={[value === "Commercial" ? styles.activeButton : styles.Button]}
-          onPress={()=>onPress('Commercial')}
+           style={[value === "Commercials" ? styles.activeButton : styles.Button]}
+          onPress={()=>onPress('Commercials')}
          >
           <Commercial/>
-           <Text style={[value === "Commercial" ? styles.TextActive : styles.Text]}>Commercials</Text>
+           <Text style={[value === "Commercials" ? styles.TextActive : styles.Text]}>Commercials</Text>
          </TouchableOpacity>
           <TouchableOpacity
          className="items-center"
-           style={[value === "Farm" ? styles.activeButton : styles.Button]}
-          onPress={()=>onPress('Farm')}
+           style={[value === "Farms/Lands" ? styles.activeButton : styles.Button]}
+          onPress={()=>onPress('Farms/Lands')}
          >
           <Farm/>
-           <Text style={[value === "Farm" ? styles.TextActive : styles.Text]}>Farm/Land</Text>
+           <Text style={[value === "Farms/Lands" ? styles.TextActive : styles.Text]}>Farms/Lands</Text>
          </TouchableOpacity>
        </View>
+        { errorText && (
+                             <Text
+                               style={{ color: Colors.light.red, marginTop: vs(5) }}
+                             >
+                               {errorText}
+                             </Text>
+                           )}</>
   )
 }
 

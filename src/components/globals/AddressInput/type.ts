@@ -2,6 +2,10 @@ export interface AddressInputProps {
   city: string;
   state: string;
   zip: string;
+  lat:string;
+  long:string;
+  longValue:number;
+  latValue:number;
   value:string;
  title:string,
   placeholder?: string;

@@ -1,11 +1,13 @@
 import {
   useGetAddressSuggestionsQuery,
   useLazyGetPlaceDetailsQuery,
+  useLazyReverseGeocodeQuery,
 } from "@/store/api/user/Google";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "@src/constants/Colors";
 import { renderToastError } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -15,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import MapView, { MapType, Marker, Region } from 'react-native-maps';
 import { AddressInputProps } from "./type";
 
 export const AdressInput = ({
@@ -28,66 +31,113 @@ export const AdressInput = ({
   errorText,
   required,
   additonalText,
-  multipleFields,
+  latValue,
+  longValue,
   state,
   lat,
   long,
   setValue = () => {},
   name = "name",
 }: AddressInputProps) => {
-  const [currentValue, setCurrentValue] = useState<string>(
-    value?.toString() || ""
-  );
-  const [isFocused, setIsFocused] = useState(false);
 
-  const [selectedData, setSelectedData] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
-  const [getPlaceDetails, { isFetching: isDetailsLoading }] =
-    useLazyGetPlaceDetailsQuery();
+  const [currentValue, setCurrentValue] = useState(value?.toString() || "");
+  const [isFocused, setIsFocused] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+
+  const mapRef = useRef<MapView>(null);
+const [mapType, setMapType] = useState<MapType>('standard'); 
+const [region, setRegion] = useState<Region>({
+  latitude: Number(latValue) || 51.5074,
+  longitude: Number(longValue) || -0.1278,
+  latitudeDelta: 0.01,
+  longitudeDelta: 0.01,
+});
+  const [getPlaceDetails] = useLazyGetPlaceDetailsQuery();
+  const [reverseGeocode] = useLazyReverseGeocodeQuery();
+
   const { data: googleData, isFetching } = useGetAddressSuggestionsQuery(
     { input: currentValue },
     { skip: currentValue.length < 3 }
   );
 
-  const handleSelectSuggestion = async (address: string, id: string) => {
+
+const handleSelectSuggestion = async (address: string, placeId: string) => {
+  setCurrentValue(address);
+  setShowSuggestions(false);
+  onSelect?.(address);
+  setValue(name, address);
+
+  try {
+    const result = await getPlaceDetails({ placeId }).unwrap();
+    const components = result?.result?.address_components || [];
+console.log(result)
+    const findComponent = (type: string) =>
+      components.find((c: any) => c.types.includes(type));
+
+    const cityName =
+      findComponent("locality")?.long_name ||
+      findComponent("administrative_area_level_2")?.long_name ||
+      "";
+    const stateCode = findComponent("administrative_area_level_1")?.short_name || "";
+    const zipCode = findComponent("postal_code")?.long_name || "";
+
+    const latitude = result?.result?.geometry?.location?.lat ?? 51.5074;
+    const longitude = result?.result?.geometry?.location?.lng ?? -0.1278;
+
+    setValue(lat, latitude);
+    setValue(long, longitude);
+    setValue(city, cityName);
+    setValue(state, stateCode);
+    setValue(zip, zipCode);
+
+
+    setRegion({ latitude, longitude, latitudeDelta: 0.01, longitudeDelta: 0.01 });
+const newRegion = { latitude, longitude, latitudeDelta: 0.0005, longitudeDelta: 0.0005 };
+setRegion(newRegion);
+mapRef.current?.animateToRegion(newRegion, 500); 
+
+mapRef.current?.animateToRegion(newRegion, 500);
+
+  } catch (err: any) {
+    renderToastError(err?.message || "Failed to fetch place details");
+  }
+};
+
+
+const handleMapPress = async (e: any) => {
+  const { latitude, longitude } = e.nativeEvent.coordinate;
+
+  setRegion({ latitude, longitude, latitudeDelta: 0.0005, longitudeDelta: 0.0005 });
+  setValue(lat, latitude);
+  setValue(long, longitude);
+
+  try {
+    const res = await reverseGeocode({ lat: latitude, lng: longitude }).unwrap();
+    const result = res?.results?.[0];
+    if (!result) return;
+
+    const components = result.address_components || [];
+    const findComponent = (type: string) =>
+      components.find((c: any) => c.types.includes(type));
+
+    const address = result.formatted_address || "";
+    const cityName =
+      findComponent("locality")?.long_name ||
+      findComponent("administrative_area_level_2")?.long_name ||
+      "";
+    const stateCode = findComponent("administrative_area_level_1")?.short_name || "";
+    const zipCode = findComponent("postal_code")?.long_name || "";
+
     setCurrentValue(address);
-    onSelect?.(address);
     setValue(name, address);
-    setShowSuggestions(false);
+    setValue(city, cityName);
+    setValue(state, stateCode);
+    setValue(zip, zipCode);
+  } catch (err: any) {
+    renderToastError("Failed to fetch address from map");
+  }
+};
 
-    try {
-      const result = await getPlaceDetails({ placeId: id }).unwrap();
-
-      const components = result?.result?.address_components || [];
-
-      const findComponent = (type: string) =>
-        components.find((c: any) => c.types.includes(type));
-
-      const cety =
-        findComponent("locality")?.long_name ||
-        findComponent("administrative_area_level_2")?.long_name ||
-        "";
-
-      const stateCode =
-        findComponent("administrative_area_level_1")?.short_name || "";
-
-      const zipCode = findComponent("postal_code")?.long_name || "";
-
-      const country = findComponent("country")?.long_name || "";
-
-      const latitude = result?.result?.geometry?.location?.lat ?? null;
-
-      const longitude = result?.result?.geometry?.location?.lng ?? null;
-
-      setValue(city, cety);
-      setValue(state, stateCode);
-      setValue(zip, zipCode);
-      setValue(lat, latitude);
-      setValue(long, longitude);
-    } catch (err: any) {
-      renderToastError(err?.message || "Failed to fetch place details");
-    }
-  };
 
   return (
     <View style={{ marginTop: vs(10) }}>
@@ -101,26 +151,26 @@ export const AdressInput = ({
         </View>
       )}
 
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <TextInput
-          value={currentValue}
-          onChangeText={(val) => {
-            setCurrentValue(val);
-            setValue(name, "");
-            setShowSuggestions(true);
-          }}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setTimeout(() => setIsFocused(false), 1000)}
-          placeholder="Enter address..."
-          style={{
-            flex: 1,
-            backgroundColor: Colors.light.LightGreen,
-            borderRadius: ms(18),
-            paddingHorizontal: hs(12),
-            height: vs(45),
-          }}
-        />
-      </View>
+      <TextInput
+        value={currentValue}
+        onChangeText={(val) => {
+          setCurrentValue(val);
+          setValue(name, "");
+          setShowSuggestions(true);
+        }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setTimeout(() => setIsFocused(false), 1000)}
+        placeholder="Enter address..."
+        placeholderTextColor={Colors.light.DarkGreen}
+        style={{
+          flex: 1,
+          color: Colors.light.DarkGreen,
+          backgroundColor: Colors.light.LightGreen,
+          borderRadius: ms(18),
+          paddingHorizontal: hs(12),
+          height: vs(45),
+        }}
+      />
 
       <View
         style={{
@@ -144,46 +194,26 @@ export const AdressInput = ({
           </View>
         )}
         {showSuggestions && isFocused && (
-          <View>
-            <FlatList
-              data={googleData?.predictions}
-              keyboardShouldPersistTaps="handled"
-              removeClippedSubviews={false}
-              nestedScrollEnabled
-              scrollEnabled
-              showsVerticalScrollIndicator={true}
-              initialNumToRender={10}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    handleSelectSuggestion(item.description, item.place_id)
-                  }
-                  style={{
-                    padding: vs(10),
-                    borderBottomWidth: 0.5,
-                    borderColor: Colors.light.lightGray,
-                    maxHeight: vs(400),
-                  }}
-                >
-                  <Text>{item.description}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            {!googleData?.predictions.length && (
-              <View
+          <FlatList
+            data={googleData?.predictions}
+            nestedScrollEnabled={true}
+            keyboardShouldPersistTaps="handled"
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() =>
+                  handleSelectSuggestion(item.description, item.place_id)
+                }
                 style={{
                   padding: vs(10),
-                  alignItems: "center",
-                  justifyContent: "center",
+                  borderBottomWidth: 0.5,
+                  borderColor: Colors.light.lightGray,
                 }}
               >
-                <Text style={{ color: Colors.light.DarkGreen }}>
-                  No addresses found
-                </Text>
-              </View>
+                <Text>{item.description}</Text>
+              </TouchableOpacity>
             )}
-          </View>
+          />
         )}
       </View>
 
@@ -192,10 +222,56 @@ export const AdressInput = ({
           {errorText}
         </Text>
       )}
+   <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setMapType("standard")}
+        >
+          <MaterialCommunityIcons name="map-outline" size={24} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setMapType("satellite")}
+        >
+          <MaterialCommunityIcons name="satellite" size={24} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setMapType("hybrid")}
+        >
+          <MaterialCommunityIcons name="google-maps" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+<MapView
+  ref={mapRef}
+   mapType={mapType}  
+  style={{ height: vs(300), width: "100%", marginTop: vs(10) }}
+  region={region} 
+  onPress={handleMapPress}
+>
+  
+<Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+</MapView>
+
+
     </View>
+    
   );
 };
 
 const styles = StyleSheet.create({
   title: { fontSize: ms(14), fontWeight: "600", zIndex: 0 },
+    buttonContainer: {
+    flexDirection: "row",
+    backgroundColor: "transparent",
+    zIndex: 10,
+  },
+  button: {
+    backgroundColor: "rgba(0,0,0,0.6)",
+    marginLeft: hs(5),
+    padding: hs(8),
+    borderRadius: 8,
+  },
 });

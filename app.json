@@ -43,6 +43,11 @@
         "foregroundImage": "./assets/logo/logo.png",
         "backgroundColor": "#ffffff"
       },
+       "config": {
+    "googleMaps": {
+      "apiKey": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY"
+    }
+  },
       "intentFilters": [
         {
           "action": "VIEW",
@@ -88,7 +93,7 @@
       "expo-web-browser"
     ],
     "extra": {
-      "googleMapsApiKey":"AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY",
+    
       "router": {
         "origin": false
       },

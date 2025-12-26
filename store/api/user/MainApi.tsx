@@ -1,55 +1,70 @@
-
-import { ContentPostType, FeedResponse, GetMyPostsOnly, GetPostType } from "@/store/type/user";
+import {
+  ContentPostType,
+  FeedResponse,
+  GetMyPostsOnly,
+  GetPostType,
+  GetProfiles,
+} from "@/store/type/user";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const MainApi = createApi({
-  reducerPath: 'MainApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://homeilove.us/api/' }),
+  reducerPath: "MainApi",
+  baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
-    getYourpost: builder.query< FeedResponse,GetPostType>({
-      query: ({userid,page}) => ({
+    getYourpost: builder.query<FeedResponse, GetPostType>({
+      query: ({ userid, page }) => ({
         url: `getYourFeeds/?userid=${userid}&page=${page}`,
-        method: 'GET',
-        
+        method: "GET",
       }),
     }),
-       getHomepost: builder.query< FeedResponse,GetPostType>({
-      query: ({userid,page}) => ({
+    getHomepost: builder.query<FeedResponse, GetPostType>({
+      query: ({ userid, page }) => ({
         url: `getHomeFeeds/?userid=${userid}&page=${page}`,
-        method: 'GET',
-        
+        method: "GET",
       }),
     }),
-     getContentpost: builder.query< FeedResponse,ContentPostType>({
-      query: ({userid,page,type}) => ({
+    getContentpost: builder.query<FeedResponse, ContentPostType>({
+      query: ({ userid, page, type }) => ({
         url: `getContentFeeds/?userid=${userid}&page=${page}&type=${type}`,
-        method: 'GET',
-        
+        method: "GET",
       }),
     }),
-      createProfile: builder.mutation< any,FormData>({
+    createProfile: builder.mutation<any, FormData>({
       query: (formatData) => ({
         url: `createProfile`,
-        method: 'POST',
-     
-        body:formatData,
+        method: "POST",
+
+        body: formatData,
       }),
     }),
-      getMYPosts: builder.query< any,GetMyPostsOnly>({
-      query: ({page,limit,type,userid}) => ({
+    getMYPosts: builder.query<any, GetMyPostsOnly>({
+      query: ({ page, limit, type, userid }) => ({
         url: `getSinglePost?type=${type}&userid=${userid}&page=${page}&limit=${limit}`,
-        method: 'GET',
-      
+        method: "GET",
       }),
     }),
-   
+    postProperty: builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `property/create`,
+        method: "POST",
+        body: formatData,
+      }),
+    }),
+    getProfiles: builder.query<any, GetProfiles>({
+      query: ({ id }) => ({
+        url: `check-profiles/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-
-export const { useGetYourpostQuery ,
+export const {
+  useGetYourpostQuery,
   useGetContentpostQuery,
   useGetHomepostQuery,
   useCreateProfileMutation,
   useGetMYPostsQuery,
+  usePostPropertyMutation,
+  useGetProfilesQuery,
 } = MainApi;

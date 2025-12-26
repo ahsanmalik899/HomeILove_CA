@@ -30,24 +30,77 @@ import {
 } from "react-native";
 import * as Yup from "yup";
 const index = () => {
-  const PostPropert = Yup.object().shape({
-    property_for: Yup.string().required("Property type is required"),
-    sale_type: Yup.string().required("Sale type is required"),
-    property_type: Yup.string().required("Property type is required"),
-    property_title: Yup.string()
-      .min(3, "Title must be at least 3 characters")
-      .required("Property title is required"),
-    asking_price: Yup.number()
-      .typeError("Price must be a number")
-      .positive("Price must be positive")
-      .required("Price is required"),
-    address: Yup.string().required("Address is required"),
-    city: Yup.string().required("City is required"),
-    bedrooms: Yup.string().required("Bedrooms field is required"),
-    bathrooms: Yup.string().required("Bathrooms field is required"),
-    property_details: Yup.string().required("Property details are required"),
-    advatize_time: Yup.string(),
-  });
+const PostProperty = Yup.object().shape({
+  property_for: Yup.string()
+    .required("Property purpose is required"),
+
+  sale_type: Yup.string()
+    .required("Ad type is required"),
+
+  property_type: Yup.string()
+    .required("Property status is required"),
+  address: Yup.string()
+    .required("Address is required"),
+
+  city: Yup.string()
+    .required("City is required"),
+
+  state: Yup.string().nullable(),
+
+  zip: Yup.string().nullable(),
+
+  lat: Yup.number().nullable(),
+
+  lng: Yup.number().nullable(),
+
+  property_title: Yup.string()
+    .min(3, "Title must be at least 3 characters")
+    .required("Property title is required"),
+
+  property_details: Yup.string()
+    .min(10, "Description must be at least 10 characters")
+    .required("Property details are required"),
+
+  land_area: Yup.string().nullable(),
+
+  bedrooms: Yup.string()
+    .required("Bedrooms are required"),
+
+  bathrooms: Yup.string()
+    .required("Bathrooms are required"),
+  asking_price: Yup.number()
+    .typeError("Price must be a number")
+    .positive("Price must be greater than zero")
+    .required("Price is required"),
+
+  saleprice_type: Yup.string().nullable(),
+
+  rent_type: Yup.string().nullable(),
+
+  visit_date: Yup.string().nullable(),
+
+  visit_time: Yup.string().nullable(),
+
+  video_link: Yup.string()
+    .url("Enter a valid video URL")
+    .nullable(),
+  ad_by: Yup.string()
+    .required("Please select advertiser type"),
+
+  advatize_time: Yup.string().when("sale_type", {
+    is: "Trending",
+    then: (schema) =>
+      schema.required("Please select advertise duration"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  post_type: Yup.string().required(),
+
+  status: Yup.string().required(),
+
+  logo: Yup.mixed().nullable(),
+});
+
    const [visit, setVisit] = useState("");
   return (
     <ScrollView className="bg-white flex-1">
@@ -161,9 +214,9 @@ const index = () => {
                 <CommunitySatatus
                   onPress={(value) => {
                     setFieldValue("property_type", value);
-                  }}
-                  value={values.property_type}
-                />
+                  } }
+                  value={values.property_type} 
+                  errorText={errors.property_type||""}                />
                 <DatePickerField
                   errorText={errors.lic_expiry}
                   name=""
@@ -462,8 +515,7 @@ const index = () => {
                   value={values.logo}
                   name="logo"
                   border
-                  setValue={setFieldValue}
-                />
+                  setValue={setFieldValue} limt={0}                />
                     <View
                   style={{
                     height: vs(1),
@@ -481,8 +533,7 @@ const index = () => {
                   value={values.logo}
                   name="logo"
                   border
-                  setValue={setFieldValue}
-                />
+                  setValue={setFieldValue} limt={0}                />
                     <View
                   style={{
                     height: vs(1),
@@ -500,8 +551,7 @@ const index = () => {
                   value={values.logo}
                   name="logo"
                   border
-                  setValue={setFieldValue}
-                />
+                  setValue={setFieldValue} limt={0}                />
                 <View
                   style={{
                     height: vs(1),

@@ -148,3 +148,7 @@ export interface FeedResponse {
   results: Result[];
   status: string;
 }
+export interface GetProfiles{
+id:number;
+
+}

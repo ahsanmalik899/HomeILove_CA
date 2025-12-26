@@ -6,26 +6,35 @@ import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RentAndSaleProps } from "./type";
-const index = ({ onPress, value }: RentAndSaleProps) => {
+const index = ({ onPress, value,errorText }: RentAndSaleProps) => {
   return (
+    <>
     <View className="flex-row justify-between">
       <TouchableOpacity className="items-center"
-        style={[value === "Sale" ? styles.activeButton : styles.Button]}
-        onPress={()=>onPress('Sale')}
+        style={[value === "sale" ? styles.activeButton : styles.Button]}
+        onPress={()=>onPress('sale')}
       >
-        {value === "Sale" ? <ActiveSale /> : <SaleIcon />}
-        <Text style={[value === "Sale" ? styles.TextActive : styles.Text]}>For Sale</Text>
+        {value === "sale" ? <ActiveSale /> : <SaleIcon />}
+        <Text style={[value === "sale" ? styles.TextActive : styles.Text]}>For Sale</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
       className="items-center"
-        style={[value === "Rent" ? styles.activeButton : styles.Button]}
-       onPress={()=>onPress('Rent')}
+        style={[value === "rent" ? styles.activeButton : styles.Button]}
+       onPress={()=>onPress('rent')}
       >
-        {value === "Rent" ? <ActiveRent /> : <RentIcon />}
-        <Text style={[value === "Rent" ? styles.TextActive : styles.Text]}>For Rent</Text>
+        {value === "rent" ? <ActiveRent /> : <RentIcon />}
+        <Text style={[value === "rent" ? styles.TextActive : styles.Text]}>For Rent</Text>
       </TouchableOpacity>
     </View>
+     { errorText && (
+                      <Text
+                        style={{ color: Colors.light.red, marginTop: vs(5) }}
+                      >
+                        {errorText}
+                      </Text>
+                    )}
+                    </>
   );
 };
 
