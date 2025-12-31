@@ -1,4 +1,7 @@
-import { useGetProfilesQuery, usePostPropertyMutation } from "@/store/api/user/MainApi";
+import {
+  useGetProfilesQuery,
+  usePostPropertyMutation,
+} from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
@@ -31,14 +34,14 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
+  const user = useAppSelector(userdata);
   const [saleType, setSaleType] = useState(true);
   const PostPropertySchema = Yup.object().shape({
     user_id: Yup.number().required("User ID is required"),
 
     user_type: Yup.string().required("User type is required"),
 
-    property_for: Yup.string()
-      .required("Sale/Rent type is required"),
+    property_for: Yup.string().required("Sale/Rent type is required"),
 
     sale_type: saleType
       ? Yup.string().required("Sale type is required")
@@ -133,19 +136,21 @@ const index = () => {
     visit_date: Yup.string().nullable(),
 
     visit_time: Yup.string().nullable(),
-
-    ad_by: Yup.string().required("Ad by field is required"),
+    ad_by:
+      user.user_type === "Business"
+        ? Yup.string().required("Ad by field is required")
+        : Yup.string().nullable(),
   });
-  const user = useAppSelector(userdata);
-const {data} = useGetProfilesQuery({ id: user.id });
 
-console.log("query state:", data);
+  const { data } = useGetProfilesQuery({ id: user.id });
+
   const [visit, setVisit] = useState("");
   const [postProperty, { isLoading }] = usePostPropertyMutation();
   return (
     <View className="bg-white flex-1 ">
       <ScrollView
-      nestedScrollEnabled={true} keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
+        keyboardShouldPersistTaps="handled"
         className="bg-white flex-1"
       >
         <HeaderWithBack header="Sell Property" />
@@ -204,68 +209,69 @@ console.log("query state:", data);
                 available_on: "",
                 visit_date: "",
                 visit_time: "",
-                ad_by: "Agent",
+                ad_by: "",
                 propertyimg: [],
                 floorimg: [],
               }}
               validationSchema={PostPropertySchema}
-onSubmit={async (values) => {
-  try {
-    const formData = new FormData();
+              onSubmit={async (values) => {
+                try {
+                  const formData = new FormData();
 
-  
-    Object.keys(values).forEach((key) => {
-      if (
-        key !== "propertyimg" &&
-        key !== "floorimg" &&
-        values[key] !== undefined &&
-        values[key] !== null
-      ) {
-        formData.append(key, String(values[key]));
-      }
-    });
+                  Object.keys(values).forEach((key) => {
+                    if (
+                      key !== "propertyimg" &&
+                      key !== "floorimg" &&
+                      values[key] !== undefined &&
+                      values[key] !== null
+                    ) {
+                      formData.append(key, String(values[key]));
+                    }
+                  });
 
+                  if (Array.isArray(values.propertyimg)) {
+                    values.propertyimg.forEach((img, index) => {
+                      if (img.uri) {
+                        formData.append("propertyimg[]", {
+                          uri: img.uri,
+                          name: img.name || `property_${index}.jpg`,
+                          type: img.type || "image/jpeg",
+                        } as any);
+                      }
+                    });
+                  }
 
-    if (Array.isArray(values.propertyimg)) {
-      values.propertyimg.forEach((img, index) => {
-        if (img.uri) {
-          formData.append("propertyimg[]", {
-            uri: img.uri,
-            name: img.name || `property_${index}.jpg`,
-            type: img.type || "image/jpeg",
-          } as any);
-        }
-      });
-    }
+                  
+                  if (Array.isArray(values.floorimg)) {
+                    values.floorimg.forEach((img, index) => {
+                      if (img.uri) {
+                        formData.append("floorimg[]", {
+                          uri: img.uri,
+                          name: img.name || `floor_${index}.jpg`,
+                          type: img.type || "image/jpeg",
+                        } as any);
+                      }
+                    });
+                  }
+                 for (const pair of formData.entries()) {
+  console.log(pair[0], pair[1]);
+}
 
-  
-    if (Array.isArray(values.floorimg)) {
-      values.floorimg.forEach((img, index) => {
-        if (img.uri) {
-          formData.append("floorimg[]", {
-            uri: img.uri,
-            name: img.name || `floor_${index}.jpg`,
-            type: img.type || "image/jpeg",
-          } as any);
-        }
-      });
-    }
- console.log(formData)
-    const result = await postProperty(formData);
+                  const result = await postProperty(formData);
 
-    if (result.data?.success) {
-      renderToastSuccess(result.data?.message);
-      console.log("Post ID:", result.data?.post_id);
-    } else {
-      console.log(result);
-    }
-  } catch (error) {
-    console.log("Error:", error);
-    renderToastError("Failed to upload property. Please try again.");
-  }
-}}
-
-
+                  if (result.data?.success) {
+                    renderToastSuccess(result.data?.message);
+                    console.log("Post ID:", result.data?.post_id);
+                  } else {
+                    console.log(result);
+                  }
+                } catch (error) {
+                  console.log("Error:", error);
+                  renderToastError(
+                    "Failed to upload property. Please try again."
+                  );
+                }
+              }}
             >
               {({
                 handleBlur,
@@ -420,8 +426,8 @@ onSubmit={async (values) => {
                     city={"city"}
                     zip={"zip"}
                     state={"state"}
-                    lat={"lng"}
-                    long="lat"
+                    lat={"lag"}
+                    long="lnt"
                     latValue={values.lat}
                     longValue={values.lng}
                     name="address"
@@ -709,7 +715,7 @@ onSubmit={async (values) => {
                       )}
                     </View>
                   </View>
-                 
+
                   <View>
                     <Text style={{ fontWeight: 600, marginTop: vs(10) }}>
                       Add main features
@@ -997,6 +1003,7 @@ onSubmit={async (values) => {
                     }}
                   />
                   <UploadPic
+                  key="propertyimg"
                     Logo={Profilelogo}
                     text1="Upload IMAGES"
                     text2=""
@@ -1008,6 +1015,7 @@ onSubmit={async (values) => {
                     setValue={setFieldValue}
                   />
                   <UploadPic
+                    key="floorimg"
                     Logo={ImageUpload}
                     text1="Upload FLOOR plan"
                     text2=" "
@@ -1030,30 +1038,267 @@ onSubmit={async (values) => {
                     required={false}
                     errorText={errors.yt_link}
                   />
-                  <Text className="font-bold">Advertise as</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setFieldValue(
-                        "ad_by",
-                        values.ad_by === "Agent" ? "" : "Agent"
-                      );
-                    }}
-                  >
-                    <View className="flex-row mt-4 items-center">
-                      <MaterialIcons
-                        size={18}
-                        color={Colors.light.DarkGreen}
-                        name={
-                          values.ad_by === "Agent"
-                            ? "check-box"
-                            : "check-box-outline-blank"
-                        }
-                      />
-                      <Text style={{ marginLeft: hs(5), fontWeight: "500" }}>
-                        Agent
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
+                  {user.user_type === "Business" && (
+                    <>
+                      <Text className="font-bold">Advertise as</Text>
+                      {data?.total_profiles !== 0 && (
+                        <View>
+                          {data?.profiles_exist?.agent && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Agent" ? "" : "Agent"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Agent"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Agent
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {data?.profiles_exist?.builder && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Builder" ? "" : "Builder"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Builder"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Builder
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {data?.profiles_exist?.decor && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Decor" ? "" : "Decor"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Decor"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Decor
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {data?.profiles_exist?.electrician && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Electrician"
+                                    ? ""
+                                    : "Electrician"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Electrician"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Electrician
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {data?.profiles_exist?.investor && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Investor" ? "" : "Investor"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Investor"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Investor
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {data?.profiles_exist?.mortgage && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Mortgage" ? "" : "Mortgage"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Mortgage"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Mortgage
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {data?.profiles_exist?.painter && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Painter" ? "" : "Painter"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Painter"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Painter
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {data?.profiles_exist?.plumber && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setFieldValue(
+                                  "ad_by",
+                                  values.ad_by === "Plumber" ? "" : "Plumber"
+                                );
+                              }}
+                            >
+                              <View className="flex-row mt-4 items-center">
+                                <MaterialIcons
+                                  size={18}
+                                  color={Colors.light.DarkGreen}
+                                  name={
+                                    values.ad_by === "Plumber"
+                                      ? "check-box"
+                                      : "check-box-outline-blank"
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginLeft: hs(5),
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  Plumber
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {touched && errors && (
+                            <Text
+                              style={{
+                                color: Colors.light.red,
+                                marginTop: vs(5),
+                              }}
+                            >
+                              {errors.ad_by}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </>
+                  )}
                   <View
                     style={{
                       height: vs(1),

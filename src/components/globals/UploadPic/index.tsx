@@ -90,7 +90,8 @@ const index = ({
                       setValue(name, null);
                     } else {
                       const updated = images.filter((_, i) => i !== index);
-                      setValue(name, updated.length ? updated : null);
+                      setValue(name, updated);
+
                     }
                   }}
                   style={{borderRadius:ms(12)}}

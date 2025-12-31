@@ -52,7 +52,7 @@ export const MainApi = createApi({
     }),
     getProfiles: builder.query<any, GetProfiles>({
       query: ({ id }) => ({
-        url: `check-profiles/${id}`,
+        url: `check-profiles?id=${id}`,
         method: "GET",
       }),
     }),

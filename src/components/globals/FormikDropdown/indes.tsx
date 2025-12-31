@@ -82,7 +82,7 @@ export const FormikDropdown = ({
         }
       }}
       setItems={setItems}
-      listMode="SCROLLVIEW"
+      listMode="MODAL"
       placeholder={placeholder}
       style={{
         backgroundColor: Colors.light.LightGreen,
