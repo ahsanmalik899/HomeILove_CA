@@ -1,7 +1,10 @@
-import ActiveRent from "@assets/icons/PostProperty/active-rent.svg";
-import ActiveSale from "@assets/icons/PostProperty/active-sale.svg";
-import RentIcon from "@assets/icons/PostProperty/non-active-rent.svg";
-import SaleIcon from "@assets/icons/PostProperty/non-active-sale.svg";
+
+import Commercial from "@assets/icons/PostProperty/commercial-green.svg";
+import Activecommercial from "@assets/icons/PostProperty/commercial-white.svg";
+import ActiveMix from "@assets/icons/PostProperty/mix-white.svg";
+import Residential from "@assets/icons/PostProperty/residential-green.svg";
+import ActiveResidential from "@assets/icons/PostProperty/residential-white.svg";
+import Mix from "@assets/SideBar/mixGreen.svg";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -13,7 +16,7 @@ const index = ({ onPress, value }: CommunityTypeprops) => {
         style={[value === "Residential" ? styles.activeButton : styles.Button]}
         onPress={()=>onPress('Residential')}
       >
-        {value === "Sale" ? <ActiveSale /> : <SaleIcon />}
+        {value === "Residential" ? <ActiveResidential/>:<Residential /> }
         <Text style={[value === "Residential" ? styles.TextActive : styles.Text]}>Residential</Text>
       </TouchableOpacity>
 
@@ -22,7 +25,7 @@ const index = ({ onPress, value }: CommunityTypeprops) => {
         style={[value === "Commercial" ? styles.activeButton : styles.Button]}
        onPress={()=>onPress('Commercial')}
       >
-        {value === "Commercial" ? <ActiveRent /> : <RentIcon />}
+        {value === "Commercial" ? <Activecommercial />:<Commercial/>}
         <Text style={[value === "Commercial" ? styles.TextActive : styles.Text]}>Commercial</Text>
       </TouchableOpacity>
        <TouchableOpacity
@@ -30,7 +33,7 @@ const index = ({ onPress, value }: CommunityTypeprops) => {
         style={[value === "Mix" ? styles.activeButton : styles.Button]}
        onPress={()=>onPress('Mix')}
       >
-        {value === "Mix" ? <ActiveRent /> : <RentIcon />}
+        {value === "Mix" ?  <ActiveMix />:<Mix /> }
         <Text style={[value === "Mix" ? styles.TextActive : styles.Text]}>Mix</Text>
       </TouchableOpacity>
     </View>

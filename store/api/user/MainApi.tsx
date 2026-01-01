@@ -50,6 +50,13 @@ export const MainApi = createApi({
         body: formatData,
       }),
     }),
+    postCommunity: builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `community/create`,
+        method: "POST",
+        body: formatData,
+      }),
+    }),
     getProfiles: builder.query<any, GetProfiles>({
       query: ({ id }) => ({
         url: `check-profiles?id=${id}`,
@@ -67,4 +74,5 @@ export const {
   useGetMYPostsQuery,
   usePostPropertyMutation,
   useGetProfilesQuery,
+  usePostCommunityMutation,
 } = MainApi;

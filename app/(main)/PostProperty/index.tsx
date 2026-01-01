@@ -36,6 +36,7 @@ import * as Yup from "yup";
 const index = () => {
   const user = useAppSelector(userdata);
   const [saleType, setSaleType] = useState(true);
+  const [propertType, setpropertType] = useState("");
   const PostPropertySchema = Yup.object().shape({
     user_id: Yup.number().required("User ID is required"),
 
@@ -48,7 +49,7 @@ const index = () => {
       : Yup.string().nullable(),
 
     property_type: Yup.string().required("Property type is required"),
-
+    furnishing_type: Yup.string().nullable(),
     property_sub_type: Yup.string().required("Property sub type is required"),
 
     address: Yup.string().required("Location is required"),
@@ -69,14 +70,14 @@ const index = () => {
 
     land_area: Yup.string().required("Area is required"),
 
-    bedroom: Yup.string()
+    bedroom:propertType==="House"? Yup.string()
       .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"),
+      .required("Bedrooms are required"):Yup.string().nullable(),
 
-    bathrooms: Yup.number()
+    bathrooms:propertType==="House"?( Yup.number()
       .typeError("Bathrooms must be a number")
       .positive()
-      .required("Bathrooms are required"),
+      .required("Bathrooms are required")):Yup.string().nullable(),
 
     purpose: Yup.string().nullable(),
 
@@ -201,6 +202,7 @@ const index = () => {
                 property_condition: "",
                 reception: "",
                 home_age: "",
+                furnishing_type: "",
                 lot_size: "",
                 house_charges: "",
                 pet_allowers: "",
@@ -241,7 +243,6 @@ const index = () => {
                     });
                   }
 
-                  
                   if (Array.isArray(values.floorimg)) {
                     values.floorimg.forEach((img, index) => {
                       if (img.uri) {
@@ -253,9 +254,9 @@ const index = () => {
                       }
                     });
                   }
-                 for (const pair of formData.entries()) {
-  console.log(pair[0], pair[1]);
-}
+                  for (const pair of formData.entries()) {
+                    console.log(pair[0], pair[1]);
+                  }
 
                   const result = await postProperty(formData);
 
@@ -370,7 +371,12 @@ const index = () => {
                   <PropertyType
                     onPress={(value) => {
                       setFieldValue("property_type", value);
+                      setpropertType(value);
                       setFieldValue("property_sub_type", "");
+                      if(value==="Farms/Lands"){
+                        setFieldValue("bedroom","")
+                         setFieldValue("bathrooms","")
+                      }
                     }}
                     value={values.property_type}
                     errorText={errors.property_type || ""}
@@ -525,6 +531,7 @@ const index = () => {
                       </View>
                     )}
                   </View>
+                {propertType!=="Farms/Lands"&&(
                   <View className="flex-row justify-between gap-3 mt-3">
                     <View className="flex-1">
                       <FormikDropdown
@@ -551,7 +558,7 @@ const index = () => {
                         value={values.bedroom}
                         touched={!!touched.bedroom}
                         errors={!!errors.bedroom}
-                        required
+                       required={propertType=== "House"}
                         errorText={errors.bedroom}
                       />
                     </View>
@@ -579,11 +586,13 @@ const index = () => {
                         value={values.bathrooms}
                         touched={!!touched.bathrooms}
                         errors={!!errors.bathrooms}
-                        required
+                          required={propertType=== "House"}
                         errorText={errors.bathrooms}
                       />
                     </View>
                   </View>
+                )}
+                  
                   <View className="flex-row justify-between gap-3 mt-3">
                     <View className="flex-1">
                       <FormikDropdown
@@ -610,7 +619,7 @@ const index = () => {
                     <View className="flex-1">
                       <FormikDropdown
                         onSelect={() => {}}
-                        options={["Yes", "No"]}
+                        options={["0", "1", "2", "3", "4", "5", "5+"]}
                         title="Reception"
                         placeholder=""
                         name="reception"
@@ -715,6 +724,26 @@ const index = () => {
                       )}
                     </View>
                   </View>
+                  {!saleType && (
+                    <FormikDropdown
+                      onSelect={() => {}}
+                      options={[
+                        "Fully Furnished",
+                        "Partly Furnished",
+                        "Unfurnished",
+                        "Under Construction",
+                      ]}
+                      title="Furnishing type"
+                      placeholder=""
+                      setValue={setFieldValue}
+                      name="urnishing_type"
+                      value={values.furnishing_type}
+                      touched={!!touched.furnishing_type}
+                      errors={!!errors.furnishing_type}
+                      required={false}
+                      errorText={errors.furnishing_type}
+                    />
+                  )}
 
                   <View>
                     <Text style={{ fontWeight: 600, marginTop: vs(10) }}>
@@ -1003,7 +1032,7 @@ const index = () => {
                     }}
                   />
                   <UploadPic
-                  key="propertyimg"
+                    key="propertyimg"
                     Logo={Profilelogo}
                     text1="Upload IMAGES"
                     text2=""

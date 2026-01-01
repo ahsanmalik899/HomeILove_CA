@@ -1,6 +1,6 @@
 import {
   useGetProfilesQuery,
-  usePostPropertyMutation,
+  usePostCommunityMutation
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Bunchers from "@assets/CreateProfile/broucher.svg";
@@ -305,7 +305,7 @@ const index = () => {
   const { data } = useGetProfilesQuery({ id: user.id });
 
   const [visit, setVisit] = useState("");
-  const [postProperty, { isLoading }] = usePostPropertyMutation();
+  const [postCommunity, { isLoading }] = usePostCommunityMutation();
   return (
     <View className="bg-white flex-1 ">
       <ScrollView
@@ -492,7 +492,7 @@ const index = () => {
                     console.log(pair[0], pair[1]);
                   }
 
-                  const result = await postProperty(formData);
+                  const result = await postCommunity(formData);
 
                   if (result.data?.success) {
                     renderToastSuccess(result.data?.message);
