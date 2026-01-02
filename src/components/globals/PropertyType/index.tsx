@@ -19,11 +19,11 @@ const index = ({value,onPress,errorText}:RentAndSaleProps) => {
    
          <TouchableOpacity
          className="items-center"
-           style={[value === "Commercials" ? styles.activeButton : styles.Button]}
-          onPress={()=>onPress('Commercials')}
+           style={[value === "Commercial" ? styles.activeButton : styles.Button]}
+          onPress={()=>onPress('Commercial')}
          >
           <Commercial/>
-           <Text style={[value === "Commercials" ? styles.TextActive : styles.Text]}>Commercials</Text>
+           <Text style={[value === "Commercial" ? styles.TextActive : styles.Text]}>Commercials</Text>
          </TouchableOpacity>
           <TouchableOpacity
          className="items-center"

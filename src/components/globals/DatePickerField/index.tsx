@@ -5,6 +5,14 @@ import { useState } from "react";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { FormikDatepicker } from "./type";
 
+// Helper to format date as YYYY-MM-DD
+const formatDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function FormikDatePicker({
   name,
   setValue,
@@ -16,38 +24,30 @@ export default function FormikDatePicker({
   required,
   placeholder,
   editable,
-  
 }: FormikDatepicker) {
   const [show, setShow] = useState(false);
 
+  // Use current value or today
   const dateValue = value ? new Date(value) : new Date();
 
   const onChange = (_: any, selectedDate?: Date) => {
     setShow(false);
 
     if (selectedDate) {
-      setValue(name, selectedDate.toISOString()); // ✅ correct
+      // Save in YYYY-MM-DD format
+      setValue(name, formatDate(selectedDate));
     }
   };
 
   return (
-    <View style={{marginTop:vs(10)}}>
-       <View className="flex-row" style={{ marginBottom: vs(10) }}>
-              {title && <Text style={{   fontSize: ms(14), fontWeight: 600 }}>{title}</Text>}
-              {required && (
-                <Text
-                  style={{
-                    color: Colors.light.red,
-                  }}
-                >
-                  *
-                </Text>
-              )}
-            
-            </View>
-            {editable?(
-                <TouchableOpacity
-        onPress={() => setShow(true)}
+    <View style={{ marginTop: vs(10) }}>
+      <View className="flex-row" style={{ marginBottom: vs(10) }}>
+        {title && <Text style={{ fontSize: ms(14), fontWeight: "600" }}>{title}</Text>}
+        {required && <Text style={{ color: Colors.light.red }}>*</Text>}
+      </View>
+
+      <TouchableOpacity
+        onPress={editable ? () => setShow(true) : undefined}
         style={{
           borderRadius: ms(18),
           paddingVertical: vs(14),
@@ -56,29 +56,8 @@ export default function FormikDatePicker({
           width: "100%",
         }}
       >
-        <Text>
-          {value
-            ? new Date(value).toDateString()
-            : placeholder}
-        </Text>
+        <Text>{value ? value : placeholder}</Text>
       </TouchableOpacity>
-            ):(
-                <TouchableOpacity
-        onPress={()=>{}}
-        style={{
-          borderRadius: ms(18),
-          paddingVertical: vs(14),
-          backgroundColor: Colors.light.LightGreen,
-          paddingHorizontal: hs(12),
-          width: "100%",
-        }}
-      >
-        <Text>
-        {placeholder}
-        </Text>
-      </TouchableOpacity>
-            )}
-    
 
       {show && (
         <DateTimePicker
@@ -89,9 +68,8 @@ export default function FormikDatePicker({
           onChange={onChange}
         />
       )}
-        {touched && errors && (
-              <Text style={{ color: Colors.light.red }}>{errorText}</Text>
-            )}
+
+      {touched && errors && <Text style={{ color: Colors.light.red }}>{errorText}</Text>}
     </View>
   );
 }

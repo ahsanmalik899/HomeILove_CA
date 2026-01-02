@@ -97,6 +97,7 @@
       "router": {
         "origin": false
       },
+       "GOOGLE_MAPS_API_KEY": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY",
       "eas": {
         "projectId": "e370ca21-f752-4295-8201-cdd94e014280"
       }

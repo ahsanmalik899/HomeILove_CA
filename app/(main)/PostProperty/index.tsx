@@ -296,6 +296,7 @@ const index = () => {
                       setFieldValue("tenancy_tenure", "");
                       setFieldValue("price_type", "");
                       setFieldValue("rent_type", "");
+                      setFieldValue("sale_type", "");
                     }}
                   />
 
@@ -432,8 +433,8 @@ const index = () => {
                     city={"city"}
                     zip={"zip"}
                     state={"state"}
-                    lat={"lag"}
-                    long="lnt"
+                    lat={"lat"}
+                    long={"lng"}
                     latValue={values.lat}
                     longValue={values.lng}
                     name="address"
@@ -736,7 +737,7 @@ const index = () => {
                       title="Furnishing type"
                       placeholder=""
                       setValue={setFieldValue}
-                      name="urnishing_type"
+                      name="furnishing_type"
                       value={values.furnishing_type}
                       touched={!!touched.furnishing_type}
                       errors={!!errors.furnishing_type}
@@ -1005,10 +1006,10 @@ const index = () => {
                           errorText={errors.price_type}
                         />
                       ) : (
-                        <FormikDropdown
+                        <FormikDropdownwithjson
                           key={"rent-type"}
                           onSelect={() => {}}
-                          options={["Per week", "per month"]}
+                          options={[{label:"Per week", value:"week"},{label:"per month",value:"month"}]}
                           title=""
                           placeholder="Rent Type"
                           name="rent_type"

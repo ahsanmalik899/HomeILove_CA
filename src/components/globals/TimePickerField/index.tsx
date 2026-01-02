@@ -5,6 +5,13 @@ import { useState } from "react";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { FormikDatepicker } from "./type";
 
+// Helper → HH:mm
+const formatTime = (date: Date) => {
+  const hours = `${date.getHours()}`.padStart(2, "0");
+  const minutes = `${date.getMinutes()}`.padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
 export default function FormikTimePicker({
   name,
   setValue,
@@ -17,13 +24,17 @@ export default function FormikTimePicker({
 }: FormikDatepicker) {
   const [show, setShow] = useState(false);
 
-  const timeValue = value ? new Date(value) : new Date();
+  // If value exists, create a Date from today + time
+  const timeValue = value
+    ? new Date(`1970-01-01T${value}:00`)
+    : new Date();
 
   const onChange = (_: any, selectedTime?: Date) => {
     setShow(false);
 
     if (selectedTime) {
-      setValue(name, selectedTime.toISOString()); // ✅ store ISO (recommended)
+      // ✅ STORE AS "HH:mm"
+      setValue(name, formatTime(selectedTime));
     }
   };
 
@@ -50,14 +61,7 @@ export default function FormikTimePicker({
           width: "100%",
         }}
       >
-        <Text>
-          {value
-            ? new Date(value).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "Select time"}
-        </Text>
+        <Text>{value ? value : "Select time"}</Text>
       </TouchableOpacity>
 
       {/* Picker */}
@@ -67,6 +71,7 @@ export default function FormikTimePicker({
           mode="time"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={onChange}
+          is24Hour={true}
         />
       )}
 
