@@ -13,6 +13,7 @@ const Loading = ({ text, isLoading }: Loadingprops) => {
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
+        zIndex:10000,
         height: '100%',
         width: '100%',
         position: 'absolute',

@@ -17,5 +17,6 @@ export interface AddressInputProps {
   additonalText?: string;
   multipleFields?: boolean;
   name?: string;
+  withmap?:boolean;
   setValue?: (field: string, value: string) => void;
 }

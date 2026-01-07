@@ -9,6 +9,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { Formik } from "formik";
+import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
@@ -30,7 +31,11 @@ const index = () => {
     reenterNewPassword: Yup.string()
       .oneOf([Yup.ref("newPassword")], "Passwords must match")
       .required("Please re-enter new password"),
+      logo:Yup.string().nullable(),
   });
+  useEffect(()=>{
+console.log(user.logo)
+  },[user])
   return (
      <View className="bg-white flex-1">
       <ScrollView>
@@ -41,13 +46,15 @@ const index = () => {
             <Text style={{ color: Colors.light.red }}>LOVE</Text> your home
           </Text>
           <Formik
+          enableReinitialize
             initialValues={{
               name: user.name,
-              mobile: user.mobile,
+              mobile: user.mobile||"",
               email: user.email,
               oldPassword: "",
               newPassword: "",
               reenterNewPassword: "",
+              logo:user.logo||null,
             }}
             validationSchema={profileschemea}
             onSubmit={(values) => console.log(values)}
@@ -131,9 +138,8 @@ const index = () => {
                   value={values.reenterNewPassword}
                   placeholder=""
                 />
-              </>
-            )}
-          </Formik>
+            
+           
           <Text
             style={{
               marginTop: vs(10),
@@ -161,10 +167,16 @@ const index = () => {
                   Logo={Profilelogo}
                   text1="Upload "
                   text2="Logo/Pic"
-                  onPress={() => {}}
-                />
-                <LargeButton text="Upload Account" handleSubmit={()=>{}}/>
+                  limt={1}
+                  name="logo"
+                  setValue={setFieldValue}
+                   value={values.logo}                />
+                <LargeButton text="Upload Account" handleSubmit={()=>{onsubmit}}/>
+                    </>
+                 )}
+          </Formik>
         </View>
+        
       </ScrollView>
     </View>
   )

@@ -210,6 +210,7 @@ const index = () => {
                 fees_conditions: "",
                 available_on: "",
                 visit_date: "",
+                
                 visit_time: "",
                 ad_by: "",
                 propertyimg: [],

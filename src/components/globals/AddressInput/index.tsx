@@ -38,6 +38,7 @@ export const AdressInput = ({
   long,
   setValue = () => {},
   name = "name",
+  withmap=true,
 }: AddressInputProps) => {
 
   const [currentValue, setCurrentValue] = useState(value?.toString() || "");
@@ -163,7 +164,7 @@ const handleMapPress = async (e: any) => {
         placeholder="Enter address..."
         placeholderTextColor={Colors.light.DarkGreen}
         style={{
-          flex: 1,
+          
           color: Colors.light.DarkGreen,
           backgroundColor: Colors.light.LightGreen,
           borderRadius: ms(18),
@@ -222,7 +223,8 @@ const handleMapPress = async (e: any) => {
           {errorText}
         </Text>
       )}
-   <View style={styles.buttonContainer}>
+      {withmap&&(<>
+         <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
           onPress={() => setMapType("standard")}
@@ -253,7 +255,8 @@ const handleMapPress = async (e: any) => {
 >
   
 <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
-</MapView>
+</MapView></>)}
+
 
 
     </View>

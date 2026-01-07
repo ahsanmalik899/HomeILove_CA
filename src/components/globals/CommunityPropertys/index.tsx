@@ -784,7 +784,7 @@ const index = ({
         placeholder=""
         onChangeText={handleChange("price4")}
         onBlur={handleBlur("price4")}
-        value={values.price2}
+        value={values.price4}
         touched={!!touched}
         errors={!!errors}
         required

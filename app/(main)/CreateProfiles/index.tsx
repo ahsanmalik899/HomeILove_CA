@@ -295,9 +295,7 @@ const Index = () => {
     city: Yup.string().required("City is required"),
     state: Yup.string().required("State is required"),
 
-    zip: Yup.string()
-      .matches(/^[0-9]+$/, "Invalid ZIP code")
-      .nonNullable(),
+    zip: Yup.string().required("zip is required"),
 
     user_lat: Yup.number().required("Latituted is required"),
     user_lng: Yup.number().nullable("Longitude is required"),
@@ -397,8 +395,8 @@ const Index = () => {
               city: "",
               state: "",
               zip: "",
-              user_lat: null,
-              user_lng: null,
+              user_lat: 0,
+              user_lng: 0,
               web: "",
               license_no: "",
               lic_state: "",

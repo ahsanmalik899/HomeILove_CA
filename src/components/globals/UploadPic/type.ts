@@ -18,4 +18,5 @@ export type UploadPic = {
   withCircule?: boolean;
   value: ImageValue | ImageValue[] | null;
   limt: number;
+  UploadComponenet?:ComponentType<any>;
 };

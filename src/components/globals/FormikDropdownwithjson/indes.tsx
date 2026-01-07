@@ -72,6 +72,7 @@ const handleRemove = (index: number) => {
   items={items}
   setOpen={setOpen}
   setItems={setItems}
+  listMode="MODAL"
   setValue={(callback) => {
     const val = callback(currentValue) as number;
     setCurrentValue(val);

@@ -63,6 +63,41 @@ export const MainApi = createApi({
         method: "GET",
       }),
     }),
+
+    postGeneralPost: builder.mutation<any, FormData>({
+      query: (data) => ({
+        url: `generalPost/create`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    setPropertyPrefrence: builder.mutation<any, any>({
+      query: (data) => ({
+        url: `setPropertyPrefrence`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    setCommunityPrefrence: builder.mutation<any, any>({
+      query: (data) => ({
+        url: `setCommunityPrefrence`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    setConectionPrefrence: builder.mutation<any, any>({
+      query: (data) => ({
+        url: `setConnectionPrefrence`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    getInquieryAgent: builder.query<any, any>({
+      query: (data) => ({
+        url: `searchAgentForInquery?lat=${data.lat}&lng=${data.lng}&radius=${data.radius}&inquiry_type=${data.inquiry_type} &per_page=${data.per_page}&page=${data.page}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -75,4 +110,9 @@ export const {
   usePostPropertyMutation,
   useGetProfilesQuery,
   usePostCommunityMutation,
+  usePostGeneralPostMutation,
+  useSetPropertyPrefrenceMutation,
+  useSetCommunityPrefrenceMutation,
+  useSetConectionPrefrenceMutation,
+  useLazyGetInquieryAgentQuery,
 } = MainApi;

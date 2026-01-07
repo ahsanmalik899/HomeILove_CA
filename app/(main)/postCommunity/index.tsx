@@ -21,6 +21,7 @@ import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
+import PdfPicker from "@src/components/globals/PdfPicker";
 import RadioButton from "@src/components/globals/RadioButton";
 import SelecteAdType from "@src/components/globals/TablikeButton";
 import TimePickerField from "@src/components/globals/TimePickerField";
@@ -56,7 +57,7 @@ const index = () => {
 
     state: Yup.string().required("State is required"),
 
-    zip: Yup.string().nullable(),
+    zip: Yup.string().required("Zip is not correct"),
 
     lat: Yup.number()
       .typeError("Latitude must be a number")
@@ -279,7 +280,7 @@ const index = () => {
             .min(0, "Invalid bathrooms")
         : Yup.string().nullable(),
   });
-  const [imagename, setimagename] = useState("");
+  
   const pickImage = async (setFieldValue: any, name: string) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -293,7 +294,7 @@ const index = () => {
       const filename = uri.split("/").pop();
       const ext = filename?.split(".").pop();
 
-      setimagename(filename);
+    
 
       setFieldValue(name, {
         uri,
@@ -475,19 +476,35 @@ const index = () => {
                       }
                     });
                   }
-  if (Array.isArray(values.broucherimg)) {
-  values.broucherimg.forEach((img, index) => {
-    if (img.uri) {
+if (Array.isArray(values.broucherimg)) {
+  values.broucherimg.forEach((pdf, index) => {
+    if (pdf?.uri) {
       formData.append("broucherimg[]", {
-        uri: img.uri,
-        name: img.name || `brochure_${index}.jpg`,
-        type: img.type || "image/jpeg",
+        uri: pdf.uri,
+        name: pdf.name || `brochure_${index}.pdf`,
+        type: "application/pdf",
       } as any);
     }
   });
 }
 
 
+
+ if (values.developer_logo?.uri) {
+                  formData.append("developer_logo", {
+                    uri: values.developer_logo?.uri,
+                    type: values.developer_logo?.type || "image/jpeg",
+                    name: values.developer_logo?.name || "logo.jpg",
+                  } as any);
+                }
+
+                 if (values.project_logo?.uri) {
+                  formData.append("project_logo", {
+                    uri: values.project_logo?.uri,
+                    type: values.project_logo?.type || "image/jpeg",
+                    name: values.project_logo?.name || "logo.jpg",
+                  } as any);
+                }
                   for (const pair of formData.entries()) {
                     console.log(pair[0], pair[1]);
                   }
@@ -815,7 +832,7 @@ const index = () => {
                     name={"floorimg"}
                     value={values.floorimg}
                   />
-                  <UploadPic
+                  <PdfPicker
                     key="brochure"
                     Logo={Bunchers}
                     text1="Upload BROCHURE"
