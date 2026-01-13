@@ -98,6 +98,21 @@ export const MainApi = createApi({
         method: "GET",
       }),
     }),
+        postAdvatizement: builder.mutation<any, FormData>({
+      query: (data) => ({
+        url: `postAdvatizement`,
+        method: "POST",
+        body: data,
+    
+      }),
+    }),
+          getYorSalePosts:builder.query<any, any>({
+      query: ({page,per_page,type,user_id,profile_type}) => ({
+        url: `get/userProperty?page=${page}&per_page=${per_page}&type=${type}&user_id=${user_id}&profile_type=${profile_type}`,
+        method: "GET",
+    
+      }),
+    }),
   }),
 });
 
@@ -115,4 +130,6 @@ export const {
   useSetCommunityPrefrenceMutation,
   useSetConectionPrefrenceMutation,
   useLazyGetInquieryAgentQuery,
+  usePostAdvatizementMutation,
+  useGetYorSalePostsQuery,
 } = MainApi;

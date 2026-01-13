@@ -1,6 +1,6 @@
 import {
   useGetProfilesQuery,
-  usePostCommunityMutation
+  usePostCommunityMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Bunchers from "@assets/CreateProfile/broucher.svg";
@@ -227,60 +227,117 @@ const index = () => {
             .required("Price is required")
             .positive("Price must be positive")
         : Yup.string().nullable(),
-    bedroom1: Yup.string()
-      .required("Bedroom is required"),
+    bedroom1: Yup.string().when("property_type1", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bedrooms must be a number")
+      .required("Bedrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+}),
     bedroom2:
       count === 2
-        ? Yup.string()
-            .required("Bedroom is required")
+        ? Yup.string().when("property_type2", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bedrooms must be a number")
+      .required("Bedrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
     bedroom3:
       count === 3
-        ? Yup.string()
-            .required("Bedroom is required")
-            
+        ? Yup.string().when("property_type3", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bedrooms must be a number")
+      .required("Bedrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
     bedroom4:
       count === 4
-        ? Yup.string()
-            .required("Bedroom is required")
-            
+        ? Yup.string().when("property_type4", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bedrooms must be a number")
+      .required("Bedrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
     bedroom5:
       count === 5
-        ? Yup.string()
-            .required("Bedroom is required")
-           
+        ? Yup.string().when("property_type5", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bedrooms must be a number")
+      .required("Bedrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
-    bathroom1: Yup.number()
-      .required("Bathroom is required")
-      .min(0, "Invalid bathrooms"),
+    bathroom1:  Yup.number().when("property_type1", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bathrooms must be a number")
+      .positive("Invalid bathrooms")
+      .required("Bathrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+}),
     bathroom2:
       count === 2
-        ? Yup.number()
-            .required("Bathroom is required")
-            .min(0, "Invalid bathrooms")
+        ?  Yup.number().when("property_type2", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bathrooms must be a number")
+      .positive("Invalid bathrooms")
+      .required("Bathrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
     bathroom3:
       count === 3
-        ? Yup.number()
-            .required("Bathroom is required")
-            .min(0, "Invalid bathrooms")
+        ?  Yup.number().when("property_type3", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bathrooms must be a number")
+      .positive("Invalid bathrooms")
+      .required("Bathrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
     bathroom4:
       count === 4
-        ? Yup.number()
-            .required("Bathroom is required")
-            .min(0, "Invalid bathrooms")
+        ? Yup.number().when("property_type4", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bathrooms must be a number")
+      .positive("Invalid bathrooms")
+      .required("Bathrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
     bathroom5:
       count === 5
-        ? Yup.number()
-            .required("Bathroom is required")
-            .min(0, "Invalid bathrooms")
+        ? Yup.number().when("property_type5", {
+  is: "House",
+  then: (s) =>
+    s
+      .typeError("Bathrooms must be a number")
+      .positive("Invalid bathrooms")
+      .required("Bathrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+})
         : Yup.string().nullable(),
   });
-  
+
   const pickImage = async (setFieldValue: any, name: string) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -293,8 +350,6 @@ const index = () => {
       const uri = asset.uri;
       const filename = uri.split("/").pop();
       const ext = filename?.split(".").pop();
-
-    
 
       setFieldValue(name, {
         uri,
@@ -476,35 +531,33 @@ const index = () => {
                       }
                     });
                   }
-if (Array.isArray(values.broucherimg)) {
-  values.broucherimg.forEach((pdf, index) => {
-    if (pdf?.uri) {
-      formData.append("broucherimg[]", {
-        uri: pdf.uri,
-        name: pdf.name || `brochure_${index}.pdf`,
-        type: "application/pdf",
-      } as any);
-    }
-  });
-}
+                  if (Array.isArray(values.broucherimg)) {
+                    values.broucherimg.forEach((pdf, index) => {
+                      if (pdf?.uri) {
+                        formData.append("broucherimg[]", {
+                          uri: pdf.uri,
+                          name: pdf.name || `brochure_${index}.pdf`,
+                          type: "application/pdf",
+                        } as any);
+                      }
+                    });
+                  }
 
+                  if (values.developer_logo?.uri) {
+                    formData.append("developer_logo", {
+                      uri: values.developer_logo?.uri,
+                      type: values.developer_logo?.type || "image/jpeg",
+                      name: values.developer_logo?.name || "logo.jpg",
+                    } as any);
+                  }
 
-
- if (values.developer_logo?.uri) {
-                  formData.append("developer_logo", {
-                    uri: values.developer_logo?.uri,
-                    type: values.developer_logo?.type || "image/jpeg",
-                    name: values.developer_logo?.name || "logo.jpg",
-                  } as any);
-                }
-
-                 if (values.project_logo?.uri) {
-                  formData.append("project_logo", {
-                    uri: values.project_logo?.uri,
-                    type: values.project_logo?.type || "image/jpeg",
-                    name: values.project_logo?.name || "logo.jpg",
-                  } as any);
-                }
+                  if (values.project_logo?.uri) {
+                    formData.append("project_logo", {
+                      uri: values.project_logo?.uri,
+                      type: values.project_logo?.type || "image/jpeg",
+                      name: values.project_logo?.name || "logo.jpg",
+                    } as any);
+                  }
                   for (const pair of formData.entries()) {
                     console.log(pair[0], pair[1]);
                   }
@@ -513,7 +566,6 @@ if (Array.isArray(values.broucherimg)) {
 
                   if (result.data?.success) {
                     renderToastSuccess(result.data?.message);
-                    
                   } else {
                     console.log(result);
                   }
@@ -875,7 +927,9 @@ if (Array.isArray(values.broucherimg)) {
                     <View className="flex-1">
                       <TouchableOpacity
                         style={{
-                          backgroundColor: values.developer_logo? Colors.light.DarkGreen: Colors.light.textGray,
+                          backgroundColor: values.developer_logo
+                            ? Colors.light.DarkGreen
+                            : Colors.light.textGray,
                           height: vs(40),
                           width: "100%",
                           borderRadius: ms(10),
@@ -902,7 +956,9 @@ if (Array.isArray(values.broucherimg)) {
                     <View className="flex-1">
                       <TouchableOpacity
                         style={{
-                          backgroundColor:values.project_logo?Colors.light.DarkGreen:Colors.light.textGray,
+                          backgroundColor: values.project_logo
+                            ? Colors.light.DarkGreen
+                            : Colors.light.textGray,
                           height: vs(40),
                           width: "100%",
                           borderRadius: ms(10),

@@ -513,7 +513,7 @@ const Index = () => {
                       touched={!!touched.investor_type}
                       errors={!!errors.investor_type}
                       errorText={errors.investor_type}
-                      multipleFields
+                      
                       required
                     />
 

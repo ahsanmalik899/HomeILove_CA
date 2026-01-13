@@ -6,7 +6,7 @@ type CircleImageProps = {
   Size: number;
 };
 const CircleImage = ({ source, Size }: CircleImageProps) => {
-  console.log(source)
+
   return (
     <Image
       style={{

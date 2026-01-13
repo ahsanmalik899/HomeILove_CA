@@ -130,7 +130,8 @@ const index = ({
           />
         </View>
       </View>
-      <View className="flex-row justify-between gap-3 mt-3">
+      {values.property_type1!=="Farms/Lands"&&(
+          <View className="flex-row justify-between gap-3 mt-3">
         <View className="flex-1">
           <FormikDropdown
             onSelect={() => {}}
@@ -156,7 +157,7 @@ const index = ({
             value={values.bedroom1}
             touched={!!touched}
             errors={!!errors}
-            required
+            required={values. property_type1==="House"}
             errorText={errors.bedroom1}
           />
         </View>
@@ -184,11 +185,13 @@ const index = ({
             value={values.bathroom1}
             touched={!!touched}
             errors={!!errors}
-            required
+                required={values. property_type1==="House"}
             errorText={errors.bathroom1}
           />
         </View>
       </View>
+      )}
+    
       <FormikInput
         title="Price"
         placeholder=""
@@ -326,6 +329,7 @@ const index = ({
               />
             </View>
           </View>
+          {values.property_type1!=="Farms/Lands"&&(
           <View className="flex-row justify-between gap-3 mt-3">
             <View className="flex-1">
               <FormikDropdown
@@ -350,7 +354,7 @@ const index = ({
                 value={values.bedroom2}
                 touched={!!touched}
                 errors={!!errors}
-                required
+                    required={values. property_type2==="House"}
                  name="bedroom2"
             setValue={setFieldValue}
                 errorText={errors.bedroom2}
@@ -378,13 +382,13 @@ const index = ({
                 value={values.bathroom2}
                 touched={!!touched}
                 errors={!!errors}
-                required
+                   required={values. property_type2==="House"}
                 name="bathroom2"
             setValue={setFieldValue}
                 errorText={errors.bathroom2}
               />
             </View>
-          </View>
+          </View>)}
           <FormikInput
             title="Price"
             placeholder=""
@@ -523,6 +527,7 @@ const index = ({
               />
             </View>
           </View>
+          {values.property_type1!=="Farms/Lands"&&(
           <View className="flex-row justify-between gap-3 mt-3">
             <View className="flex-1">
               <FormikDropdown
@@ -547,7 +552,7 @@ const index = ({
                 value={values.bedroom3}
                 touched={!!touched}
                 errors={!!errors}
-                required
+                    required={values. property_type3==="House"}
                  name="bedroom3"
             setValue={setFieldValue}
                 errorText={errors.bedroom3}
@@ -575,13 +580,13 @@ const index = ({
                 value={values.bathroom3}
                 touched={!!touched}
                 errors={!!errors}
-                required
+                    required={values. property_type3==="House"}
                 name="bathroom3"
             setValue={setFieldValue}
                 errorText={errors.bathroom3}
               />
             </View>
-          </View>
+          </View>)}
           <FormikInput
             title="Price"
             placeholder=""
@@ -720,6 +725,7 @@ const index = ({
           />
         </View>
       </View>
+      {values.property_type1!=="Farms/Lands"&&(
       <View className="flex-row justify-between gap-3 mt-3">
         <View className="flex-1">
           <FormikDropdown
@@ -744,7 +750,7 @@ const index = ({
             value={values.bedroom4}
             touched={!!touched}
             errors={!!errors}
-            required
+               required={values. property_type4==="House"}
              name="bedroom4"
             setValue={setFieldValue}
             errorText={errors.bedroom4}
@@ -772,13 +778,13 @@ const index = ({
             value={values.bathroom4}
             touched={!!touched}
             errors={!!errors}
-            required
+               required={values. property_type4==="House"}
             name="bathroom4"
             setValue={setFieldValue}
             errorText={errors.bathroom4}
           />
         </View>
-      </View>
+      </View>)}
       <FormikInput
         title="Price"
         placeholder=""
@@ -918,6 +924,7 @@ const index = ({
           />
         </View>
       </View>
+      {values.property_type1!=="Farms/Lands"&&(
       <View className="flex-row justify-between gap-3 mt-3">
         <View className="flex-1">
           <FormikDropdown
@@ -942,7 +949,7 @@ const index = ({
             value={values.bedroom5}
             touched={!!touched}
             errors={!!errors}
-            required
+                required={values. property_type5==="House"}
              name="bedroom5"
             setValue={setFieldValue}
             errorText={errors.bedroom5}
@@ -970,13 +977,13 @@ const index = ({
             value={values.bathroom5}
             touched={!!touched}
             errors={!!errors}
-            required
+                required={values. property_type5==="House"}
             name="bathroom5"
             setValue={setFieldValue}
             errorText={errors.bathroom5}
           />
         </View>
-      </View>
+      </View>)}
       <FormikInput
         title="Price"
         placeholder=""

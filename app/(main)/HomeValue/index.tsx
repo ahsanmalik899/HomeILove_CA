@@ -264,7 +264,7 @@ return(
         renderItem={renderItem}
         keyExtractor={(item) => item.agent_id}
         onEndReached={() => {
-          if (data.length > 9) {
+          if (agents.length > 9) {
             setPage((prev) => prev + 1);
           }
         }}

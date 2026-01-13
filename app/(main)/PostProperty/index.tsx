@@ -44,9 +44,11 @@ const index = () => {
 
     property_for: Yup.string().required("Sale/Rent type is required"),
 
-    sale_type: saleType
-      ? Yup.string().required("Sale type is required")
-      : Yup.string().nullable(),
+    sale_type: Yup.string().when("property_for", {
+  is: "sale",
+  then: (s) => s.required("Sale type is required"),
+  otherwise: (s) => s.notRequired().nullable(),
+}),
 
     property_type: Yup.string().required("Property type is required"),
     furnishing_type: Yup.string().nullable(),
@@ -70,14 +72,25 @@ const index = () => {
 
     land_area: Yup.string().required("Area is required"),
 
-    bedroom:propertType==="House"? Yup.string()
+    bedroom: Yup.string().when("property_type", {
+  is: "House",
+  then: (s) =>
+    s
       .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"):Yup.string().nullable(),
+      .required("Bedrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+}),
 
-    bathrooms:propertType==="House"?( Yup.number()
+
+  bathrooms: Yup.number().when("property_type", {
+  is: "House",
+  then: (s) =>
+    s
       .typeError("Bathrooms must be a number")
-      .positive()
-      .required("Bathrooms are required")):Yup.string().nullable(),
+      .positive("Invalid bathrooms")
+      .required("Bathrooms are required"),
+  otherwise: (s) => s.notRequired().nullable(),
+}),
 
     purpose: Yup.string().nullable(),
 
@@ -106,13 +119,17 @@ const index = () => {
 
     payment_method: Yup.string().required("Payment method is required"),
 
-    tenure: saleType
-      ? Yup.string().required("Ownership is required")
-      : Yup.string().nullable(),
+    tenure: Yup.string().when("property_for", {
+  is: "sale",
+  then: (s) => s.required("Ownership is required"),
+  otherwise: (s) => s.notRequired().nullable(),
+}),
 
-    tenancy_tenure: saleType
-      ? Yup.string().nullable()
-      : Yup.string().required("Tenanacy tenure is required"),
+tenancy_tenure: Yup.string().when("property_for", {
+  is: "rent",
+  then: (s) => s.required("Tenancy tenure is required"),
+  otherwise: (s) => s.notRequired().nullable(),
+}),
 
     property_condition: Yup.string().nullable(),
 

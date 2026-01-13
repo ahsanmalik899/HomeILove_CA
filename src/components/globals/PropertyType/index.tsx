@@ -14,7 +14,7 @@ const index = ({value,onPress,errorText}:RentAndSaleProps) => {
            onPress={()=>onPress('House')}
          >
           <Home/>
-           <Text style={[value === "House" ? styles.TextActive : styles.Text]}>For Sale</Text>
+           <Text style={[value === "House" ? styles.TextActive : styles.Text]}>House</Text>
          </TouchableOpacity>
    
          <TouchableOpacity

@@ -1,12 +1,22 @@
+import { usePostAdvatizementMutation } from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import AdvatiseBaner from "@assets/SideBar/advertisementpic.svg";
+import Connection from "@assets/SideBar/connection.svg";
 import HomeFeed from "@assets/SideBar/homeFeed.svg";
+import Listipage1 from "@assets/SideBar/listingPage1.svg";
+import Listipage2 from "@assets/SideBar/listinpage2.svg";
+import TimeLine from "@assets/SideBar/timeline.svg";
+import DatePickerField from "@src/components/globals/DatePickerField";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
+import Loading from "@src/components/globals/Loading";
 import TablikeButton from "@src/components/globals/TablikeButton";
 import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { Formik } from "formik";
 import { useState } from "react";
@@ -18,19 +28,77 @@ const index = () => {
   const [showAdvatizeFrom, setShowAdvatizeForm] = useState(false);
   const [advatizeinfoType, setAdvatizeinfoType] = useState("Homefeed");
   const [listingInfo, setListingInfo] = useState("ListingDetail");
+  const [PostAdvatizement,{isLoading}]=usePostAdvatizementMutation();
+  const user = useAppSelector(userdata);
   const AdvatizeSchema = Yup.object().shape({
-    advertisement_type: Yup.string().required("Advertisement type is required"),
-
     start_date: Yup.string().required("Start date is required"),
 
-    expiry_date: Yup.string().required("Expiry date is required"),
+    end_date: Yup.string().required("Expiry date is required"),
 
     ad_link: Yup.string()
       .url("Please enter a valid URL")
       .required("Ad link is required"),
-
+    business_cover: Yup.mixed().nullable(),
     on_page: Yup.string().required("Page selection is required"),
   });
+  const Listingcomponenet1 = (
+    <View style={{ marginTop: vs(10) }}>
+      <Listipage1 height={vs(300)} width={hs(350)} />
+      <Text
+        style={{
+          fontSize: ms(18),
+          color: Colors.light.DarkGreen,
+          fontWeight: "500",
+        }}
+      >
+        When user view his love home then he will view your ad
+      </Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 15 / Day</Text>
+      <View className="justify-between " style={{ marginTop: vs(10) }}>
+        <Text>
+          • Another busiest segment where users search their homing needs and
+          that where we will present your ad at top most prominent place.
+          {"\n\n"}• Target your audience as per your ad requirements e.g. if
+          broker then place ad at sale & rent ad's detailing page, if developer
+          then place ad at new communities listing segment.
+          {"\n\n"}• You can advertise your ad as per your budget reuirements
+          i.e. how many days you want to run your advertisement.( * Promotion is
+          based on minimum 1 day and maximum days you want)
+          {"\n\n"}• Your ad will be place at top of listings details page which
+          gives your ad a Must See.
+        </Text>
+      </View>
+    </View>
+  );
+  const Listingcomponenet2 = (
+    <View style={{ marginTop: vs(10) }}>
+      <Listipage2 height={vs(300)} width={hs(350)} />
+      <Text
+        style={{
+          fontSize: ms(18),
+          color: Colors.light.DarkGreen,
+          fontWeight: "500",
+        }}
+      >
+        Present your brand / business at core segment of portal
+      </Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 10 / Day</Text>
+      <View className="justify-between " style={{ marginTop: vs(10) }}>
+        <Text>
+          •You have 7 best choices to present your ad at Property for sale &
+          rent , New communities, businesses profiles listing pages.
+          {"\n\n"}•Target your audience as per your ad requirements e.g. if
+          broker then place ad at sale & rent listing, if developer then place
+          ad at new communities listing segment.
+          {"\n\n"}• You can advertise your ad as per your budget reuirements
+          i.e. how many days you want to run your advertisement.( * Promotion is
+          based on minimum 1 day and maximum days you want)
+          {"\n\n"}• Your ad will be place between listings which gives your
+          brand projection to highly concerned viewership.
+        </Text>
+      </View>
+    </View>
+  );
   const componenet1 = (
     <View style={{ marginTop: vs(10) }}>
       <HomeFeed height={vs(300)} width={hs(350)} />
@@ -46,21 +114,22 @@ const index = () => {
       <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 5/ Day</Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text>
-          Most busiest section where every user see all the activities of
-          connections and preferred properties & communities. {"\n"} No chance
-          to miss your advertisement as your ad will be placed most prominent
-          place of page.{"\n"} You can promote your business as per your budget
+          • Most busiest section where every user see all the activities of
+          connections and preferred properties & communities.
+          {"\n\n"}• No chance to miss your advertisement as your ad will be
+          placed most prominent place of page.
+          {"\n\n"}• You can promote your business as per your budget
           requirements i.e. how many days you want to run your advertisement. (*
-          Promotion is based on minimum 1 day and maximum days you want){"\n"}{" "}
-          Far more reach of your business to get more connectivity with users
-          means more engagements of your business.
+          Promotion is based on minimum 1 day and maximum days you want) .
+          {"\n\n"}• Far more reach of your business to get more connectivity
+          with users means more engagements of your business.
         </Text>
       </View>
     </View>
   );
   const componenet2 = (
     <View style={{ marginTop: vs(10) }}>
-      <HomeFeed height={vs(300)} width={hs(350)} />
+      <TimeLine height={vs(300)} width={hs(350)} />
       <Text
         style={{
           fontSize: ms(18),
@@ -68,26 +137,26 @@ const index = () => {
           fontWeight: "500",
         }}
       >
-        Present your brand / business at most visited segment for
+        Market your brand to user's own timeline page for
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 5/ Day</Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 25 / Day</Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text>
-          Most busiest section where every user see all the activities of
-          connections and preferred properties & communities. {"\n"} No chance
-          to miss your advertisement as your ad will be placed most prominent
-          place of page.{"\n"} You can promote your business as per your budget
-          requirements i.e. how many days you want to run your advertisement. (*
-          Promotion is based on minimum 1 day and maximum days you want){"\n"}{" "}
-          Far more reach of your business to get more connectivity with users
-          means more engagements of your business.
+          • Every user view its own activities and thats where your ad will be
+          placed.{"\n\n"}• Prominent place for your advertisement at our another
+          busiest segement.{"\n\n"}• You can promote your business as per your
+          budget reuirements i.e. how many days you want to run your
+          advertisement.( * Promotion is based on minimum 1 day and maximum days
+          you want)
+          {"\n\n"}• Far more reach of your business to get more connectivity
+          with users means more engagements of your business .
         </Text>
       </View>
     </View>
   );
   const componenet3 = (
     <View style={{ marginTop: vs(10) }}>
-      <HomeFeed height={vs(300)} width={hs(350)} />
+      <Connection height={vs(300)} width={hs(350)} />
       <Text
         style={{
           fontSize: ms(18),
@@ -95,19 +164,20 @@ const index = () => {
           fontWeight: "500",
         }}
       >
-        Present your brand / business at most visited segment for
+        Most economical yet results producing place for your ad at
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 5/ Day</Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 20 / Day</Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text>
-          Most busiest section where every user see all the activities of
-          connections and preferred properties & communities. {"\n"} No chance
-          to miss your advertisement as your ad will be placed most prominent
-          place of page.{"\n"} You can promote your business as per your budget
-          requirements i.e. how many days you want to run your advertisement. (*
-          Promotion is based on minimum 1 day and maximum days you want){"\n"}{" "}
-          Far more reach of your business to get more connectivity with users
-          means more engagements of your business.
+          • Your ad will be placed at user's list of connections at very
+          economical rates.
+          {"\n\n"}• Prominent place for your advertisement at another decent
+          traffic segment.
+          {"\n\n"}• You can promote your business as per your budget reuirements
+          i.e. how many days you want to run your advertisement.( * Promotion is
+          based on minimum 1 day and maximum days you want).
+          {"\n\n"}• Far more reach of your business to get more connectivity
+          with users means more engagements of your business .
         </Text>
       </View>
     </View>
@@ -178,8 +248,8 @@ const index = () => {
               btn2value="ListingPage"
               btnTxt1="Listing details pages"
               btnTxt2="Listing pages"
-              Componet1={componenet1}
-              Componet2={componenet2}
+              Componet1={Listingcomponenet1}
+              Componet2={Listingcomponenet2}
               value={listingInfo}
               onPress={(value) => {
                 setListingInfo(value);
@@ -223,6 +293,7 @@ const index = () => {
 
   if (showAdvatizeFrom) {
     return (
+      <>
       <ScrollView>
         <View className="flex-1 bg-white">
           <HeaderWithBack />
@@ -233,16 +304,65 @@ const index = () => {
             </Text>
             <Formik
               initialValues={{
-                advertisement_type: "",
                 start_date: "",
-                expiry_date: "",
+                end_date: "",
                 ad_link: "",
                 on_page: "",
+                business_cover: null,
+                user_id:user.id,
+                total_price:200,
               }}
               validationSchema={AdvatizeSchema}
-              onSubmit={(values) => {
-                console.log("Form Data:", values);
-              }}
+onSubmit={async (values) => {
+  try {
+    const formData = new FormData();
+
+    // Append normal fields
+    Object.keys(values).forEach((key) => {
+      if (
+        key !== 'business_cover' &&
+        values[key] !== undefined &&
+        values[key] !== null
+      ) {
+        formData.append(key, String(values[key]));
+      }
+    });
+
+    // Append image
+    if (values.business_cover?.uri) {
+  formData.append("business_cover", {
+    uri: values.business_cover.uri,
+    name: values.business_cover.name ?? "advertisement.jpg",
+    type: values.business_cover.type ?? "image/jpeg",
+  } as any);
+}
+
+console.log(formData);
+    // 🔥 unwrap() throws error automatically if API fails
+    const response = await PostAdvatizement(formData).unwrap();
+
+    // ✅ SUCCESS TOAST
+    renderToastSuccess(
+      response?.message || 'Advertisement submitted successfully'
+    );
+  } catch (error: any) {
+    console.log('Submit error:', error);
+
+    // ❌ Laravel validation errors
+    if (error?.data?.errors) {
+      const firstError = Object.values(error.data.errors)[0] as string[];
+      renderToastError(firstError[0]);
+      return;
+    }
+
+    // ❌ Server error
+    renderToastError(
+      error?.data?.message || 'Something went wrong. Try again.'
+    );
+  }
+}}
+
+
             >
               {({
                 handleChange,
@@ -261,65 +381,37 @@ const index = () => {
                     <TouchableOpacity
                       style={[
                         styles.btn,
-                        values.advertisement_type === "Newsfeed" &&
-                          styles.btnselected,
+                        values.on_page === "newsfeed" && styles.btnselected,
                         { flex: 1 },
                       ]}
                       onPress={() => {
-                        setFieldValue("advertisement_type", "Newsfeed");
+                        setFieldValue("on_page", "newsfeed");
                       }}
                     >
                       <Text
                         style={{
                           color:
-                            values.advertisement_type === "Newsfeed"
-                              ? "white"
-                              : "black",
+                            values.on_page === "newsfeed" ? "white" : "black",
                           fontWeight: 600,
                         }}
                       >
-                        Newsfeed
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Timeline" &&
-                          styles.btnselected,
-                        { flex: 1 },
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Timeline");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "Timeline"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Timeline
+                        News Feed
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[
                         styles.btn,
-                        values.advertisement_type === "Connections" &&
-                          styles.btnselected,
+                        values.on_page === "connections" && styles.btnselected,
                         { flex: 1 },
                       ]}
                       onPress={() => {
-                        setFieldValue("advertisement_type", "Connections");
+                        setFieldValue("on_page", "connections");
                       }}
                     >
                       <Text
                         style={{
                           color:
-                            values.advertisement_type === "Connections"
+                            values.on_page === "connections"
                               ? "white"
                               : "black",
                           fontWeight: 600,
@@ -330,26 +422,23 @@ const index = () => {
                     </TouchableOpacity>
                   </View>
                   <View
-                    className="flex-row justify-between mt-4"
-                    style={{ gap: hs(10) }}
+                    className="flex-row justify-between"
+                    style={{ marginTop: vs(10), gap: hs(5) }}
                   >
                     <TouchableOpacity
                       style={[
                         styles.btn,
-                        values.advertisement_type === "Listing Pages" &&
-                          styles.btnselected,
+                        values.on_page === "listing" && styles.btnselected,
                         { flex: 1 },
                       ]}
                       onPress={() => {
-                        setFieldValue("advertisement_type", "Listing Pages");
+                        setFieldValue("on_page", "listing");
                       }}
                     >
                       <Text
                         style={{
                           color:
-                            values.advertisement_type === "Listing Pages"
-                              ? "white"
-                              : "black",
+                            values.on_page === "listing" ? "white" : "black",
                           fontWeight: 600,
                         }}
                       >
@@ -359,223 +448,232 @@ const index = () => {
                     <TouchableOpacity
                       style={[
                         styles.btn,
-                        values.advertisement_type === "Listing details pages" &&
+                        values.on_page === "listing_details" &&
                           styles.btnselected,
                         { flex: 1 },
                       ]}
                       onPress={() => {
-                        setFieldValue(
-                          "advertisement_type",
-                          "Listing details pages"
-                        );
+                        setFieldValue("on_page", "listing_details");
                       }}
                     >
                       <Text
                         style={{
                           color:
-                            values.advertisement_type ===
-                            "Listing details pages"
+                            values.on_page === "listing_details"
                               ? "white"
                               : "black",
                           fontWeight: 600,
                         }}
                       >
-                        Listing details pages
+                        Listing deatil pages
                       </Text>
                     </TouchableOpacity>
                   </View>
-                  {errors.advertisement_type && (
-                    <Text>{errors.advertisement_type}</Text>
-                  )}
-                  <View
-                    style={{
-                      borderLeftWidth: 1,
-                      borderBottomWidth: 1,
-                      borderRightWidth: 1,
-                      marginTop: vs(20),
-                      marginBottom:vs(10),
-                      opacity: 0.15,
-                      borderColor: Colors.light.textGray,
-                      borderRadius: ms(5),
-                    }}
-                  />
-                  <Text style={{fontSize:ms(15),fontWeight:'600'}}>Listing Pages</Text>
-                  <View
-                    className="flex-row justify-between"
-                    style={{ marginTop: vs(10), gap: hs(5) }}
-                  >
-                    
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Newsfeed" &&
-                          styles.btnselected,
-                        { flex: 1 },
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Newsfeed");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "forSale"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                        }}
-                      >
-                        For Sale
-                      </Text>
-                    </TouchableOpacity>
 
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Timeline" &&
-                          styles.btnselected,
-                        { flex: 1 },
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Timeline");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "forRent"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                        }}
-                      >
-                       For Rent
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Connections" &&
-                          styles.btnselected,
-                        { flex: 1 },
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Connections");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "newCommunity"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                        }}
-                      >
-                        New Community
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                    <View
-                    className="flex-row justify-between"
-                    style={{ marginTop: vs(10), gap: hs(5) }}
-                  >
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Newsfeed" &&
-                          styles.btnselected,
-                        { flex: 1 },
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Newsfeed");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "agents"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                        }}
-                      >
-                       Agents
-                      </Text>
-                    </TouchableOpacity>
+                  {values.on_page &&
+                    values.on_page !== "newsfeed" &&
+                    values.on_page !== "connections" && (
+                      <>
+                        <View
+                          style={{
+                            borderLeftWidth: 1,
+                            borderBottomWidth: 1,
+                            borderRightWidth: 1,
+                            marginTop: vs(20),
+                            marginBottom: vs(10),
+                            opacity: 0.15,
+                            borderColor: Colors.light.textGray,
+                            borderRadius: ms(5),
+                          }}
+                        />
+                        <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+                          Listing Pages{" "}
+                        </Text>
+                        <View
+                          className="flex-row justify-between"
+                          style={{ marginTop: vs(10), gap: hs(5) }}
+                        >
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              values.on_page === "sale" && styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              setFieldValue("on_page", "sale");
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "sale" ? "white" : "black",
+                                fontWeight: 600,
+                              }}
+                            >
+                              For Sale
+                            </Text>
+                          </TouchableOpacity>
 
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Timeline" &&
-                          styles.btnselected,
-                        { flex: 1 },
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Timeline");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "developers"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                        }}
-                      >
-                      Developers
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Connections" &&
-                          styles.btnselected,
-                        { flex: 1 },
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Connections");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "mortgage"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                          fontSize:ms(11)
-                        }}
-                      >
-                       Mortgage Providers
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                    <TouchableOpacity
-                      style={[
-                        styles.btn,
-                        values.advertisement_type === "Connections" &&
-                          styles.btnselected,
-                        {width:hs(200),marginTop:vs(10)}
-                      ]}
-                      onPress={() => {
-                        setFieldValue("advertisement_type", "Connections");
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            values.advertisement_type === "HomeMaintenance"
-                              ? "white"
-                              : "black",
-                          fontWeight: 600,
-                        }}
-                      >
-                      Home maintenance
-                      </Text>
-                    </TouchableOpacity>
-                     <View
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              values.on_page === "rent" && styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              setFieldValue("on_page", "rent");
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "rent" ? "white" : "black",
+                                fontWeight: 600,
+                              }}
+                            >
+                              For Rent
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View
+                          className="flex-row justify-between"
+                          style={{ marginTop: vs(10), gap: hs(5) }}
+                        >
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              values.on_page === "community" &&
+                                styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              setFieldValue("on_page", "community");
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "community"
+                                    ? "white"
+                                    : "black",
+                                fontWeight: 600,
+                              }}
+                            >
+                              New Community
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              values.on_page === "agent" && styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              setFieldValue("on_page", "agent");
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "agent"
+                                    ? "white"
+                                    : "black",
+                                fontWeight: 600,
+                              }}
+                            >
+                              Agents
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View
+                          className="flex-row justify-between"
+                          style={{ marginTop: vs(10), gap: hs(5) }}
+                        >
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              values.on_page === "developer" &&
+                                styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              setFieldValue("on_page", "developer");
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "developer"
+                                    ? "white"
+                                    : "black",
+                                fontWeight: 600,
+                              }}
+                            >
+                              Developers
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              values.on_page === "mortgage" &&
+                                styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              setFieldValue("on_page", "mortgage");
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "mortgage"
+                                    ? "white"
+                                    : "black",
+                                fontWeight: 600,
+                                fontSize: ms(11),
+                              }}
+                            >
+                              Mortgage Providers
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity
+                          style={[
+                            styles.btn,
+                            values.on_page === "maintenance" &&
+                              styles.btnselected,
+                            { width: hs(200), marginTop: vs(10) },
+                          ]}
+                          onPress={() => {
+                            setFieldValue("on_page", "maintenance");
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color:
+                                values.on_page === "maintenance"
+                                  ? "white"
+                                  : "black",
+                              fontWeight: 600,
+                            }}
+                          >
+                            Home maintenance
+                          </Text>
+                        </TouchableOpacity>
+
+                      </>
+                    )}
+   {touched && errors && (
+                            <Text
+                              style={{
+                                color: Colors.light.red,
+                                marginTop: vs(5),
+                              }}
+                            >
+                              {errors.on_page}
+                            </Text>
+                          )}
+                  <View
                     style={{
                       borderLeftWidth: 1,
                       borderBottomWidth: 1,
@@ -588,30 +686,32 @@ const index = () => {
                   />
                   <View className="flex-row justify-between items-start gap-3">
                     <View className="flex-1">
-                      <FormikInput
+                      <DatePickerField
                         title="Start Date"
                         placeholder="mm/dd/yy"
-                        onChangeText={handleChange("start_date")}
-                        onBlur={handleBlur("start_date")}
                         value={values.start_date}
                         touched={!!touched.start_date}
                         errors={!!errors.start_date}
                         required
                         errorText={errors.start_date}
+                        name={"start_date"}
+                        editable
+                        setValue={setFieldValue}
                       />
                     </View>
 
                     <View className="flex-1">
-                      <FormikInput
+                      <DatePickerField
                         title="End Date"
                         placeholder="mm/dd/yy"
-                        onChangeText={handleChange("expiry_date")}
-                        onBlur={handleBlur("expiry_date")}
-                        value={values.expiry_date}
-                        touched={!!touched.expiry_date}
-                        errors={!!errors.expiry_date}
+                        editable
+                        name="end_date"
+                        setValue={setFieldValue}
+                        value={values.end_date}
+                        touched={!!touched.end_date}
+                        errors={!!errors.end_date}
                         required
-                        errorText={errors.expiry_date}
+                        errorText={errors.end_date}
                       />
                     </View>
                   </View>
@@ -625,6 +725,7 @@ const index = () => {
                     errors={!!errors.ad_link}
                     required
                     errorText={errors.ad_link}
+
                   />
                   <View
                     style={{
@@ -645,7 +746,10 @@ const index = () => {
                       "Recomended size 1based on selection\n above plz discuss"
                     }
                     border
-                    onPress={() => {}}
+                    limt={1}
+                    name="business_cover"
+                    setValue={setFieldValue}
+                    value={values.business_cover}
                   />
                   <LargeButton handleSubmit={() => {}} text="View your Ad" />
                   <View
@@ -665,7 +769,7 @@ const index = () => {
                       backgroundColor: "white",
                       borderRadius: ms(8),
                       elevation: 5,
-                      marginBottom:vs(20),
+                      marginBottom: vs(20),
                       paddingBottom: vs(10),
                       shadowColor: "#000",
                       shadowOffset: { width: 0, height: 2 },
@@ -685,22 +789,23 @@ const index = () => {
                     >
                       $
                     </Text>
-                    <Text style={{fontSize:ms(12)}}>
+                    <Text style={{ fontSize: ms(12) }}>
                       * By proceeding you are agree with our
                       <Text style={{ color: Colors.light.red }}>
-                       
                         advertisement policy
                       </Text>
                     </Text>
-                   
                   </View>
-                   <LargeButton handleSubmit={()=>{}} text="Pay & Submit"/>
+                  <LargeButton handleSubmit={handleSubmit} text="Pay & Submit" />
                 </>
               )}
             </Formik>
           </View>
         </View>
+    
       </ScrollView>
+           <Loading isLoading={isLoading} text="Posting Ad..."/>
+           </>
     );
   }
   return (
