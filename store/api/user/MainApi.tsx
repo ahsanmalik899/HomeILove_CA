@@ -33,13 +33,12 @@ export const MainApi = createApi({
       query: (formatData) => ({
         url: `createProfile`,
         method: "POST",
-
         body: formatData,
       }),
     }),
-    getMYPosts: builder.query<any, GetMyPostsOnly>({
-      query: ({ page, limit, type, userid }) => ({
-        url: `getSinglePost?type=${type}&userid=${userid}&page=${page}&limit=${limit}`,
+    getSinglePost: builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id }) => ({
+        url: `getSinglePostapi?type=${type}&id=${id}`,
         method: "GET",
       }),
     }),
@@ -113,6 +112,17 @@ export const MainApi = createApi({
     
       }),
     }),
+    SendVisistRequest: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: `sendVisitRequest`,
+        method: "POST",
+        body: formData,
+    headers: {
+  'Accept': 'application/json',
+}
+
+      }),
+    }),
   }),
 });
 
@@ -121,7 +131,7 @@ export const {
   useGetContentpostQuery,
   useGetHomepostQuery,
   useCreateProfileMutation,
-  useGetMYPostsQuery,
+  useGetSinglePostQuery,
   usePostPropertyMutation,
   useGetProfilesQuery,
   usePostCommunityMutation,
@@ -132,4 +142,5 @@ export const {
   useLazyGetInquieryAgentQuery,
   usePostAdvatizementMutation,
   useGetYorSalePostsQuery,
+  useSendVisistRequestMutation,
 } = MainApi;

@@ -14,6 +14,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -48,7 +49,20 @@ const YourAdsPostDesign = ({
 
     return (
       <>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            router.push({
+              pathname: "/AddSingleView",
+              params: {
+                type: type,
+                id:
+                  type === "community"
+                    ? item.post_community_id
+                    : item.post_property_id,
+              },
+            });
+          }}
+        >
           <View className="bg-white" style={styles.card}>
             <View className="flex-row justify-between items-center">
               {type === "community" ? (
@@ -89,10 +103,16 @@ const YourAdsPostDesign = ({
                 </TouchableOpacity>
               </View>
             </View>
-            <Text style={{ color: Colors.light.textGray }}>
-              {item.bedrooms} bedrooms {item.property_sub_type} for{" "}
-              {item.property_for}
-            </Text>
+            {type === "community" ? (
+              <Text style={{ color: Colors.light.textGray }}>
+                {item.community_title}
+              </Text>
+            ) : (
+              <Text style={{ color: Colors.light.textGray }}>
+                {item.bedrooms} bedrooms {item.property_sub_type} for{" "}
+                {item.property_for}
+              </Text>
+            )}
             <View>
               <Text style={styles.description}>
                 {expanded
@@ -167,45 +187,54 @@ const YourAdsPostDesign = ({
                   <UnSelecteHeart />
                 </TouchableOpacity>
               </TouchableOpacity>
-             
-                <View
-                  className=" bg-white flex-row  justify-between"
-                  style={{
-                    elevation: 5,
-                    borderRadius: 8,
-                    paddingRight: hs(20),
-                    paddingVertical: vs(5),
-                    paddingHorizontal: vs(15),
-                    marginTop: vs(10),
-                  }}
-                >
-                   {type === "community" ?(<>
+
+              <View
+                className=" bg-white flex-row  justify-between"
+                style={{
+                  elevation: 5,
+                  borderRadius: 8,
+                  paddingRight: hs(20),
+                  paddingVertical: vs(5),
+                  paddingHorizontal: vs(15),
+                  marginTop: vs(10),
+                }}
+              >
+                {type === "community" ? (
+                  <>
                     <View className="flex-row items-center">
-                    <CommunityType/>
-                     <Text style={{ marginLeft: vs(5) }}>{item.community_type}</Text>
-                  </View>
+                      <CommunityType />
+                      <Text style={{ marginLeft: vs(5) }}>
+                        {item.community_type}
+                      </Text>
+                    </View>
                     <View className="flex-row items-center">
-                    <CommunitySatatus/>
-                    <Text style={{ marginLeft: vs(5) }}>{item.community_status}</Text>
-                  </View>
-                   </>): (<>
-                  <View className="flex-row items-center">
-                    <Bed />
-                    <Text style={{ marginLeft: vs(5) }}>{item.bedrooms}</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <Shower />
-                    <Text style={{ marginLeft: vs(5) }}>{item.bathrooms}</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <Area />
-                    <Text style={{ marginLeft: vs(5) }}>
-                      {item.land_area} sqft
-                    </Text>
-                  </View>
-                  </>)}
-                </View>
-              
+                      <CommunitySatatus />
+                      <Text style={{ marginLeft: vs(5) }}>
+                        {item.community_status}
+                      </Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View className="flex-row items-center">
+                      <Bed />
+                      <Text style={{ marginLeft: vs(5) }}>{item.bedrooms}</Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <Shower />
+                      <Text style={{ marginLeft: vs(5) }}>
+                        {item.bathrooms}
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <Area />
+                      <Text style={{ marginLeft: vs(5) }}>
+                        {item.land_area} sqft
+                      </Text>
+                    </View>
+                  </>
+                )}
+              </View>
 
               <View
                 className="flex-1 items-end"
@@ -249,51 +278,49 @@ const YourAdsPostDesign = ({
       </>
     );
   };
-  return (
-    <View style={{ flex: 1, marginBottom: insets.bottom }}>
-      {isfetching && data.length === 0 ? (
-        <ActivityIndicator size="large" style={{ marginTop: 20 }} />
-      ) : data.length > 0 ? (
-        <LegendList
-          data={data}
-          scrollEnabled={scrollable}
-          renderItem={renderItem}
-          keyExtractor={(item, index) =>
-            `${item.post_property_id || item.post_community_id}-${index}`
-          }
-          onEndReached={() => {
-            if (!isfetching && hasmore) {
-              setPage((prev) => prev + 1);
-            }
-          }}
-          onEndReachedThreshold={0.6}
-          ListFooterComponent={
-            isfetching ? <ActivityIndicator size="small" /> : null
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={isfetching}
-              onRefresh={() => setPage(1)}
-            />
-          }
-        />
-      ) : (
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
-          No Data Found
-        </Text>
-      )}
+return (
+  <View style={{ flex: 1, marginBottom: insets.bottom }}>
+    {(!data || (isfetching && data.length === 0)) ? (
+     
+      <ActivityIndicator size="large" style={{ marginTop: 20 }} />
+    ) : data.length > 0 ? (
+   
+      <LegendList
+        data={data}
+        scrollEnabled={scrollable}
+        renderItem={renderItem}
+        keyExtractor={(item, index) =>
+          `${item.post_property_id || item.post_community_id}-${index}`
+        }
+        onEndReached={() => {
+          if (!isfetching && hasmore) setPage((prev) => prev + 1);
+        }}
+        onEndReachedThreshold={0.6}
+        ListFooterComponent={
+          isfetching ? <ActivityIndicator size="small" /> : null
+        }
+        refreshControl={
+          <RefreshControl refreshing={isfetching} onRefresh={() => setPage(1)} />
+        }
+      />
+    ) : (
+   
+      <Text style={{ textAlign: "center", marginTop: 20 }}>No Data Found</Text>
+    )}
 
-      {showImages && (
-        <ImageSlider
-          images={selectedImages}
-          setShowImage={(val: boolean) => {
-            setShowImages(val);
-            setscrollable(true);
-          }}
-        />
-      )}
-    </View>
-  );
+    {showImages && (
+      <ImageSlider
+        images={selectedImages}
+        setShowImage={(val: boolean) => {
+          setShowImages(val);
+          setscrollable(true);
+        }}
+      />
+    )}
+  </View>
+);
+
+
 };
 
 export default YourAdsPostDesign;

@@ -95,9 +95,8 @@ export interface CreateProfilePostType{
 }
 export interface GetMyPostsOnly{
 type:string,
-userid:number,
-page?:string,
-limit?:string
+id:number,
+
 
 }
 export interface FeedResponse {

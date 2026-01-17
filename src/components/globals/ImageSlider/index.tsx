@@ -8,8 +8,8 @@ import { ImageFormater } from '@utils/ImageFormat';
 import { useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ImageSliderProps } from './type';
-const ImageSlider = ({ images ,setShowImage}: ImageSliderProps) => {
-  const [imgNo, setImgNo] = useState(0);
+const ImageSlider = ({ images ,setShowImage,imageNo}: ImageSliderProps) => {
+  const [imgNo, setImgNo] = useState(imageNo||0);
   const [loading,setLoading]=useState(false);
   const prevImage = () => {
     setImgNo((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -42,7 +42,7 @@ const ImageSlider = ({ images ,setShowImage}: ImageSliderProps) => {
     style={StyleSheet.absoluteFillObject}
   />
 )}
-   <TouchableOpacity onPress={()=>setShowImage(false)} style={{position:'absolute',backgroundColor:'white',borderRadius:ms(10),zIndex:10,top:vs(10),right:hs(10)}}>
+   <TouchableOpacity onPress={()=>setShowImage(false)} style={{position:'absolute',backgroundColor:'white',borderRadius:ms(10),zIndex:10,top:vs(50),right:hs(10)}}>
              <Cross height={vs(30)} width={vs(30)} />
         </TouchableOpacity>
        

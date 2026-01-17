@@ -493,7 +493,7 @@ const Index = () => {
               touched,
             }) => (
               <>
-                <Text>{errors.longitude}</Text>
+                
                 {dataAccordingType.isInvestor && (
                   <>
                     <FormikDropdown

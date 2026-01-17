@@ -1,4 +1,3 @@
-import { useGetMYPostsQuery } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Community from "@assets/SideBar/community.svg";
 import Rent from "@assets/SideBar/rent.svg";
@@ -13,7 +12,7 @@ const index = () => {
   const type = "My Posts Counts";
 const user =useAppSelector(userdata);
 const userid= user.sweetghar_user_id
-  const {data,isLoading,refetch}= useGetMYPostsQuery({type,userid})
+const total="3";
   
   return (
     <View className="flex-1 bg-white">
@@ -24,7 +23,7 @@ const userid= user.sweetghar_user_id
             text="Sale"
             Svg={Sale}
             type="yourAds"
-            totalPosts={data?.result?.totalSale}
+            totalPosts={total}
             onPress={() => {
               router.navigate({pathname:"/MyPostListing",
                 params:{type:'Sale'}
@@ -35,7 +34,7 @@ const userid= user.sweetghar_user_id
             text="Rent"
             Svg={Rent}
             type="yourAds"
-          totalPosts={data?.result?.totalRent}
+          totalPosts={total}
             onPress={() => {router.navigate({pathname:"/MyPostListing",
                 params:{type:'Rent'}
               });}}
@@ -45,7 +44,7 @@ const userid= user.sweetghar_user_id
           text="Community"
           Svg={Community}
           type="yourAds"
-         totalPosts={data?.result?.totalCommunity}
+         totalPosts={total}
           onPress={() => {
             router.navigate({pathname:"/MyPostListing",
                 params:{type:'Community'}
