@@ -1,4 +1,4 @@
-import { useGetHomepostQuery } from "@/store/api/user/MainApi";
+import { useGetHomeFeedsQuery } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import PostDesign from "@src/components/globals/PostDesign/PostDesign";
 import Colors from "@src/constants/Colors";
@@ -51,21 +51,21 @@ const NewsFeeds = () => {
   );
 };
 
-  const { data, isFetching, refetch, isError, error } = useGetHomepostQuery({
-    userid: 475,
+  const { data, isFetching, refetch, isError, error } = useGetHomeFeedsQuery({
+    id: user.id,
+    type:"community",
     page,
+  limit,
   });
+ 
   useEffect(() => {
-    refetch();
-  }, [page]);
-  useEffect(() => {
-    if (!data?.result?.feed) return;
+    if (!data?.data?.feed) return;
 
     setPosts((prev) => {
       if (page === 1) {
-        return data?.result?.feed;
+        return data?.data?.feed;
       } else {
-        return [...prev, ...data?.result?.feed];
+        return [...prev, ...data?.data?.feed];
       }
     });
   }, [data]);

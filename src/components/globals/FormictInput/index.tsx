@@ -3,7 +3,7 @@ import Heart from "@assets/CreateProfile/heart-red.svg";
 import Add from "@assets/CreateProfile/Vector.svg";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -33,6 +33,19 @@ export const FormikInput = ({
 }: FormikInputProps) => {
   const [selectedData, setSelectedData] = useState<string[]>([]);
   const [multivariable, setMultivariable] = useState("");
+  useEffect(() => {
+    if (mulipleFields && value) {
+      const vals = value
+        .split(",")
+        .map(v => v.trim())
+        .filter(Boolean);
+
+      setSelectedData(vals);
+      
+    } else {
+      setSelectedData([]);
+    }
+  }, [value, mulipleFields]);
   const handleAdd = () => {
      const trimmedValue = multivariable.trim();
     if (!trimmedValue) return;

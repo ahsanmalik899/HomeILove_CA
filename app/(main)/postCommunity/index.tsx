@@ -1,6 +1,8 @@
 import {
+  useGetDataForEditQuery,
   useGetProfilesQuery,
   usePostCommunityMutation,
+  useUpdateCommunityMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Bunchers from "@assets/CreateProfile/broucher.svg";
@@ -24,15 +26,15 @@ import Loading from "@src/components/globals/Loading";
 import PdfPicker from "@src/components/globals/PdfPicker";
 import RadioButton from "@src/components/globals/RadioButton";
 import SelecteAdType from "@src/components/globals/TablikeButton";
-import TimePickerField from "@src/components/globals/TimePickerField";
 import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import * as ImagePicker from "expo-image-picker";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
@@ -40,6 +42,23 @@ const index = () => {
   const user = useAppSelector(userdata);
   const [saleType, setSaleType] = useState(true);
   const [count, setCount] = useState(1);
+
+  const params = useLocalSearchParams();
+  const type = params.type as string;
+  const id = Number(params.id);
+  const edit = params.edit === "true";
+  const { data: editData, isLoading: EditLoading } = useGetDataForEditQuery(
+    { type, id },
+    { skip: !edit }
+  );
+
+  useEffect(() => {
+    if (edit && editData) {
+      const titlesLength = editData.post?.property_titles?.length;
+      setCount(titlesLength != null ? titlesLength : 1);
+    }
+  }, [edit, editData]);
+
   const PostCommunitySchema = Yup.object().shape({
     community_title: Yup.string()
       .min(3, "Title must be at least 3 characters")
@@ -57,7 +76,7 @@ const index = () => {
 
     state: Yup.string().required("State is required"),
 
-    zip: Yup.string().required("Zip is not correct"),
+    zip: Yup.string().nullable(),
 
     lat: Yup.number()
       .typeError("Latitude must be a number")
@@ -67,11 +86,9 @@ const index = () => {
       .typeError("Longitude must be a number")
       .required("Longitude is required"),
 
-    community_details: Yup.string()
-      .min(10, "Details must be at least 10 characters")
-      .required("Community details are required"),
+    community_details: Yup.string().nullable(),
 
-    developer_name: Yup.string().required("Developer name is required"),
+    developer_name: Yup.string().nullable(),
 
     project_logo: Yup.mixed().nullable(),
 
@@ -106,7 +123,7 @@ const index = () => {
     created_date: Yup.string().nullable(),
 
     updated_date: Yup.string().nullable(),
-
+    post_id: Yup.string().nullable(),
     expiry_date: Yup.string().nullable(),
 
     post_start_date: Yup.string().nullable(),
@@ -129,11 +146,23 @@ const index = () => {
       count === 5
         ? Yup.string().required("Property type is required")
         : Yup.string().nullable(),
-    property_sub_type1: Yup.string().nullable(),
-    property_sub_type2: Yup.string().nullable(),
-    property_sub_type3: Yup.string().nullable(),
-    property_sub_type4: Yup.string().nullable(),
-    property_sub_type5: Yup.string().nullable(),
+    property_sub_type1: Yup.string().required("Property sub type is required"),
+    property_sub_type2:
+      count === 2
+        ? Yup.string().required("Property sub type is required")
+        : Yup.string().nullable(),
+    property_sub_type3:
+      count === 3
+        ? Yup.string().required("Property sub type is required")
+        : Yup.string().nullable(),
+    property_sub_type4:
+      count === 4
+        ? Yup.string().required("Property sub type is required")
+        : Yup.string().nullable(),
+    property_sub_type5:
+      count === 5
+        ? Yup.string().required("Property sub type is required")
+        : Yup.string().nullable(),
     property_title1: Yup.string().required("Title is required"),
     property_title2:
       count === 2
@@ -199,7 +228,7 @@ const index = () => {
     price1: Yup.number()
       .required("Price is required")
       .positive("Price must be positive"),
-
+    property_visit: Yup.string().nullable(),
     price2:
       count === 2
         ? Yup.number()
@@ -228,115 +257,273 @@ const index = () => {
             .positive("Price must be positive")
         : Yup.string().nullable(),
     bedroom1: Yup.string().when("property_type1", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-}),
+      is: "House",
+      then: (s) =>
+        s
+          .typeError("Bedrooms must be a number")
+          .required("Bedrooms are required"),
+      otherwise: (s) => s.notRequired().nullable(),
+    }),
     bedroom2:
       count === 2
         ? Yup.string().when("property_type2", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bedrooms must be a number")
+                .required("Bedrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
     bedroom3:
       count === 3
         ? Yup.string().when("property_type3", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bedrooms must be a number")
+                .required("Bedrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
     bedroom4:
       count === 4
         ? Yup.string().when("property_type4", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bedrooms must be a number")
+                .required("Bedrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
     bedroom5:
       count === 5
         ? Yup.string().when("property_type5", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bedrooms must be a number")
+                .required("Bedrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
-    bathroom1:  Yup.number().when("property_type1", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bathrooms must be a number")
-      .positive("Invalid bathrooms")
-      .required("Bathrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-}),
+    bathroom1: Yup.number().when("property_type1", {
+      is: "House",
+      then: (s) =>
+        s
+          .typeError("Bathrooms must be a number")
+          .positive("Invalid bathrooms")
+          .required("Bathrooms are required"),
+      otherwise: (s) => s.notRequired().nullable(),
+    }),
     bathroom2:
       count === 2
-        ?  Yup.number().when("property_type2", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bathrooms must be a number")
-      .positive("Invalid bathrooms")
-      .required("Bathrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+        ? Yup.number().when("property_type2", {
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bathrooms must be a number")
+                .positive("Invalid bathrooms")
+                .required("Bathrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
     bathroom3:
       count === 3
-        ?  Yup.number().when("property_type3", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bathrooms must be a number")
-      .positive("Invalid bathrooms")
-      .required("Bathrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+        ? Yup.number().when("property_type3", {
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bathrooms must be a number")
+                .positive("Invalid bathrooms")
+                .required("Bathrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
     bathroom4:
       count === 4
         ? Yup.number().when("property_type4", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bathrooms must be a number")
-      .positive("Invalid bathrooms")
-      .required("Bathrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bathrooms must be a number")
+                .positive("Invalid bathrooms")
+                .required("Bathrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
     bathroom5:
       count === 5
         ? Yup.number().when("property_type5", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bathrooms must be a number")
-      .positive("Invalid bathrooms")
-      .required("Bathrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-})
+            is: "House",
+            then: (s) =>
+              s
+                .typeError("Bathrooms must be a number")
+                .positive("Invalid bathrooms")
+                .required("Bathrooms are required"),
+            otherwise: (s) => s.notRequired().nullable(),
+          })
         : Yup.string().nullable(),
   });
+  const initialValues =
+    edit && editData?.post
+      ? {
+          community_title: editData.post.community_title || "",
+          community_type: editData.post.community_type || "",
+          community_status: editData.post.community_status || "",
+          expected_delivery: editData.post.expected_delivery || "",
+          address: editData.post.address || "",
+          city: editData.post.city || "",
+          state: editData.post.state || "",
+          zip: editData.post.zip || "",
+          lat: editData.post.lat || 0,
+          lng: editData.post.lng || 0,
+          community_details: editData.post.community_details || "",
+          developer_name: editData.post.developer_name || "",
+          project_logo: editData.post.project_logo || null,
+          developer_logo: editData.post.developer_logo || null,
+          facts: editData.post.facts || "",
+          visit_date: editData.post.visit_date || "",
+          visit_time: editData.post.visit_time || "",
+          property_visit: editData.post.property_visit || "",
+          video_link: editData.post.video_link || "",
+          user_id: editData.post.user_id,
+          user_type: editData.post.user_type,
+          payment_method: editData.post.payment_method || "Wallet",
+          ad_life: editData.post.ad_life || 1,
+          ad_by: editData.post.ad_by || "",
+          post_status: editData.post.post_status || "Pending",
+          post_type: editData.post.post_type || "Normal",
+          approved_by: editData.post.approved_by || "",
+          created_date: editData.post.created_date || "",
+          updated_date: editData.post.updated_date || "",
+          expiry_date: editData.post.expiry_date || "",
+          post_start_date: editData.post.post_start_date || "",
+          post_end_date: editData.post.post_end_date || "",
+          property_type1: editData.post.property_types?.[0] || "",
+          property_type2: editData.post.property_types?.[1] || "",
+          property_type3: editData.post.property_types?.[2] || "",
+          property_type4: editData.post.property_types?.[3] || "",
+          property_type5: editData.post.property_types?.[4] || "",
+          property_sub_type1: editData.post.property_sub_types?.[0] || "",
+          property_sub_type2: editData.post.property_sub_types?.[1] || "",
+          property_sub_type3: editData.post.property_sub_types?.[2] || "",
+          property_sub_type4: editData.post.property_sub_types?.[3] || "",
+          property_sub_type5: editData.post.property_sub_types?.[4] || "",
+          property_title1: editData.post.property_titles?.[0] || "",
+          property_title2: editData.post.property_titles?.[1] || "",
+          property_title3: editData.post.property_titles?.[2] || "",
+          property_title4: editData.post.property_titles?.[3] || "",
+          property_title5: editData.post.property_titles?.[4] || "",
+          tenure1: editData.post.tenures?.[0] || "",
+          tenure2: editData.post.tenures?.[1] || "",
+          tenure3: editData.post.tenures?.[2] || "",
+          tenure4: editData.post.tenures?.[3] || "",
+          tenure5: editData.post.tenures?.[4] || "",
+          land_area1: editData.post.land_areas?.[0] || "",
+          land_area2: editData.post.land_areas?.[1] || "",
+          land_area3: editData.post.land_areas?.[2] || "",
+          land_area4: editData.post.land_areas?.[3] || "",
+          land_area5: editData.post.land_areas?.[4] || "",
+          price1: editData.post.community_price?.[0] || "",
+          price2: editData.post.community_price?.[1] || "",
+          price3: editData.post.community_price?.[2] || "",
+          price4: editData.post.community_price?.[3] || "",
+          price5: editData.post.community_price?.[4] || "",
+          bedroom1: editData.post.bedrooms?.[0] || "",
+          bedroom2: editData.post.bedrooms?.[1] || "",
+          bedroom3: editData.post.bedrooms?.[2] || "",
+          bedroom4: editData.post.bedrooms?.[3] || "",
+          bedroom5: editData.post.bedrooms?.[4] || "",
+          bathroom1: editData.post.bathrooms?.[0] || "",
+          bathroom2: editData.post.bathrooms?.[1] || "",
+          bathroom3: editData.post.bathrooms?.[2] || "",
+          bathroom4: editData.post.bathrooms?.[3] || "",
+          bathroom5: editData.post.bathrooms?.[4] || "",
+          propertyimg: editData.post_images || [],
+          post_id: editData.post.post_community_id || "",
+          floorimg: editData.floor_images || [],
+          broucherimg: editData.brochures || [],
+        }
+      : {
+          // default initialValues when creating new post
+          community_title: "",
+          community_type: "",
+          community_status: "",
+          expected_delivery: "",
+          address: "",
+          city: "",
+          state: "",
+          zip: "",
+          lat: 0,
+          lng: 0,
+          community_details: "",
+          developer_name: "",
+          project_logo: null,
+          developer_logo: null,
+          facts: "",
+          visit_date: "",
+          visit_time: "",
+          property_visit: "",
+          video_link: "",
+          user_id: user.id,
+          user_type: user.user_type,
+          payment_method: "Wallet",
+          ad_life: 1,
+          ad_by: "",
+          post_status: "Pending",
+          post_type: "Normal",
+          approved_by: "",
+          created_date: "",
+          updated_date: "",
+          expiry_date: "",
+          post_start_date: "",
+          post_end_date: "",
+          property_type1: "",
+          property_type2: "",
+          property_type3: "",
+          property_type4: "",
+          property_type5: "",
+          property_sub_type1: "",
+          property_sub_type2: "",
+          property_sub_type3: "",
+          property_sub_type4: "",
+          property_sub_type5: "",
+          property_title1: "",
+          property_title2: "",
+          property_title3: "",
+          property_title4: "",
+          property_title5: "",
+          tenure1: "",
+          tenure2: "",
+          tenure3: "",
+          tenure4: "",
+          tenure5: "",
+          land_area1: "",
+          land_area2: "",
+          land_area3: "",
+          land_area4: "",
+          land_area5: "",
+          price1: "",
+          price2: "",
+          price3: "",
+          price4: "",
+          price5: "",
+          bedroom1: "",
+          bedroom2: "",
+          bedroom3: "",
+          bedroom4: "",
+          bedroom5: "",
+          bathroom1: "",
+          bathroom2: "",
+          bathroom3: "",
+          bathroom4: "",
+          bathroom5: "",
+          propertyimg: [],
+          floorimg: [],
+          broucherimg: [],
+        };
 
   const pickImage = async (setFieldValue: any, name: string) => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -360,7 +547,8 @@ const index = () => {
   };
   const { data } = useGetProfilesQuery({ id: user.id });
 
-  const [visit, setVisit] = useState("");
+  const [UpdateCommunity, { isLoading: UpdateLoading }] =
+    useUpdateCommunityMutation();
   const [postCommunity, { isLoading }] = usePostCommunityMutation();
   return (
     <View className="bg-white flex-1 ">
@@ -389,113 +577,13 @@ const index = () => {
             }}
           >
             <Formik
-              initialValues={{
-                community_title: "",
-                community_type: "",
-                community_status: "",
-
-                expected_delivery: "",
-
-                address: "",
-                city: "",
-                state: "",
-                zip: "",
-
-                lat: 0,
-                lng: 0,
-
-                community_details: "",
-
-                developer_name: "",
-
-                project_logo: null,
-                developer_logo: null,
-
-                facts: "",
-
-                visit_date: "",
-                visit_time: "",
-
-                video_link: "",
-
-                user_id: user.id,
-                user_type: user.user_type,
-
-                payment_method: "Wallet",
-
-                ad_life: 1,
-
-                ad_by: "",
-
-                post_status: "Pending",
-
-                post_type: "",
-
-                approved_by: "",
-
-                created_date: "",
-                updated_date: "",
-
-                expiry_date: "",
-
-                post_start_date: "",
-                post_end_date: "",
-                property_type1: "",
-                property_type2: "",
-                property_type3: "",
-                property_type4: "",
-                property_type5: "",
-
-                property_sub_type1: "",
-                property_sub_type2: "",
-                property_sub_type3: "",
-                property_sub_type4: "",
-                property_sub_type5: "",
-
-                property_title1: "",
-                property_title2: "",
-                property_title3: "",
-                property_title4: "",
-                property_title5: "",
-
-                tenure1: "",
-                tenure2: "",
-                tenure3: "",
-                tenure4: "",
-                tenure5: "",
-
-                land_area1: "",
-                land_area2: "",
-                land_area3: "",
-                land_area4: "",
-                land_area5: "",
-
-                price1: "",
-                price2: "",
-                price3: "",
-                price4: "",
-                price5: "",
-
-                bedroom1: "",
-                bedroom2: "",
-                bedroom3: "",
-                bedroom4: "",
-                bedroom5: "",
-
-                bathroom1: "",
-                bathroom2: "",
-                bathroom3: "",
-                bathroom4: "",
-                bathroom5: "",
-                propertyimg: [],
-                floorimg: [],
-                broucherimg: [],
-              }}
+              initialValues={initialValues}
+              enableReinitialize={true}
               validationSchema={PostCommunitySchema}
               onSubmit={async (values) => {
                 try {
                   const formData = new FormData();
-
+                  const existingPDFs: string[] = [];
                   Object.keys(values).forEach((key) => {
                     if (
                       key !== "propertyimg" &&
@@ -508,7 +596,10 @@ const index = () => {
                     }
                   });
 
-                  if (Array.isArray(values.propertyimg)) {
+                  if (
+                    Array.isArray(values.propertyimg) &&
+                    values.propertyimg.length > 0
+                  ) {
                     values.propertyimg.forEach((img, index) => {
                       if (img.uri) {
                         formData.append("propertyimg[]", {
@@ -518,9 +609,13 @@ const index = () => {
                         } as any);
                       }
                     });
+                  } else {
+                    formData.append("propertyimg", JSON.stringify([]));
                   }
-
-                  if (Array.isArray(values.floorimg)) {
+                  if (
+                    Array.isArray(values.floorimg) &&
+                    values.floorimg.length > 0
+                  ) {
                     values.floorimg.forEach((img, index) => {
                       if (img.uri) {
                         formData.append("floorimg[]", {
@@ -530,17 +625,39 @@ const index = () => {
                         } as any);
                       }
                     });
+                  } else {
+                    formData.append("floorimg", JSON.stringify([]));
                   }
-                  if (Array.isArray(values.broucherimg)) {
-                    values.broucherimg.forEach((pdf, index) => {
-                      if (pdf?.uri) {
-                        formData.append("broucherimg[]", {
-                          uri: pdf.uri,
-                          name: pdf.name || `brochure_${index}.pdf`,
-                          type: "application/pdf",
-                        } as any);
+
+                  if (
+                    Array.isArray(values.broucherimg) &&
+                    values.broucherimg.length > 0
+                  ) {
+                    values.broucherimg.forEach((pdf: any, index: number) => {
+                      if (!pdf) return;
+
+                      if (typeof pdf === "object" && pdf.uri) {
+                        if (pdf.uri.startsWith("file://")) {
+                          formData.append("broucherimg[]", {
+                            uri: pdf.uri,
+                            name: pdf.name || `brochure_${index}.pdf`,
+                            type: pdf.type || "application/pdf",
+                          } as any);
+                        } else {
+                          existingPDFs.push(pdf.uri);
+                        }
+                      } else if (typeof pdf === "string") {
+                        existingPDFs.push(pdf);
                       }
                     });
+
+                    formData.append(
+                      "existing_broucherimg",
+                      JSON.stringify(existingPDFs)
+                    );
+                  } else {
+                    formData.append("broucherimg", JSON.stringify([]));
+                    formData.append("existing_broucherimg", JSON.stringify([]));
                   }
 
                   if (values.developer_logo?.uri) {
@@ -562,12 +679,23 @@ const index = () => {
                     console.log(pair[0], pair[1]);
                   }
 
-                  const result = await postCommunity(formData);
+                  const result = edit
+                    ? await UpdateCommunity(formData)
+                    : await postCommunity(formData);
 
                   if (result.data?.success) {
                     renderToastSuccess(result.data?.message);
+                    router.replace({
+                      pathname: "/AddSingleView",
+                      params: {
+                        type: "community",
+                        id: result?.data?.post_id,
+                      },
+                    });
                   } else {
-                    console.log(result);
+                    renderToastError(
+                      result?.data?.message || "Something went wrong!"
+                    );
                   }
                 } catch (error) {
                   console.log("Error:", error);
@@ -761,14 +889,17 @@ const index = () => {
                     <View className="flex-row items-center">
                       <TouchableOpacity
                         onPress={() => {
-                          setVisit(visit === "Yes" ? "" : "Yes");
+                          setFieldValue(
+                            "property_visit",
+                            values.property_visit === "Yes" ? "" : "Yes"
+                          );
                         }}
                       >
                         <MaterialIcons
                           size={18}
                           color={Colors.light.DarkGreen}
                           name={
-                            visit === "Yes"
+                            values.property_visit === "Yes"
                               ? "check-box"
                               : "check-box-outline-blank"
                           }
@@ -783,14 +914,17 @@ const index = () => {
                     >
                       <TouchableOpacity
                         onPress={() => {
-                          setVisit(visit === "No" ? "" : "No");
+                          setFieldValue(
+                            "property_visit",
+                            values.property_visit === "No" ? "" : "No"
+                          );
                         }}
                       >
                         <MaterialIcons
                           size={18}
                           color={Colors.light.DarkGreen}
                           name={
-                            visit === "No"
+                            values.property_visit === "No"
                               ? "check-box"
                               : "check-box-outline-blank"
                           }
@@ -810,7 +944,7 @@ const index = () => {
                       opacity: 0.2,
                     }}
                   />
-                  {visit === "Yes" && (
+                  {/* {values.property_visit === "Yes" && (
                     <>
                       <View className="flex-row justify-between gap-3">
                         <View className="flex-1">
@@ -857,7 +991,7 @@ const index = () => {
                         }}
                       />
                     </>
-                  )}
+                  )} */}
 
                   <UploadPic
                     key="propertyimg"
@@ -1411,6 +1545,9 @@ const index = () => {
         </View>
       </ScrollView>
       <Loading isLoading={isLoading} text={"Creating Property Post"} />
+      <Loading isLoading={EditLoading} text={"Loading..."} />
+
+      <Loading isLoading={UpdateLoading} text={"Updating..."} />
     </View>
   );
 };

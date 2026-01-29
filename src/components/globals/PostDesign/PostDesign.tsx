@@ -194,12 +194,12 @@ const PostDesign = ({
         className="flex-1 bg-red"
         data={data}
         renderItem={renderItem}
-        keyExtractor={(item) => item.post_id}
-        onEndReached={() => {
-          if (data.length > 9) {
-            setPage((prev) => prev + 1);
-          }
-        }}
+        keyExtractor={(item) => item.post_id.toString()}
+      onEndReached={() => {
+  if (!isfetching && data?.data?.feed?.length === 10) {
+    setPage((prev) => prev + 1);
+  }
+}}
         ListHeaderComponent={withCreatePost ? <CreatePost /> : null}
         ListFooterComponent={
           isfetching ? <ActivityIndicator size="small" /> : null
@@ -209,6 +209,7 @@ const PostDesign = ({
             refreshing={isfetching}
             onRefresh={() => {
               setPage(1);
+              
             }}
           />
         }

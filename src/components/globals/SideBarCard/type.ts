@@ -5,5 +5,6 @@ export type SideBarCardprops = {
     text:string,
     type:string,
     totalPosts?:string,
+    ProfileExist?:boolean,
     onPress?:()=>void
 }

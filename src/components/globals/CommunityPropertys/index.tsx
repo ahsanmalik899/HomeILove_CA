@@ -38,7 +38,7 @@ const index = ({
               setFieldValue("property_type1", value);
               setFieldValue("property_sub_type1", "");
             }}
-            options={["House", "Commercials", "Farms/Lands"]}
+            options={["House", "Commercial", "Farms/Lands"]}
             title="Property Type "
             placeholder="Select"
             value={values.property_type1}
@@ -58,6 +58,7 @@ const index = ({
             errorText={errors.property_sub_type1}
             placeholder="Property sub type"
             value={values.property_sub_type1}
+            required
             options={
               values.property_type1 === "House"
                 ? [
@@ -70,7 +71,7 @@ const index = ({
                     "Park homes",
                     "Others",
                   ]
-                : values.property_type1 === "Commercials"
+                : values.property_type1 === "Commercial"
                 ? [
                     "office",
                     "office workspace",
@@ -237,7 +238,7 @@ const index = ({
                   setFieldValue("property_type2", value);
                   setFieldValue("property_sub_type2", "");
                 }}
-                options={["House", "Commercials", "Farms/Lands"]}
+                options={["House", "Commercial", "Farms/Lands"]}
                 title="Property Type "
                 placeholder="Select"
                 value={values.property_type2}
@@ -253,6 +254,7 @@ const index = ({
                 key={values.property_type2}
                 setValue={setFieldValue}
                 placeholder="Property sub type"
+                required
                 value={values.property_sub_type2}
                 options={
                   values.property_type2 === "House"
@@ -266,7 +268,7 @@ const index = ({
                         "Park homes",
                         "Others",
                       ]
-                    : values.property_type2 === "Commercials"
+                    : values.property_type2 === "Commercial"
                     ? [
                         "office",
                         "office workspace",
@@ -435,7 +437,7 @@ const index = ({
                   setFieldValue("property_type3", value);
                   setFieldValue("property_sub_type3", "");
                 }}
-                options={["House", "Commercials", "Farms/Lands"]}
+                options={["House", "Commercial", "Farms/Lands"]}
                 title="Property Type "
                 placeholder="Select"
                 value={values.property_type3}
@@ -464,7 +466,7 @@ const index = ({
                         "Park homes",
                         "Others",
                       ]
-                    : values.property_type3 === "Commercials"
+                    : values.property_type3 === "Commercial"
                     ? [
                         "office",
                         "office workspace",
@@ -482,6 +484,7 @@ const index = ({
                 }
                  touched={!!touched}
             errors={!!errors}
+            required
             errorText={errors.property_sub_type3}
                 name="property_sub_type3"
                 onSelect={() => {}}
@@ -633,7 +636,7 @@ const index = ({
               setFieldValue("property_type4", value);
               setFieldValue("property_sub_type4", "");
             }}
-            options={["House", "Commercials", "Farms/Lands"]}
+            options={["House", "Commercial", "Farms/Lands"]}
             title="Property Type "
             placeholder="Select"
             value={values.property_type4}
@@ -662,7 +665,7 @@ const index = ({
                     "Park homes",
                     "Others",
                   ]
-                : values.property_type4 === "Commercials"
+                : values.property_type4 === "Commercial"
                 ? [
                     "office",
                     "office workspace",
@@ -680,6 +683,7 @@ const index = ({
             }
              touched={!!touched}
             errors={!!errors}
+            required
             errorText={errors.property_sub_type4}
             name="property_sub_type4"
             onSelect={() => {}}
@@ -832,7 +836,7 @@ const index = ({
               setFieldValue("property_type5", value);
               setFieldValue("property_sub_type5", "");
             }}
-            options={["House", "Commercials", "Farms/Lands"]}
+            options={["House", "Commercial", "Farms/Lands"]}
             title="Property Type "
             placeholder="Select"
             value={values.property_type5}
@@ -848,6 +852,7 @@ const index = ({
             key={values.property_type5}
             setValue={setFieldValue}
             placeholder="Property sub type"
+            required
             value={values.property_sub_type5}
             options={
               values.property_type5 === "House"
@@ -861,7 +866,7 @@ const index = ({
                     "Park homes",
                     "Others",
                   ]
-                : values.property_type5 === "Commercials"
+                : values.property_type5 === "Commercial"
                 ? [
                     "office",
                     "office workspace",

@@ -1,87 +1,49 @@
-import CommercialSale from '@assets/Buy/commerCialPropertFroSale.svg';
-import FormandLand from '@assets/Buy/formLandForSale.svg';
-import Folclosure from '@assets/Buy/fourcoluserForsale.svg';
+import FormandLand from "@assets/Buy/formLandForSale.svg";
 import PropertyForSale from "@assets/Buy/propertyforSale.svg";
-import Rebuilt from '@assets/Buy/reBuiltForsale.svg';
-import Retirement from '@assets/Buy/retirementPropertyForSale.svg';
+import Rebuilt from "@assets/Buy/reBuiltForsale.svg";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import SideBarCard from "@src/components/globals/SideBarCard";
 import { hs, vs } from "@utils/design/design";
-import { router } from 'expo-router';
+import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 const index = () => {
   return (
     <View className="bg-white flex-1">
-      <HeaderWithBack title="Buy" buttonTitile='Raise query to Buy'/>
+      <HeaderWithBack title="Buy" buttonTitile="Raise query to Buy" />
       <View style={{ marginHorizontal: hs(20), marginTop: vs(30) }}>
         <View className="flex-row justify-between">
           <SideBarCard
             Svg={PropertyForSale}
-            text="Property For Sale"
+            text="House"
             onPress={() => {
               router.navigate({
-                pathname: "/(main)/BuyListing",
-                params: { type: "All Sale" }
-              })
+                pathname: "/(main)/BuyFilter",
+                params: { type: "House",property_for:"sale" },
+              });
             }}
             type={"Buy"}
           />
           <SideBarCard
             Svg={Rebuilt}
-            text="Re-Built Property For sale"
+            text="Commercials"
             onPress={() => {
               router.navigate({
-                pathname: "/(main)/BuyListing",
-                params: { type: "Re-Built" }
-              })
+                pathname: "/(main)/BuyFilter",
+                params: { type: "Commercial" ,property_for:"sale"},
+              });
             }}
             type={"Buy"}
           />
         </View>
         <View className="flex-row justify-between">
-          <SideBarCard
-            Svg={Folclosure}
-            text="Foreclosure For Sale"
-            onPress={() => {
-              router.navigate({
-                pathname: "/(main)/BuyListing",
-                params: { type: "Foreclosure" }
-              })
-            }}
-            type={"Buy"}
-          />
           <SideBarCard
             Svg={FormandLand}
-            text="Farm & Land For Sale"
+            text="Farm & Land"
             onPress={() => {
               router.navigate({
-                pathname: "/(main)/BuyListing",
-                params: { type: "Farm & Land" }
-              })
-            }}
-            type={"Buy"}
-          />
-        </View>
-        <View className="flex-row justify-between">
-          <SideBarCard
-            Svg={CommercialSale}
-            text="Commercial Property For Sale"
-            onPress={() => {
-              router.navigate({
-                pathname: "/(main)/BuyListing",
-                params: { type: "Commercial" }
-              })
-            }}
-            type={"Buy"}
-          />
-          <SideBarCard
-            Svg={Retirement}
-            text="Retirement Property For Sale"
-            onPress={() => {
-              router.navigate({
-                pathname: "/(main)/BuyListing",
-                params: { type: "Retirement" }
-              })
+                pathname: "/(main)/BuyFilter",
+                params: { type: "Farms/Lands",property_for:"sale" },
+              });
             }}
             type={"Buy"}
           />

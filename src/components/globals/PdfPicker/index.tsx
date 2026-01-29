@@ -5,7 +5,6 @@ import * as DocumentPicker from "expo-document-picker";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 /* ================= TYPES ================= */
-
 interface PdfPickerProps {
   text1?: string;
   text2?: string;
@@ -21,23 +20,26 @@ interface PdfPickerProps {
 }
 
 /* ================= HELPERS ================= */
-
 const normalizePDFs = (val: any) => {
   if (!val) return [];
+
   const arr = Array.isArray(val) ? val : [val];
 
   return arr
     .map((item) => {
+      // ✅ Existing PDF from backend (string)
       if (typeof item === "string") {
         return {
-          uri: item,
+          uri: item, // keep the original URL or path
           name: item.split("/").pop(),
           type: "application/pdf",
+          existing: true, // mark as existing
         };
       }
 
+      // ✅ Picked PDF (local)
       if (typeof item === "object" && item.uri) {
-        return item;
+        return { ...item, existing: false }; // new file
       }
 
       return null;
@@ -46,7 +48,6 @@ const normalizePDFs = (val: any) => {
 };
 
 /* ================= COMPONENT ================= */
-
 const PdfPicker = ({
   text1,
   text2,
@@ -63,7 +64,6 @@ const PdfPicker = ({
   const pdfs = normalizePDFs(value);
 
   /* ================= PICK PDF ================= */
-
   const pickPDF = async () => {
     const remaining = limt - pdfs.length;
 
@@ -85,24 +85,32 @@ const PdfPicker = ({
         uri: asset.uri,
         name: asset.name,
         type: "application/pdf",
+        existing: false, // mark as new file
       }));
 
-    setValue(name, limt === 1 ? files[0] : [...pdfs, ...files]);
+    setValue(name, [...pdfs, ...files]);
   };
 
-  /* =========================================== */
+  /* ================= REMOVE PDF ================= */
+  const removePDF = (index: number) => {
+    const updated = pdfs.filter((_, i) => i !== index);
+    setValue(name, updated);
+  };
 
+  /* ================= UI ================= */
   return (
     <View style={{ marginBottom: vs(20) }}>
       {/* ---------- LABEL ---------- */}
-      <View className="flex-row">
-        <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
-          {text1}
-          <Text style={{ color: Colors.light.red }}>{text2}</Text>
-          {text3}
-        </Text>
-        {additionalText && <Text>{` (${additionalText})`}</Text>}
-      </View>
+      {text1 && (
+        <View className="flex-row">
+          <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+            {text1}
+            <Text style={{ color: Colors.light.red }}>{text2}</Text>
+            {text3}
+          </Text>
+          {additionalText && <Text>{` (${additionalText})`}</Text>}
+        </View>
+      )}
 
       {/* ---------- CONTAINER ---------- */}
       <View
@@ -122,10 +130,7 @@ const PdfPicker = ({
             {pdfs.map((pdf, index) => (
               <View key={index} className="relative">
                 <TouchableOpacity
-                  onPress={() => {
-                    const updated = pdfs.filter((_, i) => i !== index);
-                    setValue(name, limt === 1 ? null : updated);
-                  }}
+                  onPress={() => removePDF(index)}
                   className="absolute right-1 top-1 z-10 bg-white"
                 >
                   <Cross />
@@ -135,6 +140,11 @@ const PdfPicker = ({
                   <Text numberOfLines={2} style={styles.pdfText}>
                     {pdf.name}
                   </Text>
+                  {pdf.existing && (
+                    <Text style={{ fontSize: ms(10), color: Colors.light.textGray }}>
+                      Existing
+                    </Text>
+                  )}
                 </View>
               </View>
             ))}
@@ -169,7 +179,6 @@ const PdfPicker = ({
 export default PdfPicker;
 
 /* ================= STYLES ================= */
-
 const styles = StyleSheet.create({
   pdfCard: {
     width: hs(140),

@@ -1,6 +1,8 @@
 import {
+  useGetDataForEditQuery,
   useGetProfilesQuery,
   usePostPropertyMutation,
+  useUpdatePropertyMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
@@ -14,7 +16,7 @@ import { AdressInput } from "@src/components/globals/AddressInput";
 import DatePickerField from "@src/components/globals/DatePickerField";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
-import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson/indes";
+import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
@@ -22,14 +24,14 @@ import PropertyType from "@src/components/globals/PropertyType";
 import RadioButton from "@src/components/globals/RadioButton";
 import SelectRentAndSale from "@src/components/globals/SelectRentAndSale";
 import SelecteAdType from "@src/components/globals/TablikeButton";
-import TimePickerField from "@src/components/globals/TimePickerField";
 import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
@@ -37,18 +39,124 @@ const index = () => {
   const user = useAppSelector(userdata);
   const [saleType, setSaleType] = useState(true);
   const [propertType, setpropertType] = useState("");
+  const params = useLocalSearchParams();
+  const type = params.type as string;
+  const id = Number(params.id);
+  const edit = params.edit === "true";
+
+  const { data: EditData, isLoading: EditLoading } = useGetDataForEditQuery(
+    { type, id },
+    { skip: !edit }
+  );
+  const initialValues = {
+    user_id: user.id,
+    user_type: user.user_type,
+    property_for: "sale",
+    sale_type: "",
+    property_type: "",
+    property_sub_type: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    lat: 0,
+    lng: 0,
+    land_area: "",
+    bedroom: "",
+    bathrooms: "",
+    purpose: "",
+    detail_property: "",
+    asking_price: "",
+    price_type: "",
+    rent_type: "",
+    yt_link: "",
+    normal_trending: "Normal",
+    time_period: 2,
+    payment_method: "wallet",
+    tenure: "",
+    tenancy_tenure: "",
+    property_condition: "",
+    reception: "",
+    home_age: "",
+    furnishing_type: "",
+    lot_size: "",
+    house_charges: "",
+    pet_allowers: "",
+    imp_facts: "",
+    fees_conditions: "",
+    available_on: "",
+    visit_date: "",
+    property_visit: "",
+    visit_time: "",
+    ad_by: "",
+    post_id: "",
+    propertyimg: [],
+    floorimg: [],
+  };
+  const EditinitialValues = useMemo(() => {
+    if (!edit || !EditData?.success) return initialValues;
+
+    const post = EditData.post;
+
+    return {
+      user_id: post.user_id,
+      user_type: post.user_type || user.user_type,
+      property_for: post.property_for || "sale",
+      sale_type: post.sale_type || "",
+      property_type: post.property_type || "",
+      property_sub_type: post.property_sub_type || "",
+      address: post.address || "",
+      city: post.city || "",
+      state: post.state || "",
+      zip: post.zip || "",
+      lat: Number(post.lat) || 0,
+      lng: Number(post.lng) || 0,
+      land_area: post.land_area || "",
+      bedroom: post.bedrooms || "",
+      bathrooms: post.bathrooms || "",
+      purpose: post.purpose || "",
+      detail_property: post.property_details || "",
+      asking_price: post.asking_price.toString() || "",
+      price_type: post.saleprice_type || "",
+      rent_type: post.rent_type || "",
+      yt_link: post.video_link || "",
+      normal_trending: "Normal",
+      time_period: 2,
+      payment_method: post.payment_method || "wallet",
+      tenure: post.tenure || "",
+      tenancy_tenure: post.tenancy_tenure || "",
+      property_condition: post.property_condition || "",
+      reception: post.reception || "",
+      home_age: post.home_age || "",
+      furnishing_type: post.furnishing_type || "",
+      lot_size: post.lot_size || "",
+      house_charges: post.house_charges || "",
+      pet_allowers: post.pet_allowers || "",
+      imp_facts: post.imp_facts || "",
+      fees_conditions: post.fees_conditions || "",
+      available_on: post.available_on || "",
+      visit_date: post.visit_date || "",
+      property_visit: post.property_visit || "",
+      visit_time: post.visit_time || "",
+      ad_by: post.ad_by || "",
+      post_id: post.post_property_id || "",
+      propertyimg: EditData.post_images || [],
+      floorimg: EditData.floor_images || [],
+    };
+  }, [edit, EditData]);
+
   const PostPropertySchema = Yup.object().shape({
     user_id: Yup.number().required("User ID is required"),
-
+    post_id: Yup.string().nullable(),
     user_type: Yup.string().required("User type is required"),
 
     property_for: Yup.string().required("Sale/Rent type is required"),
 
     sale_type: Yup.string().when("property_for", {
-  is: "sale",
-  then: (s) => s.required("Sale type is required"),
-  otherwise: (s) => s.notRequired().nullable(),
-}),
+      is: "sale",
+      then: (s) => s.required("Sale type is required"),
+      otherwise: (s) => s.notRequired().nullable(),
+    }),
 
     property_type: Yup.string().required("Property type is required"),
     furnishing_type: Yup.string().nullable(),
@@ -73,24 +181,23 @@ const index = () => {
     land_area: Yup.string().required("Area is required"),
 
     bedroom: Yup.string().when("property_type", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bedrooms must be a number")
-      .required("Bedrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-}),
+      is: "House",
+      then: (s) =>
+        s
+          .typeError("Bedrooms must be a number")
+          .required("Bedrooms are required"),
+      otherwise: (s) => s.notRequired().nullable(),
+    }),
 
-
-  bathrooms: Yup.number().when("property_type", {
-  is: "House",
-  then: (s) =>
-    s
-      .typeError("Bathrooms must be a number")
-      .positive("Invalid bathrooms")
-      .required("Bathrooms are required"),
-  otherwise: (s) => s.notRequired().nullable(),
-}),
+    bathrooms: Yup.number().when("property_type", {
+      is: "House",
+      then: (s) =>
+        s
+          .typeError("Bathrooms must be a number")
+          .positive("Invalid bathrooms")
+          .required("Bathrooms are required"),
+      otherwise: (s) => s.notRequired().nullable(),
+    }),
 
     purpose: Yup.string().nullable(),
 
@@ -120,20 +227,21 @@ const index = () => {
     payment_method: Yup.string().required("Payment method is required"),
 
     tenure: Yup.string().when("property_for", {
-  is: "sale",
-  then: (s) => s.required("Ownership is required"),
-  otherwise: (s) => s.notRequired().nullable(),
-}),
+      is: "sale",
+      then: (s) => s.required("Ownership is required"),
+      otherwise: (s) => s.notRequired().nullable(),
+    }),
 
-tenancy_tenure: Yup.string().when("property_for", {
-  is: "rent",
-  then: (s) => s.required("Tenancy tenure is required"),
-  otherwise: (s) => s.notRequired().nullable(),
-}),
+    tenancy_tenure: Yup.string().when("property_for", {
+      is: "rent",
+      then: (s) => s.required("Tenancy tenure is required"),
+      otherwise: (s) => s.notRequired().nullable(),
+    }),
 
     property_condition: Yup.string().nullable(),
 
     reception: Yup.string().nullable(),
+    property_visit: Yup.string().nullable(),
 
     home_age: Yup.string().nullable(),
 
@@ -162,7 +270,8 @@ tenancy_tenure: Yup.string().when("property_for", {
 
   const { data } = useGetProfilesQuery({ id: user.id });
 
-  const [visit, setVisit] = useState("");
+  const [UpdateProperty, { isLoading: UpdateLoading }] =
+    useUpdatePropertyMutation();
   const [postProperty, { isLoading }] = usePostPropertyMutation();
   return (
     <View className="bg-white flex-1 ">
@@ -189,50 +298,8 @@ tenancy_tenure: Yup.string().when("property_for", {
             }}
           >
             <Formik
-              initialValues={{
-                user_id: user.id,
-                user_type: user.user_type,
-                property_for: "Sale",
-                sale_type: "",
-                property_type: "",
-                property_sub_type: "",
-                address: "",
-                city: "",
-                state: "",
-                zip: "",
-                lat: 0,
-                lng: 0,
-                land_area: "",
-                bedroom: "",
-                bathrooms: "",
-                purpose: "",
-                detail_property: "",
-                asking_price: "",
-                price_type: "",
-                rent_type: "",
-                yt_link: "",
-                normal_trending: "Normal",
-                time_period: 2,
-                payment_method: "wallet",
-                tenure: "",
-                tenancy_tenure: "",
-                property_condition: "",
-                reception: "",
-                home_age: "",
-                furnishing_type: "",
-                lot_size: "",
-                house_charges: "",
-                pet_allowers: "",
-                imp_facts: "",
-                fees_conditions: "",
-                available_on: "",
-                visit_date: "",
-                
-                visit_time: "",
-                ad_by: "",
-                propertyimg: [],
-                floorimg: [],
-              }}
+              initialValues={EditinitialValues}
+              enableReinitialize={true}
               validationSchema={PostPropertySchema}
               onSubmit={async (values) => {
                 try {
@@ -249,7 +316,14 @@ tenancy_tenure: Yup.string().when("property_for", {
                     }
                   });
 
-                  if (Array.isArray(values.propertyimg)) {
+                  if (edit && values.post_id) {
+                    formData.append("post_id", String(values.post_id));
+                  }
+
+                  if (
+                    Array.isArray(values.propertyimg) &&
+                    values.propertyimg.length > 0
+                  ) {
                     values.propertyimg.forEach((img, index) => {
                       if (img.uri) {
                         formData.append("propertyimg[]", {
@@ -259,11 +333,16 @@ tenancy_tenure: Yup.string().when("property_for", {
                         } as any);
                       }
                     });
+                  } else {
+                    formData.append("propertyimg", JSON.stringify([]));
                   }
 
-                  if (Array.isArray(values.floorimg)) {
+                  if (
+                    Array.isArray(values.floorimg) &&
+                    values.floorimg.length > 0
+                  ) {
                     values.floorimg.forEach((img, index) => {
-                      if (img.uri) {
+                      if (img?.uri) {
                         formData.append("floorimg[]", {
                           uri: img.uri,
                           name: img.name || `floor_${index}.jpg`,
@@ -271,18 +350,31 @@ tenancy_tenure: Yup.string().when("property_for", {
                         } as any);
                       }
                     });
+                  } else {
+                    formData.append("floorimg", JSON.stringify([]));
                   }
+
                   for (const pair of formData.entries()) {
                     console.log(pair[0], pair[1]);
                   }
+                  // Call API
+                  const result = edit
+                    ? await UpdateProperty(formData)
+                    : await postProperty(formData);
 
-                  const result = await postProperty(formData);
+                  if (result?.data?.success) {
+                    renderToastSuccess(result.data.message);
 
-                  if (result.data?.success) {
-                    renderToastSuccess(result.data?.message);
-                    console.log("Post ID:", result.data?.post_id);
+                    router.replace({
+                      pathname: "/AddSingleView",
+                      params: {
+                        type: values.property_for,
+                        id: result?.data?.post_id,
+                      },
+                    });
                   } else {
                     console.log(result);
+                    renderToastError("Something went wrong!");
                   }
                 } catch (error) {
                   console.log("Error:", error);
@@ -392,9 +484,9 @@ tenancy_tenure: Yup.string().when("property_for", {
                       setFieldValue("property_type", value);
                       setpropertType(value);
                       setFieldValue("property_sub_type", "");
-                      if(value==="Farms/Lands"){
-                        setFieldValue("bedroom","")
-                         setFieldValue("bathrooms","")
+                      if (value === "Farms/Lands") {
+                        setFieldValue("bedroom", "");
+                        setFieldValue("bathrooms", "");
                       }
                     }}
                     value={values.property_type}
@@ -404,6 +496,7 @@ tenancy_tenure: Yup.string().when("property_for", {
                     title={""}
                     key={values.property_type}
                     setValue={setFieldValue}
+                    required
                     placeholder="Property sub type"
                     value={values.property_sub_type}
                     options={
@@ -418,7 +511,7 @@ tenancy_tenure: Yup.string().when("property_for", {
                             "Park homes",
                             "Others",
                           ]
-                        : values.property_type === "Commercials"
+                        : values.property_type === "Commercial"
                         ? [
                             "office",
                             "office workspace",
@@ -550,68 +643,68 @@ tenancy_tenure: Yup.string().when("property_for", {
                       </View>
                     )}
                   </View>
-                {propertType!=="Farms/Lands"&&(
-                  <View className="flex-row justify-between gap-3 mt-3">
-                    <View className="flex-1">
-                      <FormikDropdown
-                        onSelect={() => {}}
-                        options={[
-                          "Studio",
-                          "0",
-                          "1",
-                          "2",
-                          "3",
-                          "4",
-                          "5",
-                          "6",
-                          "7",
-                          "8",
-                          "9",
-                          "10",
-                          "10+",
-                        ]}
-                        title="Beds"
-                        name="bedroom"
-                        setValue={setFieldValue}
-                        placeholder="Beds"
-                        value={values.bedroom}
-                        touched={!!touched.bedroom}
-                        errors={!!errors.bedroom}
-                       required={propertType=== "House"}
-                        errorText={errors.bedroom}
-                      />
+                  {propertType !== "Farms/Lands" && (
+                    <View className="flex-row justify-between gap-3 mt-3">
+                      <View className="flex-1">
+                        <FormikDropdown
+                          onSelect={() => {}}
+                          options={[
+                            "Studio",
+                            "0",
+                            "1",
+                            "2",
+                            "3",
+                            "4",
+                            "5",
+                            "6",
+                            "7",
+                            "8",
+                            "9",
+                            "10",
+                            "10+",
+                          ]}
+                          title="Beds"
+                          name="bedroom"
+                          setValue={setFieldValue}
+                          placeholder="Beds"
+                          value={values.bedroom}
+                          touched={!!touched.bedroom}
+                          errors={!!errors.bedroom}
+                          required={propertType === "House"}
+                          errorText={errors.bedroom}
+                        />
+                      </View>
+                      <View className="flex-1">
+                        <FormikDropdown
+                          onSelect={() => {}}
+                          options={[
+                            "0",
+                            "1",
+                            "2",
+                            "3",
+                            "4",
+                            "5",
+                            "6",
+                            "7",
+                            "8",
+                            "9",
+                            "10",
+                            "10+",
+                          ]}
+                          title="Baths"
+                          placeholder="Baths"
+                          name="bathrooms"
+                          setValue={setFieldValue}
+                          value={values.bathrooms}
+                          touched={!!touched.bathrooms}
+                          errors={!!errors.bathrooms}
+                          required={propertType === "House"}
+                          errorText={errors.bathrooms}
+                        />
+                      </View>
                     </View>
-                    <View className="flex-1">
-                      <FormikDropdown
-                        onSelect={() => {}}
-                        options={[
-                          "0",
-                          "1",
-                          "2",
-                          "3",
-                          "4",
-                          "5",
-                          "6",
-                          "7",
-                          "8",
-                          "9",
-                          "10",
-                          "10+",
-                        ]}
-                        title="Baths"
-                        placeholder="Baths"
-                        name="bathrooms"
-                        setValue={setFieldValue}
-                        value={values.bathrooms}
-                        touched={!!touched.bathrooms}
-                        errors={!!errors.bathrooms}
-                          required={propertType=== "House"}
-                        errorText={errors.bathrooms}
-                      />
-                    </View>
-                  </View>
-                )}
-                  
+                  )}
+
                   <View className="flex-row justify-between gap-3 mt-3">
                     <View className="flex-1">
                       <FormikDropdown
@@ -880,14 +973,17 @@ tenancy_tenure: Yup.string().when("property_for", {
                     <View className="flex-row items-center">
                       <TouchableOpacity
                         onPress={() => {
-                          setVisit(visit === "Yes" ? "" : "Yes");
+                          setFieldValue(
+                            "property_visit",
+                            values.property_visit === "Yes" ? "" : "Yes"
+                          );
                         }}
                       >
                         <MaterialIcons
                           size={18}
                           color={Colors.light.DarkGreen}
                           name={
-                            visit === "Yes"
+                            values.property_visit === "Yes"
                               ? "check-box"
                               : "check-box-outline-blank"
                           }
@@ -902,14 +998,17 @@ tenancy_tenure: Yup.string().when("property_for", {
                     >
                       <TouchableOpacity
                         onPress={() => {
-                          setVisit(visit === "No" ? "" : "No");
+                          setFieldValue(
+                            "property_visit",
+                            values.property_visit === "No" ? "" : "No"
+                          );
                         }}
                       >
                         <MaterialIcons
                           size={18}
                           color={Colors.light.DarkGreen}
                           name={
-                            visit === "No"
+                            values.property_visit === "No"
                               ? "check-box"
                               : "check-box-outline-blank"
                           }
@@ -929,7 +1028,7 @@ tenancy_tenure: Yup.string().when("property_for", {
                       opacity: 0.2,
                     }}
                   />
-                  {visit === "Yes" && (
+                  {/* {values.property_visit === "Yes" && (
                     <View className="flex-row justify-between gap-3">
                       <View className="flex-1">
                         <View className="flex-1" style={{ marginLeft: hs(5) }}>
@@ -962,7 +1061,7 @@ tenancy_tenure: Yup.string().when("property_for", {
                         />
                       </View>
                     </View>
-                  )}
+                  )} */}
 
                   <FormikInput
                     title="More Description"
@@ -1027,7 +1126,10 @@ tenancy_tenure: Yup.string().when("property_for", {
                         <FormikDropdownwithjson
                           key={"rent-type"}
                           onSelect={() => {}}
-                          options={[{label:"Per week", value:"week"},{label:"per month",value:"month"}]}
+                          options={[
+                            { label: "Per week", value: "week" },
+                            { label: "per month", value: "month" },
+                          ]}
                           title=""
                           placeholder="Rent Type"
                           name="rent_type"
@@ -1516,6 +1618,8 @@ tenancy_tenure: Yup.string().when("property_for", {
         </View>
       </ScrollView>
       <Loading isLoading={isLoading} text={"Creating Property Post"} />
+      <Loading isLoading={EditLoading} text={"Loading..."} />
+      <Loading isLoading={UpdateLoading} text={"Updating Property Post..."} />
     </View>
   );
 };

@@ -5,14 +5,14 @@ import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SideBarCardprops } from "./type";
-const index = ({ Svg, text, type, totalPosts, onPress }: SideBarCardprops) => {
+const index = ({ Svg, text, type, totalPosts, onPress=()=>{},ProfileExist }: SideBarCardprops) => {
   return (
     <TouchableOpacity
       style={[styles.card, { height: type === "Buy" ? vs(160) : vs(140) }]}
       onPress={() => {
         type === "busenessProfile"
           ? router.navigate({
-              pathname: "/(main)/CreateProfiles",
+              pathname: ProfileExist?"/(main)/Account":"/(main)/CreateProfiles",
               params: { type: text },
             })
           : onPress();
@@ -20,7 +20,7 @@ const index = ({ Svg, text, type, totalPosts, onPress }: SideBarCardprops) => {
     >
       {type === "busenessProfile" ? (
         <View style={{ marginTop: vs(10) }}>
-          <Add />
+         {ProfileExist?(<ArrowUp />):( <Add />)}
         </View>
       ) : (
         <View className="flex-row justify-between items-center">

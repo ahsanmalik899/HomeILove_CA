@@ -1,25 +1,60 @@
-import { useSetCommunityPrefrenceMutation, useSetConectionPrefrenceMutation, useSetPropertyPrefrenceMutation } from "@/store/api/user/MainApi";
+import {
+  useGetCommunityPrefQuery,
+  useGetConnectionPrefQuery,
+  useGetPropertyPrefQuery,
+  useSetCommunityPrefrenceMutation,
+  useSetConectionPrefrenceMutation,
+  useSetPropertyPrefrenceMutation,
+} from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DealingAreas } from "@src/components/globals/DealingAreas";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
-import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson/indes";
+import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Loading from "@src/components/globals/Loading";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
-  const user = useAppSelector(userdata)
-  const [setPropertyPrefrence,{isLoading:PropertyLoading}]= useSetPropertyPrefrenceMutation()
-  const [setCommunityPrefrence,{isLoading:CommunityLoading}]= useSetCommunityPrefrenceMutation()
-   const [setConnectionPrefrence,{isLoading:ConnectionLoading}]= useSetConectionPrefrenceMutation()
+  const user = useAppSelector(userdata);
+  const { type } = useLocalSearchParams();
+  const [setPropertyPrefrence, { isLoading: PropertyLoading }] =
+    useSetPropertyPrefrenceMutation();
+  const [setCommunityPrefrence, { isLoading: CommunityLoading }] =
+    useSetCommunityPrefrenceMutation();
+  const [setConnectionPrefrence, { isLoading: ConnectionLoading }] =
+    useSetConectionPrefrenceMutation();
+  const { data, isFetching: conectioLoading } = useGetConnectionPrefQuery({
+    id: user.id,
+    type: "",
+  },
+{
+      skip:type!=="Connection"
+    });
+
+  const { data: communityData, isFetching: communityprefLoading } =
+    useGetCommunityPrefQuery({
+      id: user.id,
+      type: "",
+    },{
+      skip:type!=="Community"
+    });
+  const { data: propertyData, isFetching: propertyprefLoading } =
+    useGetPropertyPrefQuery({
+      id: user.id,
+      type: "",
+    },
+  {
+      skip:type!=="Property"
+    });
+ 
   const toggleStatus = (
     currentvalue: string,
     value: string,
@@ -38,7 +73,7 @@ const index = () => {
 
   const propertyPrefrenceSchema = Yup.object().shape({
     location: Yup.string().required("Location is required"),
-    user_id:Yup.string().nullable(),
+    user_id: Yup.string().nullable(),
     property_for: Yup.string().required("Property for is required"),
 
     property_type: Yup.string().required("Property type is required"),
@@ -107,12 +142,12 @@ const index = () => {
       .required("Maximum price is required")
       .min(Yup.ref("min_price"), "Max rent must be greater than min price"),
   });
- const connectionPreferenceSchema = Yup.object().shape({
-  user_id:Yup.string().required("id is required"),
+  const connectionPreferenceSchema = Yup.object().shape({
+    user_id: Yup.string().required("id is required"),
     location: Yup.string().required("Location is required"),
-  user_type:Yup.string().required("user prefrence is treguired")
+    user_type: Yup.string().required("user prefrence is treguired"),
   });
-  const { type } = useLocalSearchParams();
+
   switch (type) {
     case "Property":
       return (
@@ -121,43 +156,68 @@ const index = () => {
             <HeaderWithBack title="Set Your Property Preferences" />
             <View style={styles.card}>
               <Formik
+                enableReinitialize
                 initialValues={{
-                  location: "",
-                    user_id:user.id,
-                  property_for: "",
-                  property_type: "",
-                  property_condition: "",
-                  min_price: "",
-                  max_price: "",
+                  user_id: user.id,
 
-                  min_rent: "",
-                  max_rent: "",
+                  location: propertyData?.data?.location || "",
 
-                  min_size: "",
-                  max_size: "",
+                  property_for: propertyData?.data?.property_for || "",
+                  property_type: propertyData?.data?.property_type || "",
+                  property_condition: propertyData?.data?.property_condition || "",
 
-                  min_lot_size: "",
-                  max_lot_size: "",
+                  min_price: propertyData?.data?.min_price
+                    ? String(propertyData.data.min_price)
+                    : "",
 
-                  min_age: "",
-                  max_age: "",
+                  max_price: propertyData?.data?.max_price
+                    ? String(propertyData.data.max_price)
+                    : "",
+
+                  min_rent: propertyData?.data?.min_rent
+                    ? String(propertyData.data.min_rent)
+                    : "",
+
+                  max_rent: propertyData?.data?.max_rent
+                    ? String(propertyData.data.max_rent)
+                    : "",
+
+                  min_size: propertyData?.data?.min_size
+                    ? String(propertyData.data.min_size)
+                    : "",
+
+                  max_size: propertyData?.data?.max_size
+                    ? String(propertyData.data.max_size)
+                    : "",
+
+                  min_lot_size: propertyData?.data?.min_lot_size
+                    ? String(propertyData.data.min_lot_size)
+                    : "",
+
+                  max_lot_size: propertyData?.data?.max_lot_size
+                    ? String(propertyData.data.max_lot_size)
+                    : "",
+
+                  min_age: propertyData?.data?.min_age ? String(propertyData.data.min_age) : "",
+
+                  max_age: propertyData?.data?.max_age ? String(propertyData.data.max_age) : "",
                 }}
-            onSubmit={async (values) => {
-  try {
-    const result = await setPropertyPrefrence(values);
+                onSubmit={async (values) => {
+                  try {
+                    const result = await setPropertyPrefrence(values);
 
-    if (result?.data?.success) {
-      renderToastSuccess(result.data.message);
-    } else {
-      renderToastError(
-        result?.data?.message || "Something went wrong"
-      );
-    }
-  } catch (error) {
-    renderToastError("Server error");
-  }
-}}
-
+                    if (result?.data?.success) {
+                      renderToastSuccess(result.data.message);
+                      router.back();
+                    } else {
+                      renderToastError(
+                        result?.data?.message || "Something went wrong"
+                      );
+                    }
+                  } catch (error) {
+                    renderToastError("Server error");
+                  }
+                }}
                 validationSchema={propertyPrefrenceSchema}
               >
                 {({
@@ -286,9 +346,7 @@ const index = () => {
                         setValue={setFieldValue}
                         errorText={errors.property_type}
                         options={["House", "Commercial", "Farms/Lands"]}
-                        onSelect={() =>{}
-                         
-                        }
+                        onSelect={() => {}}
                       />
                     </View>
                     <View
@@ -308,7 +366,6 @@ const index = () => {
                         touched={!!touched.property_condition}
                         errors={!!errors.property_condition}
                         required
-                        
                         multipleFields
                         errorText={errors.property_condition}
                         options={[
@@ -319,8 +376,7 @@ const index = () => {
                           "Moderate",
                           "Need Repairs",
                         ]}
-                        onSelect={()=>{}
-                        }
+                        onSelect={() => {}}
                         setValue={setFieldValue}
                         name="property_condition"
                       />
@@ -728,7 +784,7 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                      onPress={()=>handleSubmit()}
+                        onPress={() => handleSubmit()}
                         style={{
                           backgroundColor: Colors.light.red,
                           borderRadius: ms(10),
@@ -746,7 +802,8 @@ const index = () => {
               </Formik>
             </View>
           </View>
-          <Loading text="Prefrence setting" isLoading={PropertyLoading}/>
+          <Loading text="Prefrence setting" isLoading={PropertyLoading} />
+          <Loading text="Loading..." isLoading={propertyprefLoading}/>
         </ScrollView>
       );
       break;
@@ -757,31 +814,41 @@ const index = () => {
             <HeaderWithBack title="Set Your Community Preferences" />
             <View style={styles.card}>
               <Formik
+                enableReinitialize={true}
                 initialValues={{
-                    user_id:user.id,
-                  location: "",
+                  user_id: user.id,
+
+                  location: communityData?.data?.location || "",
                   zip: "",
                   state: "",
-                  community_type: "",
-                  community_status: "",
-                  min_price: "",
-                  max_price: "",
-                }}
-                            onSubmit={async (values) => {
-  try {
-    const result = await setCommunityPrefrence(values);
 
-    if (result?.data?.success) {
-      renderToastSuccess(result.data.message);
-    } else {
-      renderToastError(
-        result?.data?.message || "Something went wrong"
-      );
-    }
-  } catch (error) {
-    renderToastError("Server error");
-  }
-}}
+                  community_type: communityData?.data?.community_type || "",
+                  community_status: communityData?.data?.community_status || "",
+
+                  min_price: communityData?.data?.min_price
+                    ? String(communityData.data.min_price)
+                    : "",
+
+                  max_price: communityData?.data?.max_price
+                    ? String(communityData.data.max_price)
+                    : "",
+                }}
+                onSubmit={async (values) => {
+                  try {
+                    const result = await setCommunityPrefrence(values);
+
+                    if (result?.data?.success) {
+                      renderToastSuccess(result.data.message);
+                      router.back();
+                    } else {
+                      renderToastError(
+                        result?.data?.message || "Something went wrong"
+                      );
+                    }
+                  } catch (error) {
+                    renderToastError("Server error");
+                  }
+                }}
                 validationSchema={communityPreferenceSchema}
               >
                 {({
@@ -1133,7 +1200,10 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                      onPress={()=>{handleSubmit();console.log(errors)}}
+                        onPress={() => {
+                          handleSubmit();
+                          console.log(errors);
+                        }}
                         style={{
                           backgroundColor: Colors.light.red,
                           borderRadius: ms(10),
@@ -1146,13 +1216,13 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                     </View>
-                   
                   </>
                 )}
               </Formik>
             </View>
           </View>
-           <Loading isLoading={CommunityLoading} text="Setting Prefrence"/>
+          <Loading isLoading={CommunityLoading} text="Setting Prefrence" />
+          <Loading isLoading={communityprefLoading} text="Loading" />
         </ScrollView>
       );
       break;
@@ -1163,26 +1233,28 @@ const index = () => {
             <HeaderWithBack title="Set Your Connection Preferences" />
             <View style={styles.card}>
               <Formik
+                enableReinitialize={true}
                 initialValues={{
-                  location: "",
-                  user_type:"",
-                  user_id:user.id,
+                  location: data?.data?.location ?? "",
+                  user_type: data?.data?.user_type ?? "",
+                  user_id: user.id,
                 }}
-                                    onSubmit={async (values) => {
-  try {
-    const result = await setConnectionPrefrence(values);
+                onSubmit={async (values) => {
+                  try {
+                    const result = await setConnectionPrefrence(values);
 
-    if (result?.data?.success) {
-      renderToastSuccess(result.data.message);
-    } else {
-      renderToastError(
-        result?.data?.message || "Something went wrong"
-      );
-    }
-  } catch (error) {
-    renderToastError("Server error");
-  }
-}}
+                    if (result?.data?.success) {
+                      renderToastSuccess(result.data.message);
+                      router.back();
+                    } else {
+                      renderToastError(
+                        result?.data?.message || "Something went wrong"
+                      );
+                    }
+                  } catch (error) {
+                    renderToastError("Server error");
+                  }
+                }}
                 validationSchema={connectionPreferenceSchema}
               >
                 {({
@@ -1209,15 +1281,25 @@ const index = () => {
                       errorText={errors.location}
                       placeholder="Please enter City, State or Zip code"
                     />
-                    <Text style={{ width: hs(250), marginTop: vs(10),fontWeight:600,fontSize:ms(18) }}>
+                    <Text
+                      style={{
+                        width: hs(250),
+                        marginTop: vs(10),
+                        fontWeight: 600,
+                        fontSize: ms(18),
+                      }}
+                    >
                       Property for
                     </Text>
-                   <View
+                    <View
                       className=" "
-                      style={{  marginTop:vs(10),marginBottom: vs(20) }}
+                      style={{ marginTop: vs(10), marginBottom: vs(20) }}
                     >
                       {/*  Electricians */}
-                      <View className="flex-row items-center"    style={{ marginLeft: hs(20),marginVertical:vs(5) }}>
+                      <View
+                        className="flex-row items-center"
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                      >
                         <TouchableOpacity
                           onPress={() =>
                             toggleStatus(
@@ -1238,13 +1320,16 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Electricians</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Electricians
+                        </Text>
                       </View>
 
                       {/* Builder */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20),marginVertical:vs(5) }}
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1266,13 +1351,16 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Builder</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Builder
+                        </Text>
                       </View>
 
                       {/*  Property agents */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20),marginVertical:vs(5) }}
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1294,12 +1382,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Property agents</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Property agents
+                        </Text>
                       </View>
-                       {/*  Plumbers */}
+                      {/*  Plumbers */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20),marginVertical:vs(5) }}
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1321,12 +1412,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Plumbers</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Plumbers
+                        </Text>
                       </View>
-                       {/*  Mortgage */}
+                      {/*  Mortgage */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20),marginVertical:vs(5) }}
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1348,12 +1442,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Mortgage Advisors</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Mortgage Advisors
+                        </Text>
                       </View>
-                        {/*  Decors */}
+                      {/*  Decors */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20),marginVertical:vs(5) }}
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1375,12 +1472,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Decors</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Decors
+                        </Text>
                       </View>
-                         {/*  Painters */}
+                      {/*  Painters */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20),marginVertical:vs(5) }}
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1402,12 +1502,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Painters</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Painters
+                        </Text>
                       </View>
-                         {/*  Investors */}
+                      {/*  Investors */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20),marginVertical:vs(5) }}
+                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1429,10 +1532,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontSize:ms(15) }}> Investors</Text>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                          {" "}
+                          Investors
+                        </Text>
                       </View>
                     </View>
-                      <View
+                    <View
                       style={{
                         height: vs(1),
                         marginTop: vs(20),
@@ -1460,7 +1566,10 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                      onPress={()=>{handleSubmit();console.log(errors)}}
+                        onPress={() => {
+                          handleSubmit();
+                          console.log(errors);
+                        }}
                         style={{
                           backgroundColor: Colors.light.red,
                           borderRadius: ms(10),
@@ -1478,7 +1587,8 @@ const index = () => {
               </Formik>
             </View>
           </View>
-          <Loading isLoading={ConnectionLoading} text="Setting Prefrence ..."/>
+          <Loading isLoading={ConnectionLoading} text="Setting Prefrence ..." />
+          <Loading isLoading={conectioLoading} text="Loading..." />
         </ScrollView>
       );
       break;

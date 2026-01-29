@@ -10,11 +10,12 @@ import Share from "@assets/icons/share.svg";
 import VerticalLine from "@assets/icons/verticalLine.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
+import { Ionicons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import DatePickerField from "@src/components/globals/DatePickerField";
 import { FormikInput } from "@src/components/globals/FormictInput";
-import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson/indes";
+import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import ImageSlider from "@src/components/globals/ImageSlider";
 import LargeButton from "@src/components/globals/LaregeButton";
@@ -26,9 +27,10 @@ import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { useLocalSearchParams } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { Formik } from "formik";
 import { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Yup from "yup";
@@ -37,7 +39,23 @@ const index = () => {
   const params = useLocalSearchParams();
   const type = params.type as string;
   const id = Number(params.id);
+
+
+  const formatPdfUrl = (file: string) => {
+ 
+  return ImageFormater(file);
+};
+
  console.log(type)
+const openPDF = async (url: string) => {
+  const googleViewer = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`;
+  await WebBrowser.openBrowserAsync(googleViewer, {
+    presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
+  });
+};
+
+
+
   const [imageNo, setImageNo] = useState(0);
   const [sendVisistRequies,{isLoading}]=useSendVisistRequestMutation()
   const { data, isFetching } = useGetSinglePostQuery({ type, id });
@@ -46,6 +64,8 @@ const index = () => {
   const [expanded, setExpanded] = useState(false);
   const latitude = parseFloat(data?.post?.lat);
   const longitude = parseFloat(data?.post?.lng);
+
+
   const showMap = !isNaN(latitude) && !isNaN(longitude);
   const facts = data?.post?.imp_facts ?? data?.post?.facts ?? "";
   const visitAdSchema = Yup.object().shape({
@@ -92,6 +112,7 @@ const index = () => {
   ) => {
     const downPayment = (downPaymentPercent / 100) * totalValue;
     const principal = totalValue - downPayment;
+
 
     const monthlyRate = interestRate / 12 / 100;
     const months = years * 12;
@@ -666,6 +687,56 @@ const index = () => {
             </>
           )}
 
+
+{data?.brochures?.length > 0 && (
+  <>
+  <Text style={styles.heading}>Brochure</Text>
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10, marginTop: 10 }}>
+    {data.brochures.map((file: string, index: number) => (
+      <TouchableOpacity
+        key={index}
+        onPress={() => openPDF(formatPdfUrl(file))}
+        style={{
+          flex: 1,
+          marginHorizontal: 5,
+          padding: 10,
+          borderRadius: 8,
+          backgroundColor: '#f2f2f2',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Ionicons
+          name="document-text-outline"
+          size={36}
+          color="#E53935"
+        />
+        <Text
+          style={{ fontSize: 12, color: '#555', marginTop: 5 }}
+          numberOfLines={1}
+        >
+          {decodeURIComponent(file)}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+   <View
+                style={{
+                  height: vs(1),
+                  marginTop: vs(20),
+                  marginBottom: vs(10),
+                  backgroundColor: Colors.light.textGray,
+                  opacity: 0.2,
+                }}
+              />
+              </>
+)}
+
+
+
+
+
+
           {type === "rent" && (
             <View>
               <View
@@ -947,7 +1018,7 @@ const index = () => {
             }}
           />
           <Text style={styles.heading}>VISIT PROPERTY IN PERSON</Text>
-          {data?.post.visit_date && (
+          {data?.post.property_visit&&data?.post.property_visit==="Yes" && (
           <Formik
             initialValues={{
               visitor_email: "",
@@ -1218,4 +1289,9 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     marginTop: vs(10),
   },
+   pdf: {
+        flex:1,
+        width:Dimensions.get('window').width,
+        height:Dimensions.get('window').height,
+    }
 });

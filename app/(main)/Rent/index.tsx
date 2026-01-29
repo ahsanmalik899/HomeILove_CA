@@ -12,15 +12,15 @@ const index = () => {
       <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
         <View className="flex-row justify-between">
           <SideBarCard Svg={Homes} text="Homes" onPress={() => {router.navigate({
-            pathname:"/(main)/RentListing",
-            params:{type:"Homes"}
+            pathname:"/BuyFilter",
+            params:{type:"House",property_for:"rent"}
           })}} type={""} />
           <SideBarCard
             Svg={Commercial}
             text="Commercial"
             onPress={() => {router.navigate({
-            pathname:"/(main)/RentListing",
-            params:{type:"Commercial"}
+            pathname:"/BuyFilter",
+            params:{type:"Commercial",property_for:"rent"}
           })}}
             type={""}
           />

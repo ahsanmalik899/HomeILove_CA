@@ -15,7 +15,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -42,16 +42,20 @@ const YourAdsPostDesign = ({
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const user = useAppSelector(userdata);
+  const listRef = useRef<any>(null);
+
+
   const insets = useSafeAreaInsets();
   const [scrollable, setscrollable] = useState(true);
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
 
+
     return (
       <>
         <TouchableOpacity
           onPress={() => {
-            router.push({
+            router.navigate({
               pathname: "/AddSingleView",
               params: {
                 type: type,
@@ -264,7 +268,14 @@ const YourAdsPostDesign = ({
                   Learn about trending ads
                 </Text>
                 <View className="flex-row ">
-                  <TouchableOpacity style={{ marginRight: hs(10) }}>
+                  <TouchableOpacity style={{ marginRight: hs(10) }} onPress={()=>{
+                   router.push({
+                    params:{edit:'true',type:type,id:type === "community"
+                    ? item.post_community_id
+                    : item.post_property_id},
+                  pathname:type==="community"?"/(main)/postCommunity":"/(main)/PostProperty"
+                   })
+                  }}>
                     <Edit />
                   </TouchableOpacity>
                   <TouchableOpacity>
@@ -288,8 +299,9 @@ return (
       <LegendList
         data={data}
         scrollEnabled={scrollable}
+        ref={listRef}
         renderItem={renderItem}
-        keyExtractor={(item, index) =>
+   keyExtractor={(item, index) =>
           `${item.post_property_id || item.post_community_id}-${index}`
         }
         onEndReached={() => {

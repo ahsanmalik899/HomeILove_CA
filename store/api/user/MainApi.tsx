@@ -9,6 +9,14 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const MainApi = createApi({
   reducerPath: "MainApi",
+  tagTypes: [
+    "PostEditData",
+    "SinglePostData",
+    "AlertPref",
+    "ConnectionPref",
+    "CommunityPref",
+    "PropertyPref",
+  ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
     getYourpost: builder.query<FeedResponse, GetPostType>({
@@ -19,7 +27,7 @@ export const MainApi = createApi({
     }),
     getHomepost: builder.query<FeedResponse, GetPostType>({
       query: ({ userid, page }) => ({
-        url: `getHomeFeeds/?userid=${userid}&page=${page}`,
+        url: `getHomeFeed/?userid=${userid}&page=${page}`,
         method: "GET",
       }),
     }),
@@ -41,6 +49,9 @@ export const MainApi = createApi({
         url: `getSinglePostapi?type=${type}&id=${id}`,
         method: "GET",
       }),
+      providesTags: (r: any, e: any, arg: { id: any }) => [
+        { type: "SinglePostData", id: arg.id },
+      ],
     }),
     postProperty: builder.mutation<any, FormData>({
       query: (formatData) => ({
@@ -76,6 +87,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["PropertyPref"],
     }),
     setCommunityPrefrence: builder.mutation<any, any>({
       query: (data) => ({
@@ -83,6 +95,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["CommunityPref"],
     }),
     setConectionPrefrence: builder.mutation<any, any>({
       query: (data) => ({
@@ -90,6 +103,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["ConnectionPref"],
     }),
     getInquieryAgent: builder.query<any, any>({
       query: (data) => ({
@@ -97,19 +111,17 @@ export const MainApi = createApi({
         method: "GET",
       }),
     }),
-        postAdvatizement: builder.mutation<any, FormData>({
+    postAdvatizement: builder.mutation<any, FormData>({
       query: (data) => ({
         url: `postAdvatizement`,
         method: "POST",
         body: data,
-    
       }),
     }),
-          getYorSalePosts:builder.query<any, any>({
-      query: ({page,per_page,type,user_id,profile_type}) => ({
+    getYorSalePosts: builder.query<any, any>({
+      query: ({ page, per_page, type, user_id, profile_type }) => ({
         url: `get/userProperty?page=${page}&per_page=${per_page}&type=${type}&user_id=${user_id}&profile_type=${profile_type}`,
         method: "GET",
-    
       }),
     }),
     SendVisistRequest: builder.mutation<any, FormData>({
@@ -117,10 +129,149 @@ export const MainApi = createApi({
         url: `sendVisitRequest`,
         method: "POST",
         body: formData,
-    headers: {
-  'Accept': 'application/json',
-}
-
+        headers: {
+          Accept: "application/json",
+        },
+      }),
+    }),
+    getPostCount: builder.query<any, any>({
+      query: ({ user_id }) => ({
+        url: `getPostCount?user_id=${user_id}`,
+        method: "GET",
+      }),
+    }),
+    getDataForEdit: builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id }) => ({
+        url: `getDataForEditPost?type=${type}&id=${id}`,
+        method: "GET",
+      }),
+      providesTags: (r: any, e: any, arg: { id: any }) => [
+        { type: "PostEditData", id: arg.id },
+      ],
+    }),
+    updateProperty: builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `property/update`,
+        method: "POST",
+        body: formatData,
+      }),
+      invalidatesTags: (result, error, formData) => {
+        const id = formData.get("post_id");
+        if (!id || typeof id !== "string") return [];
+        return [
+          { type: "PostEditData" as const, id },
+          { type: "SinglePostData" as const, id },
+        ];
+      },
+    }),
+    getHomeFeeds: builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id, page, limit }) => ({
+        url: `getHomeFeed?userid=${id}$page=${page}$limit=${limit}`,
+        method: "GET",
+      }),
+    }),
+    updateCommunity: builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `community/update`,
+        method: "POST",
+        body: formatData,
+      }),
+      invalidatesTags: (result, error, formData) => {
+        const id = formData.get("post_id");
+        if (!id || typeof id !== "string") return [];
+        return [
+          { type: "PostEditData" as const, id },
+          { type: "SinglePostData" as const, id },
+        ];
+      },
+    }),
+    saveAllerts: builder.mutation<any, FormData>({
+      query: (formatdata) => ({
+        url: `/saveUpdateAlert`,
+        method: "POST",
+        body: formatdata,
+      }),
+      invalidatesTags: ["AlertPref"],
+    }),
+    getAlertPref: builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id }) => ({
+        url: `GetAlertPref?user_id=${id}`,
+        method: "GET",
+      }),
+      providesTags: ["AlertPref"],
+    }),
+    getConnectionPref: builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id }) => ({
+        url: `GetConnectionPref?user_id=${id}`,
+        method: "GET",
+      }),
+      providesTags: ["ConnectionPref"],
+    }),
+    getCommunityPref: builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id }) => ({
+        url: `GetCommunityPref?user_id=${id}`,
+        method: "GET",
+      }),
+      providesTags: ["CommunityPref"],
+    }),
+    getPropertyPref: builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id }) => ({
+        url: `GetPropertyPref?user_id=${id}`,
+        method: "GET",
+      }),
+      providesTags: ["PropertyPref"],
+    }),
+    getPropertyList: builder.query<any, any>({
+      query: ({
+        page ,
+        property_for,
+        property_type,
+        property_sub_type,
+        condition,
+        address,
+        city,
+        state,
+        zip,
+        lat,
+        lng,
+        radius,
+        min_price_range,
+        max_price_range,
+        max_rent_range,
+        no_of_baths,
+        sale_type,
+        min_beds,
+        max_beds,
+        tenure,
+        price_type,
+        sort,
+      }) => ({
+        url: "getPropertyListing",
+        method: "GET",
+        params: {
+          page,
+          property_for,
+          property_type,
+          property_sub_type,
+          condition,
+          address,
+          city,
+          state,
+          zip,
+          lat,
+          lng,
+          radius,
+          min_price_range,
+          max_price_range,
+          max_rent_range,
+          no_of_baths,
+          sale_type,
+          price_type,
+          tenure,
+           min_beds,
+        max_beds,
+          sort,
+        },
       }),
     }),
   }),
@@ -143,4 +294,15 @@ export const {
   usePostAdvatizementMutation,
   useGetYorSalePostsQuery,
   useSendVisistRequestMutation,
+  useGetPostCountQuery,
+  useGetDataForEditQuery,
+  useUpdatePropertyMutation,
+  useUpdateCommunityMutation,
+  useGetHomeFeedsQuery,
+  useSaveAllertsMutation,
+  useGetAlertPrefQuery,
+  useGetConnectionPrefQuery,
+  useGetCommunityPrefQuery,
+  useGetPropertyPrefQuery,
+  useGetPropertyListQuery,
 } = MainApi;

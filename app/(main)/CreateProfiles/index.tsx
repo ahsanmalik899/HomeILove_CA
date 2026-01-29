@@ -9,7 +9,7 @@ import DatePickerField from "@src/components/globals/DatePickerField";
 import { DealingAreas } from "@src/components/globals/DealingAreas";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
-import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson/indes";
+import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";

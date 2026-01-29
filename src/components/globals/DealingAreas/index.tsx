@@ -9,7 +9,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Colors from "@src/constants/Colors";
 import { renderToastError } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -50,8 +50,48 @@ export const DealingAreas = ({
   const [selectedlat, setSelectedlat] = useState<number[]>([]);
   const [selectedlog, setSelectedlong] = useState<number[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
-const normalize = (str: string) =>
-  str.replace(/,/g, "").replace(/\s+/g, " ").trim();
+  useEffect(() => {
+    if (!value) {
+      setSelectedData([]);
+      setCurrentValue("");
+      return;
+    }
+
+    // ✅ Nationwide should NOT go into array
+    if (value === "Nationwide") {
+      setSelectedData([]); // ✅ empty array
+      setCurrentValue("Nationwide");
+      return;
+    }
+
+    // Normal CSV values
+    const addresses = value.split(",").map((v) => v.trim());
+    setSelectedData(addresses);
+    setCurrentValue("");
+
+    if (city) {
+      setSelectedCity(city.split(","));
+    }
+
+    if ((state as any)?.latitude) {
+      setSelectedlat(
+        String((state as any).latitude)
+          .split(",")
+          .map(Number)
+      );
+    }
+
+    if ((state as any)?.longitude) {
+      setSelectedlong(
+        String((state as any).longitude)
+          .split(",")
+          .map(Number)
+      );
+    }
+  }, [value]);
+
+  const normalize = (str: string) =>
+    str.replace(/,/g, "").replace(/\s+/g, " ").trim();
   const [getPlaceDetails] = useLazyGetPlaceDetailsQuery();
   const { data: googleData, isFetching } = useGetAddressSuggestionsQuery(
     { input: currentValue },
@@ -59,7 +99,7 @@ const normalize = (str: string) =>
   );
 
   const handleSelectSuggestion = async (address: string, id: string) => {
-  setCurrentValue(address.replace(/,/g, ""));
+    setCurrentValue(address.replace(/,/g, ""));
     setShowSuggestions(false);
 
     try {
@@ -87,11 +127,11 @@ const normalize = (str: string) =>
 
   const handleAdd = () => {
     if (!currentValue) return;
-     const isValid = googleData?.predictions.some(
-    (p) => normalize(p.description) === normalize(currentValue)
-  );
+    const isValid = googleData?.predictions.some(
+      (p) => normalize(p.description) === normalize(currentValue)
+    );
 
-  if (!isValid) return;
+    if (!isValid) return;
     if (selectedData.includes(currentValue)) return;
 
     const updatedData = [...selectedData, currentValue];
@@ -246,7 +286,7 @@ const normalize = (str: string) =>
           <FlatList
             data={googleData?.predictions}
             nestedScrollEnabled
-              scrollEnabled
+            scrollEnabled
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity

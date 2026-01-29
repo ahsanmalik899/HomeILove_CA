@@ -1,8 +1,10 @@
+import { useGetPostCountQuery } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Community from "@assets/SideBar/community.svg";
 import Rent from "@assets/SideBar/rent.svg";
 import Sale from "@assets/SideBar/sale.svg";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import Loading from "@src/components/globals/Loading";
 import SideBarCard from "@src/components/globals/SideBarCard";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, vs } from "@utils/design/design";
@@ -10,10 +12,10 @@ import { router } from "expo-router";
 import { View } from "react-native";
 const index = () => {
   const type = "My Posts Counts";
-const user =useAppSelector(userdata);
-const userid= user.sweetghar_user_id
-const total="3";
-  
+  const user = useAppSelector(userdata);
+  const { data, isFetching } = useGetPostCountQuery({ user_id: user.id });
+  const total = "3";
+
   return (
     <View className="flex-1 bg-white">
       <HeaderWithBack title="Your Ads" />
@@ -23,10 +25,11 @@ const total="3";
             text="Sale"
             Svg={Sale}
             type="yourAds"
-            totalPosts={total}
+            totalPosts={data?.data?.sale_posts}
             onPress={() => {
-              router.navigate({pathname:"/MyPostListing",
-                params:{type:'Sale'}
+              router.navigate({
+                pathname: "/MyPostListing",
+                params: { type: "Sale" },
               });
             }}
           />
@@ -34,24 +37,29 @@ const total="3";
             text="Rent"
             Svg={Rent}
             type="yourAds"
-          totalPosts={total}
-            onPress={() => {router.navigate({pathname:"/MyPostListing",
-                params:{type:'Rent'}
-              });}}
+            totalPosts={data?.data?.rent_posts}
+            onPress={() => {
+              router.navigate({
+                pathname: "/MyPostListing",
+                params: { type: "Rent" },
+              });
+            }}
           />
         </View>
         <SideBarCard
           text="Community"
           Svg={Community}
           type="yourAds"
-         totalPosts={total}
+          totalPosts={data?.data?.community_posts}
           onPress={() => {
-            router.navigate({pathname:"/MyPostListing",
-                params:{type:'Community'}
-              });
+            router.navigate({
+              pathname: "/MyPostListing",
+              params: { type: "Community" },
+            });
           }}
         />
       </View>
+      <Loading isLoading={isFetching} text="Loading..." />
     </View>
   );
 };
