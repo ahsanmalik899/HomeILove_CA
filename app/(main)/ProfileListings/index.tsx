@@ -1,0 +1,223 @@
+import { useGetProfileListingQuery } from "@/store/api/user/MainApi";
+import Threedot from "@assets/Buy/threedotwhite.svg";
+import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import ProfileFilter from "@src/components/globals/ProfileFilter";
+import ProfileListingDesign from "@src/components/globals/ProfileListingDesign";
+import Colors from "@src/constants/Colors";
+import { hs, ms, vs } from "@utils/design/design";
+import { useLocalSearchParams } from "expo-router";
+import { Formik } from "formik";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import * as Yup from "yup";
+const index = () => {
+  const params = useLocalSearchParams();
+  const [page, setpage] = useState(1);
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [name, setname] = useState("");
+  const [address, setAddress] = useState(params.address || "");
+  const [lat, setLat] = useState(Number(params.lat) || 0);
+  const [lng, setLng] = useState(Number(params.lng) || 0);
+  const [state, setState] = useState(params.stateCode || "");
+  const [city, setCity] = useState(params.city || "");
+  const [zip, setZip] = useState(params.zip || "");
+  const [showFilter, setShowFilter] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+
+ 
+    const FilterSchema = Yup.object().shape({
+      radius: Yup.string().nullable(),
+     
+    });
+     const [filterValues, setFilterValues] = useState({
+        radius: params.radius || "",
+      });
+    
+      const [apiFilters, setApiFilters] = useState({
+        page,
+        address,
+        city,
+        state,
+        zip,
+        lat,
+        lng,
+        name,
+        type:params.type,
+        radius: params.radius || undefined,
+      });
+ const { data: profileList, isLoading, isFetching } =
+  useGetProfileListingQuery(apiFilters);
+
+   const mapToApiFilters = (values: any) => ({
+    page,
+    address,
+    city,
+    state,
+    zip,
+    lat,
+    lng,
+    name,
+    type:params.type,
+    radius: values.radius || undefined,
+  });
+  useEffect(() => {
+  setApiFilters((prev) => ({
+    ...prev,
+    page,
+    address,
+    city,
+    state,
+    zip,
+    lat,
+    lng,
+    name,
+  }));
+}, [page, address, city, state, zip, lat, lng, name]);
+
+  useEffect(() => {
+    if (!profileList) return;
+
+    const newProfiles = profileList.data?? [];
+
+    setHasMore(
+      profileList.pagination.current_page < profileList.pagination.last_page
+    );
+
+    setProfiles((prev) =>
+      page === 1 ? newProfiles : [...prev, ...newProfiles]
+    );
+      setInitialLoadDone(true);
+  }, [profileList, page]);
+
+  return (
+    <View className=" flex-1" style={{ backgroundColor: "#F4F0F0" }}>
+      <HeaderWithBack />
+     <View style={styles.filterBar}>
+ 
+  <View style={{ flex: 1 }}>
+    <Text style={styles.resultTitle}>
+      {params.type?.toString().toUpperCase()} Profiles
+    </Text>
+    <Text style={styles.resultSub}>
+      {city || state || "Nearby"} • {profiles.length} results
+    </Text>
+  </View>
+  <TouchableOpacity
+    style={styles.filterBtn}
+    onPress={() => setShowFilter(true)}
+  >
+    <Text style={styles.filterText}>Filters</Text>
+    <Threedot width={16} height={16} />
+  </TouchableOpacity>
+</View>
+
+      <ProfileListingDesign
+        data={profiles}
+        isfetching={isFetching}
+        setPage={setpage}
+        type="community"
+        hasmore={hasMore}
+         initialLoadDone={initialLoadDone}
+      />
+       {showFilter && (
+              <Formik
+                initialValues={filterValues}
+                enableReinitialize
+                validationSchema={FilterSchema}
+                onSubmit={(values) => {
+                  setFilterValues(values);
+      
+                  setpage(1);
+                  setApiFilters(mapToApiFilters(values));
+                  setShowFilter(false);
+                }}
+              >
+                {({
+                  values,
+                  errors,
+                  touched,
+                  setFieldValue,
+                  handleSubmit,
+                  resetForm,
+                  setFieldTouched,
+                }) => (
+                  <ProfileFilter
+                  type={params.type.toString()}
+                    values={values}
+                    errors={errors}
+                    touched={touched}
+                    setFieldValue={setFieldValue}
+                    handleSubmit={handleSubmit}
+                    resetForm={resetForm}
+                    setshowFilter={setShowFilter}
+                    setAddress={setAddress}
+                    setCity={setCity}
+                    setLat={setLat}
+                    setLng={setLng}
+                    setState={setState}
+                    setZip={setZip}
+                    onpress={() => {}}
+                    latValue={lat}
+                    longValue={lng}
+                    value={address.toString()}
+                    name={name.toString()}
+                    setname={setname}
+                  />
+                )}
+              </Formik>
+            )}
+    </View>
+  );
+};
+
+export default index;
+
+const styles = StyleSheet.create({
+   filterBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: vs(16),
+    marginBottom: vs(8),
+    paddingVertical: vs(12),
+    paddingHorizontal: hs(14),
+    backgroundColor: "#fff",
+    borderRadius: ms(12),
+
+    // subtle shadow
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 3,
+  },
+
+  resultTitle: {
+    fontSize: ms(15),
+    fontWeight: "700",
+    color: "#111",
+  },
+
+  resultSub: {
+    fontSize: ms(12),
+    color: Colors.light.textGray,
+    marginTop: vs(2),
+  },
+
+  filterBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: hs(6),
+    paddingHorizontal: hs(12),
+    paddingVertical: vs(8),
+    borderRadius: ms(20),
+    backgroundColor: Colors.light.red,
+  },
+
+  filterText: {
+    color: "#fff",
+    fontSize: ms(13),
+    fontWeight: "600",
+  },
+});

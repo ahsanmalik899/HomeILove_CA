@@ -1,9 +1,9 @@
 import { useGetPropertyListQuery } from "@/store/api/user/MainApi";
 import Threedot from "@assets/Buy/threedotwhite.svg";
+import SortDropdown from "@src/components/globals/DropDownField";
 import Filter from "@src/components/globals/Filter";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import PropertyListingDesign from "@src/components/globals/PropertyListingDesign";
-import SerchBar from "@src/components/globals/SerchBar";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { useLocalSearchParams } from "expo-router";
@@ -14,9 +14,10 @@ import * as Yup from "yup";
 
 const index = () => {
   const params = useLocalSearchParams();
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [page, setpage] = useState(1);
-const [properties, setProperties] = useState<any[]>([]);
-const [hasMore, setHasMore] = useState(true);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
   const [address, setAddress] = useState(params.address || "");
   const [lat, setLat] = useState(Number(params.lat) || 0);
   const [lng, setLng] = useState(Number(params.lng) || 0);
@@ -24,46 +25,67 @@ const [hasMore, setHasMore] = useState(true);
   const [city, setCity] = useState(params.city || "");
   const [zip, setZip] = useState(params.zip || "");
   const [showFilter, setShowFilter] = useState(false);
+  const [sort, setSort] = useState("");
 
-  
+  const sortOptions = [
+    { label: "All", value: "" },
+    { label: "Recent First", value: "post_property_id_desc" },
+    { label: "Oldest First", value: "post_property_id_asc" },
+    { label: "Price: High to Low", value: "asking_price_desc" },
+    { label: "Price: Low to High", value: "asking_price_asc" },
+  ];
+
   const [filterValues, setFilterValues] = useState({
+    propertysubType: params.propertysubType
+      ? params.propertysubType.split(",")
+      : [],
+    propertyCondition: params.condition ? params.condition.split(",") : [],
+    tenure: [],
+    furnishing_type:[],
+    tinency_tenure: [],
+    purposeful_type: [],
     radius: params.radius || "",
-    property_for: params.property_for||"sale",
+    property_for: params.property_for || "sale",
     propertyType: params.propertyType || "House",
-    propertysubType: params.propertysubType || "All",
-    price_type:params.saleprice_type||"",
-    propertyCondition: params.condition||"",
+    price_type: params.saleprice_type || "",
+    max_rent_range: params.max_rent_range,
+    pet_allowers: params.pet_allowers,
+    available_on: params.aivilable_on,
     minBed: "",
     maxBed: "",
     minPrice: "",
     maxPrice: "",
     bathrooms: "",
-    tenure: "",
+    sort: sort,
   });
 
-  /** 🔹 API Filters */
   const [apiFilters, setApiFilters] = useState({
     page,
-    property_for: params.property_for||undefined,
+    property_for: params.property_for || undefined,
     address,
     city,
     state,
     zip,
     lat,
     lng,
-   condition: params.condition||undefined,
-    price_type:params.saleprice_type||undefined,
+    sort,
+    available_on: params.aivilable_on||undefined,
+    pet_allowers: params.pet_allowers,
+    max_rent_range: params.max_rent_range,
+    condition: params.condition || undefined,
+    price_type: params.saleprice_type || undefined,
     radius: params.radius || undefined,
     property_type: params.propertyType,
     property_sub_type:
       params.propertysubType !== "All" ? params.propertysubType : undefined,
   });
 
-
-  const { data: propertyList, isLoading, isFetching, refetch } =
-    useGetPropertyListQuery(apiFilters);
-
-  console.log(propertyList?.data?.properties)
+  const {
+    data: propertyList,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetPropertyListQuery(apiFilters);
   useEffect(() => {
     setApiFilters((prev) => ({
       ...prev,
@@ -74,15 +96,21 @@ const [hasMore, setHasMore] = useState(true);
       lat,
       lng,
       page,
+      sort,
     }));
-  }, [address, city, state, zip, lat, lng,page]);
+  }, [address, city, state, zip, lat, lng, page, sort]);
 
   /** 🔹 Validation */
   const FilterSchema = Yup.object().shape({
     radius: Yup.string().nullable(),
     propertyType: Yup.string().nullable(),
-    propertysubType: Yup.string().nullable(),
-    propertyCondition: Yup.string().nullable(),
+    pet_allowers: Yup.string().nullable(),
+    available_on:Yup.string().nullable(),
+    propertyCondition: Yup.array().of(Yup.string()),
+    tenure: Yup.array().of(Yup.string()),
+    furnishing_type: Yup.array().of(Yup.string()),
+    purposeful_type: Yup.array().of(Yup.string()),
+    tinency_tenure: Yup.array().of(Yup.string()),
     minBed: Yup.number().nullable().min(0, "Invalid value"),
     maxBed: Yup.number()
       .nullable()
@@ -96,68 +124,84 @@ const [hasMore, setHasMore] = useState(true);
         minPrice ? schema.min(minPrice, "Max must be ≥ Min") : schema
       ),
     bathrooms: Yup.number().nullable(),
-    tenure: Yup.string().nullable(),
   });
 
-  /** 🔹 Map Formik values to API */
   const mapToApiFilters = (values: any) => ({
     page,
-    property_for:values.property_for||undefined,
+    property_for: values.property_for || undefined,
+    pet_allowers:values.pet_allowers||undefined,
     address,
     city,
     state,
     zip,
     lat,
     lng,
+    sort,
+    available_on:values.available_on||undefined,
+    furnishing_type:values.furnishing_type.length ? values.furnishing_type.join(",") : undefined,
+    tenure: values.tenure.length ? values.tenure.join(",") : undefined,
+    purposeful_type: values.purposeful_type.length
+      ? values.purposeful_type.join(",")
+      : undefined,
+    tinency_tenure: values.tinency_tenure.length
+      ? values.tinency_tenure.join(",")
+      : undefined,
+    property_sub_type:
+      values.propertysubType.length === 1 && values.propertysubType[0] === "All"
+        ? undefined
+        : values.propertysubType.filter((v: string) => v !== "All").join(",") ||
+          undefined,
+
+    condition: values.propertyCondition.length
+      ? values.propertyCondition.join(",")
+      : undefined,
     price_type: values.saleprice_type || undefined,
     radius: values.radius || undefined,
     property_type: values.propertyType,
-    property_sub_type:
-      values.propertysubType !== "All" ? values.propertysubType : undefined,
-    condition: values.propertyCondition || undefined,
     min_price_range: values.minPrice || undefined,
     max_price_range: values.maxPrice || undefined,
     no_of_baths: values.bathrooms || undefined,
-    tenure: values.tenure || undefined,
-     min_beds: values.minBed !== "" ? Number(values.minBed) : undefined,
-  max_beds: values.maxBed !== "" ? Number(values.maxBed) : undefined,
+    // no_of_baths: values.bathrooms && values.bathrooms !== "0" ? Number(values.bathrooms) : undefined,
+    min_beds: values.minBed !== "" ? Number(values.minBed) : undefined,
+    max_beds: values.maxBed !== "" ? Number(values.maxBed) : undefined,
   });
-useEffect(() => {
-  if (!propertyList) return; 
+  useEffect(() => {
+    if (!propertyList) return;
 
-  const newProperties = propertyList.data?.properties ?? [];
+    const newProperties = propertyList.data?.properties ?? [];
 
-  setHasMore(
-    propertyList.pagination.current_page < propertyList.pagination.last_page
-  );
+    setHasMore(
+      propertyList.pagination.current_page < propertyList.pagination.last_page
+    );
 
-  setProperties(prev =>
-    page === 1
-      ? newProperties 
-      : [...prev, ...newProperties] 
-  );
-}, [propertyList, page]);
-
+    setProperties((prev) =>
+      page === 1 ? newProperties : [...prev, ...newProperties]
+    );
+    setInitialLoadDone(true);
+  }, [propertyList, page]);
 
   return (
-    <View className="bg-white flex-1" >
+    <View className=" flex-1" style={{ backgroundColor: "#F4F0F0" }}>
       <HeaderWithBack />
-<View style={{paddingHorizontal:hs(20)}}>
-      <View className="flex-row justify-between gap-2" style={{ marginTop: vs(20),paddingBottom:vs(5) }}>
-        <View style={{ width: hs(300) }}>
-          <SerchBar
-            setAddress={setAddress}
-            setCity={setCity}
-            setLat={setLat}
-            setLng={setLng}
-            setState={setState}
-            setZip={setZip}
-            onpress={() => {}}
-            latValue={lat}
-            longValue={lng}
-            value={address.toString()}
-          />
-        </View>
+
+      <View
+        className="flex-row justify-between gap-2"
+        style={{
+          marginTop: vs(20),
+          paddingBottom: vs(5),
+          paddingHorizontal: hs(20),
+        }}
+      >
+        {!showFilter && (
+          <View style={{ width: hs(250) }}>
+            <SortDropdown
+              value={sort}
+              setValue={setSort}
+              items={sortOptions}
+              setpage={setpage}
+            />
+          </View>
+        )}
 
         <TouchableOpacity
           style={{
@@ -173,17 +217,24 @@ useEffect(() => {
         </TouchableOpacity>
       </View>
 
-      
+      <PropertyListingDesign
+        data={properties}
+        isfetching={isFetching}
+        setPage={setpage}
+        type="sale"
+        hasmore={hasMore}
+        initialLoadDone={initialLoadDone}
+      />
       {showFilter && (
         <Formik
-          initialValues={filterValues} 
+          initialValues={filterValues}
           enableReinitialize
           validationSchema={FilterSchema}
           onSubmit={(values) => {
-            setFilterValues(values); 
-            console.log(values);
-            setpage(1); 
-            setApiFilters(mapToApiFilters(values)); 
+            setFilterValues(values);
+
+            setpage(1);
+            setApiFilters(mapToApiFilters(values));
             setShowFilter(false);
           }}
         >
@@ -194,10 +245,10 @@ useEffect(() => {
             setFieldValue,
             handleSubmit,
             resetForm,
-            setFieldTouched
+            setFieldTouched,
           }) => (
             <Filter
-            setFieldTouched={setFieldTouched}
+              setFieldTouched={setFieldTouched}
               values={values}
               errors={errors}
               touched={touched}
@@ -205,12 +256,21 @@ useEffect(() => {
               handleSubmit={handleSubmit}
               resetForm={resetForm}
               setshowFilter={setShowFilter}
+              setAddress={setAddress}
+              setCity={setCity}
+              setLat={setLat}
+              setLng={setLng}
+              setState={setState}
+              setZip={setZip}
+              onpress={() => {}}
+              latValue={lat}
+              longValue={lng}
+              value={address.toString()}
+              type={params.property_for.toString()}
             />
           )}
         </Formik>
       )}
-      </View>
-      <PropertyListingDesign data={properties} isfetching={isFetching} setPage={setpage} type="sale" hasmore={hasMore}/>
     </View>
   );
 };

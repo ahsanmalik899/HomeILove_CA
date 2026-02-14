@@ -13,6 +13,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
@@ -35,6 +36,7 @@ const YourAdsPostDesign = ({
   setposts,
   type,
   hasmore,
+  initialLoadDone,
 }: postDataType) => {
   const [showImages, setShowImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -60,7 +62,7 @@ const YourAdsPostDesign = ({
             router.navigate({
               pathname: "/AddSingleView",
               params: {
-                type: type,
+                type: item.property_for,
                 id: item.post_property_id,
               },
             });
@@ -73,11 +75,11 @@ const YourAdsPostDesign = ({
                 backgroundColor:
                   item.post_type === "Trending"
                     ? Colors.light.LightGreen
-                    : "white",
+                    : Colors.light.lightGray,
                 paddingHorizontal: hs(10),
                 paddingVertical: vs(10),
                 borderRadius: ms(10),
-                marginBottom: item.post_type === "Trending" ? vs(10) : vs(0),
+                marginBottom: vs(10) ,
               }}
             >
               <Text
@@ -86,36 +88,49 @@ const YourAdsPostDesign = ({
                     item.post_type === "Trending"
                       ? Colors.light.DarkGreen
                       : "black",
-                  fontWeight: 600,
+                  fontWeight: 700,
+                  fontSize:ms(20),
+                   fontFamily: 'PopinRegular',
                 }}
               >
-                $ {item.asking_price}{" "}
-                {type === "rent" && (
-                  <Text style={{ color: Colors.light.red }}>
+                $ {formatPrice(item.asking_price)}
+                {item.property_for === "rent" && (
+                  <Text style={{ color: Colors.light.red , fontSize:ms(18), fontFamily: 'PopinRegular',}}>
                     /{item.rent_type}
                   </Text>
                 )}
               </Text>
               {item.post_type === "Trending" && (
                 <Text
-                  style={{ fontWeight: 600, color: Colors.light.DarkGreen }}
+                  style={{ fontWeight: 600, color: Colors.light.DarkGreen, fontFamily:"PopinRegular"}}
                 >
                   Trending
                 </Text>
               )}
             </View>
 
-            <Text style={{ color: "black" }}>
+            <Text style={{ color: "black",fontWeight:700,fontSize:ms(15), fontFamily: 'PopinRegular', }}>
               {item.bedrooms} bedrooms {item.property_sub_type} for{" "}
               {item.property_for}
             </Text>
-            <Text style={{ color: Colors.light.textGray, marginTop: vs(5) }}>
+            <Text style={{ color: Colors.light.textGray, marginTop: vs(5), fontFamily: 'PopinRegular', }}>
               {item.address}
             </Text>
+             <View
+                                style={{
+                                  height: vs(1),
+                                  marginTop: vs(5),
+                                  
+                                  backgroundColor: Colors.light.textGray,
+                                  opacity: 0.2,
+                                }}
+                              />
             <View>
+              
+              <View style={{marginTop:vs(5)}}>
              {item.post_type === "Trending" && facts && (
   facts
-    .split(",")
+    .split(",",4)
     .filter(Boolean)
     .map((fact, index) => (
       <View
@@ -135,9 +150,9 @@ const YourAdsPostDesign = ({
           <Text
             style={{
               color: Colors.light.DarkGreen,
-              fontSize: ms(15),
               fontWeight: "500",
               width: hs(250),
+               fontFamily: 'PopinRegular',
             }}
           >
             {fact.trim()}
@@ -145,7 +160,7 @@ const YourAdsPostDesign = ({
         </View>
       </View>
     ))
-)}
+)}</View>
 
               <Text style={styles.description}>
                 {expanded
@@ -177,8 +192,8 @@ const YourAdsPostDesign = ({
                       : NoImage
                   }
                   style={{
-                    height: vs(180),
-                    width: hs(320),
+                    height: vs(200),
+                    width: hs(350),
                     borderRadius: ms(10),
                     resizeMode: "cover",
                     alignSelf: "center",
@@ -198,7 +213,7 @@ const YourAdsPostDesign = ({
                 >
                   <View className="flex-row items-center">
                     <Camera />
-                    <Text style={{ color: "white", fontWeight: 600 }}>
+                    <Text style={{ color: "white", fontWeight: 600, fontFamily: 'PopinRegular', }}>
                       {" "}
                       {item.images ? item.images.length : 0}
                     </Text>
@@ -212,6 +227,7 @@ const YourAdsPostDesign = ({
                         color: "white",
                         fontWeight: 600,
                         borderRadius: ms(10),
+                         fontFamily: 'PopinRegular',
                       }}
                     >
                       {item.saleprice_type}
@@ -237,6 +253,7 @@ const YourAdsPostDesign = ({
                         color: "white",
                         fontWeight: 600,
                         borderRadius: ms(10),
+                         fontFamily: 'PopinRegular',
                       }}
                     >
                       {item.property_condition}
@@ -284,7 +301,7 @@ const YourAdsPostDesign = ({
                   elevation: 5,
                   borderRadius: 8,
                   paddingRight: hs(20),
-                  paddingVertical: vs(5),
+                  paddingVertical: vs(10),
                   paddingHorizontal: vs(15),
                   marginTop: vs(10),
                 }}
@@ -292,15 +309,15 @@ const YourAdsPostDesign = ({
                 <>
                   <View className="flex-row items-center">
                     <Bed />
-                    <Text style={{ marginLeft: vs(5) }}>{item.bedrooms}</Text>
+                    <Text style={{ marginLeft: vs(5) , fontFamily: 'PopinRegular',}}>{item.bedrooms}</Text>
                   </View>
                   <View className="flex-row items-center">
                     <Shower />
-                    <Text style={{ marginLeft: vs(5) }}>{item.bathrooms}</Text>
+                    <Text style={{ marginLeft: vs(5) , fontFamily: 'PopinRegular',}}>{item.bathrooms}</Text>
                   </View>
                   <View className="flex-row items-center">
                     <Area />
-                    <Text style={{ marginLeft: vs(5) }}>
+                    <Text style={{ marginLeft: vs(5), fontFamily: 'PopinRegular', }}>
                       {item.land_area} sqft
                     </Text>
                   </View>
@@ -310,13 +327,13 @@ const YourAdsPostDesign = ({
               <View
                 className="flex-row justify-between"
                 style={{
-                  backgroundColor: Colors.light.cardgreenLight,
+                  backgroundColor: Colors.light.lightGray,
                   borderRadius: 8,
                   paddingRight: hs(20),
                   paddingVertical: vs(5),
                   paddingHorizontal: hs(10),
                   marginTop: vs(8),
-                  marginBottom: vs(10),
+                 
                 }}
               >
                 <TouchableOpacity>
@@ -325,11 +342,15 @@ const YourAdsPostDesign = ({
                 <TouchableOpacity>
                   <Call />
                 </TouchableOpacity>
+<CircleImage
+  source={
+    item.posted_by?.logo
+      ? { uri: ImageFormater(item.posted_by.logo) }
+      : null
+  }
+  Size={40}
+/>
 
-                <CircleImage
-                  source={{ uri: ImageFormater(item.posted_by.logo) }}
-                  Size={35}
-                />
               </View>
             </View>
           </View>
@@ -339,7 +360,7 @@ const YourAdsPostDesign = ({
   };
   return (
     <View style={{ flex: 1, marginBottom: insets.bottom }}>
-      {!data || (isfetching && data.length === 0) ? (
+     {!initialLoadDone ? (
         <ActivityIndicator size="large" style={{ marginTop: 20 }} />
       ) : data.length > 0 ? (
         <LegendList
@@ -365,7 +386,7 @@ const YourAdsPostDesign = ({
           }
         />
       ) : (
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
+        <Text style={{ textAlign: "center", marginTop: 20, fontFamily: 'PopinRegular', }}>
           No Data Found
         </Text>
       )}
@@ -404,10 +425,13 @@ const styles = StyleSheet.create({
   description: {
     marginVertical: vs(10),
     fontWeight: 500,
+    color:Colors.light.textGray,
+    fontFamily: 'PopinRegular',
   },
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
+     fontFamily: 'PopinRegular',
   },
    card2: {
     backgroundColor: "white",

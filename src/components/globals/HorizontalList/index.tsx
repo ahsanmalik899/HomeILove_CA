@@ -4,11 +4,11 @@ import Share from "@assets/icons/share.svg";
 import ThreeDots from "@assets/icons/threedots.svg";
 import image from "@assets/test/test.jpeg";
 import { LegendList } from '@legendapp/list';
+import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from '@utils/design/design';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import CircleImage from '../CircleImage/CircleImage';
 import CommentInput from '../CommentInput';
 import LableImage from '../LabelImage/LableImage';
@@ -99,15 +99,18 @@ const index = ({ data, isfetching }: postDataType) => {
     return (
 
         <View style={{ paddingBottom: insets.bottom }}>
-            <LegendList
-                className="flex-1 bg-red"
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.post_id}
+        {!isfetching ? (
+  <LegendList
+    data={data}
+    renderItem={renderItem}
+    keyExtractor={(item) => item.id.toString()}
+    estimatedItemSize={200}
+  />
+) : (
+  <Text style={{ textAlign: "center", marginTop: 20 }}>Loading...</Text>
+)}
 
-
-            />
-        </View>
+                </View>
     );
 }
 

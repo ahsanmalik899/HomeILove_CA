@@ -1,4 +1,7 @@
-import { useGetSinglePostQuery, useSendVisistRequestMutation } from "@/store/api/user/MainApi";
+import {
+  useGetSinglePostQuery,
+  useSendVisistRequestMutation,
+} from "@/store/api/user/MainApi";
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
 import RedHeart from "@assets/CreateProfile/heart-red.svg";
 import Camera from "@assets/Feedimg/camera.svg";
@@ -30,7 +33,14 @@ import { useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Formik } from "formik";
 import { useState } from "react";
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Yup from "yup";
@@ -40,31 +50,28 @@ const index = () => {
   const type = params.type as string;
   const id = Number(params.id);
 
-
   const formatPdfUrl = (file: string) => {
- 
-  return ImageFormater(file);
-};
+    return ImageFormater(file);
+  };
 
- console.log(type)
-const openPDF = async (url: string) => {
-  const googleViewer = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`;
-  await WebBrowser.openBrowserAsync(googleViewer, {
-    presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
-  });
-};
-
-
+  console.log(type);
+  const openPDF = async (url: string) => {
+    const googleViewer = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+      url
+    )}`;
+    await WebBrowser.openBrowserAsync(googleViewer, {
+      presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
+    });
+  };
 
   const [imageNo, setImageNo] = useState(0);
-  const [sendVisistRequies,{isLoading}]=useSendVisistRequestMutation()
+  const [sendVisistRequies, { isLoading }] = useSendVisistRequestMutation();
   const { data, isFetching } = useGetSinglePostQuery({ type, id });
   const [showImages, setShowImages] = useState(false);
   const [showFloor, setShowFloor] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const latitude = parseFloat(data?.post?.lat);
   const longitude = parseFloat(data?.post?.lng);
-
 
   const showMap = !isNaN(latitude) && !isNaN(longitude);
   const facts = data?.post?.imp_facts ?? data?.post?.facts ?? "";
@@ -112,7 +119,6 @@ const openPDF = async (url: string) => {
   ) => {
     const downPayment = (downPaymentPercent / 100) * totalValue;
     const principal = totalValue - downPayment;
-
 
     const monthlyRate = interestRate / 12 / 100;
     const months = years * 12;
@@ -687,40 +693,46 @@ const openPDF = async (url: string) => {
             </>
           )}
 
-
-{data?.brochures?.length > 0 && (
-  <>
-  <Text style={styles.heading}>Brochure</Text>
-  <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10, marginTop: 10 }}>
-    {data.brochures.map((file: string, index: number) => (
-      <TouchableOpacity
-        key={index}
-        onPress={() => openPDF(formatPdfUrl(file))}
-        style={{
-          flex: 1,
-          marginHorizontal: 5,
-          padding: 10,
-          borderRadius: 8,
-          backgroundColor: '#f2f2f2',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Ionicons
-          name="document-text-outline"
-          size={36}
-          color="#E53935"
-        />
-        <Text
-          style={{ fontSize: 12, color: '#555', marginTop: 5 }}
-          numberOfLines={1}
-        >
-          {decodeURIComponent(file)}
-        </Text>
-      </TouchableOpacity>
-    ))}
-  </View>
-   <View
+          {data?.brochures?.length > 0 && (
+            <>
+              <Text style={styles.heading}>Brochure</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 10,
+                  marginTop: 10,
+                }}
+              >
+                {data.brochures.map((file: string, index: number) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => openPDF(formatPdfUrl(file))}
+                    style={{
+                      flex: 1,
+                      marginHorizontal: 5,
+                      padding: 10,
+                      borderRadius: 8,
+                      backgroundColor: "#f2f2f2",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Ionicons
+                      name="document-text-outline"
+                      size={36}
+                      color="#E53935"
+                    />
+                    <Text
+                      style={{ fontSize: 12, color: "#555", marginTop: 5 }}
+                      numberOfLines={1}
+                    >
+                      {decodeURIComponent(file)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View
                 style={{
                   height: vs(1),
                   marginTop: vs(20),
@@ -729,13 +741,8 @@ const openPDF = async (url: string) => {
                   opacity: 0.2,
                 }}
               />
-              </>
-)}
-
-
-
-
-
+            </>
+          )}
 
           {type === "rent" && (
             <View>
@@ -1018,136 +1025,141 @@ const openPDF = async (url: string) => {
             }}
           />
           <Text style={styles.heading}>VISIT PROPERTY IN PERSON</Text>
-          {data?.post.property_visit&&data?.post.property_visit==="Yes" && (
-          <Formik
-            initialValues={{
-              visitor_email: "",
-              receiver_email: "ahsanmalik89939@gmail.com",
-              visitor_name: "",
-              visitor_contact: "",
-              visitor_message: "",
-              visit_date: "",
-              visit_time: "",
-              post_id:
-                type === "community"
-                  ? data?.post?.post_community_id
-                  : data?.post?.post_property_id,
-              type: type,
-              ad_type: "sale",
-              link: "",
-              
-            }}
-  onSubmit={async (values) => {
-  try {
-    const formData = new FormData();
+          {data?.post.property_visit && data?.post.property_visit === "Yes" && (
+            <Formik
+              initialValues={{
+                visitor_email: "",
+                receiver_email: "ahsanmalik89939@gmail.com",
+                visitor_name: "",
+                visitor_contact: "",
+                visitor_message: "",
+                visit_date: "",
+                visit_time: "",
+                post_id:
+                  type === "community"
+                    ? data?.post?.post_community_id
+                    : data?.post?.post_property_id,
+                type: type,
+                ad_type: "sale",
+                link: "",
+              }}
+              onSubmit={async (values) => {
+                try {
+                  const formData = new FormData();
 
-    Object.entries(values).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== "") {
-        formData.append(key, String(value));
-      }
-    });
+                  Object.entries(values).forEach(([key, value]) => {
+                    if (value !== null && value !== undefined && value !== "") {
+                      formData.append(key, String(value));
+                    }
+                  });
 
-    const result = await sendVisistRequies(formData).unwrap();
+                  const result = await sendVisistRequies(formData).unwrap();
 
-    console.log("Request sent successfully:", result);
-  } catch (error) {
-    console.log("Error sending request:", error);
-  }
-}}
-
-            validationSchema={visitAdSchema}
-          >
-            {({
-              handleBlur,
-              handleChange,
-              handleReset,
-              handleSubmit,
-              setFieldValue,
-              errors,
-              values,
-              touched,
-            }) => (
-              <>
-                <View style={[styles.card2, { paddingHorizontal: hs(0) }]}>
-                  <Text className="text-center font-bold">
-                    Please fill details to book in person visit to property
-                  </Text>
-                  <View style={{ paddingHorizontal: hs(15) }}>
-                    <FormikInput
-                      title="Name"
-                      placeholder="Enter name"
-                      onChangeText={handleChange("visitor_name")}
-                      onBlur={handleBlur("visitor_name")}
-                      value={values.visitor_name}
-                      touched={!!touched.visitor_name}
-                      errors={!!errors.visitor_name}
-                      required
-                      errorText={errors.visitor_name}
-                    />
-                    <FormikInput
-                      title="Email"
-                      placeholder="Please enter email"
-                      onChangeText={handleChange("visitor_email")}
-                      onBlur={handleBlur("visitor_email")}
-                      value={values.visitor_email}
-                      touched={!!touched.visitor_email}
-                      errors={!!errors.visitor_email}
-                      required
-                      errorText={errors.visitor_email}
-                    />
-                    <FormikInput
-                      title="Phone"
-                      placeholder="Please enter phone"
-                      onChangeText={handleChange("visitor_contact")}
-                      onBlur={handleBlur("visitor_contact")}
-                      value={values.visitor_contact}
-                      touched={!!touched.visitor_contact}
-                      errors={!!errors.visitor_contact}
-                      required
-                      errorText={errors.visitor_contact}
-                    />
-                    <FormikInput
-                      title="Message"
-                      placeholder="Message....."
-                      onChangeText={handleChange("visitor_message")}
-                      onBlur={handleBlur("visitor_message")}
-                      value={values.visitor_message}
-                      touched={!!touched.visitor_message}
-                      errors={!!errors.visitor_message}
-                      multiline
-                      required
-                      errorText={errors.visitor_message}
-                    />
-                    <DatePickerField
-                      errorText={errors.visit_date}
-                      name="visit_date"
-                      required
-                      value={values.visit_date}
-                      editable
-                      setValue={setFieldValue}
-                      title="Visit date"
-                      placeholder="mm/dd/yyyy"
-                      touched={!!touched}
-                      errors={!!errors}
-                    />
-                    <TimePickerField
-                      errorText={errors.visit_time}
-                      name="visit_time"
-                      required={false}
-                      value={values.visit_time}
-                      editable
-                      setValue={setFieldValue}
-                      title="Time for viewing"
-                      placeholder="dd/mm/yy"
-                      touched={!!touched}
-                      errors={!!errors}
-                    />
-                    <LargeButton handleSubmit={()=>{handleSubmit();console.log(errors)}} text="Submit" />
+                  console.log("Request sent successfully:", result);
+                } catch (error) {
+                  console.log("Error sending request:", error);
+                }
+              }}
+              validationSchema={visitAdSchema}
+            >
+              {({
+                handleBlur,
+                handleChange,
+                handleReset,
+                handleSubmit,
+                setFieldValue,
+                errors,
+                values,
+                touched,
+              }) => (
+                <>
+                  <View style={[styles.card2, { paddingHorizontal: hs(0) }]}>
+                    <Text className="text-center font-bold">
+                      Please fill details to book in person visit to property
+                    </Text>
+                    <View style={{ paddingHorizontal: hs(15) }}>
+                      <FormikInput
+                        title="Name"
+                        placeholder="Enter name"
+                        onChangeText={handleChange("visitor_name")}
+                        onBlur={handleBlur("visitor_name")}
+                        value={values.visitor_name}
+                        touched={!!touched.visitor_name}
+                        errors={!!errors.visitor_name}
+                        required
+                        errorText={errors.visitor_name}
+                      />
+                      <FormikInput
+                        title="Email"
+                        placeholder="Please enter email"
+                        onChangeText={handleChange("visitor_email")}
+                        onBlur={handleBlur("visitor_email")}
+                        value={values.visitor_email}
+                        touched={!!touched.visitor_email}
+                        errors={!!errors.visitor_email}
+                        required
+                        errorText={errors.visitor_email}
+                      />
+                      <FormikInput
+                        title="Phone"
+                        placeholder="Please enter phone"
+                        onChangeText={handleChange("visitor_contact")}
+                        onBlur={handleBlur("visitor_contact")}
+                        value={values.visitor_contact}
+                        touched={!!touched.visitor_contact}
+                        errors={!!errors.visitor_contact}
+                        required
+                        errorText={errors.visitor_contact}
+                      />
+                      <FormikInput
+                        title="Message"
+                        placeholder="Message....."
+                        onChangeText={handleChange("visitor_message")}
+                        onBlur={handleBlur("visitor_message")}
+                        value={values.visitor_message}
+                        touched={!!touched.visitor_message}
+                        errors={!!errors.visitor_message}
+                        multiline
+                        required
+                        errorText={errors.visitor_message}
+                      />
+                      <DatePickerField
+                        errorText={errors.visit_date}
+                        name="visit_date"
+                        required
+                        value={values.visit_date}
+                        editable
+                        setValue={setFieldValue}
+                        title="Visit date"
+                        placeholder="mm/dd/yyyy"
+                        touched={!!touched}
+                        errors={!!errors}
+                      />
+                      <TimePickerField
+                        errorText={errors.visit_time}
+                        name="visit_time"
+                        required={false}
+                        value={values.visit_time}
+                        editable
+                        setValue={setFieldValue}
+                        title="Time for viewing"
+                        placeholder="dd/mm/yy"
+                        touched={!!touched}
+                        errors={!!errors}
+                      />
+                      <LargeButton
+                        handleSubmit={() => {
+                          handleSubmit();
+                          console.log(errors);
+                        }}
+                        text="Submit"
+                      />
+                    </View>
                   </View>
-                </View>
-              </>
-            )}
-          </Formik>)}
+                </>
+              )}
+            </Formik>
+          )}
           <View
             style={{
               height: vs(1),
@@ -1289,9 +1301,9 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     marginTop: vs(10),
   },
-   pdf: {
-        flex:1,
-        width:Dimensions.get('window').width,
-        height:Dimensions.get('window').height,
-    }
+  pdf: {
+    flex: 1,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
 });

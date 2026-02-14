@@ -9,7 +9,10 @@ import { View } from "react-native";
 const index = () => {
   return (
     <View className="flex-1 bg-white ">
-      <HeaderWithBack title="Get Help"buttonTitile="Raise query to Local Experts for free" />
+      <HeaderWithBack title="Get Help"buttonTitile="Raise query to Local Experts for free"  onButtonPress={()=>router.navigate({
+        pathname:"/HomeValue",
+        params:{type:"get help"}
+      })}  />
       <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
         <View className="flex-row justify-between">
           <SideBarCard
@@ -18,7 +21,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/GetHelpListing",
-                params: { type: "Mortgage" },
+                params: { type: "mortgage" },
               });
             }}
             type={"Buy"}
@@ -29,7 +32,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/GetHelpListing",
-                params: { type: "Agent" },
+                params: { type: "agent" },
               });
             }}
             type={"Buy"}
@@ -42,7 +45,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/GetHelpListing",
-                params: { type: "Investor" },
+                params: { type: "investor" },
               });
             }}
             type={"Buy"}

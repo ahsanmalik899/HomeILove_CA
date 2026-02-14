@@ -34,7 +34,7 @@ const index = () => {
       <View style={{ marginTop: vs(5) }}>
         <SideBarButtons
           text="Home Value"
-          onPress={() => router.navigate("/HomeValue")}
+          onPress={() => router.navigate({pathname:"/HomeValue",params:{type:"home valuation"}})}
         />
       </View>
       <View style={{ marginTop: vs(5) }}>

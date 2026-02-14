@@ -21,7 +21,7 @@ const index = ({
   onPress,
 }:TabLikeButtonProps) => {
   return (
-    <View className=" bg-white" >
+    <View className=" bg-white flex-1" >
           {title1 &&(
             <Text style={{ fontSize: ms(14), fontWeight: 600 }}>
         {title1}

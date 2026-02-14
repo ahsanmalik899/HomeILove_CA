@@ -14,9 +14,10 @@ const index = () => {
       <HeaderWithBack
         title="Home Romance"
         buttonTitile="Raise query to Local Experts for free"
-        onButtonPress={() => {
-          router.push("/(main)/HomeRomanceQuery");
-        }}
+        onButtonPress={()=>router.navigate({
+               pathname:"/HomeValue",
+               params:{type:"maintenance"}
+             })} 
       />
       <ScrollView style={{ paddingHorizontal: hs(20), paddingTop: vs(30) }}>
         <View className="flex-row justify-between">
@@ -27,7 +28,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/HomeRomanceListing",
-                params: { type: "Electricians" },
+                params: { type: "electrician" },
               });
             }}
           />
@@ -38,7 +39,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/HomeRomanceListing",
-                params: { type: "Plumbers" },
+                params: { type: "plumber" },
               });
             }}
           />
@@ -51,7 +52,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/HomeRomanceListing",
-                params: { type: "Decors" },
+                params: { type: "decor" },
               });
             }}
           />
@@ -62,7 +63,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/HomeRomanceListing",
-                params: { type: "Painters" },
+                params: { type: "painter" },
               });
             }}
           />
@@ -76,7 +77,7 @@ const index = () => {
             onPress={() => {
               router.navigate({
                 pathname: "/(main)/HomeRomanceListing",
-                params: { type: "Builders" },
+                params: { type: "builder" },
               });
             }}
           />

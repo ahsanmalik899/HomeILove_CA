@@ -2,7 +2,7 @@ import { hs, ms, vs } from "@utils/design/design";
 import { Image, ImageSourcePropType } from "react-native";
 
 type CircleImageProps = {
-  source:  ImageSourcePropType;
+  source:  ImageSourcePropType|null|undefined;
   Size: number;
 };
 const CircleImage = ({ source, Size }: CircleImageProps) => {
@@ -16,7 +16,10 @@ const CircleImage = ({ source, Size }: CircleImageProps) => {
         resizeMode: "contain",
         backgroundColor: "black",
       }}
-      source={source}
+      source={   source
+          ? source
+          : require("@assets/icons/private-user.png") 
+      }
     />
   );
 };

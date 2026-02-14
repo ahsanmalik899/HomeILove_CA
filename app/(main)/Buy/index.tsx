@@ -9,7 +9,10 @@ import { StyleSheet, View } from "react-native";
 const index = () => {
   return (
     <View className="bg-white flex-1">
-      <HeaderWithBack title="Buy" buttonTitile="Raise query to Buy" />
+      <HeaderWithBack title="Buy" buttonTitile="Raise query to Buy" onButtonPress={()=>router.navigate({
+        pathname:"/HomeValue",
+        params:{type:"buy"}
+      })} />
       <View style={{ marginHorizontal: hs(20), marginTop: vs(30) }}>
         <View className="flex-row justify-between">
           <SideBarCard

@@ -3,7 +3,11 @@ import { Text, View } from "react-native";
 import WebView from "react-native-webview";
 import YoutubePlayer from "react-native-youtube-iframe";
 
-const VideoSection = ({ url }: { url: string }) => {
+const VideoSection = ({ url }: { url?: string | null }) => {
+  if (!url) {
+    return <Text>No video available</Text>; // fallback for undefined/null
+  }
+
   const ytRegex =
     /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([a-zA-Z0-9_-]{11})/;
   const dmRegex = /(?:dailymotion\.com\/video|dai\.ly)\/([a-zA-Z0-9]+)/;
@@ -15,8 +19,13 @@ const VideoSection = ({ url }: { url: string }) => {
 
   if (ytMatch) {
     return (
-      <View style={{ width: "100%", height: vs(300) }}>
-        <YoutubePlayer height={300} width={"100%"} play={false} videoId={ytMatch[1]} />
+      <View style={{ width: "100%" }}>
+        <YoutubePlayer
+          height={210}
+          width={"100%"}
+          play={false}
+          videoId={ytMatch[1]}
+        />
       </View>
     );
   }

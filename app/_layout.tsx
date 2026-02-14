@@ -14,7 +14,6 @@ _TextInput.defaultProps.allowFontScaling = false;
 _Text.defaultProps.maxFontSizeMultiplier = 1;
 _TextInput.defaultProps.maxFontSizeMultiplier = 1;
 // eslint-disable-next-line import/extensions
-import SpaceMonoFont from '@assets/fonts/SpaceMono-Regular.ttf';
 import store from '@store/index';
 import { toastConfig } from '@utils/helpers/toast';
 import { useFonts } from 'expo-font';
@@ -38,7 +37,8 @@ const persistor = persistStore(store);
 
 const ReduxWrapper = () => {
   const [loaded, error] = useFonts({
-    SpaceMono: SpaceMonoFont,
+    SpaceMono:require('@assets/fonts/SpaceMono-Regular.ttf'),
+    PopinRegular:require("@assets/fonts/Poppins-Regular.ttf"),
   });
 
   useEffect(() => {

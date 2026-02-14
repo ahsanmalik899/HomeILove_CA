@@ -88,7 +88,7 @@ const index = () => {
 
     community_details: Yup.string().nullable(),
 
-    developer_name: Yup.string().nullable(),
+    developer_name: Yup.string().required("Developer name is required"),
 
     project_logo: Yup.mixed().nullable(),
 
@@ -1054,7 +1054,7 @@ const index = () => {
                     value={values.developer_name}
                     touched={!!touched.developer_name}
                     errors={!!errors.developer_name}
-                    required={false}
+                    required
                     errorText={errors.developer_name}
                   />
                   <View className="flex-row justify-between gap-3 mt-5">
