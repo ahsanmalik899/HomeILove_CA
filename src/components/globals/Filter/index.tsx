@@ -122,6 +122,7 @@ const index = ({
           fontFamily: "PopinRegula",
           fontSize: ms(15),
           marginBottom: vs(20),
+          
         }}
       >
         Filter
@@ -225,6 +226,7 @@ const index = ({
                     color: values.propertysubType?.includes(option)
                       ? "white"
                       : "black",
+                      fontFamily: "PopinRegula",
                   }}
                 >
                   {option}
@@ -252,6 +254,7 @@ const index = ({
                   fontFamily: "PopinRegula",
                   fontSize: ms(15),
                   marginVertical: vs(10),
+                  
                 }}
               >
                 Condition
@@ -285,6 +288,7 @@ const index = ({
                       color: values.propertyCondition?.includes(item.value)
                         ? "white"
                         : "black",
+                        fontFamily: "PopinRegula",
                     }}
                   >
                     {item.label}
@@ -309,6 +313,7 @@ const index = ({
                     fontFamily: "PopinRegula",
                     fontSize: ms(15),
                     marginVertical: vs(10),
+                    
                   }}
                 >
                   Purposeful property
@@ -345,6 +350,7 @@ const index = ({
                             color: values.purposeful_type?.includes(option)
                               ? "white"
                               : "black",
+                              fontFamily: "PopinRegula",
                           }}
                         >
                           {option === "Commonhold"
@@ -402,7 +408,7 @@ const index = ({
                         style={{
                           color:
                             values.pet_allowers === option ? "white" : "black",
-                          
+                          fontFamily: "PopinRegula",
                         }}
                       >
                         {option}
@@ -467,7 +473,7 @@ const index = ({
                             (option === "Any Date" ? null : option)
                               ? "white"
                               : "black",
-                       
+                       fontFamily: "PopinRegula",
                         }}
                       >
                         {option}
@@ -539,6 +545,7 @@ const index = ({
                           color: values.furnishing_type?.includes(option)
                             ? "white"
                             : "black",
+                            fontFamily: "PopinRegula",
                         }}
                       >
                         {option}
@@ -718,6 +725,7 @@ const index = ({
                   fontFamily: "PopinRegula",
                   fontSize: ms(15),
                   marginVertical: vs(10),
+
                 }}
               >
                 Bathrooms
@@ -818,6 +826,7 @@ const index = ({
                       color: values.tenure?.includes(option)
                         ? "white"
                         : "black",
+                        fontFamily: "PopinRegula",
                     }}
                   >
                     {option === "Commonhold" ? "Under Construction" : option}
@@ -856,6 +865,7 @@ const index = ({
                       color: values.tinency_tenure?.includes(option)
                         ? "white"
                         : "black",
+                        fontFamily: "PopinRegula",
                     }}
                   >
                     {option}
@@ -960,16 +970,19 @@ const styles = StyleSheet.create({
     fontSize: ms(28),
     fontWeight: "600",
     color: "white",
+    fontFamily: "PopinRegula",
   },
 
   counterValue: {
     width: hs(80),
     alignItems: "center",
     justifyContent: "center",
+    fontFamily: "PopinRegula",
   },
 
   counterNumber: {
     fontSize: ms(24),
     fontWeight: "700",
+    fontFamily: "PopinRegula",
   },
 });

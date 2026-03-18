@@ -1,4 +1,5 @@
 import {
+  useDeleterecivedInquiriesMutation,
   useDeletSendedInquiryMutation,
   useGetRecivedInquieryQuery,
   useGetsendedInquieryQuery,
@@ -32,8 +33,15 @@ const index = () => {
   const [ids, setIds] = useState<number[]>([]);
   const [recivesIds, setReciveIds] = useState<number[]>([]);
   const [deletsended, { isLoading }] = useDeletSendedInquiryMutation();
+  const [deletrecived, { isLoading: loadingRecivedDelet }] =
+    useDeleterecivedInquiriesMutation();
   const [selectAll, setSellectall] = useState(false);
   const [selectAllcomp2, setSellectallcomp2] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteType, setDeleteType] = useState<"sent" | "received" | null>(
+    null
+  );
+
   const handleSelect = (id: number | string) => {
     const numId = Number(id);
     setIds((prev) => {
@@ -58,15 +66,57 @@ const index = () => {
   const [recivedpage, setrecivedPage] = useState(1);
   const [sended, setsended] = useState([]);
   const [recived, setrecived] = useState([]);
-  const { isFetching, data } = useGetsendedInquieryQuery({
+  const { isFetching, data,refetch:refetchSended } = useGetsendedInquieryQuery({
     id: user.id,
     page: sendpage,
   });
-  const { isFetching: recivedLoading, data: recivedData } =
+    const confirmDelete = async () => {
+      try {
+        if (deleteType === "sent") {
+          const formData = new FormData();
+          formData.append("ids", ids.join(","));
+
+          const result = await deletsended(formData).unwrap();
+          renderToastSuccess("Deleted successfully!");
+
+          setsended((prev) =>
+            prev.filter((item) => !ids.includes(Number(item.inquiry_id)))
+          );
+
+          setIds([]);
+          setSellectall(false);
+        }
+
+        if (deleteType === "received") {
+          const formData = new FormData();
+          formData.append("ids", recivesIds.join(","));
+          formData.append("user_id", user.id.toString());
+
+          const result = await deletrecived(formData).unwrap();
+          renderToastSuccess("Deleted successfully!");
+
+          setrecived((prev) =>
+            prev.filter((item) => !recivesIds.includes(Number(item.inquiry_id)))
+          );
+
+          setReciveIds([]);
+          setSellectallcomp2(false);
+        }
+
+        setShowConfirm(false);
+      } catch (err) {
+        console.log("Delete Error:", err);
+        renderToastError("Failed to delete inquiries");
+        setShowConfirm(false);
+      }
+    };
+  const { isFetching: recivedLoading, data: recivedData, refetch: refetchRecived } =
     useGetRecivedInquieryQuery({ id: user.id, page: recivedpage });
   const renderItem = ({ item }) => {
     const profileCount = item.profiles?.length || 0;
     const [showprofile, setShowprofile] = useState(false);
+  
+
     return (
       <TouchableOpacity
         style={[
@@ -99,7 +149,6 @@ const index = () => {
           </Text>
         </View>
 
-        {/* Info Row */}
         {(item.property_type || item.min_price || item.max_price) && (
           <View style={styles.infoRow}>
             {item.property_type && (
@@ -152,24 +201,23 @@ const index = () => {
               item.users_id?.toString() || Math.random().toString()
             }
             renderItem={({ item: profile }) => (
-              <TouchableOpacity
-                style={[
-                  styles.card,
-                  {
-                    backgroundColor: "white",
-                    borderColor: "white",
-                    elevation: 3,
-                  },
-                ]}
-              >
-                <View className="flex-row gap-3">
+              <TouchableOpacity style={styles.card}>
+                <View style={styles.topRow}>
                   <CircleImage
-                    Size={40}
+                    Size={45}
                     source={{ uri: ImageFormater(profile?.logo) }}
                   />
-                  <Text style={styles.address}>{profile?.business_name}</Text>
+
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.name}>{profile?.business_name}</Text>
+                    <Text style={styles.address}>{profile?.address}</Text>
+                  </View>
                 </View>
-                <Text style={styles.address}>{profile?.address}</Text>
+                {profile?.inquiry_closed && (
+                  <View style={styles.closedBadge}>
+                    <Text style={styles.closedText}>Inquiry Closed</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             )}
           />
@@ -279,24 +327,10 @@ const index = () => {
           <Text>Select All</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={async () => {
-            const formData = new FormData();
-            formData.append("ids", ids.join(",")); // "1,2,3"
-            if (ids.length)
-              try {
-                const result = await deletsended(formData).unwrap();
-
-                renderToastSuccess("Deleted successfully!");
-                console.log("delete success", result);
-                setsended((prev) =>
-                  prev.filter((item) => !ids.includes(Number(item.inquiry_id)))
-                );
-                setIds([]);
-                setSellectall(false);
-              } catch (err) {
-                console.log("Delete Error:", err);
-                renderToastError("Failed to delete inquiries");
-              }
+          onPress={() => {
+            if (!ids.length) return;
+            setDeleteType("sent");
+            setShowConfirm(true);
           }}
         >
           <Delete />
@@ -326,7 +360,10 @@ const index = () => {
             refreshControl={
               <RefreshControl
                 refreshing={isFetching}
-                onRefresh={() => setsendPage(1)}
+                onRefresh={()=>{
+   setsendPage(1);
+   refetchSended();
+}} 
               />
             }
           />
@@ -336,8 +373,9 @@ const index = () => {
   );
   const componenet2 = (
     <View style={{ marginTop: vs(10), flex: 1 }}>
-      <View><Text>Your inquiries</Text></View>
-      
+      <View>
+        <Text>Your inquiries</Text>
+      </View>
 
       {!recivedLoading && recived?.length === 0 ? (
         <View style={{ alignItems: "center" }}>
@@ -384,26 +422,10 @@ const index = () => {
               <Text>Select All</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={async () => {
-                const formData = new FormData();
-                formData.append("ids", recivesIds.join(",")); // "1,2,3"
-                if (recivesIds.length)
-                  try {
-                    const result = await deletsended(formData).unwrap();
-
-                    renderToastSuccess("Deleted successfully!");
-                    console.log("delete success", result);
-                    setrecived((prev) =>
-                      prev.filter(
-                        (item) => !recivesIds.includes(Number(item.inquiry_id))
-                      )
-                    );
-                    setReciveIds([]);
-                    setSellectallcomp2(false);
-                  } catch (err) {
-                    console.log("Delete Error:", err);
-                    renderToastError("Failed to delete inquiries");
-                  }
+              onPress={() => {
+                if (!recivesIds.length) return;
+                setDeleteType("received");
+                setShowConfirm(true);
               }}
             >
               <Delete />
@@ -424,8 +446,11 @@ const index = () => {
             }
             refreshControl={
               <RefreshControl
-                refreshing={isFetching}
-                onRefresh={() => setrecivedPage(1)}
+              refreshing={recivedLoading}
+               onRefresh={()=>{
+   setrecivedPage(1);
+   refetchRecived();
+}}
               />
             }
           />
@@ -434,9 +459,9 @@ const index = () => {
     </View>
   );
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white" style={{backgroundColor:"#F4F0F0"}}>
       <HeaderWithBack title="Inquiries" />
-      <View className="flex-1" style={{ marginHorizontal: hs(20) }}>
+      <View className="flex-1" style={{ marginHorizontal: hs(10) }}>
         <TablikeButton
           btn1value="Sent"
           btn2value="Received"
@@ -446,9 +471,60 @@ const index = () => {
           value={value}
           Componet1={componenet1}
           Componet2={componenet2}
+          backgroundColor="#F4F0F0"
         />
       </View>
       <Loading isLoading={isLoading} text="Deleting..." />
+      <View
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }}
+      >
+       {showConfirm && (
+  <View
+    style={{
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      backgroundColor: "rgba(0,0,0,0.4)",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <View
+      style={{
+        width: "80%",
+        backgroundColor: "white",
+        padding: 20,
+        borderRadius: 12,
+      }}
+    >
+      <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 20 }}>
+        Are you sure you want to delete{" "}
+        {deleteType === "sent" ? ids.length : recivesIds.length} inquiries?
+      </Text>
+
+      <View style={{ flexDirection: "row",justifyContent:"space-between" }}>
+        <TouchableOpacity onPress={() => setShowConfirm(false)}>
+          <Text style={{ color: "gray", fontWeight: "600" }}>Cancel</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={confirmDelete}>
+          <Text style={{ color: Colors.light.red, fontWeight: "700" }}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+)}
+
+      </View>
+      <Loading isLoading={loadingRecivedDelet||isLoading} text="Deleting ..."/>
     </View>
   );
 };
@@ -475,12 +551,14 @@ const styles = StyleSheet.create({
     fontSize: ms(16),
     fontWeight: "500",
     color: Colors.light.red,
+    fontFamily: "PopinRegula",
   },
 
   city: {
     fontSize: ms(12),
     color: "#666",
     marginTop: 2,
+    fontFamily: "PopinRegula",
   },
   card: {
     marginVertical: 8,
@@ -501,24 +579,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     color: Colors.light.red,
+    fontFamily: "PopinRegula",
   },
 
   subTitle: {
     fontSize: 14,
     fontWeight: "500",
     color: Colors.light.DarkGreen,
+    fontFamily: "PopinRegula",
   },
 
   address: {
     fontSize: 13,
     color: "#777",
     marginTop: 3,
+    fontFamily: "PopinRegula",
   },
 
   date: {
     fontSize: 12,
     color: "#999",
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
 
   infoRow: {
@@ -539,6 +621,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "white",
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
 
   message: {
@@ -546,6 +629,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: "black",
+    fontFamily: "PopinRegula",
   },
   senderBox: {
     flexDirection: "row",
@@ -561,11 +645,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: Colors.light.red,
+    fontFamily: "PopinRegula",
   },
 
   senderInfo: {
     fontSize: 12,
     color: "#666",
     marginTop: 2,
+    fontFamily: "PopinRegula",
+  },
+  closedBadge: {
+    marginTop: 10,
+    alignSelf: "flex-start",
+    backgroundColor: "#ffe5e5",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+
+  closedText: {
+    color: Colors.light.red,
+    fontSize: 12,
+    fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
 });

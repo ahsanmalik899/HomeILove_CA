@@ -20,6 +20,7 @@ const Account = () => {
             color: Colors.light.DarkGreen,
             fontWeight: "600",
             fontSize: ms(16),
+            fontFamily: "PopinRegula",
           }}
         >
           {user.name}

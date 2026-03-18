@@ -30,10 +30,10 @@ const index = () => {
           <HeaderWithBack />
           <View style={{ marginHorizontal: hs(20) }}>
             <Text style={styles.mainHeading}>
-              Keep<Text style={{ color: Colors.light.red }}> LIGHTENING </Text>
+              Keep<Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> LIGHTENING </Text>
               your home
             </Text>
-            <Text>
+            <Text style={{fontFamily: "PopinRegula",}}>
               Keep maintaining your home electrifying equipment with our expert
               electricians.Simply search best & economical electricians around
               you.
@@ -94,7 +94,7 @@ const index = () => {
                       />
                       <View className="flex-row justify-between items-center mt-3">
                         <View style={styles.line} />
-                        <Text>OR</Text>
+                        <Text style={{fontFamily:"PopinRegula"}}>OR</Text>
                         <View style={styles.line} />
                       </View>
                       <SearchProfile
@@ -111,7 +111,7 @@ const index = () => {
          
             <Text style={styles.mainHeading}>
               Leading 
-              <Text style={{ color: Colors.light.red }}> ELECTRICIANS</Text>
+              <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}> ELECTRICIANS</Text>
             </Text>
               <LeadingList data={profileList?.data} isFetching={isFetching} />
           </View>
@@ -126,10 +126,10 @@ const index = () => {
           <HeaderWithBack />
           <View style={{ marginHorizontal: hs(20) }}>
             <Text style={styles.mainHeading}>
-              Fix home to<Text style={{ color: Colors.light.red }}> LIVE </Text>
+              Fix home to<Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> LIVE </Text>
               with comfort
             </Text>
-            <Text>
+            <Text style={{fontFamily: "PopinRegula",}}>
               Keep maintaining your home with our expert plumbers.Simply search
               local plumbers around you.
             </Text>
@@ -187,7 +187,7 @@ const index = () => {
                       />
                       <View className="flex-row justify-between items-center mt-3">
                         <View style={styles.line} />
-                        <Text>OR</Text>
+                        <Text style={{fontFamily: "PopinRegula",}}>OR</Text>
                         <View style={styles.line} />
                       </View>
                       <SearchProfile
@@ -203,7 +203,7 @@ const index = () => {
                       />
                          <Text style={styles.mainHeading}>
               Leading 
-              <Text style={{ color: Colors.light.red }}> PLUMBERS</Text>
+              <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> PLUMBERS</Text>
             </Text>
              <LeadingList data={profileList?.data} isFetching={isFetching} />
           </View>
@@ -222,7 +222,7 @@ const index = () => {
               Home at<Text style={{ color: Colors.light.red }}> GLANCE </Text>
               with love
             </Text>
-            <Text>
+            <Text style={{fontFamily: "PopinRegula",}}>
               Re-invent your home with our expert interior decors. Simply search
               local home stagers around you.
             </Text>
@@ -282,7 +282,7 @@ const index = () => {
                       />
                       <View className="flex-row justify-between items-center mt-3">
                         <View style={styles.line} />
-                        <Text>OR</Text>
+                        <Text style={{fontFamily: "PopinRegula",}}>OR</Text>
                         <View style={styles.line} />
                       </View>
                       <SearchProfile
@@ -298,7 +298,7 @@ const index = () => {
                       />
                          <Text style={styles.mainHeading}>
               Leading 
-              <Text style={{ color: Colors.light.red }}> DECORS</Text>
+              <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> DECORS</Text>
             </Text>
                <LeadingList data={profileList?.data} isFetching={isFetching} />
           </View>
@@ -313,16 +313,16 @@ const index = () => {
           <HeaderWithBack />
           <View style={{ marginHorizontal: hs(20) }}>
             <Text style={styles.mainHeading}>
-              Give new<Text style={{ color: Colors.light.red }}> LOOKS </Text>
+              Give new<Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> LOOKS </Text>
               to your home
             </Text>
-            <Text>
+            <Text style={{fontFamily: "PopinRegula",}}>
               Give new look to your home with our expert painters. Simply search
               local painters around you.
             </Text>
             <Text style={styles.subHeading}>
               Search experienced{" "}
-              <Text style={{ color: Colors.light.red }}>Painters</Text>
+              <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>Painters</Text>
             </Text>
            
              <SerchBar
@@ -377,7 +377,7 @@ const index = () => {
                       />
                       <View className="flex-row justify-between items-center mt-3">
                         <View style={styles.line} />
-                        <Text>OR</Text>
+                        <Text style={{fontFamily: "PopinRegula",}}>OR</Text>
                         <View style={styles.line} />
                       </View>
                       <SearchProfile
@@ -393,7 +393,7 @@ const index = () => {
                       />
                          <Text style={styles.mainHeading}>
               Leading 
-              <Text style={{ color: Colors.light.red }}> PAINTERS</Text>
+              <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> PAINTERS</Text>
             </Text>
               <LeadingList data={profileList?.data} isFetching={isFetching} />
           </View>
@@ -408,17 +408,17 @@ const index = () => {
           <HeaderWithBack />
           <View style={{ marginHorizontal: hs(20) }}>
             <Text style={styles.mainHeading}>
-              <Text style={{ color: Colors.light.red }}>BUILD</Text>or
-              <Text style={{ color: Colors.light.red }}> RE-BUILD </Text>
+              <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>BUILD</Text>or
+              <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> RE-BUILD </Text>
               your home
             </Text>
-            <Text>
+            <Text style={{fontFamily: "PopinRegula",}}>
               Give structural change or build your home with our leading expert
               builders. Simply search local home builders around you.
             </Text>
             <Text style={styles.subHeading}>
               Search experienced{" "}
-              <Text style={{ color: Colors.light.red }}>Home Builders</Text>
+              <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>Home Builders</Text>
             </Text>
            
              <SerchBar
@@ -473,7 +473,7 @@ const index = () => {
                       />
                       <View className="flex-row justify-between items-center mt-3">
                         <View style={styles.line} />
-                        <Text>OR</Text>
+                        <Text style={{fontFamily: "PopinRegula",}}>OR</Text>
                         <View style={styles.line} />
                       </View>
                       <SearchProfile
@@ -489,7 +489,7 @@ const index = () => {
                       />
                          <Text style={styles.mainHeading}>
               Leading 
-              <Text style={{ color: Colors.light.red }}> BUILDERS</Text>
+              <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> BUILDERS</Text>
             </Text>
                <LeadingList data={profileList?.data} isFetching={isFetching} />
           </View>
@@ -507,11 +507,13 @@ const styles = StyleSheet.create({
     marginTop: vs(20),
     fontSize: ms(20),
     fontWeight: 500,
+    fontFamily: "PopinRegula",
   },
   subHeading: {
     marginTop: vs(10),
     fontSize: ms(20),
     fontWeight: 500,
+    fontFamily: "PopinRegula",
   },
    line: {
     flex: 1,

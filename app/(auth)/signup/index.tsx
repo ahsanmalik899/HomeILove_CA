@@ -335,11 +335,13 @@ const styles = StyleSheet.create({
   loginTextBlack: {
     fontSize: ms(14),
     color: "#666",
+        fontFamily: "PopinRegula",
   },
   loginTextGreen: {
     fontSize: ms(14),
     color: "#4A90A4",
     fontWeight: "600",
+        fontFamily: "PopinRegula",
   },
   passwordContainer: {
     flexDirection: "row",
@@ -356,6 +358,7 @@ const styles = StyleSheet.create({
     height: vs(48),
     fontSize: ms(14),
     color: "#333",
+        fontFamily: "PopinRegula",
   },
   logoContainer: {
     alignItems: "center",
@@ -368,6 +371,7 @@ const styles = StyleSheet.create({
     fontWeight: 400,
     marginTop: vs(50),
     color: "black",
+        fontFamily: "PopinRegula",
   },
   subtitle: {
     fontSize: ms(15),
@@ -376,11 +380,13 @@ const styles = StyleSheet.create({
     marginTop: vs(10),
     marginBottom: vs(20),
     lineHeight: vs(20),
+        fontFamily: "PopinRegula",
   },
   label: {
     fontSize: ms(14),
     color: "#333",
     fontWeight: "500",
+        fontFamily: "PopinRegula",
   },
   input: {
     height: vs(48),
@@ -392,9 +398,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     fontSize: ms(14),
     color: "#333",
+        fontFamily: "PopinRegula",
   },
   textview: {
     marginVertical: "auto",
+        fontFamily: "PopinRegula",
   },
   container: {
     padding: 20,
@@ -412,6 +420,7 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     marginBottom: 5,
+        fontFamily: "PopinRegula",
   },
   button: {
     backgroundColor: "#D32F2F",
@@ -423,6 +432,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "600",
+        fontFamily: "PopinRegula",
   },
   uploadbutton: {
     backgroundColor: Colors.light.red,
@@ -437,5 +447,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: ms(16),
     fontWeight: "600",
+        fontFamily: "PopinRegula",
   },
 });

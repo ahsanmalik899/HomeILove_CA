@@ -1,4 +1,6 @@
 /* eslint-disable import/order */
+import { useSaveNotificationTokenMutation } from '@/store/api/user/MainApi';
+import { registerForPushNotificationsAsync } from '@/store/Notification/usePushNotification';
 import { Onboarding } from '@/store/slices/selector/OnBoarding';
 import { userdata } from '@/store/slices/selector/user';
 import Logo from '@assets/splash/logo.svg';
@@ -6,6 +8,7 @@ import splashbg from '@assets/splash/splashbackground.png';
 import Colors from '@src/constants/Colors';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { hs, vs } from '@utils/design/design';
+import * as Notifications from "expo-notifications";
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Dimensions, ImageBackground, StyleSheet } from 'react-native';
@@ -184,6 +187,55 @@ const Index = () => {
       ],
     };
   });
+
+  const [saveUserToken] = useSaveNotificationTokenMutation();
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const setupPush = async () => {
+      try {
+        const token = await registerForPushNotificationsAsync();
+       console.log(token)
+        if (token) {
+          await saveUserToken({
+            user_id: user.id,
+            expo_token: token,
+          }).unwrap();
+        }
+
+      } catch (e) {
+        console.log("Push setup error:", e);
+      }
+    };
+
+    setupPush();
+
+  }, [user?.id]);
+  useEffect(() => {
+
+    // ✅ When notification is clicked
+    const subscription =
+      Notifications.addNotificationResponseReceivedListener(
+        (response) => {
+
+          const data =
+            response.notification.request.content.data;
+
+          console.log("Notification Clicked:", data);
+
+          if (data) {
+              setTimeout(() => {
+      router.replace('/(auth)/CreateNewpass');
+    }, 800); // IMPORTANT
+          }
+        }
+      );
+
+    return () => subscription.remove();
+
+  }, []);
+
   return (
     <ImageBackground
       className="flex-1 items-center justify-center"

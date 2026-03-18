@@ -1,7 +1,7 @@
+import { useDeletePostMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
 import Camera from "@assets/Feedimg/camera.svg";
-import UnSelecteHeart from "@assets/Feedimg/unselected_heart.svg";
 import Area from "@assets/icons/MypostListing/area.svg";
 import Bed from "@assets/icons/MypostListing/bed.svg";
 import Delet from "@assets/icons/MypostListing/delet.svg";
@@ -18,7 +18,9 @@ import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
@@ -29,27 +31,50 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
 import LargeButton from "../LaregeButton";
+import Loading from "../Loading";
 import { postDataType } from "./type";
 const YourAdsPostDesign = ({
   data,
   setPage,
   isfetching,
-  setposts,
   type,
   hasmore,
+  refetch,
+  setpost,
+  initialLoadDone,
 }: postDataType) => {
   const [showImages, setShowImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteType, setDeleteType] = useState("");
+  const [selectedPost, setSelectedPost] = useState(null);
   const user = useAppSelector(userdata);
   const listRef = useRef<any>(null);
-
-
+  const [deletePost, { isLoading }] = useDeletePostMutation();
   const insets = useSafeAreaInsets();
   const [scrollable, setscrollable] = useState(true);
+  const handleDelete = async (post, type, postType) => {
+    try {
+      await deletePost({
+        post_id: post.post_property_id || post.post_community_id,
+        type: postType,
+        delete_type: type,
+      });
+
+      refetch();
+      setpost((prev) =>
+        prev.filter(
+          (item) =>
+            (item.post_property_id || item.post_community_id) !==
+            (post.post_property_id || post.post_community_id)
+        )
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  };
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
-
 
     return (
       <>
@@ -71,17 +96,30 @@ const YourAdsPostDesign = ({
             <View className="flex-row justify-between items-center">
               {type === "community" ? (
                 <Text
-                  style={{ color: Colors.light.DarkGreen, fontWeight: 600 }}
+                  style={{
+                    color: Colors.light.DarkGreen,
+                    fontWeight: 600,
+                    fontFamily: "PopinRegula",
+                  }}
                 >
                   From $ {item.price1}
                 </Text>
               ) : (
                 <Text
-                  style={{ color: Colors.light.DarkGreen, fontWeight: 600 }}
+                  style={{
+                    color: Colors.light.DarkGreen,
+                    fontWeight: 600,
+                    fontFamily: "PopinRegula",
+                  }}
                 >
                   $ {item.asking_price}{" "}
                   {type === "rent" && (
-                    <Text style={{ color: Colors.light.red }}>
+                    <Text
+                      style={{
+                        color: Colors.light.red,
+                        fontFamily: "PopinRegula",
+                      }}
+                    >
                       /{item.rent_type}
                     </Text>
                   )}
@@ -101,18 +139,31 @@ const YourAdsPostDesign = ({
                   }}
                   onPress={() => {}}
                 >
-                  <Text className=" items-center text-white text-center">
+                  <Text
+                    className=" items-center text-white text-center"
+                    style={{ fontFamily: "PopinRegula" }}
+                  >
                     {type === "community" ? item.post_status : item.status}
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
             {type === "community" ? (
-              <Text style={{ color: Colors.light.textGray }}>
+              <Text
+                style={{
+                  color: Colors.light.textGray,
+                  fontFamily: "PopinRegula",
+                }}
+              >
                 {item.community_title}
               </Text>
             ) : (
-              <Text style={{ color: Colors.light.textGray }}>
+              <Text
+                style={{
+                  color: Colors.light.textGray,
+                  fontFamily: "PopinRegula",
+                }}
+              >
                 {item.bedrooms} bedrooms {item.property_sub_type} for{" "}
                 {item.property_for}
               </Text>
@@ -129,7 +180,7 @@ const YourAdsPostDesign = ({
                   : item.property_details?.slice(0, 70) +
                     (item.property_details?.length > 70 ? "...." : "")}
 
-                {(type === "Community"
+                {(type === "community"
                   ? item.community_details?.length
                   : item.property_details?.length) > 70 && (
                   <Text
@@ -174,22 +225,17 @@ const YourAdsPostDesign = ({
                   className="flex-row"
                 >
                   <Camera />
-                  <Text style={{ color: "white", fontWeight: 600 }}>
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: 600,
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
                     {" "}
                     {item.images ? item.images.length : 0}
                   </Text>
                 </View>
-                <TouchableOpacity
-                  style={{
-                    position: "absolute",
-                    top: vs(5),
-                    right: hs(10),
-                    alignItems: "center",
-                  }}
-                  className="flex-row"
-                >
-                  <UnSelecteHeart />
-                </TouchableOpacity>
               </TouchableOpacity>
 
               <View
@@ -207,13 +253,17 @@ const YourAdsPostDesign = ({
                   <>
                     <View className="flex-row items-center">
                       <CommunityType />
-                      <Text style={{ marginLeft: vs(5) }}>
+                      <Text
+                        style={{ marginLeft: vs(5), fontFamily: "PopinRegula" }}
+                      >
                         {item.community_type}
                       </Text>
                     </View>
                     <View className="flex-row items-center">
                       <CommunitySatatus />
-                      <Text style={{ marginLeft: vs(5) }}>
+                      <Text
+                        style={{ marginLeft: vs(5), fontFamily: "PopinRegula" }}
+                      >
                         {item.community_status}
                       </Text>
                     </View>
@@ -222,17 +272,25 @@ const YourAdsPostDesign = ({
                   <>
                     <View className="flex-row items-center">
                       <Bed />
-                      <Text style={{ marginLeft: vs(5) }}>{item.bedrooms}</Text>
+                      <Text
+                        style={{ marginLeft: vs(5), fontFamily: "PopinRegula" }}
+                      >
+                        {item.bedrooms}
+                      </Text>
                     </View>
                     <View className="flex-row items-center">
                       <Shower />
-                      <Text style={{ marginLeft: vs(5) }}>
+                      <Text
+                        style={{ marginLeft: vs(5), fontFamily: "PopinRegula" }}
+                      >
                         {item.bathrooms}
                       </Text>
                     </View>
                     <View className="flex-row items-center">
                       <Area />
-                      <Text style={{ marginLeft: vs(5) }}>
+                      <Text
+                        style={{ marginLeft: vs(5), fontFamily: "PopinRegula" }}
+                      >
                         {item.land_area} sqft
                       </Text>
                     </View>
@@ -264,21 +322,62 @@ const YourAdsPostDesign = ({
                 className="flex-row justify-between items-center"
                 style={{ marginTop: vs(10), paddingHorizontal: hs(10) }}
               >
-                <Text style={{ color: Colors.light.textGray }}>
+                <Text
+                  style={{
+                    color: Colors.light.textGray,
+                    fontFamily: "PopinRegula",
+                  }}
+                >
                   Learn about trending ads
                 </Text>
                 <View className="flex-row ">
-                  <TouchableOpacity style={{ marginRight: hs(10) }} onPress={()=>{
-                   router.push({
-                    params:{edit:'true',type:type,id:type === "community"
-                    ? item.post_community_id
-                    : item.post_property_id},
-                  pathname:type==="community"?"/(main)/postCommunity":"/(main)/PostProperty"
-                   })
-                  }}>
+                  <TouchableOpacity
+                    style={{ marginRight: hs(10) }}
+                    onPress={() => {
+                      router.push({
+                        params: {
+                          edit: "true",
+                          type: type,
+                          id:
+                            type === "community"
+                              ? item.post_community_id
+                              : item.post_property_id,
+                        },
+                        pathname:
+                          type === "community"
+                            ? "/(main)/postCommunity"
+                            : "/(main)/PostProperty",
+                      });
+                    }}
+                  >
                     <Edit />
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if(item.ad_by==="agent"){
+
+                      setSelectedPost(item);
+                     setDeleteType("Deleted");
+             
+
+                Alert.alert("Confirm", "Are you sure you want to delete?", [
+                  { text: "No" },
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      handleDelete(selectedPost, "Deleted", type);
+                    },
+                  },
+                ]);
+              
+                    
+                      }
+                      else{
+                          setSelectedPost(item);
+                      setDeleteModal(true);
+                      }
+                    }}
+                  >
                     <Delet />
                   </TouchableOpacity>
                 </View>
@@ -289,50 +388,133 @@ const YourAdsPostDesign = ({
       </>
     );
   };
-return (
-  <View style={{ flex: 1, marginBottom: insets.bottom }}>
-    {(!data || (isfetching && data.length === 0)) ? (
-     
-      <ActivityIndicator size="large" style={{ marginTop: 20 }} />
-    ) : data.length > 0 ? (
-   
-      <LegendList
-        data={data}
-        scrollEnabled={scrollable}
-        ref={listRef}
-        renderItem={renderItem}
-   keyExtractor={(item, index) =>
-          `${item.post_property_id || item.post_community_id}-${index}`
-        }
-        onEndReached={() => {
-          if (!isfetching && hasmore) setPage((prev) => prev + 1);
-        }}
-        onEndReachedThreshold={0.6}
-        ListFooterComponent={
-          isfetching ? <ActivityIndicator size="small" /> : null
-        }
-        refreshControl={
-          <RefreshControl refreshing={isfetching} onRefresh={() => setPage(1)} />
-        }
-      />
-    ) : (
-   
-      <Text style={{ textAlign: "center", marginTop: 20 }}>No Data Found</Text>
-    )}
+  return (
+    <View style={{ flex: 1, marginBottom: insets.bottom }}>
+      {!initialLoadDone ? (
+        <ActivityIndicator size="large" style={{ marginTop: 20 }} />
+      ) : data.length > 0 ? (
+        <LegendList
+          data={data}
+          scrollEnabled={scrollable}
+          ref={listRef}
+          renderItem={renderItem}
+          keyExtractor={(item, index) =>
+            `${item.post_property_id || item.post_community_id}-${index}`
+          }
+          onEndReached={() => {
+            if (!isfetching && hasmore) setPage((prev) => prev + 1);
+          }}
+          onEndReachedThreshold={0.6}
+          ListFooterComponent={
+            isfetching ? <ActivityIndicator size="small" /> : null
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={isfetching}
+              onRefresh={() => {
+                setPage(1);
+                refetch();
+              }}
+            />
+          }
+        />
+      ) : (
+        <Text
+          style={{
+            textAlign: "center",
+            marginTop: 20,
+            fontFamily: "PopinRegula",
+          }}
+        >
+          No Data Found
+        </Text>
+      )}
 
-    {showImages && (
-      <ImageSlider
-        images={selectedImages}
-        setShowImage={(val: boolean) => {
-          setShowImages(val);
-          setscrollable(true);
-        }}
-      />
-    )}
-  </View>
-);
+      {showImages && (
+        <ImageSlider
+          images={selectedImages}
+          setShowImage={(val: boolean) => {
+            setShowImages(val);
+            setscrollable(true);
+          }}
+        />
+      )}
+      <Modal visible={deleteModal} transparent={true} animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              width: "85%",
+              borderRadius: 10,
+              padding: 20,
+            }}
+          >
+            <Text style={{ fontWeight: "600", fontSize: 16, marginBottom: 15 }}>
+              Delete Ad Options
+            </Text>
 
+            <TouchableOpacity
+              style={{ marginBottom: 15 }}
+              onPress={() => {
+                setDeleteType("Past");
+                setDeleteModal(false);
 
+                Alert.alert("Confirm", "Are you sure you want to delete?", [
+                  { text: "No" },
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      handleDelete(selectedPost, "Past", type);
+                    },
+                  },
+                ]);
+              }}
+            >
+              <Text style={{ color: "black" }}>
+                Delete but add to my profile as past deals
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                setDeleteType("Deleted");
+                setDeleteModal(false);
+
+                Alert.alert("Confirm", "Are you sure you want to delete?", [
+                  { text: "No" },
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      handleDelete(selectedPost, "Deleted", type);
+                    },
+                  },
+                ]);
+              }}
+            >
+              <Text style={{ color: "red" }}>
+                Delete Ad & don't add to profile
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ marginTop: 20 }}
+              onPress={() => setDeleteModal(false)}
+            >
+              <Text style={{ textAlign: "center", color: "gray" }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Loading isLoading={isLoading} text="Deleting.." />
+    </View>
+  );
 };
 
 export default YourAdsPostDesign;
@@ -348,6 +530,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontWeight: "bold",
+    fontFamily: "PopinRegula",
   },
   uperSection: {
     marginLeft: hs(10),
@@ -355,9 +538,11 @@ const styles = StyleSheet.create({
   description: {
     marginVertical: vs(10),
     fontWeight: 500,
+    fontFamily: "PopinRegula",
   },
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
 });

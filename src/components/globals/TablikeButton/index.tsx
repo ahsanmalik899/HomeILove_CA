@@ -19,13 +19,14 @@ const index = ({
   Componet2,
   Componet3,
   onPress,
+  backgroundColor="white",
 }:TabLikeButtonProps) => {
   return (
-    <View className=" bg-white flex-1" >
+    <View className=" bg-white flex-1" style={{backgroundColor:backgroundColor}}>
           {title1 &&(
-            <Text style={{ fontSize: ms(14), fontWeight: 600 }}>
+            <Text style={{ fontSize: ms(14), fontWeight: 600 ,fontFamily: "PopinRegula",}}>
         {title1}
-        <Text style={{ color: Colors.light.red }}>{title2}</Text>
+        <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>{title2}</Text>
       </Text>
           )}  
       <View className="flex-row justify-between" style={{ marginTop: vs(10),gap:hs(10) }}>
@@ -37,6 +38,7 @@ const index = ({
             style={{
               color: value === btn1value ?  "white":"black" ,
               fontWeight: 600,
+              fontFamily: "PopinRegula",
             }}
           >
             {btnTxt1}
@@ -50,6 +52,7 @@ const index = ({
             style={{
               color: value === btn2value ?   "white": "black",
               fontWeight: 600,
+              fontFamily: "PopinRegula",
             }}
           >
             {btnTxt2}
@@ -64,6 +67,7 @@ const index = ({
             style={{
               color: value === btn3value ?  "white":"black" ,
               fontWeight: 600,
+              fontFamily: "PopinRegula",
             }}
           >
             {btnTxt3}

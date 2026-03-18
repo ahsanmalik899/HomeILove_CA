@@ -79,13 +79,13 @@ const Index = () => {
           {/* Main Heading */}
           <Text style={styles.mainHeading}>
             {dataBuy.mainHeading}
-            <Text style={{ color: Colors.light.red }}>{dataBuy.redText}</Text>
+            <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>{dataBuy.redText}</Text>
             {dataBuy.endText}
           </Text>
           <Text style={styles.subHeading}>{dataBuy.subHeading}</Text>
 
           {/* Search Bar */}
-          <View style={{ marginVertical: vs(10) }}>
+          <View style={{ marginVertical: vs(10), }}>
             <SerchBar
               setAddress={setaddress}
               setCity={setCity}
@@ -157,7 +157,7 @@ const Index = () => {
                         { backgroundColor: isSelected ? Colors.light.DarkGreen : "#E0E0E0" },
                       ]}
                     >
-                      <Text style={{ color: isSelected ? "white" : "black", fontWeight: "500" }}>{option}</Text>
+                      <Text style={{ color: isSelected ? "white" : "black", fontWeight: "500",fontFamily: "PopinRegula", }}>{option}</Text>
                     </TouchableOpacity>
                   );
                 })}
@@ -189,7 +189,7 @@ const Index = () => {
 
           {/* Leading Developers */}
           <Text style={styles.sectionHeading}>
-            Leading <Text style={{ color: Colors.light.red }}>DEVELOPERS</Text>
+            Leading <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>DEVELOPERS</Text>
           </Text>
           <LeadingList data={profileList?.data}  isFetching={isFetching} />
         </View>
@@ -206,17 +206,20 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     lineHeight: vs(28),
     color: "#222",
+    fontFamily: "PopinRegula",
   },
   subHeading: {
     fontSize: ms(16),
     fontWeight: "500",
     color: "#555",
+    fontFamily: "PopinRegula",
   },
   sectionHeading: {
     fontSize: ms(20),
     fontWeight: "700",
     marginTop: vs(10),
     color: "#222",
+    fontFamily: "PopinRegula",
   },
   subTypeContainer: {
     flexDirection: "row",
@@ -237,6 +240,7 @@ const styles = StyleSheet.create({
     marginHorizontal: hs(10),
     color: "#555",
     fontWeight: "500",
+    fontFamily: "PopinRegula",
   },
   line: {
     flex: 1,

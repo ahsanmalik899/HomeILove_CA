@@ -75,13 +75,14 @@ export const FormikInput = ({
           <Text
             style={{
               color: Colors.light.red,
+              fontFamily: "PopinRegula",
             }}
           >
             *
           </Text>
         )}
         {additonalText && (
-          <Text style={{ paddingLeft: hs(5) }}>{`(${additonalText})`}</Text>
+          <Text style={{ paddingLeft: hs(5),fontFamily: "PopinRegula", }}>{`(${additonalText})`}</Text>
         )}
       </View>
       <View className="flex-row gap-2">
@@ -145,7 +146,8 @@ export const FormikInput = ({
                       color: Colors.light.DarkGreen,
                       fontSize: ms(15),
                       fontWeight: "500",
-                      width:hs(250)
+                      width:hs(250),
+                      fontFamily: "PopinRegula",
                     }}
                   >
                     {item}
@@ -164,19 +166,20 @@ export const FormikInput = ({
         )}
       </View>
       {touched && errors && (
-        <Text style={{ color: Colors.light.red }}>{errorText}</Text>
+        <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>{errorText}</Text>
       )}
     </View>
   );
 };
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: 600 },
+  title: { fontSize: ms(14), fontWeight: 600,fontFamily: "PopinRegula", },
   inputdes: {
     height: vs(120),
     textAlignVertical: "top",
   },
   input: {
     backgroundColor: "transparent",
+    fontFamily: "PopinRegula",
   },
       card: {
       backgroundColor: "#fff",

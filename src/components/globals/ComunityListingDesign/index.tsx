@@ -88,28 +88,29 @@ const YourAdsPostDesign = ({
                       : "black",
                   fontWeight: 700,
                   fontSize:ms(18),
+                  fontFamily: "PopinRegula",
                 }}
               >
                From $ {item.price1}
                 {type === "rent" && (
-                  <Text style={{ color: Colors.light.red , fontSize:ms(18),}}>
+                  <Text style={{ color: Colors.light.red , fontSize:ms(18),fontFamily: "PopinRegula",}}>
                     /{item.rent_type}
                   </Text>
                 )}
               </Text>
               {item.post_type === "Trending" && (
                 <Text
-                  style={{ fontWeight: 600, color: Colors.light.DarkGreen, }}
+                  style={{ fontWeight: 600, color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}
                 >
                   Trending
                 </Text>
               )}
             </View>
 
-            <Text style={{ color: "black",fontWeight:700 }}>
+            <Text style={{ color: "black",fontWeight:700,fontFamily: "PopinRegula", }}>
               {item.community_title}
             </Text>
-            <Text style={{ color: Colors.light.textGray, marginTop: vs(5) }}>
+            <Text style={{ color: Colors.light.textGray, marginTop: vs(5),fontFamily: "PopinRegula", }}>
               {item.address}
             </Text>
              <View
@@ -147,6 +148,7 @@ const YourAdsPostDesign = ({
             style={{
               color: Colors.light.DarkGreen,
               fontWeight: "500",
+              fontFamily: "PopinRegula",
               width: hs(250),
             }}
           >
@@ -208,7 +210,7 @@ const YourAdsPostDesign = ({
                 >
                   <View className="flex-row items-center">
                     <Camera />
-                    <Text style={{ color: "white", fontWeight: 600 }}>
+                    <Text style={{ color: "white", fontWeight: 600 ,fontFamily: "PopinRegula",}}>
                       {" "}
                       {item.images ? item.images.length : 0}
                     </Text>
@@ -222,6 +224,7 @@ const YourAdsPostDesign = ({
                         color: "white",
                         fontWeight: 600,
                         borderRadius: ms(10),
+                        fontFamily: "PopinRegula",
                       }}
                     >
                       {item.saleprice_type}
@@ -247,6 +250,7 @@ const YourAdsPostDesign = ({
                         color: "white",
                         fontWeight: 600,
                         borderRadius: ms(10),
+                        fontFamily: "PopinRegula",
                       }}
                     >
                       {item.property_condition}
@@ -302,13 +306,13 @@ const YourAdsPostDesign = ({
                 <>
                   <View className="flex-row items-center">
                                        <CommunityType />
-                                       <Text style={{ marginLeft: vs(5) }}>
+                                       <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
                                          {item.community_type}
                                        </Text>
                                      </View>
                                      <View className="flex-row items-center">
                                        <CommunitySatatus />
-                                       <Text style={{ marginLeft: vs(5) }}>
+                                       <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
                                          {item.community_status}
                                        </Text>
                                      </View>
@@ -411,6 +415,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontWeight: "bold",
+    fontFamily: "PopinRegula",
   },
   uperSection: {
     marginLeft: hs(10),
@@ -424,6 +429,7 @@ const styles = StyleSheet.create({
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
    card2: {
     backgroundColor: "white",

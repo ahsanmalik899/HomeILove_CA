@@ -124,7 +124,7 @@ const AddressSearch = ({
           {isFetching && (
             <View style={styles.loadingWrapper}>
               <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
-              <Text style={{ marginTop: vs(5) }}>Loading...</Text>
+              <Text style={{ marginTop: vs(5),fontFamily: "PopinRegula", }}>Loading...</Text>
             </View>
           )}
 
@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: hs(12),
     borderWidth: ms(1),
     height: vs(45),
+    fontFamily: "PopinRegula",
   },
   searchButton: {
     backgroundColor: Colors.light.red,

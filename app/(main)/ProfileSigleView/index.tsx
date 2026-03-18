@@ -1,18 +1,38 @@
-import { useGetSingleProfileQuery } from "@/store/api/user/MainApi";
+import {
+  useGetotherPastWorkQuery,
+  useGetProfilesForConectionQuery,
+  useGetSingleProfileQuery,
+  useUserAgentPastPostsApiQuery,
+  useWriteReviewApiMutation,
+} from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
 import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
+import { LegendList } from "@legendapp/list";
+import { AdressInput } from "@src/components/globals/AddressInput";
+import CircleImage from "@src/components/globals/CircleImage/CircleImage";
+import { FormikInput } from "@src/components/globals/FormictInput";
+import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import LargeButton from "@src/components/globals/LaregeButton";
+import Loading from "@src/components/globals/Loading";
+import PastDealsagent from "@src/components/globals/PastDealsagent";
+import SetRating from "@src/components/globals/SetRating";
 import StarRating from "@src/components/globals/StarRating";
 import VideoSection from "@src/components/globals/ViedioSection";
 import Colors from "@src/constants/Colors";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { Formik } from "formik";
+import { useEffect, useState } from "react";
 import {
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,169 +40,951 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-const index = () => {
+import * as Yup from "yup";
+
+const Index = () => {
+  const user = useAppSelector(userdata);
   const params = useLocalSearchParams();
   const type = params.type as string;
-  const [expanded, setExpanded] = useState(false);
   const id = Number(params.id);
 
-  const { data, isFetching } = useGetSingleProfileQuery({ type, id });
-  const latitude = parseFloat(data?.data?.user_lat);
-  const longitude = parseFloat(data?.data?.user_lng);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [reviewModal, setReviewModal] = useState(false);
+  const [review, setReview] = useState("");
+  const [postrating, setpostRating] = useState(0);
+  const [showConnection, setShowConnection] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [showPast, setShowpast] = useState(false);
+  const ReviewSchema = Yup.object().shape({
+    review: Yup.string()
+      .required("Review is required")
+      .max(5000, "Maximum 5000 characters"),
+
+    sender_profile_type: Yup.string().required("Please select profile"),
+
+    sender_profile_id: Yup.string().nullable(),
+
+    imp_facts: Yup.string(),
+  });
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(10);
+  const [posts, setPosts] = useState<[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const { data, isLoading } = useGetSingleProfileQuery({ type, id });
+
+  const profile = data?.data;
+  const { data: Profiles, isLoading: ProfilesLoading } =
+    useGetProfilesForConectionQuery({ id: user.id });
+  const {
+    data: othePastdata,
+    isLoading: otherWorkLoding,
+    refetch: pastRefetch,
+  } = useGetotherPastWorkQuery(
+    { user_id: profile?.users_id, work_section: type },
+    { skip: !profile?.users_id || type === "agent"||profile?.post_type!=="Trending" }
+  );
+
+  const {
+    data: pastData,
+    isLoading: pastLoading,
+    refetch,
+  } = useUserAgentPastPostsApiQuery(
+    { page, per_page: perPage, user_id: profile?.users_id },
+    { skip: !profile?.users_id || type !== "agent" ||profile?.post_type!=="Trending"}
+  );
+  useEffect(() => {
+    if (!pastData?.data) return;
+
+    setHasMore(pastData?.has_more);
+
+    setPosts((prev) =>
+      page === 1 ? pastData.data : [...prev, ...pastData.data]
+    );
+    setInitialLoadDone(true);
+  }, [pastData]);
+  const [writeReview] = useWriteReviewApiMutation();
+  const latitude = Number(profile?.user_lat);
+  const longitude = Number(profile?.user_lng);
   const showMap = !isNaN(latitude) && !isNaN(longitude);
+
+  const rating = Number(profile?.rating || 0);
+  const totalReviews = profile?.total_reviews || 0;
+  const submitReview = async (values: {
+    review: any;
+    imp_facts: any;
+    sender_profile_type: any;
+    sender_profile_id?: any;
+  }) => {
+    try {
+      const body = {
+        sender_id: user.id,
+        sender_profile_id: values.sender_profile_id,
+        sender_profile_type: values.sender_profile_type,
+
+        receiver_id: profile.users_id,
+        receiver_profile_id: profile.id,
+        receiver_profile_type: profile.type,
+
+        review: values.review,
+        imp_facts: values.imp_facts,
+        rating: postrating,
+      };
+
+      const res = await writeReview(body).unwrap();
+
+      // API returned success
+      if (res.success) {
+        renderToastSuccess(res.message);
+      } else {
+        // This shouldn't happen with unwrap(), but just in case
+        renderToastError(res.message || "Review submission failed");
+      }
+    } catch (error) {
+      // RTK Query unwrap throws here for 4xx/5xx responses
+      const errorMsg =
+        error?.data?.message || // your backend message
+        error?.error || // fallback
+        "Review submission failed";
+
+      renderToastError(errorMsg);
+    } finally {
+      setReview(false);
+    }
+  };
   return (
-    <ScrollView className="flex-1 bg-white">
-      <View style={{ position: "relative", width: "100%" }}>
-        <HeaderWithBack />
-        <Image
-          source={{
-            uri: ImageFormater(data?.data?.cover) || undefined,
-          }}
-          defaultSource={NoImage}
-          style={{
-            height: vs(250),
-            width: "100%",
-            borderBottomLeftRadius: ms(20),
-            borderBottomRightRadius: ms(20),
-            resizeMode: "cover",
-            backgroundColor: "gray",
-          }}
-        />
-      </View>
-      <View
-        style={{
-          marginHorizontal: hs(5),
-          paddingHorizontal: hs(10),
-          paddingVertical: vs(20),
-          backgroundColor: Colors.light.DarkGreen,
-          marginTop: vs(20),
-          borderRadius: ms(20),
-        }}
-      >
-        <Text
-          style={[styles.heading,{color:'white'}]}
-        >
-          {data?.data?.business_name}
-        </Text>
-        <Text   style={[styles.info,{color:'white'}]}>{data?.data?.address}</Text>
-        <Text  style={[styles.info,{color:'white',marginVertical:vs(5)}]}>
-          {data?.data?.city},{data?.data?.zip},{data?.data?.state}
-        </Text>
-      </View>
-      <View style={styles.card}>
-        <Text  style={[styles.heading]}>Service for</Text>
-        <Text style={[styles.info]}>{data?.data?.services}</Text>
-        <Text  style={[styles.heading]}>Dealing Areas</Text>
-        <View style={[styles.card,{marginBottom:vs(5)}]}>
-<Text>{data?.data?.dealing_areas}</Text>
-        </View>
-        <View className="flex-row justify-between items-center">
-        <View className="flex-row justify-between items-center">
-          <Call/><Text>{data?.data?.contact}</Text>
-        </View>
-        <View className="flex-row justify-between items-center">
-          <Text>{data?.data?.web}</Text>
-        </View>
-        </View>
-         <View
-        style={{
-          height: vs(1),
-          marginTop: vs(20),
-          marginBottom: vs(10),
-          backgroundColor: Colors.light.textGray,
-          opacity: 0.2,
-        }}
-      />
-
-      <View className="flex-row gap-2">
-        <TouchableOpacity>
-          <Heart />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Share />
-        </TouchableOpacity>
-      </View>
-      </View>
-     <View style={{marginHorizontal:hs(10)}}>
-      <Text style={[styles.heading,{color:Colors.light.DarkGreen,marginTop:vs(20)}]}>
-        ABOUT <Text style={[styles.heading,{color:Colors.light.red}]}> {data?.data?.business_name}</Text>
-      </Text>
-      <Text style={styles.description}>
-        {expanded
-          ? data?.data?.remarks
-          : data?.data?.remarks?.slice(0, 70) +
-            (data?.data?.remarks?.length > 70 ? "..." : "")}
-
-        {data?.data?.remarks?.length > 70 && (
-          <Text
-            style={styles.moreText}
-            onPress={() => setExpanded(expanded ? false : true)}
-          >
-            {expanded ? " Show Less" : " Read More"}
-          </Text>
-        )}
-      </Text>
-  
-      {showMap && (
-        <MapView
-          style={{ height: vs(250), width: "100%", marginVertical: vs(10) }}
-          initialRegion={{
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-        >
-          <Marker
-            coordinate={{
-              latitude,
-              longitude,
+    <>
+      <ScrollView className="flex-1 bg-white">
+        {/* Cover */}
+        <View style={{ position: "relative" }}>
+          <HeaderWithBack />
+          <Image
+            source={{
+              uri: ImageFormater(profile?.cover),
             }}
+            defaultSource={NoImage}
+            style={styles.cover}
           />
-        </MapView>
-      )}
-      <VideoSection url={data?.data?.youtube_link} />
-      <Text style={[styles.heading,{color:Colors.light.red}]}>
-        Rating<Text style={{color:Colors.light.DarkGreen}}> & </Text>Reviews
-      </Text>
-      <Text>Ratings</Text>
-      <View>
-        <Text>Reviews</Text>
-        <StarRating rating={0} size={30} />
-      </View>
-      <TouchableOpacity>Write a Review</TouchableOpacity>
-      <Text>
-        DEALS BY <Text></Text>
-      </Text>
+        </View>
+
+        {/* Business Info */}
+        <View style={styles.businessCard}>
+          <Text style={[styles.title, { color: "white" }]}>
+            {profile?.business_name}
+          </Text>
+
+          <Text style={styles.whiteText}>{profile?.address}</Text>
+
+          <Text style={styles.whiteText}>
+            {profile?.city}, {profile?.zip}, {profile?.state}
+          </Text>
+        </View>
+
+        {/* Services */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Service for</Text>
+          <Text style={styles.text}>{profile?.services}</Text>
+
+          <Text style={[styles.sectionTitle, { marginTop: 10 }]}>
+            Dealing Areas
+          </Text>
+
+          <Text style={styles.text}>{profile?.dealing_areas}</Text>
+
+          {/* Contact */}
+          <View style={styles.rowBetween}>
+            <View style={styles.row}>
+              <Call />
+              <Text style={styles.text}>{profile?.contact}</Text>
+            </View>
+
+            <Text style={styles.text}>{profile?.web}</Text>
           </View>
-    </ScrollView>
+
+          {/* Divider */}
+          <View style={styles.divider} />
+
+          {/* Actions */}
+          <View style={styles.row}>
+            <TouchableOpacity>
+              <Heart />
+            </TouchableOpacity>
+
+            <TouchableOpacity>
+              <Share />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* About */}
+        <View style={{ marginHorizontal: hs(10) }}>
+          <Text style={styles.aboutTitle}>
+            ABOUT{" "}
+            <Text style={{ color: Colors.light.red }}>
+              {profile?.business_name}
+            </Text>
+          </Text>
+
+          <Text style={styles.description}>
+            {expanded
+              ? profile?.remarks
+              : profile?.remarks?.slice(0, 90) +
+                (profile?.remarks?.length > 90 ? "..." : "")}
+
+            {profile?.remarks?.length > 90 && (
+              <Text
+                style={styles.moreText}
+                onPress={() => setExpanded(!expanded)}
+              >
+                {expanded ? " Show Less" : " Read More"}
+              </Text>
+            )}
+          </Text>
+
+          {/* Map */}
+          {showMap && (
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude,
+                longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            >
+              <Marker coordinate={{ latitude, longitude }} />
+            </MapView>
+          )}
+
+          <VideoSection url={profile?.youtube_link} />
+          {profile?.advisory_service === "Yes" && (
+            <View style={styles.mortgageCard}>
+              <Text style={styles.mortgageTitle}>
+                Ask for FREE home mortgage advice from
+              </Text>
+
+              <Text style={styles.mortgageCompany}>
+                {profile?.business_name}
+              </Text>
+
+              <Formik
+                initialValues={{
+                  address: "",
+                  city: "",
+                  state: "",
+                  zip: "",
+                  lat: 0,
+                  lng: 0,
+                  advice_for: "Home purchase",
+                  name: "",
+                  email: "",
+                  contact: "",
+                  message: "",
+                }}
+                onSubmit={(values) => {
+                  console.log(values);
+                  renderToastSuccess("Request sent successfully");
+                }}
+              >
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                  touched,
+                  setFieldValue,
+                }) => (
+                  <>
+                    <AdressInput
+                      city={"city"}
+                      zip={"zip"}
+                      state={"state"}
+                      lat={"lat"}
+                      long={"lng"}
+                      latValue={values.lat}
+                      longValue={values.lng}
+                      name="address"
+                      setValue={setFieldValue}
+                      onSelect={() => {}}
+                      title="Property Location"
+                      placeholder="Enter complete address or street"
+                      value={values.address}
+                      touched={!!touched.address}
+                      errors={!!errors.address}
+                      required
+                      withmap={false}
+                      errorText={errors.address}
+                    />
+                    {type === "agent" ||
+                      (type === "mortgage" && (
+                        <FormikDropdownwithjson
+                          title={"I need advice on?"}
+                          key={values.advice_for}
+                          setValue={setFieldValue}
+                          required
+                          placeholder="Select"
+                          value={values.advice_for}
+                          options={
+                            type === "mortgage"
+                              ? [
+                                  {
+                                    label: "Home purchase property",
+                                    value: "Home purchase",
+                                  },
+                                  { label: "Refinance", value: "Refinance" },
+                                  {
+                                    label: "Home equity",
+                                    value: "Home equity",
+                                  },
+                                  { label: "Others", value: "Others" },
+                                ]
+                              : type === "agent"
+                              ? [
+                                  {
+                                    label: "Selling property",
+                                    value: "Selling property",
+                                  },
+                                  {
+                                    label: "Buying property",
+                                    value: "Buying property",
+                                  },
+                                  {
+                                    label: "Letting property",
+                                    value: "Letting property",
+                                  },
+                                  { label: "others", value: "others" },
+                                ]
+                              : []
+                          }
+                          name="advice_for"
+                          onSelect={() => {}}
+                        />
+                      ))}
+                    <View style={styles.dottedDivider} />
+
+                    <FormikInput
+                      title="Name"
+                      placeholder="Please enter name"
+                      onChangeText={handleChange("name")}
+                      onBlur={handleBlur("name")}
+                      value={values.name}
+                      touched={!!touched.name}
+                      errors={!!errors.name}
+                      errorText={errors.name}
+                      required={false}
+                    />
+
+                    <FormikInput
+                      title="Email"
+                      placeholder="Please enter email"
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
+                      value={values.email}
+                      touched={!!touched.email}
+                      errors={!!errors.email}
+                      errorText={errors.email}
+                      required={false}
+                    />
+
+                    <FormikInput
+                      title="Contact"
+                      placeholder="Please enter contact"
+                      onChangeText={handleChange("contact")}
+                      onBlur={handleBlur("contact")}
+                      value={values.contact}
+                      touched={!!touched.contact}
+                      errors={!!errors.contact}
+                      errorText={errors.contact}
+                      required={false}
+                    />
+
+                    <FormikInput
+                      title="Message"
+                      placeholder="Write your message"
+                      multiline
+                      onChangeText={handleChange("message")}
+                      onBlur={handleBlur("message")}
+                      value={values.message}
+                      touched={!!touched.message}
+                      errors={!!errors.message}
+                      errorText={errors.message}
+                      required={false}
+                    />
+
+                    <TouchableOpacity
+                      style={styles.mortgageBtn}
+                      onPress={() => handleSubmit()}
+                    >
+                      <Text style={styles.mortgageBtnText}>Send</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </Formik>
+
+              {/* Agent Image */}
+              <View style={styles.agentContainer}>
+                <CircleImage
+                  Size={120}
+                  source={{
+                    uri: ImageFormater(profile?.logo),
+                  }}
+                />
+              </View>
+            </View>
+          )}
+          {profile?.post_type && (
+            <>
+              <LargeButton
+                handleSubmit={() => {
+                  setShowpast(!showPast);
+                }}
+                text={
+                  showPast
+                    ? "Hide my past deals (jobs)"
+                    : "Show my past deals (jobs) "
+                }
+              />
+              {showPast && type === "agent" && (
+                <View>
+                  <PastDealsagent
+                    data={posts}
+                    hasmore={hasMore}
+                    isfetching={pastLoading}
+                    setPage={setPage}
+                    type={type}
+                    setpost={setPosts}
+                    refetch={refetch}
+                    initialLoadDone={initialLoadDone}
+                  />
+                </View>
+              )}
+              {showPast && type !== "agent" && (
+                <View style={{ marginTop: vs(15) }}>
+                  <LegendList
+                    data={othePastdata?.data || []}
+                    keyExtractor={(item: any) =>
+                      item.user_past_work_id.toString()
+                    }
+                    renderItem={({ item }: any) => {
+                      const firstImage = item.images?.length
+                        ? ImageFormater(item.images[0])
+                        : null;
+
+                      return (
+                        <View style={styles.pastCard}>
+                          <Image
+                            source={firstImage ? { uri: firstImage } : NoImage}
+                            style={styles.fullImage}
+                          />
+
+                          <View style={styles.pastContent}>
+                            <View style={styles.rowBetween}>
+                              <View>
+                                <Text style={styles.pastTitle}>
+                                  {item.property_type}
+                                </Text>
+
+                                <Text style={styles.pastText}>
+                                  {item.property_sub_type}
+                                </Text>
+                              </View>
+                            </View>
+
+                            <Text style={styles.pastText}>
+                              Beds : {item.beds}
+                            </Text>
+
+                            <Text style={styles.pastText}>
+                              {item.city} , {item.state}
+                            </Text>
+
+                            <Text style={styles.pastDesc}>
+                              {item.job_description}
+                            </Text>
+                          </View>
+                        </View>
+                      );
+                    }}
+                  />
+                </View>
+              )}
+            </>
+          )}
+
+          <View style={styles.ratingContainer}>
+            <Text style={styles.ratingTitle}>
+              Rating <Text style={{ color: Colors.light.DarkGreen }}>&</Text>{" "}
+              Reviews
+            </Text>
+
+            <View style={styles.ratingBox}>
+              <StarRating rating={rating} size={26} />
+
+              <Text style={styles.ratingValue}>{rating.toFixed(1)}</Text>
+
+              <Text style={styles.reviewCount}>{totalReviews} Reviews</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.reviewBtn}
+              onPress={() => setReviewModal(true)}
+            >
+              <Text style={styles.reviewBtnText}>Write a Review</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.dealText}>
+              DEALS BY{" "}
+              <Text style={styles.businessName}>{profile?.business_name}</Text>
+            </Text>
+          </View>
+        </View>
+        <Loading isLoading={isLoading} text="Loading.." />
+      </ScrollView>
+      <Modal visible={reviewModal} transparent animationType="slide">
+        <Formik
+          initialValues={{
+            review: "",
+            imp_facts: "",
+            sender_profile_type: "",
+            sender_profile_id: "",
+          }}
+          validationSchema={ReviewSchema}
+          onSubmit={(values) => submitReview(values)}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            setFieldValue,
+          }) => (
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Write Review</Text>
+
+                <SetRating
+                  rating={postrating}
+                  setRating={setpostRating}
+                  size={30}
+                />
+
+                <FormikInput
+                  title="More Description"
+                  placeholder="Write here (Upto 5000 characters)"
+                  onChangeText={handleChange("review")}
+                  onBlur={handleBlur("review")}
+                  value={values.review}
+                  touched={!!touched.review}
+                  errors={!!errors.review}
+                  errorText={errors.review}
+                  multiline
+                  required={false}
+                />
+
+                <FormikInput
+                  placeholder=" important facts or your experience about "
+                  onChangeText={handleChange("imp_facts")}
+                  onBlur={handleBlur("imp_facts")}
+                  value={values.imp_facts}
+                  mulipleFields
+                  name="imp_facts"
+                  setValue={setFieldValue}
+                  title={""}
+                  touched={!!touched.imp_facts}
+                  errors={!!errors}
+                  required={false}
+                  errorText={errors.imp_facts}
+                />
+
+                <View style={{ marginTop: 20 }}>
+                  <Text style={{ fontWeight: "600", marginBottom: 10 }}>
+                    Select Profile
+                  </Text>
+
+                  {Profiles?.profiles?.map((item, index) => {
+                    const selected =
+                      values.sender_profile_type === item.profile_type;
+
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.profileCard,
+                          selected && {
+                            borderColor: "#0F9D58",
+                            borderWidth: 2,
+                          },
+                        ]}
+                        onPress={() => {
+                          setFieldValue(
+                            "sender_profile_type",
+                            item.profile_type
+                          );
+                          setFieldValue("sender_profile_id", item.profile_id);
+                        }}
+                      >
+                        <CircleImage
+                          Size={50}
+                          source={{
+                            uri: ImageFormater(item.logo),
+                          }}
+                        />
+
+                        <View style={{ marginLeft: 12 }}>
+                          <Text style={styles.businessName}>
+                            {item.business_name}
+                          </Text>
+
+                          <Text style={styles.profileType}>
+                            {item.profile_type}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+
+                  {touched.sender_profile_type &&
+                    errors.sender_profile_type && (
+                      <Text
+                        style={{
+                          color: "red",
+                          marginTop: 5,
+                        }}
+                      >
+                        {errors.sender_profile_type}
+                      </Text>
+                    )}
+                </View>
+
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setReviewModal(false);
+                    }}
+                    style={styles.cancelBtn}
+                  >
+                    <Text>Cancel</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={handleSubmit}
+                    style={styles.submitBtn}
+                  >
+                    <Text style={{ color: "white" }}>Submit</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+        </Formik>
+      </Modal>
+    </>
   );
 };
 
-export default index;
-
+export default Index;
 const styles = StyleSheet.create({
-  description: {
-    marginVertical: vs(10),
-    fontWeight: 500,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
+
+  modalContainer: {
+    width: "90%",
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 20,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 15,
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 10,
+    height: 100,
+    marginTop: 10,
+  },
+  profileType: {
+    fontSize: 13,
+    color: "#777",
+    marginTop: 2,
+    fontFamily: "PopinRegula",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+
+  cancelBtn: {
+    padding: 10,
+  },
+
+  submitBtn: {
+    backgroundColor: Colors.light.DarkGreen,
+    padding: 10,
+    borderRadius: 8,
+  },
+  cover: {
+    height: vs(250),
+    width: "100%",
+    borderBottomLeftRadius: ms(20),
+    borderBottomRightRadius: ms(20),
+    resizeMode: "cover",
+    backgroundColor: "gray",
+  },
+
+  businessCard: {
+    marginHorizontal: hs(10),
+    padding: 15,
+    backgroundColor: Colors.light.DarkGreen,
+    borderRadius: 15,
+    marginTop: vs(20),
+  },
+
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    fontFamily: "PopinRegula",
+  },
+
+  whiteText: {
+    color: "white",
+    marginTop: 4,
+    fontFamily: "PopinRegula",
+  },
+
+  card: {
+    backgroundColor: "white",
+    padding: 15,
+    borderRadius: 12,
+    marginHorizontal: 10,
+    marginTop: 10,
+    elevation: 3,
+  },
+
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 5,
+    fontFamily: "PopinRegula",
+  },
+
+  text: {
+    fontFamily: "PopinRegula",
+  },
+
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#ddd",
+    marginVertical: 10,
+  },
+
+  aboutTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: Colors.light.DarkGreen,
+    marginTop: 20,
+    fontFamily: "PopinRegula",
+  },
+
+  description: {
+    marginVertical: 10,
+    fontFamily: "PopinRegula",
+  },
+
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
   },
-  card: {
-        backgroundColor: "white",
-          borderRadius: 12,
-          paddingVertical: vs(15),
-          paddingHorizontal: hs(15),
-          marginTop: vs(10),
-          marginHorizontal:hs(5),
-          elevation: 3,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.2,
-          shadowRadius: 2,
-    },
-       heading:{ fontSize:ms(15), fontWeight: 700, fontFamily: "PopinRegula" },
-       info:{  fontFamily: "PopinRegula" }
+
+  map: {
+    height: vs(250),
+    width: "100%",
+    marginVertical: 10,
+  },
+  profileContainer: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 15,
+  },
+
+  profileCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderColor: "#ddd",
+  },
+
+  ratingContainer: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    marginVertical: 12,
+    elevation: 3,
+  },
+
+  ratingTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: Colors.light.red,
+    marginBottom: 15,
+  },
+
+  ratingBox: {
+    alignItems: "center",
+  },
+
+  ratingValue: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginTop: 8,
+    color: Colors.light.DarkGreen,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    zIndex: 10000,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  reviewCount: {
+    fontSize: 14,
+    color: "#777",
+  },
+
+  reviewBtn: {
+    marginTop: 15,
+    backgroundColor: Colors.light.DarkGreen,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+
+  reviewBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+
+  dealText: {
+    marginTop: 18,
+    color: "#666",
+  },
+
+  businessName: {
+    fontWeight: "700",
+    color: Colors.light.red,
+  },
+  mortgageCard: {
+    backgroundColor: "#fff",
+    marginHorizontal: 12,
+    marginTop: 20,
+    padding: 20,
+    borderRadius: 12,
+    elevation: 4,
+  },
+
+  mortgageTitle: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#000",
+    fontFamily: "PopinRegula",
+  },
+
+  mortgageCompany: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "700",
+    color: Colors.light.red,
+    marginBottom: 15,
+  },
+
+  mortgageBtn: {
+    backgroundColor: Colors.light.DarkGreen,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+
+  mortgageBtnText: {
+    color: "#fff",
+    fontWeight: "700",
+  },
+
+  agentContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  dottedDivider: {
+    borderBottomWidth: 1,
+    borderStyle: "dotted",
+    borderColor: Colors.light.DarkGreen,
+    marginVertical: 15,
+  },
+  pastCard: {
+    backgroundColor: "white",
+    marginHorizontal: hs(15),
+    marginBottom: vs(15),
+    borderRadius: 15,
+    overflow: "hidden",
+    elevation: 4,
+  },
+
+  fullImage: {
+    width: "100%",
+    height: vs(180),
+    resizeMode: "cover",
+  },
+
+  pastContent: {
+    padding: 12,
+  },
+
+  pastTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    fontFamily: "PopinRegula",
+  },
+
+  pastText: {
+    fontSize: 13,
+    marginTop: 3,
+    fontFamily: "PopinRegula",
+  },
+
+  pastDesc: {
+    fontSize: 13,
+    marginTop: 6,
+    color: "gray",
+    fontFamily: "PopinRegula",
+  },
 });

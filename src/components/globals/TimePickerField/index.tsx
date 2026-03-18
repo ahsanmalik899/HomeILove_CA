@@ -43,11 +43,11 @@ export default function FormikTimePicker({
       {/* Label */}
       <View className="flex-row" style={{ marginBottom: vs(10) }}>
         {title && (
-          <Text style={{ fontSize: ms(14), fontWeight: "600" }}>
+          <Text style={{ fontSize: ms(14), fontWeight: "600",fontFamily: "PopinRegula", }}>
             {title}
           </Text>
         )}
-        {required && <Text style={{ color: Colors.light.red }}> *</Text>}
+        {required && <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> *</Text>}
       </View>
 
       {/* Button */}
@@ -61,7 +61,7 @@ export default function FormikTimePicker({
           width: "100%",
         }}
       >
-        <Text>{value ? value : "Select time"}</Text>
+        <Text style={{fontFamily: "PopinRegula",}}>{value ? value : "Select time"}</Text>
       </TouchableOpacity>
 
       {/* Picker */}
@@ -77,7 +77,7 @@ export default function FormikTimePicker({
 
       {/* Error */}
       {touched && errors && (
-        <Text style={{ color: Colors.light.red }}>{errorText}</Text>
+        <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>{errorText}</Text>
       )}
     </View>
   );

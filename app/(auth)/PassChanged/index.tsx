@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     lineHeight: vs(44),
     marginBottom: vs(15),
     marginTop: vs(40),
+        fontFamily: "PopinRegula",
   },
   subtitle: {
     fontSize: ms(16),
@@ -106,6 +107,7 @@ const styles = StyleSheet.create({
     lineHeight: vs(20),
     marginBottom: vs(10),
     marginTop: vs(5),
+        fontFamily: "PopinRegula",
   },
   illustrationWrapper: {
     alignItems: 'center',

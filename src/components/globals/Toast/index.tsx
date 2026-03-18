@@ -72,6 +72,7 @@ const Toast = ({ variant, title, error, success }: ToastProps) => {
                     : variant !== 'outline'
                     ? '#000'
                     : 'primary',
+                    fontFamily: "PopinRegula",
               }}
             >
               {title && title?.length > 70

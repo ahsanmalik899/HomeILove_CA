@@ -49,13 +49,14 @@ const index = () => {
           fontSize: ms(18),
           color: Colors.light.DarkGreen,
           fontWeight: "500",
+          fontFamily: "PopinRegula",
         }}
       >
         When user view his love home then he will view your ad
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 15 / Day</Text>
-      <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600",fontFamily: "PopinRegula", }}>$ 15 / Day</Text>
+      <View className="justify-between " style={{ marginTop: vs(10), }}>
+        <Text style={{fontFamily: "PopinRegula",}}>
           • Another busiest segment where users search their homing needs and
           that where we will present your ad at top most prominent place.
           {"\n\n"}• Target your audience as per your ad requirements e.g. if
@@ -78,13 +79,14 @@ const index = () => {
           fontSize: ms(18),
           color: Colors.light.DarkGreen,
           fontWeight: "500",
+          fontFamily: "PopinRegula",
         }}
       >
         Present your brand / business at core segment of portal
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 10 / Day</Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600",fontFamily: "PopinRegula", }}>$ 10 / Day</Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text>
+        <Text style={{fontFamily: "PopinRegula",}}>
           •You have 7 best choices to present your ad at Property for sale &
           rent , New communities, businesses profiles listing pages.
           {"\n\n"}•Target your audience as per your ad requirements e.g. if
@@ -107,13 +109,14 @@ const index = () => {
           fontSize: ms(18),
           color: Colors.light.DarkGreen,
           fontWeight: "500",
+          fontFamily: "PopinRegula",
         }}
       >
         Present your brand / business at most visited segment for
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 5/ Day</Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600",fontFamily: "PopinRegula", }}>$ 5/ Day</Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text>
+        <Text style={{fontFamily: "PopinRegula",}}>
           • Most busiest section where every user see all the activities of
           connections and preferred properties & communities.
           {"\n\n"}• No chance to miss your advertisement as your ad will be
@@ -135,13 +138,14 @@ const index = () => {
           fontSize: ms(18),
           color: Colors.light.DarkGreen,
           fontWeight: "500",
+          fontFamily: "PopinRegula",
         }}
       >
         Market your brand to user's own timeline page for
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 25 / Day</Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600",fontFamily: "PopinRegula", }}>$ 25 / Day</Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text>
+        <Text style={{fontFamily: "PopinRegula",}}>
           • Every user view its own activities and thats where your ad will be
           placed.{"\n\n"}• Prominent place for your advertisement at our another
           busiest segement.{"\n\n"}• You can promote your business as per your
@@ -162,13 +166,14 @@ const index = () => {
           fontSize: ms(18),
           color: Colors.light.DarkGreen,
           fontWeight: "500",
+          fontFamily: "PopinRegula",
         }}
       >
         Most economical yet results producing place for your ad at
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600" }}>$ 20 / Day</Text>
+      <Text style={{ fontSize: ms(20), fontWeight: "600",fontFamily: "PopinRegula", }}>$ 20 / Day</Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text>
+        <Text style={{fontFamily: "PopinRegula",}}>
           • Your ad will be placed at user's list of connections at very
           economical rates.
           {"\n\n"}• Prominent place for your advertisement at another decent
@@ -188,11 +193,11 @@ const index = () => {
         <View className="flex-1 bg-white">
           <HeaderWithBack />
           <View style={{ marginHorizontal: hs(20), marginTop: vs(30) }}>
-            <Text className="font-bold">
+            <Text className="font-bold" style={{fontFamily: "PopinRegula",}}>
               Market your Brand or Business on Nation's smartest real-estate
               platform Tranparent - Targeted- Economical
             </Text>
-            <Text style={{ marginTop: vs(30), marginBottom: vs(10) }}>
+            <Text style={{ marginTop: vs(30), marginBottom: vs(10),fontFamily: "PopinRegula", }}>
               Advertisement options at different segments to give you targeted
               audiences right for your marketing needs.We have five major
               segements where you can market your business
@@ -262,6 +267,7 @@ const index = () => {
               fontSize: ms(12),
               fontWeight: "500",
               marginHorizontal: hs(20),
+              fontFamily: "PopinRegula",
             }}
           >
             Let's start rolling your brand's marketing.Select best placement for
@@ -273,6 +279,7 @@ const index = () => {
               color: Colors.light.red,
               fontWeight: "500",
               marginHorizontal: hs(20),
+              fontFamily: "PopinRegula",
             }}
           >
             So give new shine to your brand
@@ -298,9 +305,9 @@ const index = () => {
         <View className="flex-1 bg-white">
           <HeaderWithBack />
           <View style={{ marginHorizontal: hs(20), marginVertical: vs(20) }}>
-            <Text style={{ fontSize: ms(20), fontWeight: "500" }}>
+            <Text style={{ fontSize: ms(20), fontWeight: "500" ,fontFamily: "PopinRegula",}}>
               Making your brand more
-              <Text style={{ color: Colors.light.red }}>SHINING</Text> with us !
+              <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>SHINING</Text> with us !
             </Text>
             <Formik
               initialValues={{
@@ -393,6 +400,7 @@ console.log(formData);
                           color:
                             values.on_page === "newsfeed" ? "white" : "black",
                           fontWeight: 600,
+                          fontFamily: "PopinRegula",
                         }}
                       >
                         News Feed
@@ -415,6 +423,7 @@ console.log(formData);
                               ? "white"
                               : "black",
                           fontWeight: 600,
+                          fontFamily: "PopinRegula",
                         }}
                       >
                         Connections
@@ -440,6 +449,7 @@ console.log(formData);
                           color:
                             values.on_page === "listing" ? "white" : "black",
                           fontWeight: 600,
+                          fontFamily: "PopinRegula",
                         }}
                       >
                         Listing Pages
@@ -463,6 +473,7 @@ console.log(formData);
                               ? "white"
                               : "black",
                           fontWeight: 600,
+                          fontFamily: "PopinRegula",
                         }}
                       >
                         Listing deatil pages
@@ -486,7 +497,7 @@ console.log(formData);
                             borderRadius: ms(5),
                           }}
                         />
-                        <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+                        <Text style={{ fontSize: ms(15), fontWeight: "600",fontFamily: "PopinRegula", }}>
                           Listing Pages{" "}
                         </Text>
                         <View
@@ -508,6 +519,7 @@ console.log(formData);
                                 color:
                                   values.on_page === "sale" ? "white" : "black",
                                 fontWeight: 600,
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               For Sale
@@ -529,6 +541,7 @@ console.log(formData);
                                 color:
                                   values.on_page === "rent" ? "white" : "black",
                                 fontWeight: 600,
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               For Rent
@@ -557,6 +570,7 @@ console.log(formData);
                                     ? "white"
                                     : "black",
                                 fontWeight: 600,
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               New Community
@@ -579,6 +593,7 @@ console.log(formData);
                                     ? "white"
                                     : "black",
                                 fontWeight: 600,
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               Agents
@@ -607,6 +622,7 @@ console.log(formData);
                                     ? "white"
                                     : "black",
                                 fontWeight: 600,
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               Developers
@@ -631,6 +647,7 @@ console.log(formData);
                                     : "black",
                                 fontWeight: 600,
                                 fontSize: ms(11),
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               Mortgage Providers
@@ -655,6 +672,7 @@ console.log(formData);
                                   ? "white"
                                   : "black",
                               fontWeight: 600,
+                              fontFamily: "PopinRegula",
                             }}
                           >
                             Home maintenance
@@ -668,6 +686,7 @@ console.log(formData);
                               style={{
                                 color: Colors.light.red,
                                 marginTop: vs(5),
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               {errors.on_page}
@@ -777,7 +796,7 @@ console.log(formData);
                       shadowRadius: 5,
                     }}
                   >
-                    <Text style={{ fontWeight: "500", fontSize: ms(15) }}>
+                    <Text style={{ fontWeight: "500", fontSize: ms(15) ,fontFamily: "PopinRegula",}}>
                       Total you are paying for your AD
                     </Text>
                     <Text
@@ -785,13 +804,14 @@ console.log(formData);
                         marginVertical: vs(10),
                         fontWeight: "600",
                         color: Colors.light.red,
+                        fontFamily: "PopinRegula",
                       }}
                     >
                       $
                     </Text>
-                    <Text style={{ fontSize: ms(12) }}>
+                    <Text style={{ fontSize: ms(12),fontFamily: "PopinRegula", }}>
                       * By proceeding you are agree with our
-                      <Text style={{ color: Colors.light.red }}>
+                      <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>
                         advertisement policy
                       </Text>
                     </Text>
@@ -817,10 +837,10 @@ console.log(formData);
           style={{ marginHorizontal: hs(20), marginTop: vs(20) }}
         >
           <AdvatiseBaner />
-          <Text style={{ fontWeight: 600, marginTop: vs(30) }}>
+          <Text style={{ fontWeight: 600, marginTop: vs(30),fontFamily: "PopinRegula", }}>
             You have no advertisement.
           </Text>
-          <Text style={{ marginTop: vs(20) }}>
+          <Text style={{ marginTop: vs(20),fontFamily: "PopinRegula", }}>
             Why not advertise your business or brand at our website and expand
             in no time and cost effectively
           </Text>

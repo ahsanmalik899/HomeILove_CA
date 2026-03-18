@@ -23,6 +23,7 @@ const index = () => {
   const rawType = useLocalSearchParams().type;
   const [ProfileType, SetProfilrType] = useState("");
   const type = String(rawType).toLowerCase();
+    const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(ProfileType);
   const filter = ProfilesData?.profiles_exist
     ? Object.entries(ProfilesData.profiles_exist)
@@ -38,7 +39,7 @@ const index = () => {
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
 
-  const { data, isFetching, isError } = useGetYorSalePostsQuery({
+  const { data, isFetching, isError,refetch } = useGetYorSalePostsQuery({
     type,
     per_page: perPage,
     page,
@@ -70,9 +71,11 @@ const index = () => {
     setHasMore(data?.has_more);
 
     setPosts((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
+    setInitialLoadDone(true)
+    
   }, [data]);
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white" style={{backgroundColor:"#F4F0F0"}}>
       <HeaderWithBack title={type + " Listing"} />
       <View className="flex-1">
         {filter.length > 0 && (
@@ -96,6 +99,9 @@ const index = () => {
           isfetching={isFetching}
           setPage={setPage}
           type={type}
+          setpost={setPosts}
+          refetch={refetch}
+          initialLoadDone={initialLoadDone}
         />
       </View>
     </View>
@@ -113,7 +119,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: "#F2F2F2",
+    backgroundColor: "#fff",
     marginRight: 8,
   },
 
@@ -124,14 +130,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#333",
     fontWeight: "500",
+    fontFamily: "PopinRegula",
   },
 
   filterTextActive: {
     color: "#fff",
     fontWeight: "600",
+    fontFamily: "PopinRegula",
+    fontFamily: "PopinRegula",
   },
   filterContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#F4F0F0",
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
@@ -143,5 +152,6 @@ const styles = StyleSheet.create({
     color: "#444",
     marginLeft: 16,
     marginBottom: 8,
+    fontFamily: "PopinRegula",
   },
 });

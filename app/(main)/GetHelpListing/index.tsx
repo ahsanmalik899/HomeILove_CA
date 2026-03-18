@@ -91,7 +91,7 @@ const Index = () => {
             />
             <View className="flex-row justify-between items-center mt-3">
               <View style={styles.line} />
-              <Text>OR</Text>
+              <Text style={{fontFamily: "PopinRegula",}}>OR</Text>
               <View style={styles.line} />
             </View>
             <SearchProfile
@@ -175,7 +175,7 @@ const Index = () => {
             />
             <View className="flex-row justify-between items-center mt-3">
               <View style={styles.line} />
-              <Text>OR</Text>
+              <Text style={{fontFamily: "PopinRegula",}}>OR</Text>
               <View style={styles.line} />
             </View>
             <SearchProfile
@@ -201,7 +201,7 @@ const Index = () => {
           <HeaderWithBack />
         
             <Text style={styles.mainHeading}>
-              Get<Text style={{ color: Colors.light.red }}> BETTER </Text>
+              Get<Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> BETTER </Text>
               rates from {"\n"}investors
             </Text>
               <Text style={styles.description}>
@@ -262,7 +262,7 @@ const Index = () => {
             />
             <View className="flex-row justify-between items-center mt-3">
               <View style={styles.line} />
-              <Text>OR</Text>
+              <Text style={{fontFamily: "PopinRegula",}}>OR</Text>
               <View style={styles.line} />
             </View>
             <SearchProfile
@@ -293,6 +293,7 @@ const styles = StyleSheet.create({
     fontSize: ms(20),
     fontWeight: "500",
     lineHeight: vs(22),
+    fontFamily: "PopinRegula",
   },
   description: {
     fontSize: ms(14),
@@ -300,12 +301,14 @@ const styles = StyleSheet.create({
     marginTop: vs(5),
     marginBottom: vs(16),
     lineHeight: vs(20),
+    fontFamily: "PopinRegula",
   },
   subHeading: {
     marginTop: vs(20),
     fontSize: ms(18),
     fontWeight: "500",
     marginBottom: vs(10),
+    fontFamily: "PopinRegula",
   },
   line: {
     flex: 1,

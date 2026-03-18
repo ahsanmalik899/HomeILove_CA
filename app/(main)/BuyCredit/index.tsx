@@ -1,17 +1,26 @@
-import PayLater from "@assets/SideBar/pay-later.svg";
+import { useGetUserWalletQuery } from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import PowerdByPayPal from "@assets/SideBar/Powered by PayPal.svg";
-import Volit from '@assets/SideBar/volit-white.svg';
 import { MaterialIcons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
-import LargeButton from "@src/components/globals/LaregeButton";
 import Colors from "@src/constants/Colors";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { renderToastError } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
+import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 const index = () => {
+  const user = useAppSelector(userdata);
   const bundlesData = [
     { id: "1", type: "Basic", price: "200", amount: "650" },
     { id: "2", type: "Medium", price: "400", amount: "1300" },
@@ -19,16 +28,31 @@ const index = () => {
     { id: "4", type: "High Volume", price: "700", amount: "2200" },
   ];
   const [adType, setAdtype] = useState("");
+  const [selectedAmount, setSelectedAmount] = useState("");
+  const [upgradeAmount, setUpgradeAmout] = useState("");
+  const { data, isLoading, isFetching } = useGetUserWalletQuery({
+    id: user.id,
+  });
   return (
     <View className="flex-1 bg-white">
       <ScrollView>
         <View>
           <HeaderWithBack title="Buy Credits" />
           <View style={{ marginTop: vs(10), marginHorizontal: hs(20) }}>
-            <Text style={{ fontWeight: 600 }}>Bundles</Text>
-            <Text style={{ fontSize: ms(20), fontWeight: 600 }}>
+            <Text style={{ fontWeight: 600, fontFamily: "PopinRegula" }}>
+              Bundles
+            </Text>
+            <Text
+              style={{
+                fontSize: ms(20),
+                fontWeight: 600,
+                fontFamily: "PopinRegula",
+              }}
+            >
               Have more
-              <Text style={{ color: Colors.light.red }}>
+              <Text
+                style={{ color: Colors.light.red, fontFamily: "PopinRegula" }}
+              >
                 {" "}
                 PROPERTIES & BUSINESS{" "}
               </Text>
@@ -49,7 +73,11 @@ const index = () => {
               </Text>
               <TouchableOpacity style={{ marginVertical: vs(20) }}>
                 <Text
-                  style={{ color: Colors.light.DarkGreen, fontWeight: 600 }}
+                  style={{
+                    color: Colors.light.DarkGreen,
+                    fontWeight: 600,
+                    fontFamily: "PopinRegula",
+                  }}
                 >
                   One place to boost your businesss
                 </Text>
@@ -80,9 +108,13 @@ const index = () => {
                       paddingVertical: vs(10),
                     }}
                   >
-                    <Text>Bundles</Text>
-                    <Text>{"  "}Bundle price</Text>
-                    <Text>{"  "}Amount you get</Text>
+                    <Text style={{ fontFamily: "PopinRegula" }}>Bundles</Text>
+                    <Text style={{ fontFamily: "PopinRegula" }}>
+                      Bundle price
+                    </Text>
+                    <Text style={{ fontFamily: "PopinRegula" }}>
+                      Amount you get
+                    </Text>
                   </View>
                 }
                 renderItem={({ item }) => (
@@ -95,9 +127,11 @@ const index = () => {
                   >
                     <View className="flex-row items-center ">
                       <TouchableOpacity
-                        onPress={() =>
-                          setAdtype(adType === item.type ? "" : item.type)
-                        }
+                        onPress={() => {
+                          setAdtype(adType === item.type ? "" : item.type);
+                          setSelectedAmount(item.price);
+                          setUpgradeAmout(item.amount);
+                        }}
                       >
                         <MaterialIcons
                           size={18}
@@ -109,48 +143,82 @@ const index = () => {
                           }
                         />
                       </TouchableOpacity>
-                      <Text style={{ marginLeft: hs(10) }}>{item.type}</Text>
+                      <Text
+                        style={{
+                          marginLeft: hs(10),
+                          fontFamily: "PopinRegula",
+                        }}
+                      >
+                        {item.type}
+                      </Text>
                     </View>
-                    <Text>{item.price}</Text>
-                    <Text>{item.amount}</Text>
+                    <Text style={{ fontFamily: "PopinRegula" }}>
+                      {item.price}
+                    </Text>
+                    <Text style={{ fontFamily: "PopinRegula" }}>
+                      {item.amount}
+                    </Text>
                   </View>
                 )}
               />
             </View>
           </View>
-         
-    <View style={styles.card}>
-      <Text style={styles.title}>Your Homeilove Account Balance</Text>
 
- 
-        <Text style={styles.amountLabel}>Amount</Text>
-        <Text style={styles.amountValue}>$355.00</Text>
-     
+          <View style={styles.card}>
+            <Text style={styles.title}>Your Homeilove Account Balance</Text>
 
-      <LargeButton text="Add Credits" handleSubmit={() => {}} />
+            <Text style={styles.amountLabel}>Amount</Text>
+            <View style={styles.amountValue}>
+              {isLoading || isFetching ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.light.DarkGreen}
+                />
+              ) : (
+                <Text
+                  style={{
+                    color: Colors.light.DarkGreen,
+                    fontFamily: "PopinRegula",
+                  }}
+                >
+                  ${data?.amount ?? 0}
+                </Text>
+              )}
+            </View>
 
-      <View style={styles.paymentOptions}>
-        <TouchableOpacity style={[styles.paymentButton, { backgroundColor: Colors.light.Yellow }]}>
-          <View className="mt-2">
-             <Paypal />
+            <View style={styles.paymentOptions}>
+              <TouchableOpacity
+                style={styles.paypalMainButton}
+                onPress={() => {
+                  if (adType === "") {
+                    renderToastError("Please select bundle first");
+                    return;
+                  }
+
+                  router.navigate({
+                    pathname: "/PaymentScreen",
+                    params: {
+                      amount: selectedAmount,
+                      type:"Bundel",
+                      upgrade_amount:upgradeAmount,
+                    },
+                  });
+                }}
+              >
+                <View style={styles.paypalContent}>
+                  <Paypal />
+
+                  <Text style={styles.paypalText}>
+                    Pay with PayPal or Debit/Credit Card
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <View className="self-center mt-3">
+                <PowerdByPayPal />
+              </View>
+            </View>
           </View>
-         
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.paymentButton, { backgroundColor:Colors.light.Yellow}]}>
-          <PayLater />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.paymentButton, { backgroundColor: "#2C2C2C" }]}>
-          <Volit  />
-          <Text style={styles.paymentText}>Debit or Credit Card</Text>
-        </TouchableOpacity>
-        
-      </View>
-      <View className="self-center mt-4">
-      <PowerdByPayPal/>
-      </View>
-    </View>
         </View>
       </ScrollView>
     </View>
@@ -162,11 +230,12 @@ export default index;
 const styles = StyleSheet.create({
   text: {
     marginTop: vs(20),
+    fontFamily: "PopinRegula",
   },
-   card: {
+  card: {
     marginVertical: vs(20),
     marginHorizontal: hs(15),
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: ms(8),
     elevation: 5,
     paddingVertical: vs(10),
@@ -179,24 +248,27 @@ const styles = StyleSheet.create({
   title: {
     fontSize: ms(14),
     textAlign: "center",
-    fontWeight:'500',
+    fontWeight: "500",
     marginBottom: vs(15),
+    fontFamily: "PopinRegula",
   },
 
   amountLabel: {
     fontSize: ms(16),
     fontWeight: "600",
-     marginBottom: vs(5),
+    marginBottom: vs(5),
     color: Colors.light.text,
+    fontFamily: "PopinRegula",
   },
   amountValue: {
     marginTop: vs(5),
     paddingVertical: vs(10),
     paddingHorizontal: hs(10),
     backgroundColor: Colors.light.LightGreen,
-    borderRadius: ms(10), 
-    marginBottom:vs(20),   
-    color:Colors.light.DarkGreen
+    borderRadius: ms(10),
+    marginBottom: vs(20),
+    color: Colors.light.DarkGreen,
+    fontFamily: "PopinRegula",
   },
   paymentOptions: {
     marginTop: vs(30),
@@ -204,9 +276,9 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     borderRadius: ms(8),
-    alignItems:'center',
-    justifyContent:'center',
-    height:vs(40),
+    alignItems: "center",
+    justifyContent: "center",
+    height: vs(40),
     marginBottom: vs(10),
   },
   paymentText: {
@@ -214,5 +286,26 @@ const styles = StyleSheet.create({
     fontSize: ms(14),
     fontWeight: "600",
     marginLeft: hs(8),
+    fontFamily: "PopinRegula",
+  },
+  paypalMainButton: {
+    backgroundColor: Colors.light.Yellow,
+    borderRadius: ms(8),
+    height: vs(48),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  paypalContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  paypalText: {
+    marginLeft: hs(10),
+    fontSize: ms(14),
+    fontWeight: "600",
+    color: "#003087",
+    fontFamily: "PopinRegula",
   },
 });

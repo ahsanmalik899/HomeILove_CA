@@ -103,12 +103,12 @@ const PdfPicker = ({
       {/* ---------- LABEL ---------- */}
       {text1 && (
         <View className="flex-row">
-          <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+          <Text style={{ fontSize: ms(15), fontWeight: "600",fontFamily: "PopinRegula", }}>
             {text1}
-            <Text style={{ color: Colors.light.red }}>{text2}</Text>
+            <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>{text2}</Text>
             {text3}
           </Text>
-          {additionalText && <Text>{` (${additionalText})`}</Text>}
+          {additionalText && <Text style={{fontFamily: "PopinRegula",}}>{` (${additionalText})`}</Text>}
         </View>
       )}
 
@@ -141,7 +141,7 @@ const PdfPicker = ({
                     {pdf.name}
                   </Text>
                   {pdf.existing && (
-                    <Text style={{ fontSize: ms(10), color: Colors.light.textGray }}>
+                    <Text style={{ fontSize: ms(10), color: Colors.light.textGray,fontFamily: "PopinRegula", }}>
                       Existing
                     </Text>
                   )}
@@ -192,5 +192,6 @@ const styles = StyleSheet.create({
   pdfText: {
     fontSize: ms(12),
     textAlign: "center",
+    fontFamily: "PopinRegula",
   },
 });

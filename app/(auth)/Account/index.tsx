@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: 'black',
     textAlign: 'left',
+        fontFamily: "PopinRegula",
   
   },
   subtitle: {
@@ -128,6 +129,7 @@ const styles = StyleSheet.create({
     marginTop: vs(12),
     lineHeight: vs(20),
     textAlign: 'left',
+        fontFamily: "PopinRegula",
   },
   illustrationContainer: {
     height: vs(200),

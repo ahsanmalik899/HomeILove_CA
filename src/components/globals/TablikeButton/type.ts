@@ -13,5 +13,5 @@ export type TabLikeButtonProps={
   Componet2?: React.ReactNode;
    Componet3?: React.ReactNode;
     onPress:(value:string)=>void
-
+    backgroundColor?:string;
 }

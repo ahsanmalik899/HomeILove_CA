@@ -79,6 +79,7 @@ const index = ({
           fontFamily: "PopinRegula",
           fontSize: ms(15),
           marginBottom: vs(20),
+          
         }}
       >
         Filter

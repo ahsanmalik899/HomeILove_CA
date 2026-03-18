@@ -192,7 +192,7 @@ const index = () => {
       <View style={{ marginHorizontal: hs(20) }}>
         <Text style={styles.mainHeading}>
           {dataBuy.mainHeading}
-          <Text style={{ color: Colors.light.red }}>{dataBuy.redText}</Text>
+          <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>{dataBuy.redText}</Text>
           {dataBuy.endText}
         </Text>
         <Text style={styles.subHeading}>{dataBuy.subHeading}</Text>
@@ -268,7 +268,7 @@ const index = () => {
                       : "lightgray",
                   }}
                 >
-                  <Text style={{ color: isSelected ? "white" : "black" }}>
+                  <Text style={{ color: isSelected ? "white" : "black",fontFamily: "PopinRegula", }}>
                     {option}
                   </Text>
                 </TouchableOpacity>
@@ -291,10 +291,11 @@ const index = () => {
             fontWeight: 500,
             marginBottom: vs(10),
             textAlign: "center",
+            fontFamily: "PopinRegula",
           }}
         >
           Quickly search your{" "}
-          <Text style={{ color: Colors.light.red, marginBottom: vs(20) }}>
+          <Text style={{ color: Colors.light.red, marginBottom: vs(20),fontFamily: "PopinRegula", }}>
             dream
           </Text>{" "}
           living
@@ -332,11 +333,13 @@ const styles = StyleSheet.create({
     marginTop: vs(20),
     fontSize: ms(20),
     fontWeight: 500,
+    fontFamily: "PopinRegula",
   },
   subHeading: {
     marginTop: vs(20),
     fontSize: ms(20),
     marginBottom: vs(10),
     fontWeight: 500,
+    fontFamily: "PopinRegula",
   },
 });

@@ -93,12 +93,12 @@ const pickImage = async () => {
       {/* ---------- LABEL ---------- */}
       {text1&&(
            <View className="flex-row">
-        <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+        <Text style={{ fontSize: ms(15), fontWeight: "600",fontFamily: "PopinRegula", }}>
           {text1}
-          <Text style={{ color: Colors.light.red }}>{text2}</Text>
+          <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>{text2}</Text>
           {text3}
         </Text>
-        {additionalText && <Text>{` (${additionalText})`}</Text>}
+        {additionalText && <Text style={{fontFamily: "PopinRegula",}}>{` (${additionalText})`}</Text>}
       </View>
       )}
    

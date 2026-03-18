@@ -179,11 +179,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: "#000",
+    fontFamily: "PopinRegula",
   },
 
   location: {
     color: "#666",
     marginTop: 4,
+    fontFamily: "PopinRegula",
   },
 
   ratingRow: {
@@ -200,12 +202,14 @@ const styles = StyleSheet.create({
   ratingText: {
     color: "#444",
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
 
   services: {
     marginTop: 8,
     color: "#777",
     lineHeight: 18,
+    fontFamily: "PopinRegula",
   },
   skeletonCard: {
     width: "100%",
@@ -235,5 +239,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     borderRadius: 8,
     marginTop: 8,
+    fontFamily: "PopinRegula",
   },
 });

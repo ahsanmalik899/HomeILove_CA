@@ -78,6 +78,7 @@ const index = ({
           fontFamily: "PopinRegula",
           fontSize: ms(15),
           marginBottom: vs(20),
+          
         }}
       >
         Filter
@@ -179,6 +180,7 @@ const index = ({
                     color: values.estate_type?.includes(option)
                       ? "white"
                       : "black",
+                      fontFamily: "PopinRegula",
                   }}
                 >
                   {option}
@@ -233,6 +235,7 @@ const index = ({
                     color: values.development_status?.includes(option)
                       ? "white"
                       : "black",
+                      fontFamily: "PopinRegula",
                   }}
                 >
                   {option}

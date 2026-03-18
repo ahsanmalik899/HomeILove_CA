@@ -36,12 +36,12 @@ const index = () => {
     <View className="flex-1">
       <HeaderWithBack />
       <View style={{ marginHorizontal: hs(20) }}>
-        <Text style={{ marginTop: vs(20), fontSize: ms(20), fontWeight: 500 }}>
+        <Text style={{ marginTop: vs(20), fontSize: ms(20), fontWeight: 500 ,fontFamily: "PopinRegula",}}>
           Send your home
-          <Text style={{ color: Colors.light.red }}> Maintenance</Text> {"\n"}
+          <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> Maintenance</Text> {"\n"}
           inquiry to experts
         </Text>
-        <Text style={{ color: Colors.light.textGray, marginTop: vs(10) }}>
+        <Text style={{ color: Colors.light.textGray, marginTop: vs(10),fontFamily: "PopinRegula", }}>
           Send free no obligation inquiry for your home maintenance to our
           reputed and experienced local homing experts in simple steps
         </Text>

@@ -4,7 +4,13 @@ import PostDesign from "@src/components/globals/PostDesign/PostDesign";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const NewsFeeds = () => {
   const [page, setPage] = useState(1);
@@ -25,39 +31,31 @@ const NewsFeeds = () => {
     { id: 10, name: "Investors" },
   ];
 
- const renderFilterItem = ({ item }) => {
-  const isActive = selectedFilter === item.name;
+  const renderFilterItem = ({ item }) => {
+    const isActive = selectedFilter === item.name;
 
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        setSelectedFilter(item.name);
-        setPage(1);
-      }}
-      style={[
-        styles.filterChip,
-        isActive && styles.filterChipActive,
-      ]}
-    >
-      <Text
-        style={[
-          styles.filterText,
-          isActive && styles.filterTextActive,
-        ]}
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedFilter(item.name);
+          setPage(1);
+        }}
+        style={[styles.filterChip, isActive && styles.filterChipActive]}
       >
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+        <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
+          {item.name}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const { data, isFetching, refetch, isError, error } = useGetHomeFeedsQuery({
     id: user.id,
-    type:"community",
+    type: selectedFilter,
     page,
-  limit,
+    limit,
   });
- 
+
   useEffect(() => {
     if (!data?.data?.feed) return;
 
@@ -71,26 +69,26 @@ const NewsFeeds = () => {
   }, [data]);
   return (
     <View className="bg-white flex-1">
-     <View style={styles.filterContainer}>
-  <Text style={styles.sortText}>Sort by</Text>
+      <View style={styles.filterContainer}>
+        <Text style={styles.sortText}>Sort by</Text>
 
-  <FlatList
-    data={filter}
-    renderItem={renderFilterItem}
-    keyExtractor={(item) => item.id.toString()}
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    contentContainerStyle={styles.filterList}
-  />
-</View>
+        <FlatList
+          data={filter}
+          renderItem={renderFilterItem}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterList}
+        />
+      </View>
 
-      <PostDesign data={Posts} isfetching={isFetching} setPage={setPage} />
+      <PostDesign data={Posts} isfetching={isFetching} setPage={setPage} refetch={refetch} setData={setPosts} />
     </View>
   );
 };
 const styles = StyleSheet.create({
   filterContainer: {
-    backgroundColor: "#fff",
+    backgroundColor:  "#F4F0F0",
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
@@ -102,6 +100,7 @@ const styles = StyleSheet.create({
     color: "#444",
     marginLeft: 16,
     marginBottom: 8,
+    fontFamily: "PopinRegula",
   },
 
   filterList: {
@@ -112,7 +111,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: "#F2F2F2",
+    backgroundColor: Colors.light.lightGray,
     marginRight: 8,
   },
 
@@ -123,11 +122,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#333",
     fontWeight: "500",
+    fontFamily: "PopinRegula",
   },
 
   filterTextActive: {
     color: "#fff",
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
 });
 

@@ -4,13 +4,14 @@ import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 interface ButtonProps {
  id:number;
+ onPress:()=>void;
 }
-const index = ({id}: ButtonProps) => {
+const index = ({id,onPress}: ButtonProps) => {
   return (
     <TouchableOpacity style={styles.button} onPress={() =>{
-        console.log('pressed')
+      onPress()
     }}>
-      <Text style={styles.buttonText}>Unfollow</Text>
+      <Text style={styles.buttonText}>Connect</Text>
     </TouchableOpacity>
   );
 };
@@ -30,5 +31,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: '600',
+    fontFamily: "PopinRegula",
   },
 });

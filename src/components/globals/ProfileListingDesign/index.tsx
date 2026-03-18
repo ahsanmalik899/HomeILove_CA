@@ -52,6 +52,7 @@ const YourAdsPostDesign = ({
               params: {
                 type: item.type,
                 id: item.id,
+                userid:item.users_id,
               },
             });
           }}
@@ -79,44 +80,45 @@ const YourAdsPostDesign = ({
                       : "black",
                   fontWeight: 700,
                   fontSize: ms(18),
+                  fontFamily: "PopinRegula",
                 }}
               >
                 $ {item.contact}
                 {item.property_for === "rent" && (
-                  <Text style={{ color: Colors.light.red, fontSize: ms(18) }}>
+                  <Text style={{ color: Colors.light.red, fontSize: ms(18),fontFamily: "PopinRegula", }}>
                     /{item.rent_type}
                   </Text>
                 )}
               </Text>
               {item.post_type === "Trending" && (
                 <Text
-                  style={{ fontWeight: 600, color: Colors.light.DarkGreen }}
+                  style={{ fontWeight: 600, color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}
                 >
                   Trending
                 </Text>
               )}
             </View>
             <View className="flex-row justify-between">
-              <Text style={{ color: "black", fontWeight: "700" }}>
+              <Text style={{ color: "black", fontWeight: "700",fontFamily: "PopinRegula", }}>
                 {item.business_name.length > 20
                   ? item.business_name.slice(0, 20) + "..."
                   : item.business_name}
               </Text>
               <View className="flex-row items-center gap-2">
                 <StarRating rating={item.rating} size={10} />
-                <Text style={{ color: Colors.light.textGray, fontWeight: 700 }}>
+                <Text style={{ color: Colors.light.textGray, fontWeight: 700,fontFamily: "PopinRegula", }}>
                   {item.total_reviews} reviews
                 </Text>
               </View>
             </View>
             <View className="flex-row justify-between">
-              <Text style={{ color: Colors.light.textGray, marginTop: vs(5) }}>
+              <Text style={{ color: Colors.light.textGray, marginTop: vs(5),fontFamily: "PopinRegula", }}>
                 {item.address.length > 25
                   ? item.address.slice(0, 25) + "..."
                   : item.address}
               </Text>
 
-              <Text style={{ color: Colors.light.textGray, marginTop: vs(5) }}>
+              <Text style={{ color: Colors.light.textGray, marginTop: vs(5) ,fontFamily: "PopinRegula",}}>
                 License# {item.license_no}
               </Text>
             </View>
@@ -130,6 +132,7 @@ const YourAdsPostDesign = ({
               }}
             />
             <View>
+              {item.remarks&&(
               <Text style={styles.description}>
                 {expanded
                   ? item.remarks
@@ -144,7 +147,7 @@ const YourAdsPostDesign = ({
                     {expanded ? " Show Less" : " Read More"}
                   </Text>
                 )}
-              </Text>
+              </Text>)}
 
               <TouchableOpacity
                 onPress={() => {
@@ -202,8 +205,8 @@ const YourAdsPostDesign = ({
                   marginTop: vs(10),
                 }}
               >
-             <Text style={{fontWeight:600,fontSize:ms(15)}}>{item.sale_posts} Sale ads</Text>
-             <Text style={{fontWeight:600,fontSize:ms(15)}}>{item.rent_posts} Rent ads</Text>
+             <Text style={{fontWeight:600,fontSize:ms(15),fontFamily: "PopinRegula",}}>{item.sale_posts} Sale ads</Text>
+             <Text style={{fontWeight:600,fontSize:ms(15),fontFamily: "PopinRegula",}}>{item.rent_posts} Rent ads</Text>
               </View>
 
               <View
@@ -284,7 +287,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   name: {
-    fontWeight: "bold",
+    fontWeight: "bold",fontFamily: "PopinRegula",
   },
   uperSection: {
     marginLeft: hs(10),
@@ -293,11 +296,12 @@ const styles = StyleSheet.create({
     marginVertical: vs(10),
     fontWeight: 500,
     color: Colors.light.textGray,
-    fontFamily: "",
+    fontFamily: "PopinRegula",
   },
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
   card2: {
     backgroundColor: "white",

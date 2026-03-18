@@ -3,4 +3,6 @@ export type postDataType= {
     setPage: React.Dispatch<React.SetStateAction<number>>;
     isfetching:boolean;
     withCreatePost?:boolean;
+      refetch: () => void;
+      setData:(data:[])=>void;
 }

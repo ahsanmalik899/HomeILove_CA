@@ -51,7 +51,7 @@ const index = () => {
         <HeaderWithBack />
         <View style={{ marginHorizontal: hs(20) }} >
           <Text style={styles.mainHeading}>{dataBuy.mainHeading}
-            <Text style={{ color: Colors.light.red }}>{dataBuy.redText}</Text>
+            <Text style={{ color: Colors.light.red ,  fontFamily: "PopinRegula",}}>{dataBuy.redText}</Text>
             {dataBuy.endText}
           </Text>
           <Text style={styles.subHeading}>{dataBuy.subHeading}</Text>
@@ -80,11 +80,13 @@ const styles = StyleSheet.create({
     marginTop: vs(20),
     fontSize: ms(20),
     fontWeight: 500,
+      fontFamily: "PopinRegula",
   },
   subHeading: {
     marginTop: vs(20),
     fontSize: ms(20),
     marginBottom: vs(10),
     fontWeight: 500,
+      fontFamily: "PopinRegula",
   }
 })

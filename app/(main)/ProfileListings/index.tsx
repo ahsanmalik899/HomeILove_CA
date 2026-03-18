@@ -197,12 +197,14 @@ const styles = StyleSheet.create({
     fontSize: ms(15),
     fontWeight: "700",
     color: "#111",
+      fontFamily: "PopinRegula",
   },
 
   resultSub: {
     fontSize: ms(12),
     color: Colors.light.textGray,
     marginTop: vs(2),
+      fontFamily: "PopinRegula",
   },
 
   filterBtn: {
@@ -219,5 +221,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: ms(13),
     fontWeight: "600",
+      fontFamily: "PopinRegula",
   },
 });

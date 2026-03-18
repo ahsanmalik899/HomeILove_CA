@@ -5,7 +5,7 @@ import YoutubePlayer from "react-native-youtube-iframe";
 
 const VideoSection = ({ url }: { url?: string | null }) => {
   if (!url) {
-    return <Text>No video available</Text>; // fallback for undefined/null
+    return <Text style={{fontFamily: "PopinRegula",}}>No video available</Text>; // fallback for undefined/null
   }
 
   const ytRegex =
@@ -60,7 +60,7 @@ const VideoSection = ({ url }: { url?: string | null }) => {
     );
   }
 
-  return <Text>Unsupported video URL</Text>;
+  return <Text style={{fontFamily: "PopinRegula",}}>Unsupported video URL</Text>;
 };
 
 export default VideoSection;

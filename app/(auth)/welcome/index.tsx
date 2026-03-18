@@ -176,14 +176,17 @@ const styles = StyleSheet.create({
   heading: {
     marginTop: vs(90),
     marginHorizontal: hs(20),
+        fontFamily: "PopinRegula",
   },
   headingtext: {
     fontSize: ms(30),
     letterSpacing: 2,
     fontWeight: 600,
+        fontFamily: "PopinRegula",
   },
   discription: {
     marginTop: vs(20),
+        fontFamily: "PopinRegula",
   },
   bottom: {
     marginBottom: vs(30),

@@ -32,7 +32,8 @@ const _layout = () => {
               style={{
                 color: focused? Colors.light.red:Colors.light.DarkGreen,
                 fontWeight: focused ? "600" : "400",
-                fontSize:ms(12)
+                fontSize:ms(12),
+                fontFamily: "PopinRegula",
               }}
             >
               Home Feed
@@ -51,7 +52,8 @@ const _layout = () => {
               style={{
                color: focused? Colors.light.red:Colors.light.DarkGreen,
                 fontWeight: focused ? "600" : "400",
-                fontSize:ms(12)
+                fontSize:ms(12),
+                fontFamily: "PopinRegula",
               }}
             >
               Message
@@ -70,7 +72,8 @@ const _layout = () => {
               style={{
                 color: focused? Colors.light.red:Colors.light.DarkGreen,
                 fontWeight: focused ? "600" : "400",
-                fontSize:ms(12)
+                fontSize:ms(12),
+                fontFamily: "PopinRegula",
               }}
             >
               Dashboard

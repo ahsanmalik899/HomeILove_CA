@@ -4,4 +4,7 @@ export type postDataType= {
     isfetching:boolean;
     type:string;
     hasmore:boolean;
+    initialLoadDone:boolean;
+    refetch:()=>void;
+    setpost:(data:any)=>void;
 }

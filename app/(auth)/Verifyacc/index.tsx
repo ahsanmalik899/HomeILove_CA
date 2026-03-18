@@ -163,9 +163,11 @@ const styles = StyleSheet.create({
     fontSize: ms(37),
     fontWeight: '400',
     color: 'black',
+    
     marginTop: vs(-2),
      paddingTop: vs(-20),
-
+         fontFamily: "PopinRegula",
+    fontFamily: "PopinRegula",
     lineHeight: vs(44), // keeps “Verify” & “Account.” evenly spaced
   },
   subtitle: {
@@ -174,10 +176,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: vs(12),
     lineHeight: vs(20),
+        fontFamily: "PopinRegula",
   },
   emailText: {
     color: 'black',
     fontWeight: '500',
+        fontFamily: "PopinRegula",
   },
   illustrationContainer: {
     height: vs(200),
@@ -200,6 +204,7 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
     marginBottom: vs(5),
+        fontFamily: "PopinRegula",
   },
   resendLinkButton: {
     padding: 1,
@@ -209,15 +214,18 @@ const styles = StyleSheet.create({
     color: '#4A90A4',
     fontSize: ms(14),
     fontWeight: '600',
+        fontFamily: "PopinRegula",
   },
   countdownText: {
     color: 'black',
     fontWeight: '600',
+        fontFamily: "PopinRegula",
   },
   againText: {
     color: '#4A90A4',
     fontWeight: '600',
     textDecorationLine: 'underline',
+        fontFamily: "PopinRegula",
   },
  
 

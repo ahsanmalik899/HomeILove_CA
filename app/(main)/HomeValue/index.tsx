@@ -240,11 +240,11 @@ const map = {
               <View style={{ marginHorizontal: hs(20) }}>
                 <Text style={styles.mainHeading}>
                   Get smart with{" "}
-                  <Text style={{ color: Colors.light.red }}>BEST</Text>{" "}
+                  <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>BEST</Text>{" "}
                   valuation
                 </Text>
                 <Text
-                  style={{ marginTop: vs(10), color: Colors.light.textGray }}
+                  style={{ marginTop: vs(10), color: Colors.light.textGray,fontFamily: "PopinRegula", }}
                 >
                   Get authentic home valuation from our local expert agents for
                   FREE
@@ -272,7 +272,7 @@ const map = {
                           }
                         />
                       </TouchableOpacity>
-                      <Text style={{ marginLeft: hs(5) }}>
+                      <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}>
                         Need property for rent
                       </Text>
                     </View>
@@ -303,7 +303,7 @@ const map = {
                       </TouchableOpacity>
                     </View>
 
-                    <Text style={{ marginLeft: hs(5) }}>Need to rent out</Text>
+                    <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}>Need to rent out</Text>
                   </View>
                 )}
                 {type === "community" && (
@@ -329,7 +329,7 @@ const map = {
                           }
                         />
                       </TouchableOpacity>
-                      <Text style={{ marginLeft: hs(5) }}>New homes</Text>
+                      <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}>New homes</Text>
                     </View>
 
                     <View
@@ -358,11 +358,11 @@ const map = {
                       </TouchableOpacity>
                     </View>
 
-                    <Text style={{ marginLeft: hs(5) }}>New estate</Text>
+                    <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}>New estate</Text>
                   </View>
                 )}
                 {touched.inquiryType && errors.inquiryType && (
-                  <Text style={{ color: Colors.light.red, marginTop: vs(5) }}>
+                  <Text style={{ color: Colors.light.red, marginTop: vs(5) ,fontFamily: "PopinRegula",}}>
                     {errors.inquiryType}
                   </Text>
                 )}
@@ -759,14 +759,14 @@ const map = {
               color={Colors.light.DarkGreen}
               name={selectAll ? "check-box" : "check-box-outline-blank"}
             />
-            <Text>Select All</Text>
+            <Text style={{fontFamily: "PopinRegula",}}>Select All</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>
               {!isFetching && agents?.length === 0 ? (
                 <View style={{ alignItems: "center", marginTop: 120 }}>
                   <Text
-                    style={{ fontSize: 18, fontWeight: "600", color: "black" }}
+                    style={{ fontSize: 18, fontWeight: "600", color: "black" ,fontFamily: "PopinRegula",}}
                   >
                     No Data Found
                   </Text>
@@ -898,7 +898,7 @@ formData.append("inv_loan_amount", step1Data.inv_loan_amount || "");
                       multiline
                       errorText={errors.message}
                     />
-                    <Text className="mt-5">
+                    <Text  style={{fontFamily: "PopinRegula",}} className="mt-5">
                       by proceeding,you consent to receive ccalls and texts at
                       the number you provided, including marketing by autodialer
                       and prerecorded and artificial voice, and email, from
@@ -937,6 +937,7 @@ const styles = StyleSheet.create({
     marginTop: vs(20),
     fontSize: ms(20),
     fontWeight: 500,
+    fontFamily: "PopinRegula",
   },
 
   uperSection: {
@@ -957,6 +958,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: "600",
     color: "#333",
+    fontFamily: "PopinRegula",
   },
 
   value: {
@@ -982,12 +984,14 @@ const styles = StyleSheet.create({
     fontSize: ms(14),
     fontWeight: "700",
     color: "#000",
+    fontFamily: "PopinRegula",
   },
 
   city: {
     fontSize: ms(12),
     color: "#666",
     marginTop: 2,
+    fontFamily: "PopinRegula",
   },
 
   divider: {
@@ -999,6 +1003,7 @@ const styles = StyleSheet.create({
   area: {
     fontSize: ms(12),
     color: "#444",
+    fontFamily: "PopinRegula",
   },
 
   ratingRow: {

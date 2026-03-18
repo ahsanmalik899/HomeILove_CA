@@ -8,7 +8,7 @@ const index = ({Svg,Heading,BtnText,OnSubmit}:PrefrenceCardprops) => {
     <View  style={{borderRadius:ms(10)}} className=' bg-white pt-1  '>
      <View  style={{ alignItems:'center', width: '100%'}}>
      <Svg/>     
-     <Text  style={{fontWeight:600, fontSize:ms(15)}}>{Heading}</Text>
+     <Text  style={{fontWeight:600, fontSize:ms(15),fontFamily: "PopinRegula",}}>{Heading}</Text>
     </View>
     <View style={{paddingHorizontal:hs(20), marginVertical:vs(10)}}>
     <LargeButton text={BtnText} handleSubmit={OnSubmit}/>

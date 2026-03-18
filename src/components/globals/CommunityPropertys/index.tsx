@@ -1017,7 +1017,7 @@ const index = ({
         }}
         onPress={()=>{if(count<5){setCount((prev: number)=> prev + 1)}}}
       >
-        <Text style={{ color: "white" }}>Add More properties</Text>
+        <Text style={{ color: "white",fontFamily: "PopinRegula", }}>Add More properties</Text>
       </TouchableOpacity>
 )}
 

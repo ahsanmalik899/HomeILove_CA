@@ -8,7 +8,7 @@ const index = ({ title,text, checkedValue,value, onPress }: RadioButtonProps) =>
   return (
     <View>
       {title&&(
-      <Text className="font-bold">{title}</Text>)}
+      <Text className="font-bold" style={{fontFamily: "PopinRegula",}}>{title}</Text>)}
       <TouchableOpacity
         onPress={() => {
           onPress(value===checkedValue? "":checkedValue);
@@ -20,7 +20,7 @@ const index = ({ title,text, checkedValue,value, onPress }: RadioButtonProps) =>
             color={Colors.light.DarkGreen}
             name={value === checkedValue ? "check-box" : "check-box-outline-blank"}
           />
-          <Text style={{ marginLeft: hs(5), fontWeight: "500" }}>{text}</Text>
+          <Text style={{ marginLeft: hs(5), fontWeight: "500",fontFamily: "PopinRegula", }}>{text}</Text>
         </View>
       </TouchableOpacity>
     </View>

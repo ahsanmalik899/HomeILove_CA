@@ -29,7 +29,7 @@ const index = ({ onPress, value,errorText }: RentAndSaleProps) => {
     </View>
      { errorText && (
                       <Text
-                        style={{ color: Colors.light.red, marginTop: vs(5) }}
+                        style={{ color: Colors.light.red, marginTop: vs(5),fontFamily: "PopinRegula", }}
                       >
                         {errorText}
                       </Text>
@@ -58,10 +58,12 @@ const styles = StyleSheet.create({
   TextActive: {
     fontWeight: 500,
     color: "white",
-    marginTop:vs(5)
+    marginTop:vs(5),
+    fontFamily: "PopinRegula",
   },
   Text: {
     fontWeight: 400,
-     marginTop:vs(5)
+     marginTop:vs(5),
+     fontFamily: "PopinRegula",
   },
 });

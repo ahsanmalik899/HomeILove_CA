@@ -21,7 +21,7 @@ const Loading = ({ text, isLoading }: Loadingprops) => {
       }}
     >
       <ActivityIndicator size="large" color={Colors.light.red} />
-      <Text style={{ marginTop: 10, color: '#333' }}>{text}</Text>
+      <Text style={{ marginTop: 10, color: '#333',fontFamily: "PopinRegula", }}>{text}</Text>
     </View>
   );
 };

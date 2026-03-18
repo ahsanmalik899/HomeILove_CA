@@ -188,12 +188,14 @@ const styles = StyleSheet.create({
     color: 'black',
     lineHeight: vs(40),
     marginTop: vs(-30),
+        fontFamily: "PopinRegula",
   },
   subtitle: {
     fontSize: ms(16),
     color: 'black',
     fontWeight: '500',
     marginBottom: vs(30),
+        fontFamily: "PopinRegula",
   },
   inputWrapper: {
     position: 'relative',
@@ -206,6 +208,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: hs(15),
     backgroundColor: '#fff',
     fontSize: ms(14),
+        fontFamily: "PopinRegula",
     color: '#000',
   },
   eyeIcon: {
@@ -218,11 +221,13 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: vs(18),
     marginLeft: hs(190),
+        fontFamily: "PopinRegula",
   },
   errorText: {
     color: 'red',
     fontSize: ms(12),
     marginTop: vs(4),
     marginLeft: hs(4),
+        fontFamily: "PopinRegula",
   },
 });

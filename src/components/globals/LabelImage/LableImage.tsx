@@ -7,10 +7,10 @@ const LableImage = ({source,title,price}:LableImageProps) => {
   <View>
     <Image  style ={styles.image}source={source}/>
 <View className='flex-row justify-between' style={{position:'absolute',width:'100%',bottom:0, marginVertical:vs(5),backgroundColor:'rgba(76, 76, 76, 0.7)', paddingHorizontal:hs(20),paddingVertical:vs(10),borderBottomStartRadius:ms(50),borderBottomEndRadius:ms(50)}}>
-    <Text style={{color:'white'}}>
+    <Text style={{color:'white',fontFamily: "PopinRegula",}}>
    {title}
     </Text>
-    <Text style={{color:'white'}}>
+    <Text style={{color:'white',fontFamily: "PopinRegula",}}>
 {price}
     </Text>
 </View>

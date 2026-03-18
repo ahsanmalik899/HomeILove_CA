@@ -1,3 +1,4 @@
+import { useUpdateAccountApiMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import Usertypelogo from "@assets/Home/accountperson.svg";
@@ -7,6 +8,7 @@ import LargeButton from "@src/components/globals/LaregeButton";
 import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { Formik } from "formik";
 import { useEffect } from "react";
@@ -36,14 +38,15 @@ const index = () => {
   useEffect(()=>{
 console.log(user.logo)
   },[user])
+  const [updateAccount] = useUpdateAccountApiMutation();
   return (
      <View className="bg-white flex-1">
       <ScrollView>
         <HeaderWithBack title="Account Profile" redButton buttonTitile="Delete Account" />
         <View style={{ marginHorizontal: hs(20), marginTop: vs(10), paddingBottom:vs(70)}}>
-          <Text style={{ fontSize: ms(20), fontWeight: 600 }}>
+          <Text style={{ fontSize: ms(20), fontWeight: 600, fontFamily: "PopinRegula", }}>
             Awesome! Right place to{" "}
-            <Text style={{ color: Colors.light.red }}>LOVE</Text> your home
+            <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>LOVE</Text> your home
           </Text>
           <Formik
           enableReinitialize
@@ -57,7 +60,29 @@ console.log(user.logo)
               logo:user.logo||null,
             }}
             validationSchema={profileschemea}
-            onSubmit={(values) => console.log(values)}
+          onSubmit={async (values) => {
+  try {
+
+    const body = {
+      user_id: user.id,
+      name: values.name,
+      email: values.email,
+      mobile: values.mobile,
+      old_password: values.oldPassword,
+      new_password: values.newPassword,
+      logo: values.logo
+    };
+
+    const res = await updateAccount(body).unwrap();
+
+    if(res.success){
+      renderToastSuccess(res.message);
+    }
+
+  } catch (error) {
+    renderToastError("Update failed");
+  }
+}}
           >
             {({
               handleChange,
@@ -96,13 +121,13 @@ console.log(user.logo)
                   onBlur={handleBlur("email")}
                   errors={!!errors.email}
                   required
-                  onChangeText={handleChange("eamil")}
+               onChangeText={handleChange("email")}
                   title="Email"
                   touched={!!touched.email}
                   value={values.email}
                   placeholder="Email"
                 />
-                <Text style={{ marginTop: vs(10), fontWeight: 600 }}>
+                <Text style={{ marginTop: vs(10), fontWeight: 600,fontFamily: "PopinRegula", }}>
                   Change Password
                 </Text>
                 <FormikInput
@@ -144,6 +169,7 @@ console.log(user.logo)
             style={{
               marginTop: vs(10),
               fontWeight: 600,
+              fontFamily: "PopinRegula",
             }}
           >
             User Type:
@@ -159,7 +185,7 @@ console.log(user.logo)
             }}
           >
             <Usertypelogo />
-            <Text style={{ marginTop: vs(10), fontWeight: 600 ,fontSize:ms(15)}}>
+            <Text style={{ marginTop: vs(10), fontWeight: 600 ,fontSize:ms(15),fontFamily: "PopinRegula",}}>
               {user.user_type}
             </Text>
           </View>
@@ -171,7 +197,7 @@ console.log(user.logo)
                   name="logo"
                   setValue={setFieldValue}
                    value={values.logo}                />
-                <LargeButton text="Upload Account" handleSubmit={()=>{onsubmit}}/>
+                <LargeButton text="Update Account" handleSubmit={handleSubmit} />
                     </>
                  )}
           </Formik>

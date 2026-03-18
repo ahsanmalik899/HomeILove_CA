@@ -42,8 +42,8 @@ export default function FormikDatePicker({
   return (
     <View style={{ marginTop: vs(10) }}>
       <View className="flex-row" style={{ marginBottom: vs(10) }}>
-        {title && <Text style={{ fontSize: ms(14), fontWeight: "600" }}>{title}</Text>}
-        {required && <Text style={{ color: Colors.light.red }}>*</Text>}
+        {title && <Text style={{ fontSize: ms(14), fontWeight: "600",fontFamily: "PopinRegula", }}>{title}</Text>}
+        {required && <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>*</Text>}
       </View>
 
       <TouchableOpacity
@@ -56,7 +56,7 @@ export default function FormikDatePicker({
           width: "100%",
         }}
       >
-        <Text>{value ? value : placeholder}</Text>
+        <Text style={{fontFamily: "PopinRegula",}}>{value ? value : placeholder}</Text>
       </TouchableOpacity>
 
       {show && (
@@ -69,7 +69,7 @@ export default function FormikDatePicker({
         />
       )}
 
-      {touched && errors && <Text style={{ color: Colors.light.red }}>{errorText}</Text>}
+      {touched && errors && <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>{errorText}</Text>}
     </View>
   );
 }

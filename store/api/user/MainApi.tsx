@@ -16,13 +16,18 @@ export const MainApi = createApi({
     "ConnectionPref",
     "CommunityPref",
     "PropertyPref",
-    "senderInquires"
+    "senderInquires",
+    "Comments",
+    "NewsFeeds",
+    "MypostCount",
+    "CheckProfile",
+    "otherPastData"
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
     getYourpost: builder.query<FeedResponse, GetPostType>({
       query: ({ userid, page }) => ({
-        url: `getYourFeeds/?userid=${userid}&page=${page}`,
+        url: `getUserGeneralPosts?user_id=${userid}&page=${page}`,
         method: "GET",
       }),
     }),
@@ -31,6 +36,7 @@ export const MainApi = createApi({
         url: `getHomeFeed/?userid=${userid}&page=${page}`,
         method: "GET",
       }),
+      providesTags: ["NewsFeeds"],
     }),
     getContentpost: builder.query<FeedResponse, ContentPostType>({
       query: ({ userid, page, type }) => ({
@@ -41,6 +47,13 @@ export const MainApi = createApi({
     createProfile: builder.mutation<any, FormData>({
       query: (formatData) => ({
         url: `createProfile`,
+        method: "POST",
+        body: formatData,
+      }),
+    }),
+    updateProfile: builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `updateProfile`,
         method: "POST",
         body: formatData,
       }),
@@ -73,8 +86,14 @@ export const MainApi = createApi({
         url: `check-profiles?id=${id}`,
         method: "GET",
       }),
+      providesTags: ["CheckProfile"],
     }),
-
+    getProfilesForConection: builder.query<any, GetProfiles>({
+      query: ({ id }) => ({
+        url: `checkProfilesForconnection?id=${id}`,
+        method: "GET",
+      }),
+    }),
     postGeneralPost: builder.mutation<any, FormData>({
       query: (data) => ({
         url: `generalPost/create`,
@@ -125,6 +144,12 @@ export const MainApi = createApi({
         method: "GET",
       }),
     }),
+    userAgentPastPostsApi: builder.query<any, any>({
+      query: ({ page, per_page, user_id }) => ({
+        url: `get/userAgentPastPostsApi?page=${page}&per_page=${per_page}&user_id=${user_id}`,
+        method: "GET",
+      }),
+    }),
     SendVisistRequest: builder.mutation<any, FormData>({
       query: (formData) => ({
         url: `sendVisitRequest`,
@@ -140,6 +165,7 @@ export const MainApi = createApi({
         url: `getPostCount?user_id=${user_id}`,
         method: "GET",
       }),
+      providesTags: ["MypostCount"],
     }),
     getDataForEdit: builder.query<any, GetMyPostsOnly>({
       query: ({ type, id }) => ({
@@ -167,7 +193,7 @@ export const MainApi = createApi({
     }),
     getHomeFeeds: builder.query<any, GetMyPostsOnly>({
       query: ({ type, id, page, limit }) => ({
-        url: `getHomeFeed?userid=${id}$page=${page}$limit=${limit}`,
+        url: `getHomeFeed?userid=${id}&page=${page}&limit=${limit}&type=${type}`,
         method: "GET",
       }),
     }),
@@ -389,29 +415,319 @@ export const MainApi = createApi({
         body: formatdata,
       }),
     }),
-     getsendedInquiery: builder.query<any, any>({
-      query: ({ id,page }) => ({
+    getsendedInquiery: builder.query<any, any>({
+      query: ({ id, page }) => ({
         url: `/getInquries?user_id=${id}&page=${page}`,
         method: "GET",
       }),
-       providesTags:[ "senderInquires"
-      ],
+      providesTags: ["senderInquires"],
     }),
-      deletSendedInquiry: builder.mutation<any, any>({
+    deletSendedInquiry: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
         url: "deletSendedInquries",
         method: "POST",
         body: formatdata,
       }),
-       invalidatesTags: ["senderInquires"],
+      invalidatesTags: ["senderInquires"],
     }),
-       getRecivedInquiery: builder.query<any, any>({
-      query: ({ id,page }) => ({
+    deleterecivedInquiries: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "deleterecivedInquiries",
+        method: "POST",
+        body: formatdata,
+      }),
+      invalidatesTags: ["senderInquires"],
+    }),
+    getRecivedInquiery: builder.query<any, any>({
+      query: ({ id, page }) => ({
         url: `/getRecivedInquiries?user_id=${id}&page=${page}`,
         method: "GET",
       }),
-       providesTags:[ "senderInquires"
-      ],
+      providesTags: ["senderInquires"],
+    }),
+    getReviews: builder.query<any, any>({
+      query: ({ id, profile_type, type }) => ({
+        url: `/get/userReviews?user_id=${id}&profile_type=${profile_type}&type=${type}`,
+        method: "GET",
+      }),
+    }),
+    sendRequest: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "sendRequestApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
+
+    deletePropertyPreferencesApi: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "deletePropertyPreferencesApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
+    deleteConnectionPreferencesApi: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "deleteConnectionPreferencesApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
+    deleteCommunityPreferencesApi: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "deleteCommunityPreferencesApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
+    postCommentApi: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "postCommentApi",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["SinglePostData", "Comments"],
+    }),
+    postReplyApi: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "postReplyApi",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Comments"],
+    }),
+    deleteCommentApi: builder.mutation({
+      query: (id) => ({
+        url: `deleteCommentApi`,
+        method: "DELETE",
+        body: { comment_id: id },
+      }),
+      invalidatesTags: ["Comments", "NewsFeeds"],
+    }),
+    getPostCommentsApi: builder.query<any, any>({
+      query: ({ post_id }) => ({
+        url: `/getPostCommentsApi?post_id=${post_id}`,
+        method: "GET",
+      }),
+      providesTags: ["Comments"],
+    }),
+    getMyTrendingProfiles: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `getMyTrendingProfiles?user_id=${id}`,
+        method: "GET",
+      }),
+    }),
+
+    saveItemApi: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "saveItemApi",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    unsaveItemApi: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "unsaveItemApi",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    likePost: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "likePost",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["NewsFeeds"],
+    }),
+    unlikePost: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "unlikePost",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["NewsFeeds"],
+    }),
+    getConnectedUsersApi: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `getConnectedUsersApi?user_id=${id}`,
+        method: "GET",
+      }),
+    }),
+    getReceivedRequestsApi: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `getReceivedRequestsApi?user_id=${id}`,
+        method: "GET",
+      }),
+    }),
+    getSentRequestsApi: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `getSentRequestsApi?sender_id=${id}`,
+        method: "GET",
+      }),
+    }),
+    getNotifications: builder.query({
+      query: ({ user_id, page = 1 }) =>
+        `notifications/all?user_id=${user_id}&page=${page}`,
+    }),
+
+    markRead: builder.mutation({
+      query: ({ id, user_id }) => ({
+        url: `notifications/read/${id}`,
+        method: "POST",
+        body: { user_id },
+      }),
+    }),
+    getChatListApi: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `getChatListApi?user_id=${id}`,
+        method: "GET",
+      }),
+    }),
+    HidePost: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "hide-post",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    saveNotificationToken: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "saveNotificationToken",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    PaybyPaypal: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "create-paypal-order",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    DeletReview: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "deleteReview",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    ReviseReview: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "askForReview",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    getUnreadNotificationsCount: builder.query({
+      query: ({ user_id }) =>
+        `getUnreadNotificationsCountApi?user_id=${user_id}`,
+    }),
+
+    CapturePayment: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "capturePaypalOrder",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    getUserWallet: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `getUserWallet?user_id=${id}`,
+        method: "GET",
+      }),
+    }),
+    getMessagesApi: builder.query({
+      query: ({ userId, chatUserId, page = 1 }) => ({
+        url: `getMessages`,
+        params: {
+          user_id: userId,
+          chat_user_id: chatUserId,
+          page,
+        },
+      }),
+    }),
+
+    sendMessageApi: builder.mutation({
+      query: (data) => ({
+        url: `sendMessageApi`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    markAsReadApi: builder.mutation({
+      query: (data) => ({
+        url: "markAsRead",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    writeReviewApi: builder.mutation({
+      query: (data) => ({
+        url: "writeReviewApi",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    updateReviewApi: builder.mutation({
+      query: ({ body }) => ({
+        url: `updateReview`,
+        method: "POST",
+        body,
+      }),
+    }),
+    updateAccountApi: builder.mutation({
+      query: (body) => ({
+        url: "/updateAccount",
+        method: "POST",
+        body,
+      }),
+    }),
+    markAllAsSeen: builder.mutation({
+      query: ({ user_id }) => ({
+        url: "notifications/mark-all-seen",
+        method: "POST",
+        body: { user_id },
+      }),
+    }),
+    deletePost: builder.mutation({
+      query: (data) => ({
+        url: "deletePost",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["MypostCount"],
+    }),
+    deleteProfile: builder.mutation({
+      query: (body) => ({
+        url: "deleteProfile",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["CheckProfile"],
+    }),
+     savePastWork: builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `savePastWork`,
+        method: "POST",
+        body: formatData,
+      }),
+    }),
+      getotherPastWork: builder.query<any, any>({
+      query: ({user_id,work_section}) => ({
+        url: `getPastWork?user_id=${user_id}&work_section=${work_section}`,
+        method: "GET",
+       
+      }),
+      providesTags:["otherPastData"]
+    }),
+    deletePastWork:builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `deletePastWork`,
+        method: "POST",
+        body: formatData,
+      }),
+      invalidatesTags:["otherPastData"]
     }),
   }),
 });
@@ -454,4 +770,50 @@ export const {
   useGetsendedInquieryQuery,
   useDeletSendedInquiryMutation,
   useGetRecivedInquieryQuery,
+  useDeleterecivedInquiriesMutation,
+  useGetReviewsQuery,
+  useSendRequestMutation,
+  useGetProfilesForConectionQuery,
+  useDeletePropertyPreferencesApiMutation,
+  useDeleteConnectionPreferencesApiMutation,
+  useDeleteCommunityPreferencesApiMutation,
+  useGetPostCommentsApiQuery,
+  usePostCommentApiMutation,
+  useDeleteCommentApiMutation,
+  usePostReplyApiMutation,
+  useGetMyTrendingProfilesQuery,
+  useSaveItemApiMutation,
+  useUnsaveItemApiMutation,
+  useLikePostMutation,
+  useUnlikePostMutation,
+  useGetConnectedUsersApiQuery,
+  useGetReceivedRequestsApiQuery,
+  useGetSentRequestsApiQuery,
+  useGetNotificationsQuery,
+  useMarkReadMutation,
+  useGetChatListApiQuery,
+  useHidePostMutation,
+  useSaveNotificationTokenMutation,
+  usePaybyPaypalMutation,
+  useDeletReviewMutation,
+  useReviseReviewMutation,
+  useGetUnreadNotificationsCountQuery,
+  useCapturePaymentMutation,
+  useGetUserWalletQuery,
+  useSendMessageApiMutation,
+  useGetMessagesApiQuery,
+  useMarkAsReadApiMutation,
+  useWriteReviewApiMutation,
+  useUpdateReviewApiMutation,
+  useUpdateAccountApiMutation,
+  useMarkAllAsSeenMutation,
+  useDeletePostMutation,
+  useDeleteProfileMutation,
+  useUpdateProfileMutation,
+  useUserAgentPastPostsApiQuery,
+  useSavePastWorkMutation,
+  useGetotherPastWorkQuery,
+  useDeletePastWorkMutation,
+  useLazyGetotherPastWorkQuery,
+  useLazyUserAgentPastPostsApiQuery,
 } = MainApi;

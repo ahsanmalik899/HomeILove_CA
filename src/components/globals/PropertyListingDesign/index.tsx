@@ -1,3 +1,7 @@
+import {
+  useSaveItemApiMutation,
+  useUnsaveItemApiMutation,
+} from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
 import Mail from "@assets/Buy/email-open.svg";
@@ -15,7 +19,7 @@ import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { formatPrice } from "@utils/PriceFormater";
 import { router } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -45,16 +49,60 @@ const YourAdsPostDesign = ({
   const listRef = useRef<any>(null);
   const [imageNo, setImageNo] = useState(0);
   const insets = useSafeAreaInsets();
+  const [saveItemApi] = useSaveItemApiMutation();
+  const [unsaveItemApi] = useUnsaveItemApiMutation();
+  const [savedItems, setSavedItems] = useState<{ [key: number]: boolean }>({});
+  const [savingItems, setSavingItems] = useState<{ [key: number]: boolean }>(
+    {}
+  );
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    const initialSaved: { [key: number]: boolean } = {};
+    data.forEach((item) => {
+      const id = item.post_property_id || item.post_community_id;
+      initialSaved[id] = item.is_saved ?? false;
+    });
+    setSavedItems(initialSaved);
+  }, [data]);
+
   const [scrollable, setscrollable] = useState(true);
   const renderItem = ({ item }) => {
-    const [expanded, setExpanded] = useState(false);
+    const itemId = item.post_property_id || item.post_community_id;
+    const isSaved = savedItems[itemId] ?? false;
+
+    const toggleSave = async () => {
+     
+      setSavedItems((prev) => ({ ...prev, [itemId]: !isSaved }));
+      setSavingItems((prev) => ({ ...prev, [itemId]: true }));
+
+      try {
+        if (isSaved) {
+          await unsaveItemApi({
+            saved_id: itemId,
+            user_id: user.id,
+            type: item.property_for || "sale",
+          }).unwrap();
+        } else {
+          await saveItemApi({
+            saved_id: itemId,
+            user_id: user.id,
+            type: item.property_for || "sale",
+          }).unwrap();
+        }
+      } catch (error) {
+        console.log("Error saving/unsaving item:", error);
+        setSavedItems((prev) => ({ ...prev, [itemId]: isSaved }));
+      } finally {
+        setSavingItems((prev) => ({ ...prev, [itemId]: false }));
+      }
+    };
     const openslider = (index: number) => {
       setSelectedImages(item.images || []);
       setShowImages(true);
       setscrollable(false);
       setImageNo(index);
     };
-      const facts = item.imp_facts ?? item.facts ?? "";
+    const facts = item.imp_facts ?? item.facts ?? "";
     return (
       <>
         <TouchableOpacity
@@ -79,7 +127,7 @@ const YourAdsPostDesign = ({
                 paddingHorizontal: hs(10),
                 paddingVertical: vs(10),
                 borderRadius: ms(10),
-                marginBottom: vs(10) ,
+                marginBottom: vs(10),
               }}
             >
               <Text
@@ -89,78 +137,100 @@ const YourAdsPostDesign = ({
                       ? Colors.light.DarkGreen
                       : "black",
                   fontWeight: 700,
-                  fontSize:ms(20),
-                   fontFamily: 'PopinRegular',
+                  fontSize: ms(20),
+                  fontFamily: "PopinRegular",
                 }}
               >
                 $ {formatPrice(item.asking_price)}
                 {item.property_for === "rent" && (
-                  <Text style={{ color: Colors.light.red , fontSize:ms(18), fontFamily: 'PopinRegular',}}>
+                  <Text
+                    style={{
+                      color: Colors.light.red,
+                      fontSize: ms(18),
+                      fontFamily: "PopinRegular",
+                    }}
+                  >
                     /{item.rent_type}
                   </Text>
                 )}
               </Text>
               {item.post_type === "Trending" && (
                 <Text
-                  style={{ fontWeight: 600, color: Colors.light.DarkGreen, fontFamily:"PopinRegular"}}
+                  style={{
+                    fontWeight: 600,
+                    color: Colors.light.DarkGreen,
+                    fontFamily: "PopinRegular",
+                  }}
                 >
                   Trending
                 </Text>
               )}
             </View>
 
-            <Text style={{ color: "black",fontWeight:700,fontSize:ms(15), fontFamily: 'PopinRegular', }}>
+            <Text
+              style={{
+                color: "black",
+                fontWeight: 700,
+                fontSize: ms(15),
+                fontFamily: "PopinRegular",
+              }}
+            >
               {item.bedrooms} bedrooms {item.property_sub_type} for{" "}
               {item.property_for}
             </Text>
-            <Text style={{ color: Colors.light.textGray, marginTop: vs(5), fontFamily: 'PopinRegular', }}>
+            <Text
+              style={{
+                color: Colors.light.textGray,
+                marginTop: vs(5),
+                fontFamily: "PopinRegular",
+              }}
+            >
               {item.address}
             </Text>
-             <View
-                                style={{
-                                  height: vs(1),
-                                  marginTop: vs(5),
-                                  
-                                  backgroundColor: Colors.light.textGray,
-                                  opacity: 0.2,
-                                }}
-                              />
+            <View
+              style={{
+                height: vs(1),
+                marginTop: vs(5),
+
+                backgroundColor: Colors.light.textGray,
+                opacity: 0.2,
+              }}
+            />
             <View>
-              
-              <View style={{marginTop:vs(5)}}>
-             {item.post_type === "Trending" && facts && (
-  facts
-    .split(",",4)
-    .filter(Boolean)
-    .map((fact, index) => (
-      <View
-        key={index}
-        style={[
-          {
-           
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: vs(3),
-          },
-        ]}
-      >
-        <View className="flex-row gap-3 items-center">
-          <RedHeart height={vs(10)} width={vs(10)} />
-          <Text
-            style={{
-              color: Colors.light.DarkGreen,
-              fontWeight: "500",
-              width: hs(250),
-               fontFamily: 'PopinRegular',
-            }}
-          >
-            {fact.trim()}
-          </Text>
-        </View>
-      </View>
-    ))
-)}</View>
+              <View style={{ marginTop: vs(5) }}>
+                {item.post_type === "Trending" &&
+                  facts &&
+                  facts
+                    .split(",", 4)
+                    .filter(Boolean)
+                    .map((fact, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          {
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            marginBottom: vs(3),
+                          },
+                        ]}
+                      >
+                        <View className="flex-row gap-3 items-center">
+                          <RedHeart height={vs(10)} width={vs(10)} />
+                          <Text
+                            style={{
+                              color: Colors.light.DarkGreen,
+                              fontWeight: "500",
+                              width: hs(250),
+                              fontFamily: "PopinRegular",
+                            }}
+                          >
+                            {fact.trim()}
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+              </View>
 
               <Text style={styles.description}>
                 {expanded
@@ -213,7 +283,13 @@ const YourAdsPostDesign = ({
                 >
                   <View className="flex-row items-center">
                     <Camera />
-                    <Text style={{ color: "white", fontWeight: 600, fontFamily: 'PopinRegular', }}>
+                    <Text
+                      style={{
+                        color: "white",
+                        fontWeight: 600,
+                        fontFamily: "PopinRegular",
+                      }}
+                    >
                       {" "}
                       {item.images ? item.images.length : 0}
                     </Text>
@@ -227,7 +303,7 @@ const YourAdsPostDesign = ({
                         color: "white",
                         fontWeight: 600,
                         borderRadius: ms(10),
-                         fontFamily: 'PopinRegular',
+                        fontFamily: "PopinRegular",
                       }}
                     >
                       {item.saleprice_type}
@@ -253,48 +329,56 @@ const YourAdsPostDesign = ({
                         color: "white",
                         fontWeight: 600,
                         borderRadius: ms(10),
-                         fontFamily: 'PopinRegular',
+                        fontFamily: "PopinRegular",
                       }}
                     >
                       {item.property_condition}
                     </Text>
                   )}
-                  <TouchableOpacity style={{ marginLeft: "auto" }}>
-                    <UnSelecteHeart />
+                  <TouchableOpacity
+                    style={{ marginLeft: "auto" }}
+                    onPress={toggleSave}
+                  >
+                    {savingItems[itemId] ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : isSaved ? (
+                      <RedHeart />
+                    ) : (
+                      <UnSelecteHeart />
+                    )}
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
-              {item.post_type==="Trending"&&(
+              {item.post_type === "Trending" && (
                 <>
-                 <LegendList
-                data={item.images || []}
-                horizontal
-                className="flex-1"
-                keyExtractor={(item, index) => `${item}-${index}`}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity
-                    className="mt-4 mr-2"
-                    onPress={() => {
-                      openslider(index);
-                    }}
-                  >
-                    <Image
-                      source={{ uri: ImageFormater(item) }}
-                      style={{
-                        height: vs(80),
-                        width: vs(80),
-                        borderRadius: ms(10),
-                        resizeMode: "cover",
-                        backgroundColor: "gray",
-                      }}
-                    />
-                  </TouchableOpacity>
-                )}
-              />
-            
-            </>
+                  <LegendList
+                    data={item.images || []}
+                    horizontal
+                    className="flex-1"
+                    keyExtractor={(item, index) => `${item}-${index}`}
+                    renderItem={({ item, index }) => (
+                      <TouchableOpacity
+                        className="mt-4 mr-2"
+                        onPress={() => {
+                          openslider(index);
+                        }}
+                      >
+                        <Image
+                          source={{ uri: ImageFormater(item) }}
+                          style={{
+                            height: vs(80),
+                            width: vs(80),
+                            borderRadius: ms(10),
+                            resizeMode: "cover",
+                            backgroundColor: "gray",
+                          }}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  />
+                </>
               )}
-             
+
               <View
                 className=" bg-white flex-row  justify-between"
                 style={{
@@ -309,15 +393,25 @@ const YourAdsPostDesign = ({
                 <>
                   <View className="flex-row items-center">
                     <Bed />
-                    <Text style={{ marginLeft: vs(5) , fontFamily: 'PopinRegular',}}>{item.bedrooms}</Text>
+                    <Text
+                      style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
+                    >
+                      {item.bedrooms}
+                    </Text>
                   </View>
                   <View className="flex-row items-center">
                     <Shower />
-                    <Text style={{ marginLeft: vs(5) , fontFamily: 'PopinRegular',}}>{item.bathrooms}</Text>
+                    <Text
+                      style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
+                    >
+                      {item.bathrooms}
+                    </Text>
                   </View>
                   <View className="flex-row items-center">
                     <Area />
-                    <Text style={{ marginLeft: vs(5), fontFamily: 'PopinRegular', }}>
+                    <Text
+                      style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
+                    >
                       {item.land_area} sqft
                     </Text>
                   </View>
@@ -333,7 +427,6 @@ const YourAdsPostDesign = ({
                   paddingVertical: vs(5),
                   paddingHorizontal: hs(10),
                   marginTop: vs(8),
-                 
                 }}
               >
                 <TouchableOpacity>
@@ -342,15 +435,14 @@ const YourAdsPostDesign = ({
                 <TouchableOpacity>
                   <Call />
                 </TouchableOpacity>
-<CircleImage
-  source={
-    item.posted_by?.logo
-      ? { uri: ImageFormater(item.posted_by.logo) }
-      : null
-  }
-  Size={40}
-/>
-
+                <CircleImage
+                  source={
+                    item.posted_by?.logo
+                      ? { uri: ImageFormater(item.posted_by.logo) }
+                      : null
+                  }
+                  Size={40}
+                />
               </View>
             </View>
           </View>
@@ -360,7 +452,7 @@ const YourAdsPostDesign = ({
   };
   return (
     <View style={{ flex: 1, marginBottom: insets.bottom }}>
-     {!initialLoadDone ? (
+      {!initialLoadDone ? (
         <ActivityIndicator size="large" style={{ marginTop: 20 }} />
       ) : data.length > 0 ? (
         <LegendList
@@ -386,7 +478,13 @@ const YourAdsPostDesign = ({
           }
         />
       ) : (
-        <Text style={{ textAlign: "center", marginTop: 20, fontFamily: 'PopinRegular', }}>
+        <Text
+          style={{
+            textAlign: "center",
+            marginTop: 20,
+            fontFamily: "PopinRegular",
+          }}
+        >
           No Data Found
         </Text>
       )}
@@ -425,15 +523,15 @@ const styles = StyleSheet.create({
   description: {
     marginVertical: vs(10),
     fontWeight: 500,
-    color:Colors.light.textGray,
-    fontFamily: 'PopinRegular',
+    color: Colors.light.textGray,
+    fontFamily: "PopinRegular",
   },
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
-     fontFamily: 'PopinRegular',
+    fontFamily: "PopinRegular",
   },
-   card2: {
+  card2: {
     backgroundColor: "white",
     borderRadius: 12,
     paddingVertical: vs(15),

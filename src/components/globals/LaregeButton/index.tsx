@@ -29,5 +29,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: '600',
+    fontFamily: "PopinRegula",
   },
 });

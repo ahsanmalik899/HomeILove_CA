@@ -57,10 +57,12 @@ const styles = StyleSheet.create({
   TextActive: {
     fontWeight: 500,
     color: Colors.light.red,
-    marginTop:vs(5)
+    marginTop:vs(5),
+    fontFamily: "PopinRegula",
   },
   Text: {
     fontWeight: 400,
-     marginTop:vs(5)
+     marginTop:vs(5),
+     fontFamily: "PopinRegula",
   },
 })

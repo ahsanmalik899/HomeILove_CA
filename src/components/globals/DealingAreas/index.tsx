@@ -194,11 +194,11 @@ export const DealingAreas = ({
   return (
     <View style={{ marginTop: vs(10), zIndex: 1000 }}>
       {title && (
-        <View style={{ flexDirection: "row", marginBottom: vs(10) }}>
+        <View style={{ flexDirection: "row", marginBottom: vs(10),fontFamily: "PopinRegula", }}>
           <Text style={styles.title}>{title}</Text>
-          {required && <Text style={{ color: Colors.light.red }}> *</Text>}
+          {required && <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> *</Text>}
           {additonalText && (
-            <Text style={{ paddingLeft: hs(5) }}>({additonalText})</Text>
+            <Text style={{ paddingLeft: hs(5),fontFamily: "PopinRegula", }}>({additonalText})</Text>
           )}
         </View>
       )}
@@ -214,7 +214,7 @@ export const DealingAreas = ({
             }
           />
         </TouchableOpacity>
-        <Text style={{ marginLeft: hs(5) }}>Nationwide</Text>
+        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}>Nationwide</Text>
       </View>
 
       {/* Input + Add Button */}
@@ -278,7 +278,7 @@ export const DealingAreas = ({
             }}
           >
             <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
-            <Text style={{ marginTop: vs(5) }}>Loading...</Text>
+            <Text style={{ marginTop: vs(5),fontFamily: "PopinRegula", }}>Loading...</Text>
           </View>
         )}
 
@@ -313,7 +313,7 @@ export const DealingAreas = ({
               justifyContent: "center",
             }}
           >
-            <Text style={{ color: Colors.light.DarkGreen }}>
+            <Text style={{ color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}>
               No addresses found
             </Text>
           </View>
@@ -346,6 +346,7 @@ export const DealingAreas = ({
                   width: hs(250),
                   fontSize: ms(15),
                   fontWeight: "500",
+                  fontFamily: "PopinRegula",
                 }}
               >
                 {item}
@@ -359,7 +360,7 @@ export const DealingAreas = ({
       />
 
       {touched && errors && (
-        <Text style={{ color: Colors.light.red, marginTop: vs(5) }}>
+        <Text style={{ color: Colors.light.red, marginTop: vs(5),fontFamily: "PopinRegula", }}>
           {errorText}
         </Text>
       )}
@@ -368,7 +369,7 @@ export const DealingAreas = ({
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600" },
+  title: { fontSize: ms(14), fontWeight: "600",fontFamily: "PopinRegula", },
   card: {
     backgroundColor: "#fff",
     borderRadius: ms(10),

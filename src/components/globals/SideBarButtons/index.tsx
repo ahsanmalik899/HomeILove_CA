@@ -18,7 +18,7 @@ const index = ({ text, onPress }: SideBarButtonProps) => {
       }}
     >
       <Text
-        style={{ color: Colors.light.DarkGreen,fontWeight:600  }}
+        style={{ color: Colors.light.DarkGreen,fontWeight:600 ,fontFamily: "PopinRegula", }}
       >
         {text}
       </Text>

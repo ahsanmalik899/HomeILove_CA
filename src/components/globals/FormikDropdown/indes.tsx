@@ -86,16 +86,16 @@ export const FormikDropdown = ({
       {title && (
         <View className="flex-row" style={{ marginBottom: vs(10) }}>
           <Text style={styles.title}>{title}</Text>
-          {required && <Text style={{ color: Colors.light.red }}> *</Text>}
+          {required && <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> *</Text>}
           {additonalText && (
-            <Text style={{ paddingLeft: hs(5) }}>
+            <Text style={{ paddingLeft: hs(5),fontFamily: "PopinRegula", }}>
               ({additonalText})
             </Text>
           )}
         </View>
       )}
 
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", }}>
         <View style={{ flex: 1 }}>
           <DropDownPicker
             open={open}
@@ -149,7 +149,7 @@ export const FormikDropdown = ({
       </View>
 
       {touched && errorText && (
-        <Text style={{ color: Colors.light.red, marginTop: vs(5) }}>
+        <Text style={{ color: Colors.light.red, marginTop: vs(5),fontFamily: "PopinRegula", }}>
           {errorText}
         </Text>
       )}
@@ -178,6 +178,7 @@ export const FormikDropdown = ({
                     fontSize: ms(15),
                     fontWeight: "500",
                     width: hs(250),
+                    fontFamily: "PopinRegula",
                   }}
                 >
                   {item}
@@ -195,7 +196,7 @@ export const FormikDropdown = ({
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600" },
+  title: { fontSize: ms(14), fontWeight: "600" ,fontFamily: "PopinRegula",},
   card: {
     backgroundColor: "#fff",
     borderRadius: ms(10),

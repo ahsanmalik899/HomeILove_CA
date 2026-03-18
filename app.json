@@ -35,6 +35,7 @@
       }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
         "QUERY_ALL_PACKAGES"

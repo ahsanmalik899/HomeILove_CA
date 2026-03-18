@@ -46,7 +46,7 @@ export const SearchDeveloper = ({
       {title && (
         <View style={{ flexDirection: "row", marginBottom: vs(10) }}>
           <Text style={styles.title}>{title}</Text>
-          {required && <Text style={{ color: Colors.light.red }}> *</Text>}
+          {required && <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> *</Text>}
         </View>
       )}
 
@@ -65,7 +65,7 @@ export const SearchDeveloper = ({
           {isFetching && (
             <View style={styles.loader}>
               <ActivityIndicator size="small" />
-              <Text>Loading...</Text>
+              <Text style={{fontFamily: "PopinRegula",}}>Loading...</Text>
             </View>
           )}
 
@@ -84,7 +84,7 @@ export const SearchDeveloper = ({
                 }}
                 style={styles.item}
               >
-                <Text>{item.name}</Text>
+                <Text style={{fontFamily: "PopinRegula",}}>{item.name}</Text>
               </TouchableOpacity>
             )}
           />
@@ -92,7 +92,7 @@ export const SearchDeveloper = ({
       )}
 
       {touched && errors && (
-        <Text style={{ color: Colors.light.red, marginTop: vs(5) }}>
+        <Text style={{ color: Colors.light.red, marginTop: vs(5),fontFamily: "PopinRegula", }}>
           {errorText}
         </Text>
       )}
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: ms(14),
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
   input: {
     color: Colors.light.DarkGreen,
@@ -111,6 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: ms(18),
     paddingHorizontal: hs(12),
     height: vs(45),
+    fontFamily: "PopinRegula",
   },
   dropdown: {
     backgroundColor: "white",

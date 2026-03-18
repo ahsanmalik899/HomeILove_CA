@@ -38,5 +38,6 @@ const styles = StyleSheet.create({
     fontSize: ms(15),
     fontWeight: "600",
     color:Colors.light.DarkGreen,
+    fontFamily: "PopinRegula",
   },
 });

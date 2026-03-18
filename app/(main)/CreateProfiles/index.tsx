@@ -1,4 +1,8 @@
-import { useCreateProfileMutation } from "@/store/api/user/MainApi";
+import {
+  useCreateProfileMutation,
+  useGetSingleProfileQuery,
+  useUpdateProfileMutation,
+} from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
@@ -22,7 +26,7 @@ import { hs, ms, vs } from "@utils/design/design";
 
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -71,6 +75,15 @@ const Index = () => {
   const user = useAppSelector(userdata);
   const { type } = useLocalSearchParams();
   const [valuationFor, setValuationFor] = useState(false);
+  const params = useLocalSearchParams();
+  const ProfileType = params.ProfileType as string;
+  const id = Number(params.id);
+  const edit = params.edit === "true";
+  const { data, isLoading: LodingEditData } = useGetSingleProfileQuery(
+    { type: ProfileType, id },
+    { skip: !edit }
+  );
+
   switch (type) {
     case "Builder Profile":
       dataAccordingType = {
@@ -78,7 +91,7 @@ const Index = () => {
         title: "Builder",
         licenceNoTitle: "License No",
         serviceTitle: "Services for",
-        serviceDefault: "All type of developments",
+        serviceDefault: "",
         serviceOption: [
           "All type of developments",
           "Home developments",
@@ -277,9 +290,9 @@ const Index = () => {
       break;
   }
 
-
-
   const [createprofile, { isLoading }] = useCreateProfileMutation();
+  const [updateProfile, { isLoading: UpdateLoading }] =
+    useUpdateProfileMutation();
   const ProfileSchema = Yup.object().shape({
     business_name: Yup.string()
       .min(2, "Too short!")
@@ -295,7 +308,7 @@ const Index = () => {
     city: Yup.string().required("City is required"),
     state: Yup.string().required("State is required"),
 
-    zip: Yup.string().required("zip is required"),
+    zip: Yup.string().nullable(),
 
     user_lat: Yup.number().required("Latituted is required"),
     user_lng: Yup.number().nullable("Longitude is required"),
@@ -367,9 +380,14 @@ const Index = () => {
       ? Yup.string().required("Please select a service")
       : Yup.string().nullable(),
   });
+  useEffect(() => {
+    if (edit && data?.data) {
+      setValuationFor(!!data.data.valuation_for);
+    }
+  }, [edit, data]);
   return (
     <View className="bg-white flex-1 ">
-      <ScrollView >
+      <ScrollView>
         <HeaderWithBack />
         <Text
           style={{
@@ -377,54 +395,80 @@ const Index = () => {
             marginHorizontal: hs(20),
             fontSize: ms(20),
             fontWeight: 500,
+            fontFamily: "PopinRegula",
           }}
         >
           Create your{" "}
-          <Text style={{ color: Colors.light.red }}>
+          <Text style={{ color: Colors.light.red, fontFamily: "PopinRegula" }}>
             {dataAccordingType.title}
           </Text>{" "}
           profile
         </Text>
 
-        <View style={{ marginHorizontal: hs(20), marginTop: vs(20), marginBottom:vs(20)}}>
+        <View
+          style={{
+            marginHorizontal: hs(20),
+            marginTop: vs(20),
+            marginBottom: vs(20),
+          }}
+        >
           <Formik
             initialValues={{
-              business_name: "",
-              contact: "",
-              address: "",
-              city: "",
-              state: "",
-              zip: "",
-              user_lat: 0,
-              user_lng: 0,
-              web: "",
-              license_no: "",
-              lic_state: "",
-              lic_expiry: "",
-              dealing_areas: "",
-              dealing_city: "",
-              latitude: null,
-              longitude: null,
+              business_name: edit ? data?.data?.business_name || "" : "",
+              contact: edit ? data?.data?.contact || "" : "",
+              address: edit ? data?.data?.address || "" : "",
+              city: edit ? data?.data?.city || "" : "",
+              state: edit ? data?.data?.state || "" : "",
+              zip: edit ? data?.data?.zip || "" : "",
+              user_lat: edit ? data?.data?.user_lat || 0 : 0,
+              user_lng: edit ? data?.data?.user_lng || 0 : 0,
+              web: edit ? data?.data?.web || "" : "",
+
+              license_no: edit ? data?.data?.license_no || "" : "",
+              lic_state: edit ? data?.data?.lic_state || "" : "",
+              lic_expiry: edit ? data?.data?.lic_expiry || "" : "",
+
+              dealing_areas: edit ? data?.data?.dealing_areas || "" : "",
+              dealing_city: edit ? data?.data?.dealing_city || "" : "",
+
+              latitude: edit ? data?.data?.latitude : null,
+              longitude: edit ? data?.data?.longitude : null,
+
               investor_type: "",
               invest_in: "",
-              issuing_authority: "",
-              min_invest: "",
-              max_invest: "",
-              advisory_service: "",
-              remarks: "",
-              youtube_link: "",
-              services: dataAccordingType.serviceDefault,
+
+              issuing_authority:edit? data?.data?.issuing_authority: "",
+
+              min_invest: edit? data?.data?.min_invest:"",
+              max_invest:edit? data?.data?.max_invest :"",
+
+              advisory_service: edit
+                ? data?.data?.valuation_for
+                  ? "Yes"
+                  : data?.data?.advisory_service
+                : "",
+
+              remarks: edit ? data?.data?.remarks || "" : "",
+
+              youtube_link: edit ? data?.data?.youtube_link || "" : "",
+
+              services: edit
+                ? data?.data?.services || data?.data?.agent_for
+                : "",
+
               users_id: user.id,
-              post_type: "Normal",
-              logo: null,
-              cover: null,
-              institution: "",
-              valuation_for: "",
+
+              post_type: edit ? data?.data?.post_type || "Normal" : "Normal",
+
+              logo: edit ? data?.data?.logo : null,
+              cover: edit ? data?.data?.cover : null,
+
+              institution: edit ? data?.data?.institution : "",
+              id: edit ? data?.data?.id : "",
+              valuation_for: edit ? data?.data?.valuation_for || "" : "",
             }}
-           
             validationSchema={ProfileSchema}
             onSubmit={async (values) => {
-             
               try {
                 const formData = new FormData();
 
@@ -466,7 +510,9 @@ const Index = () => {
                 }
 
                 // Call RTK Query mutation
-                const res = await createprofile(formData).unwrap();
+                const res = edit
+                  ? await updateProfile(formData).unwrap()
+                  : await createprofile(formData).unwrap();
 
                 if (res?.success) {
                   renderToastSuccess(
@@ -493,7 +539,6 @@ const Index = () => {
               touched,
             }) => (
               <>
-                
                 {dataAccordingType.isInvestor && (
                   <>
                     <FormikDropdown
@@ -513,7 +558,6 @@ const Index = () => {
                       touched={!!touched.investor_type}
                       errors={!!errors.investor_type}
                       errorText={errors.investor_type}
-                      
                       required
                     />
 
@@ -573,7 +617,7 @@ const Index = () => {
                             { label: "upto 20 million", value: 2000000 },
                             { label: "upto 50 million", value: 5000000 },
                             { label: "upto 60 million", value: 6000000 },
-                             { label: "Above 60 million", value: 60000001 },
+                            { label: "Above 60 million", value: 60000001 },
                           ]}
                           onSelect={(val) => setFieldValue("max_invest", val)}
                           touched={!!touched.max_invest}
@@ -647,7 +691,7 @@ const Index = () => {
                   name="address"
                   latValue={values.user_lat}
                   longValue={values.user_lng}
-                  lat="user_lat"    
+                  lat="user_lat"
                   long="user_lng"
                   setValue={setFieldValue}
                   onSelect={() => {}}
@@ -759,7 +803,13 @@ const Index = () => {
                   placeholder="Please enter City, State or Zip code"
                 />
 
-                <Text style={{ width: hs(250), marginTop: vs(10) }}>
+                <Text
+                  style={{
+                    width: hs(250),
+                    marginTop: vs(10),
+                    fontFamily: "PopinRegula",
+                  }}
+                >
                   {dataAccordingType.valuation
                     ? "Do you provide valuaition services in your locality?"
                     : "Do you provide advisory services in your locality?"}
@@ -775,8 +825,8 @@ const Index = () => {
                           "advisory_service",
                           values.advisory_service === "Yes" ? "" : "Yes"
                         );
-                        if(type==="Agent Profile"){
-                        setValuationFor(true);
+                        if (type === "Agent Profile") {
+                          setValuationFor(true);
                         }
                       }}
                     >
@@ -790,7 +840,11 @@ const Index = () => {
                         }
                       />
                     </TouchableOpacity>
-                    <Text style={{ marginLeft: hs(5) }}>Yes</Text>
+                    <Text
+                      style={{ marginLeft: hs(5), fontFamily: "PopinRegula" }}
+                    >
+                      Yes
+                    </Text>
                   </View>
                   <View
                     className="flex-row items-center"
@@ -817,10 +871,19 @@ const Index = () => {
                     </TouchableOpacity>
                   </View>
 
-                  <Text style={{ marginLeft: hs(5) }}>No</Text>
+                  <Text
+                    style={{ marginLeft: hs(5), fontFamily: "PopinRegula" }}
+                  >
+                    No
+                  </Text>
                 </View>
                 {touched.advisory_service && errors.advisory_service && (
-                  <Text style={{ color: Colors.light.red }}>
+                  <Text
+                    style={{
+                      color: Colors.light.red,
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
                     {errors.advisory_service}
                   </Text>
                 )}
@@ -911,44 +974,65 @@ const Index = () => {
                     opacity: 0.2,
                   }}
                 />
-                <View style={{ marginTop: vs(10) }}>
-                  <SelecteAdType
-                    title1="Select Ad "
-                    title2="Type"
-                    btnTxt1="Normal Ad"
-                    btnTxt2="Trending Ad"
-                    btn1value="Normal"
-                    btn2value="Promoted"
-                    Componet1={
-                      <Text
-                        style={{
-                          marginTop: vs(10),
-                          fontSize: ms(11),
-                          color: Colors.light.textGray,
-                        }}
-                      >
-                        Post your ad for free.You can upgrade your ad to
-                        trending from your dashboard any time to make deal done
-                        more quickly
-                      </Text>
-                    }
-                    Componet2={
-                      <Text
-                        style={{
-                          marginTop: vs(10),
-                          fontSize: ms(11),
-                          color: Colors.light.textGray,
-                        }}
-                      >
-                        Post your ad for free.You can upgrade your ad to
-                        trending from your dashboard any time to make deal done
-                        more quickly
-                      </Text>
-                    }
-                    value={values.post_type}
-                    onPress={(selected) => setFieldValue("post_type", selected)}
+                {edit ? (
+                  <LargeButton
+                    text="Update Ad"
+                    handleSubmit={() => {
+                      handleSubmit();
+                    }}
                   />
-                </View>
+                ) : (
+                  <View style={{ marginTop: vs(10), flex: 1 }}>
+                    <SelecteAdType
+                      title1="Select Ad "
+                      title2="Type"
+                      btnTxt1="Normal Ad"
+                      btnTxt2="Trending Ad"
+                      btn1value="Normal"
+                      btn2value="Promoted"
+                      Componet1={
+                        <>
+                          <Text
+                            style={{
+                              marginTop: vs(10),
+                              fontSize: ms(11),
+                              color: Colors.light.textGray,
+                              fontFamily: "PopinRegula",
+                            }}
+                          >
+                            Post your ad for free.You can upgrade your ad to
+                            trending from your dashboard any time to make deal
+                            done more quickly
+                          </Text>
+                          <LargeButton
+                            text="Submit Ad"
+                            handleSubmit={() => {
+                              handleSubmit();
+                            }}
+                          />
+                        </>
+                      }
+                      Componet2={
+                        <Text
+                          style={{
+                            marginTop: vs(10),
+                            fontSize: ms(11),
+                            color: Colors.light.textGray,
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          Post your ad for free.You can upgrade your ad to
+                          trending from your dashboard any time to make deal
+                          done more quickly
+                        </Text>
+                      }
+                      value={values.post_type}
+                      onPress={(selected) =>
+                        setFieldValue("post_type", selected)
+                      }
+                    />
+                  </View>
+                )}
                 <View
                   style={{
                     height: vs(1),
@@ -958,13 +1042,13 @@ const Index = () => {
                     opacity: 0.2,
                   }}
                 />
-                <LargeButton  text="Submit Ad" handleSubmit={()=>{handleSubmit()}} />
               </>
             )}
           </Formik>
         </View>
       </ScrollView>
       <Loading isLoading={isLoading} text={`Creating ${type}....`} />
+      <Loading isLoading={LodingEditData} text="Loading..." />
     </View>
   );
 };

@@ -11,7 +11,7 @@ const index = ({ Image, text, onPress }: QuickSerchCardProps) => {
       onPress={onPress}
     >
       <Image />
-      <Text className="font-bold">{text}</Text>
+      <Text className="font-bold" style={{fontFamily: "PopinRegula",}}>{text}</Text>
     </TouchableOpacity>
   );
 };

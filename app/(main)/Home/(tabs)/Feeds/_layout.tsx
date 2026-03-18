@@ -39,7 +39,7 @@ tabBarLabel: ({ focused, color }) => {
   }
 
   return (
-    <Text style={{ color,fontSize:ms(12), fontWeight: focused ? 'bold' : 'normal' }}>
+    <Text style={{ color,fontSize:ms(12), fontWeight: focused ? 'bold' : 'normal',fontFamily: "PopinRegula", }}>
       {label}
     </Text>
   );

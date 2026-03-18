@@ -28,11 +28,11 @@ const index = ({ data, isfetching }: postDataType) => {
                             <View className="flex-row">
                                 <Text style={styles.name}>{item.name}</Text>
                                 {item.connection_type && (
-                                    <Text> ({item.connection_type})</Text>
+                                    <Text style={{fontFamily: "PopinRegula",}}> ({item.connection_type})</Text>
                                 )}
 
                             </View>
-                            <Text>{item.post_created_date || item.created_date}</Text>
+                            <Text style={{fontFamily: "PopinRegula",}}>{item.post_created_date || item.created_date}</Text>
                         </View>
                     </View>
                     <TouchableOpacity>
@@ -65,7 +65,7 @@ const index = ({ data, isfetching }: postDataType) => {
                                     <Like />
                                 </TouchableOpacity>
                                 <Text
-                                    style={{ color: Colors.light.DarkGreen, paddingLeft: hs(2) }}
+                                    style={{ color: Colors.light.DarkGreen, paddingLeft: hs(2),fontFamily: "PopinRegula", }}
                                 >
                                     {item.likes}
                                 </Text>
@@ -78,7 +78,7 @@ const index = ({ data, isfetching }: postDataType) => {
                                     <Comment />
                                 </TouchableOpacity>
                                 <Text
-                                    style={{ color: Colors.light.DarkGreen, paddingLeft: hs(2) }}
+                                    style={{ color: Colors.light.DarkGreen, paddingLeft: hs(2),fontFamily: "PopinRegula", }}
                                 >
                                     16
                                 </Text>
@@ -107,7 +107,7 @@ const index = ({ data, isfetching }: postDataType) => {
     estimatedItemSize={200}
   />
 ) : (
-  <Text style={{ textAlign: "center", marginTop: 20 }}>Loading...</Text>
+  <Text style={{ textAlign: "center", marginTop: 20 ,fontFamily: "PopinRegula",}}>Loading...</Text>
 )}
 
                 </View>
@@ -126,15 +126,17 @@ const styles = StyleSheet.create({
     },
     name: {
         fontWeight: "bold",
+        fontFamily: "PopinRegula",
     },
     uperSection: {
         marginLeft: hs(10),
     },
     description: {
         marginVertical: vs(10),
+        fontFamily: "PopinRegula",
     },
     moreText: {
         color: Colors.light.DarkGreen,
-        fontWeight: '600'
+        fontWeight: '600',fontFamily: "PopinRegula",
     }
 })

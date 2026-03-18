@@ -36,14 +36,18 @@ const index = () => {
             text="Mortgage Profile"
             Svg={Mortgagae}
             type="busenessProfile"
-            ProfileExist={data?.profiles_exist?.mortgage}
+            ProfileExist={data?.profiles_exist?.mortgage?.exists}
+            id={data?.profiles_exist?.mortgage?.profile_id}
+            profileType="mortgage"
           />
 
           <SideBarCard
             text="Builder Profile"
             Svg={Builder}
             type="busenessProfile"
-              ProfileExist={data?.profiles_exist?.builder}
+              ProfileExist={data?.profiles_exist?.builder?.exists}
+              id={data?.profiles_exist?.builder?.profile_id}
+              profileType="builder"
           />
         </View>
         <View className="flex-row justify-between">
@@ -51,13 +55,18 @@ const index = () => {
             text="Investor Profile"
             Svg={Investor}
             type="busenessProfile"
-            ProfileExist={data?.profiles_exist?.investor}
+            ProfileExist={data?.profiles_exist?.investor?.exists}
+            id={data?.profiles_exist?.investor?.profile_id}
+            profileType="investor"
           />
           <SideBarCard
             text="Agent Profile"
             Svg={Agent}
             type="busenessProfile"
-            ProfileExist={data?.profiles_exist?.agent}
+            ProfileExist={data?.profiles_exist?.agent?.exists}
+            id={data?.profiles_exist?.agent?.profile_id}
+            profileType="agent"
+
           />
         </View>
         <View className="flex-row justify-between">
@@ -65,13 +74,17 @@ const index = () => {
             text="Plumber Profile"
             Svg={Plumber}
             type="busenessProfile"
-            ProfileExist={data?.profiles_exist?.plumber}
+            ProfileExist={data?.profiles_exist?.plumber?.exists}
+            id={data?.profiles_exist?.plumber?.profile_id}
+            profileType="plumber"
           />
           <SideBarCard
             text="Painter Profile"
             Svg={Painter}
             type="busenessProfile"
-            ProfileExist={data?.profiles_exist?.painter}
+            ProfileExist={data?.profiles_exist?.painter?.exists}
+            id={data?.profiles_exist?.painter?.profile_id}
+            profileType="painter"
           />
         </View>
         <View className="flex-row justify-between">
@@ -79,13 +92,17 @@ const index = () => {
             text="Electrician Profile"
             Svg={Electrician}
             type="busenessProfile"
-            ProfileExist={data?.profiles_exist?.electrician}
+            ProfileExist={data?.profiles_exist?.electrician?.exists}
+            id={data?.profiles_exist?.electrician?.profile_id}
+            profileType="electrician"
           />
           <SideBarCard
             text="Decor Profile"
             Svg={Decore}
             type="busenessProfile"
-            ProfileExist={data?.profiles_exist?.decor}
+            ProfileExist={data?.profiles_exist?.decor?.exists}
+            id={data?.profiles_exist?.decor?.profile_id}
+            profileType="decor"
           />
         </View>
       </ScrollView>

@@ -143,12 +143,12 @@ const index = () => {
         >
           {type === "community" ? (
             <View className="flex-row justify-between">
-              <Text style={{ color: "black", fontWeight: "600", flex: 1 }}>
+              <Text style={{ color: "black", fontWeight: "600", flex: 1,fontFamily: "PopinRegula", }}>
                 {data?.post?.community_title ?? ""}
               </Text>
 
               {data?.post?.community_price?.length > 0 && (
-                <Text style={{ color: Colors.light.red, fontWeight: "600" }}>
+                <Text style={{ color: Colors.light.red, fontWeight: "600",fontFamily: "PopinRegula", }}>
                   From $ {data.post.community_price[0]} To ${" "}
                   {
                     data.post.community_price[
@@ -166,7 +166,7 @@ const index = () => {
                 alignItems: "flex-start",
               }}
             >
-              <Text style={{ color: "black", fontWeight: "600", flex: 1 }}>
+              <Text style={{ color: "black", fontWeight: "600", flex: 1 ,fontFamily: "PopinRegula",}}>
                 {data?.post?.bedrooms ?? 0} bedrooms{" "}
                 {data?.post?.property_sub_type ?? ""} for{" "}
                 {data?.post?.property_for ?? ""}
@@ -177,6 +177,7 @@ const index = () => {
                   color: Colors.light.red,
                   fontWeight: "600",
                   marginLeft: 8,
+                  fontFamily: "PopinRegula",
                 }}
               >
                 $ {data?.post?.asking_price ?? 0}
@@ -220,7 +221,7 @@ const index = () => {
                 className="flex-row"
                 onPress={() => setShowFloor(true)}
               >
-                <Text style={{ color: "white", fontWeight: 600 }}>
+                <Text style={{ color: "white", fontWeight: 600,fontFamily: "PopinRegula", }}>
                   Floor Images{" "}
                   {data?.floor_images ? data?.floor_images.length : 0}
                 </Text>
@@ -237,7 +238,7 @@ const index = () => {
               className="flex-row"
             >
               <Camera />
-              <Text style={{ color: "white", fontWeight: 600 }}>
+              <Text style={{ color: "white", fontWeight: 600,fontFamily: "PopinRegula", }}>
                 {data?.post_images ? data?.post_images.length : 0}
               </Text>
             </View>
@@ -284,13 +285,13 @@ const index = () => {
               <>
                 <View className="flex-row items-center">
                   <CommunityType />
-                  <Text style={{ marginLeft: vs(5) }}>
+                  <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
                     {data?.post.community_type}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
                   <CommunitySatatus />
-                  <Text style={{ marginLeft: vs(5) }}>
+                  <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
                     {data?.post?.community_status}
                   </Text>
                 </View>
@@ -299,19 +300,19 @@ const index = () => {
               <>
                 <View className="flex-row items-center">
                   <Bed />
-                  <Text style={{ marginLeft: vs(5) }}>
+                  <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
                     {data?.post?.bedrooms}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
                   <Shower />
-                  <Text style={{ marginLeft: vs(5) }}>
+                  <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula",}}>
                     {data?.post?.bathrooms}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
                   <Area />
-                  <Text style={{ marginLeft: vs(5) }}>
+                  <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
                     {data?.post?.land_area} sqft
                   </Text>
                 </View>
@@ -323,6 +324,7 @@ const index = () => {
               className="flex-1 mr-2"
               numberOfLines={2}
               ellipsizeMode="tail"
+              style={{fontFamily: "PopinRegula",}}
             >
               {data?.post?.address}
             </Text>
@@ -1274,14 +1276,17 @@ const styles = StyleSheet.create({
   },
   textred: {
     color: Colors.light.red,
+    fontFamily: "PopinRegula",
   },
   description: {
     marginVertical: vs(10),
     fontWeight: 500,
+    fontFamily: "PopinRegula",
   },
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
+    fontFamily: "PopinRegula",
   },
   card2: {
     backgroundColor: "white",
@@ -1300,6 +1305,7 @@ const styles = StyleSheet.create({
     fontSize: ms(15),
     fontWeight: 500,
     marginTop: vs(10),
+    fontFamily: "PopinRegula",
   },
   pdf: {
     flex: 1,

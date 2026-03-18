@@ -55,11 +55,11 @@ const handleRemove = (index: number) => {
   return (
     <View style={{ marginTop: vs(10), zIndex: open ? 1000 : 1 }}>
       {title && (
-        <View className="flex-row" style={{ marginBottom: vs(10) }}>
+        <View className="flex-row" style={{ marginBottom: vs(10), }}>
           <Text style={styles.title}>{title}</Text>
-          {required && <Text style={{ color: Colors.light.red }}> *</Text>}
+          {required && <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> *</Text>}
           {additonalText && (
-            <Text style={{ paddingLeft: hs(5) }}>{`(${additonalText})`}</Text>
+            <Text style={{ paddingLeft: hs(5) ,fontFamily: "PopinRegula",}}>{`(${additonalText})`}</Text>
           )}
         </View>
       )}
@@ -117,7 +117,7 @@ const handleRemove = (index: number) => {
 </View>
 
       {touched && errors && (
-        <Text style={{ color: Colors.light.red, marginTop: vs(5) }}>
+        <Text style={{ color: Colors.light.red, marginTop: vs(5),fontFamily: "PopinRegula", }}>
           {errorText}
         </Text>
       )}
@@ -133,7 +133,7 @@ const handleRemove = (index: number) => {
     <View style={[styles.card]}>
       <View className="flex-row gap-3 items-center">
         <Heart />
-        <Text >{selectedLabel}</Text>
+        <Text style={{fontFamily: "PopinRegula",}}>{selectedLabel}</Text>
       </View>
       <TouchableOpacity onPress={() => handleRemove(index)}>
         <Cross />
@@ -149,7 +149,7 @@ const handleRemove = (index: number) => {
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600" },
+  title: { fontSize: ms(14), fontWeight: "600",fontFamily: "PopinRegula", },
     card: {
     backgroundColor: "#fff",
     borderRadius: ms(10),

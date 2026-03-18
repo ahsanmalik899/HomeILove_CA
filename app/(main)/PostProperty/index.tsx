@@ -1,17 +1,16 @@
 import {
   useGetDataForEditQuery,
   useGetProfilesQuery,
+  useGetUserWalletQuery,
   usePostPropertyMutation,
   useUpdatePropertyMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
-import PayLater from "@assets/SideBar/pay-later.svg";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
-import PowerdByPayPal from "@assets/SideBar/Powered by PayPal.svg";
-import Volit from "@assets/SideBar/volit-white.svg";
 import { MaterialIcons } from "@expo/vector-icons";
+import { LegendList } from "@legendapp/list";
 import { AdressInput } from "@src/components/globals/AddressInput";
 import DatePickerField from "@src/components/globals/DatePickerField";
 import { FormikInput } from "@src/components/globals/FormictInput";
@@ -21,7 +20,6 @@ import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
 import PropertyType from "@src/components/globals/PropertyType";
-import RadioButton from "@src/components/globals/RadioButton";
 import SelectRentAndSale from "@src/components/globals/SelectRentAndSale";
 import SelecteAdType from "@src/components/globals/TablikeButton";
 import UploadPic from "@src/components/globals/UploadPic";
@@ -32,7 +30,13 @@ import { hs, ms, vs } from "@utils/design/design";
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useMemo, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
@@ -43,11 +47,18 @@ const index = () => {
   const type = params.type as string;
   const id = Number(params.id);
   const edit = params.edit === "true";
-
+  const [selectedAmount, setSelectedAmount] = useState("");
   const { data: EditData, isLoading: EditLoading } = useGetDataForEditQuery(
     { type, id },
     { skip: !edit }
   );
+  const {
+    data: amount,
+    isLoading: AmountLoading,
+    isFetching,
+  } = useGetUserWalletQuery({
+    id: user.id,
+  });
   const initialValues = {
     user_id: user.id,
     user_type: user.user_type,
@@ -71,8 +82,8 @@ const index = () => {
     rent_type: "",
     yt_link: "",
     normal_trending: "Normal",
-    time_period: 2,
-    payment_method: "wallet",
+    time_period: "",
+    payment_method: "",
     tenure: "",
     tenancy_tenure: "",
     property_condition: "",
@@ -93,6 +104,11 @@ const index = () => {
     propertyimg: [],
     floorimg: [],
   };
+  const advertiseOptions = [
+    { id: "1", type: "15", price: "50" },
+    { id: "2", type: "30", price: "100" },
+    { id: "3", type: "60", price: "150" },
+  ];
   const EditinitialValues = useMemo(() => {
     if (!edit || !EditData?.success) return initialValues;
 
@@ -121,8 +137,8 @@ const index = () => {
       rent_type: post.rent_type || "",
       yt_link: post.video_link || "",
       normal_trending: "Normal",
-      time_period: 2,
-      payment_method: post.payment_method || "wallet",
+      time_period: "",
+      payment_method: post.payment_method,
       tenure: post.tenure || "",
       tenancy_tenure: post.tenancy_tenure || "",
       property_condition: post.property_condition || "",
@@ -220,11 +236,9 @@ const index = () => {
       .oneOf(["Normal", "Trending"])
       .required("Post type is required"),
 
-    time_period: Yup.number()
-      .typeError("Time period must be a number")
-      .required("Time period is required"),
+    time_period: Yup.number().nullable(),
 
-    payment_method: Yup.string().required("Payment method is required"),
+    payment_method: Yup.string().nullable(),
 
     tenure: Yup.string().when("property_for", {
       is: "sale",
@@ -281,10 +295,22 @@ const index = () => {
         className="bg-white flex-1"
       >
         <HeaderWithBack header="Sell Property" />
-        <View style={{ marginHorizontal: hs(10), marginVertical: vs(20) }}>
-          <Text style={{ fontWeight: 600, fontSize: ms(15) }}>
+        <View style={{ marginVertical: vs(20) }}>
+          <Text
+            style={{
+              fontWeight: 600,
+              fontSize: ms(15),
+              paddingHorizontal: hs(10),
+              fontFamily: "PopinRegula",
+            }}
+          >
             Great! In simple steps
-            <Text style={{ color: Colors.light.red }}> ADVERTISE </Text>
+            <Text
+              style={{ color: Colors.light.red, fontFamily: "PopinRegula" }}
+            >
+              {" "}
+              ADVERTISE{" "}
+            </Text>
             your property For Sale
           </Text>
           <View
@@ -294,6 +320,7 @@ const index = () => {
               marginTop: vs(10),
               borderRadius: 15,
               elevation: 4,
+              marginHorizontal: hs(5),
               backgroundColor: "white",
             }}
           >
@@ -392,6 +419,8 @@ const index = () => {
                 values,
                 errors,
                 touched,
+                validateForm,
+                setTouched,
               }) => (
                 <>
                   <SelectRentAndSale
@@ -427,7 +456,14 @@ const index = () => {
                               }
                             />
                           </TouchableOpacity>
-                          <Text style={{ marginLeft: hs(5) }}>Normal Sale</Text>
+                          <Text
+                            style={{
+                              marginLeft: hs(5),
+                              fontFamily: "PopinRegula",
+                            }}
+                          >
+                            Normal Sale
+                          </Text>
                         </View>
                         <View
                           className="flex-row items-center"
@@ -448,12 +484,23 @@ const index = () => {
                               }
                             />
                           </TouchableOpacity>
-                          <Text style={{ marginLeft: hs(5) }}>Foreclosure</Text>
+                          <Text
+                            style={{
+                              marginLeft: hs(5),
+                              fontFamily: "PopinRegula",
+                            }}
+                          >
+                            Foreclosure
+                          </Text>
                         </View>
                       </View>
                       {touched && errors && (
                         <Text
-                          style={{ color: Colors.light.red, marginTop: vs(5) }}
+                          style={{
+                            color: Colors.light.red,
+                            marginTop: vs(5),
+                            fontFamily: "PopinRegula",
+                          }}
                         >
                           {errors.sale_type}
                         </Text>
@@ -475,6 +522,7 @@ const index = () => {
                       fontWeight: 600,
                       marginBottom: vs(10),
                       fontSize: ms(14),
+                      fontFamily: "PopinRegula",
                     }}
                   >
                     Property Type
@@ -574,6 +622,7 @@ const index = () => {
                       fontSize: ms(15),
                       fontWeight: 500,
                       marginBottom: vs(10),
+                      fontFamily: "PopinRegula",
                     }}
                   >
                     Property Details
@@ -858,10 +907,16 @@ const index = () => {
                   )}
 
                   <View>
-                    <Text style={{ fontWeight: 600, marginTop: vs(10) }}>
+                    <Text
+                      style={{
+                        fontWeight: 600,
+                        marginTop: vs(10),
+                        fontFamily: "PopinRegula",
+                      }}
+                    >
                       Add main features
                     </Text>
-                    <Text>
+                    <Text style={{ fontFamily: "PopinRegula" }}>
                       (Type property feature and hit + sign. To add more
                       features repeat process)
                     </Text>
@@ -904,9 +959,18 @@ const index = () => {
                         multiline
                         errorText={errors.fees_conditions}
                       />
-                      <Text style={{ fontWeight: 600 }}>
+                      <Text
+                        style={{ fontWeight: 600, fontFamily: "PopinRegula" }}
+                      >
                         When property available for occupancy?
-                        <Text style={{ color: Colors.light.red }}>*</Text>
+                        <Text
+                          style={{
+                            color: Colors.light.red,
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          *
+                        </Text>
                       </Text>
                       <View className="flex-row gap-3 items-center justify-between">
                         <TouchableOpacity
@@ -930,7 +994,11 @@ const index = () => {
                               }
                             />
                             <Text
-                              style={{ marginLeft: hs(5), fontWeight: "500" }}
+                              style={{
+                                marginLeft: hs(5),
+                                fontWeight: "500",
+                                fontFamily: "PopinRegula",
+                              }}
                             >
                               Vacant now
                             </Text>
@@ -941,6 +1009,7 @@ const index = () => {
                             color: Colors.light.red,
                             fontSize: ms(15),
                             fontWeight: 500,
+                            fontFamily: "PopinRegula",
                           }}
                         >
                           OR
@@ -962,10 +1031,12 @@ const index = () => {
                       </View>
                     </>
                   )}
-                  <Text style={{ fontWeight: 600 }}>
+                  <Text style={{ fontWeight: 600, fontFamily: "PopinRegula" }}>
                     Property Visit options
                   </Text>
-                  <Text>Buyer can visit property physically?</Text>
+                  <Text style={{ fontFamily: "PopinRegula" }}>
+                    Buyer can visit property physically?
+                  </Text>
                   <View
                     className="flex-row"
                     style={{ marginTop: vs(10), marginBottom: vs(20) }}
@@ -989,7 +1060,11 @@ const index = () => {
                           }
                         />
                       </TouchableOpacity>
-                      <Text style={{ marginLeft: hs(5) }}>Yes</Text>
+                      <Text
+                        style={{ marginLeft: hs(5), fontFamily: "PopinRegula" }}
+                      >
+                        Yes
+                      </Text>
                     </View>
 
                     <View
@@ -1016,7 +1091,11 @@ const index = () => {
                       </TouchableOpacity>
                     </View>
 
-                    <Text style={{ marginLeft: hs(5) }}>No</Text>
+                    <Text
+                      style={{ marginLeft: hs(5), fontFamily: "PopinRegula" }}
+                    >
+                      No
+                    </Text>
                   </View>
 
                   <View
@@ -1190,7 +1269,12 @@ const index = () => {
                   />
                   {user.user_type === "Business" && (
                     <>
-                      <Text className="font-bold">Advertise as</Text>
+                      <Text
+                        className="font-bold"
+                        style={{ fontFamily: "PopinRegula" }}
+                      >
+                        Advertise as
+                      </Text>
                       {data?.total_profiles !== 0 && (
                         <View>
                           {data?.profiles_exist?.agent && (
@@ -1216,6 +1300,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Agent
@@ -1246,6 +1331,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Builder
@@ -1276,6 +1362,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Decor
@@ -1308,6 +1395,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Electrician
@@ -1338,6 +1426,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Investor
@@ -1368,6 +1457,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Mortgage
@@ -1398,6 +1488,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Painter
@@ -1428,6 +1519,7 @@ const index = () => {
                                   style={{
                                     marginLeft: hs(5),
                                     fontWeight: "500",
+                                    fontFamily: "PopinRegula",
                                   }}
                                 >
                                   Plumber
@@ -1440,6 +1532,7 @@ const index = () => {
                               style={{
                                 color: Colors.light.red,
                                 marginTop: vs(5),
+                                fontFamily: "PopinRegula",
                               }}
                             >
                               {errors.ad_by}
@@ -1458,7 +1551,14 @@ const index = () => {
                       opacity: 0.2,
                     }}
                   />
-                  <SelecteAdType
+                  {edit?( <LargeButton
+                          handleSubmit={() => {
+                            handleSubmit();
+                            console.log(errors);
+                          }}
+                          text="Submit Ad"
+                        />):(
+                           <SelecteAdType
                     title1="Select Ad Type"
                     title2=""
                     btnTxt1="Free Ad"
@@ -1466,52 +1566,98 @@ const index = () => {
                     btn1value="Normal"
                     btn2value="Trending"
                     Componet1={
-                      <Text
-                        style={{
-                          marginTop: vs(10),
-                          color: Colors.light.textGray,
-                        }}
-                      >
-                        Post your ad for free.You can upgrade your ad to
-                        trending from your dashboard any time to make deal done
-                        more quickly
-                      </Text>
+                      <>
+                        <Text
+                          style={{
+                            marginTop: vs(10),
+                            color: Colors.light.textGray,
+                            fontFamily: "PopinRegula",
+                            marginBottom: vs(10),
+                          }}
+                        >
+                          Post your ad for free.You can upgrade your ad to
+                          trending from your dashboard any time to make deal
+                          done more quickly
+                        </Text>
+                        <LargeButton
+                          handleSubmit={() => {
+                            handleSubmit();
+                            console.log(errors);
+                          }}
+                          text="Submit Ad"
+                        />
+                      </>
                     }
                     Componet2={
                       <View>
-                        <View className="flex-row justify-between items-center mt-4">
-                          <RadioButton
-                            onPress={(value) =>
-                              setFieldValue("advatize_time", value)
-                            }
-                            checkedValue="15 Days"
-                            text="For 15 days"
-                            value={values.advatize_time}
-                          />
-                          <Text>$50</Text>
-                        </View>
-                        <View className="flex-row justify-between items-center">
-                          <RadioButton
-                            onPress={(value) =>
-                              setFieldValue("advatize_time", value)
-                            }
-                            checkedValue="30 Days"
-                            text="For 30 days"
-                            value={values.advatize_time}
-                          />
-                          <Text>$100</Text>
-                        </View>
-                        <View className="flex-row justify-between items-center">
-                          <RadioButton
-                            onPress={(value) =>
-                              setFieldValue("advatize_time", value)
-                            }
-                            checkedValue="60 Days"
-                            text="For 60 days"
-                            value={values.advatize_time}
-                          />
-                          <Text>$150</Text>
-                        </View>
+                        <LegendList
+                          data={advertiseOptions}
+                          keyExtractor={(item) => item.id}
+                          estimatedItemSize={50}
+                          ListHeaderComponent={
+                            <View
+                              className="flex-row justify-between items-center"
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: Colors.light.textGray,
+                                borderRadius: ms(5),
+                                paddingHorizontal: hs(10),
+                                paddingVertical: vs(10),
+                              }}
+                            >
+                              <Text style={{ fontFamily: "PopinRegula" }}>
+                                Advertise Time
+                              </Text>
+                              <Text style={{ fontFamily: "PopinRegula" }}>
+                                Price
+                              </Text>
+                            </View>
+                          }
+                          renderItem={({ item }) => (
+                            <View
+                              className="flex-row justify-between items-center"
+                              style={{
+                                paddingHorizontal: hs(10),
+                                paddingVertical: vs(10),
+                              }}
+                            >
+                 
+                              <View className="flex-row items-center">
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    setFieldValue("time_period", item.type);
+
+                                    setSelectedAmount(item.price);
+                                  }}
+                                >
+                                  <MaterialIcons
+                                    size={20}
+                                    color={Colors.light.DarkGreen}
+                                    name={
+                                      values.time_period === item.type
+                                        ? "radio-button-checked"
+                                        : "radio-button-unchecked"
+                                    }
+                                  />
+                                </TouchableOpacity>
+
+                                <Text
+                                  style={{
+                                    marginLeft: hs(10),
+                                    fontFamily: "PopinRegula",
+                                  }}
+                                >
+                                  For {item.type} Days
+                                </Text>
+                              </View>
+
+                              <Text style={{ fontFamily: "PopinRegula" }}>
+                                ${item.price}
+                              </Text>
+                            </View>
+                          )}
+                        />
+
                         <View
                           style={{
                             height: vs(1),
@@ -1521,96 +1667,143 @@ const index = () => {
                             opacity: 0.2,
                           }}
                         />
-                        <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
+                        <Text
+                          style={{
+                            fontSize: ms(15),
+                            fontWeight: "600",
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           Select your payment method
                         </Text>
                         <View style={styles.card} className="items-center">
-                          <Text style={{ fontSize: ms(15), fontWeight: "600" }}>
-                            Your Homeilove account balance
-                          </Text>
                           <Text
                             style={{
-                              marginVertical: vs(10),
-                              color: Colors.light.red,
                               fontSize: ms(15),
                               fontWeight: "600",
+                              fontFamily: "PopinRegula",
                             }}
                           >
-                            $ 0
+                            Your Homeilove account balance
                           </Text>
+                          {AmountLoading || isFetching ? (
+                            <ActivityIndicator
+                              size="small"
+                              color={Colors.light.red}
+                            />
+                          ) : (
+                            <Text
+                              style={{
+                                marginVertical: vs(10),
+                                color: Colors.light.red,
+                                fontSize: ms(15),
+                                fontWeight: "600",
+                                fontFamily: "PopinRegula",
+                              }}
+                            >
+                              {amount.amount}
+                            </Text>
+                          )}
                           <Text
-                            className="text-center"
-                            style={{ color: Colors.light.textGray }}
+                            className="text-center mb-5"
+                            style={{
+                              color: Colors.light.textGray,
+                              fontFamily: "PopinRegula",
+                            }}
                           >
                             Have more ads to post then buy bundle and get extra
                             discount. You’ can use credit any time means no
                             expiry!
                           </Text>
-                          <View></View>
+                          <LargeButton
+                            text="Add Credits"
+                            handleSubmit={() => {
+                              router.push("/BuyCredit");
+                            }}
+                          />
                         </View>
                         <View>
                           <View style={styles.card}>
                             <Text style={styles.title}>
-                              Your Homeilove account Balance
+                              Pay and Ad post Atomaticlly
                             </Text>
 
-                            <LargeButton
-                              text="Add Credits"
-                              handleSubmit={() => {}}
-                            />
+                            <TouchableOpacity
+                              className="mb-4"
+                              style={styles.paypalMainButton}
+                              onPress={async () => {
+                                // run form validation
+                                const errors = await validateForm();
 
-                            <View style={styles.paymentOptions}>
-                              <TouchableOpacity
-                                style={[
-                                  styles.paymentButton,
-                                  { backgroundColor: Colors.light.Yellow },
-                                ]}
-                              >
-                                <View className="mt-2">
-                                  <Paypal />
-                                </View>
-                              </TouchableOpacity>
+                                // mark fields touched so errors show
+                                setTouched({
+                                  time_period: true,
+                                  // add other required fields here
+                                });
 
-                              <TouchableOpacity
-                                style={[
-                                  styles.paymentButton,
-                                  { backgroundColor: Colors.light.Yellow },
-                                ]}
-                              >
-                                <PayLater />
-                              </TouchableOpacity>
+                                if (Object.keys(errors).length > 0) {
+                                  renderToastError(
+                                    "Please fill all required fields"
+                                  );
+                                  return;
+                                }
 
-                              <TouchableOpacity
-                                style={[
-                                  styles.paymentButton,
-                                  { backgroundColor: "#2C2C2C" },
-                                ]}
-                              >
-                                <Volit />
-                                <Text style={styles.paymentText}>
-                                  Debit or Credit Card
+                                if (!selectedAmount) {
+                                  renderToastError(
+                                    "Please select bundle first"
+                                  );
+                                  return;
+                                }
+
+                                router.navigate({
+                                  pathname: "/PaymentScreen",
+                                  params: {
+                                    amount: selectedAmount,
+                                    type:"Post"
+                                  },
+                                });
+                              }}
+                            >
+                              <View style={styles.paypalContent}>
+                                <Paypal />
+
+                                <Text style={styles.paypalText}>
+                                  Pay with PayPal or Debit/Credit Card
                                 </Text>
-                              </TouchableOpacity>
-                            </View>
-                            <View className="self-center mt-4">
-                              <PowerdByPayPal />
-                            </View>
+                              </View>
+                            </TouchableOpacity>
+                            <LargeButton
+                              handleSubmit={() => {
+                                if (!selectedAmount && selectedAmount === "") {
+                                  renderToastError(
+                                    "Please select bundle first"
+                                  );
+                                  return;
+                                }
+                                if (amount.amount >= Number(selectedAmount)) {
+                                  setFieldValue("payment_method", "Wallet");
+                                  setFieldValue("amount", selectedAmount);
+                                  handleSubmit();
+                                } else {
+                                  renderToastError(
+                                    "You dont have enought amount in wallet plz recharge"
+                                  );
+                                }
+                              }}
+                              text="Pay with wallet"
+                            />
                           </View>
                         </View>
                       </View>
                     }
-                    value={values.sale_type}
-                    onPress={(selected) => setFieldValue("sale_type", selected)}
+                    value={values.normal_trending}
+                    onPress={(selected) =>
+                      setFieldValue("normal_trending", selected)
+                    }
                   />
-                  <View className="my-4">
-                    <LargeButton
-                      handleSubmit={() => {
-                        handleSubmit();
-                        console.log(errors);
-                      }}
-                      text="Submit Ad"
-                    />
-                  </View>
+                        )}
+                 
+                  <View className="my-4"></View>
                 </>
               )}
             </Formik>
@@ -1644,6 +1837,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "500",
     marginBottom: vs(15),
+    fontFamily: "PopinRegula",
   },
 
   paymentOptions: {
@@ -1662,5 +1856,26 @@ const styles = StyleSheet.create({
     fontSize: ms(14),
     fontWeight: "600",
     marginLeft: hs(8),
+  },
+
+  paypalMainButton: {
+    backgroundColor: Colors.light.Yellow,
+    borderRadius: ms(8),
+    height: vs(48),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  paypalContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  paypalText: {
+    marginLeft: hs(10),
+    fontSize: ms(14),
+    fontWeight: "600",
+    color: "#003087",
+    fontFamily: "PopinRegula",
   },
 });

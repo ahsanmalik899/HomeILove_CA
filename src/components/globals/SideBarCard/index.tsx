@@ -5,15 +5,15 @@ import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SideBarCardprops } from "./type";
-const index = ({ Svg, text, type, totalPosts, onPress=()=>{},ProfileExist }: SideBarCardprops) => {
+const index = ({ Svg, text, type, totalPosts,profileType,id, onPress=()=>{},ProfileExist }: SideBarCardprops) => {
   return (
     <TouchableOpacity
       style={[styles.card, { height: type === "Buy" ? vs(160) : vs(140) }]}
       onPress={() => {
         type === "busenessProfile"
           ? router.navigate({
-              pathname: ProfileExist?"/(main)/Account":"/(main)/CreateProfiles",
-              params: { type: text },
+              pathname: ProfileExist?"/MProfile":"/(main)/CreateProfiles",
+              params: { type: text ,id:id,profileType:profileType},
             })
           : onPress();
       }}
@@ -24,7 +24,7 @@ const index = ({ Svg, text, type, totalPosts, onPress=()=>{},ProfileExist }: Sid
         </View>
       ) : (
         <View className="flex-row justify-between items-center">
-          <Text style={{ color: Colors.light.red }}>{totalPosts}</Text>
+          <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>{totalPosts}</Text>
           <ArrowUp />
         </View>
       )}
@@ -37,6 +37,7 @@ const index = ({ Svg, text, type, totalPosts, onPress=()=>{},ProfileExist }: Sid
             fontWeight: 600,
             paddingHorizontal: hs(5),
             textAlign: "center",
+            fontFamily: "PopinRegula",
           }}
         >
           {text}

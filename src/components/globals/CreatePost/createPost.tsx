@@ -21,7 +21,7 @@ const createPost = () => {
   const UploadButton = () => (
     <View className="flex-row">
       <ImageIcon />
-      <Text style={{ color: Colors.light.DarkGreen }}>Image</Text>
+      <Text style={{ color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}>Image</Text>
     </View>
   );
 const [CreatePost,{isError,isLoading}]= usePostGeneralPostMutation()
@@ -127,7 +127,7 @@ const user =useAppSelector(userdata)
       }) => (
         <>
         <View className="bg-white" style={styles.card}>
-          <Text className="font-bold" style={{ fontWeight: "600" }}>
+          <Text className="font-bold" style={{ fontWeight: "600",fontFamily: "PopinRegula", }}>
             Create Post
           </Text>
           <View
@@ -143,7 +143,7 @@ const user =useAppSelector(userdata)
             <ChatIcon />
 
             <TextInput
-              style={{ marginLeft: vs(10), fontSize: ms(14), width: hs(265) }}
+              style={{ marginLeft: vs(10), fontSize: ms(14), width: hs(265),fontFamily: "PopinRegula", }}
               placeholder="What's up, Name?"
               onChangeText={handleChange("post_description")}
               onBlur={handleBlur("post_description")}
@@ -151,7 +151,7 @@ const user =useAppSelector(userdata)
             />
           </View>
           {touched && errors && (
-            <Text style={{ color: Colors.light.red, marginBottom: vs(5) }}>
+            <Text style={{ color: Colors.light.red, marginBottom: vs(5),fontFamily: "PopinRegula", }}>
               {errors.post_description}
             </Text>
           )}
@@ -217,7 +217,7 @@ const user =useAppSelector(userdata)
                     }}
                   >
                     <Veido />
-                    <Text style={{ color: Colors.light.DarkGreen }}>Video</Text>
+                    <Text style={{ color: Colors.light.DarkGreen ,fontFamily: "PopinRegula",}}>Video</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -232,7 +232,7 @@ const user =useAppSelector(userdata)
               }}
               onPress={() => handleSubmit()}
             >
-              <Text style={{ color: "white", fontWeight: "600",textAlign:'center' }}>Post</Text>
+              <Text style={{ color: "white", fontWeight: "600",textAlign:'center',fontFamily: "PopinRegula", }}>Post</Text>
             </TouchableOpacity>
           </View>
            

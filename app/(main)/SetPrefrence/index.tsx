@@ -1,4 +1,7 @@
 import {
+  useDeleteCommunityPreferencesApiMutation,
+  useDeleteConnectionPreferencesApiMutation,
+  useDeletePropertyPreferencesApiMutation,
   useGetCommunityPrefQuery,
   useGetConnectionPrefQuery,
   useGetPropertyPrefQuery,
@@ -24,6 +27,13 @@ import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
   const user = useAppSelector(userdata);
+  const [ResetProperty, { isLoading: resetPropertyLoading }] =
+    useDeletePropertyPreferencesApiMutation();
+     const [ResetCommunity, { isLoading: resetCommunityLoading }] =
+    useDeleteCommunityPreferencesApiMutation();
+     useDeletePropertyPreferencesApiMutation();
+     const [ResetConnection, { isLoading: resetConnectionLoading }] =
+    useDeleteConnectionPreferencesApiMutation();
   const { type } = useLocalSearchParams();
   const [setPropertyPrefrence, { isLoading: PropertyLoading }] =
     useSetPropertyPrefrenceMutation();
@@ -31,30 +41,37 @@ const index = () => {
     useSetCommunityPrefrenceMutation();
   const [setConnectionPrefrence, { isLoading: ConnectionLoading }] =
     useSetConectionPrefrenceMutation();
-  const { data, isFetching: conectioLoading } = useGetConnectionPrefQuery({
-    id: user.id,
-    type: "",
-  },
-{
-      skip:type!=="Connection"
-    });
-
-  const { data: communityData, isFetching: communityprefLoading } =
-    useGetCommunityPrefQuery({
-      id: user.id,
-      type: "",
-    },{
-      skip:type!=="Community"
-    });
-  const { data: propertyData, isFetching: propertyprefLoading } =
-    useGetPropertyPrefQuery({
+  const { data,refetch:refetchConnectionPreference, isFetching: conectioLoading } = useGetConnectionPrefQuery(
+    {
       id: user.id,
       type: "",
     },
-  {
-      skip:type!=="Property"
-    });
- 
+    {
+      skip: type !== "Connection",
+    }
+  );
+
+  const { data: communityData,refetch:refetchCommunityPreference, isFetching: communityprefLoading } =
+    useGetCommunityPrefQuery(
+      {
+        id: user.id,
+        type: "",
+      },
+      {
+        skip: type !== "Community",
+      }
+    );
+  const { data: propertyData,refetch: refetchPropertyPreference ,isFetching: propertyprefLoading } =
+    useGetPropertyPrefQuery(
+      {
+        id: user.id,
+        type: "",
+      },
+      {
+        skip: type !== "Property",
+      }
+    );
+
   const toggleStatus = (
     currentvalue: string,
     value: string,
@@ -72,80 +89,76 @@ const index = () => {
   };
 
   const propertyPrefrenceSchema = Yup.object().shape({
-    location: Yup.string().required("Location is required"),
+    location: Yup.string().nullable(),
     user_id: Yup.string().nullable(),
-    property_for: Yup.string().required("Property for is required"),
+    property_for: Yup.string().nullable(),
 
-    property_type: Yup.string().required("Property type is required"),
-    property_condition: Yup.string().required(
-      "Property condition type is required"
-    ),
+    property_type: Yup.string().nullable(),
+    property_condition: Yup.string().nullable(),
     min_price: Yup.number()
       .typeError("Minimum price must be a number")
-      .required("Minimum price is required"),
+      .nullable(),
 
     max_price: Yup.number()
       .typeError("Maximum price must be a number")
-      .required("Maximum price is required")
+      .nullable()
       .min(Yup.ref("min_price"), "Max rent must be greater than min price"),
     min_rent: Yup.number()
       .typeError("Minimum rent must be a number")
-      .required("Minimum rent is required"),
+      .nullable(),
 
     max_rent: Yup.number()
       .typeError("Maximum rent must be a number")
-      .required("Maximum rent is required")
+      .nullable()
       .min(Yup.ref("min_rent"), "Max rent must be greater than min rent"),
     min_size: Yup.number()
       .typeError("Minimum size must be a number")
-      .required("Minimum size is required"),
+      .nullable(),
 
     max_size: Yup.number()
       .typeError("Maximum size must be a number")
-      .required("Maximum size is required")
+      .nullable()
       .min(Yup.ref("min_size"), "Max size must be greater than size rent"),
     min_lot_size: Yup.number()
       .typeError("Minimum lot size must be a number")
-      .required("Minimum lot size is required"),
+      .nullable(),
 
     max_lot_size: Yup.number()
       .typeError("Maximum lot size must be a number")
-      .required("Maximum lot size is required")
+      .nullable()
       .min(
         Yup.ref("min_lot_size"),
         "Max lot size must be greater than min lot size"
       ),
 
-    min_age: Yup.number()
-      .typeError("Minimum age must be a number")
-      .required("Minimum age is required"),
+    min_age: Yup.number().typeError("Minimum age must be a number").nullable(),
 
     max_age: Yup.number()
       .typeError("Maximum age must be a number")
-      .required("Maximum age is required")
+      .nullable()
       .min(Yup.ref("min_age"), "Max rent age be greater than min age"),
   });
   const communityPreferenceSchema = Yup.object().shape({
-    location: Yup.string().required("Location is required"),
+    location: Yup.string().nullable(),
     zip: Yup.string().nullable(),
     state: Yup.string().nullable(),
 
-    community_type: Yup.string().required("Community type is required"),
-    community_status: Yup.string().required("Community type is required"),
+    community_type: Yup.string().nullable(),
+    community_status: Yup.string().nullable(),
 
     min_price: Yup.number()
       .typeError("Minimum price must be a number")
-      .required("Minimum price is required"),
+      .nullable(),
 
     max_price: Yup.number()
       .typeError("Maximum price must be a number")
-      .required("Maximum price is required")
+      .nullable()
       .min(Yup.ref("min_price"), "Max rent must be greater than min price"),
   });
   const connectionPreferenceSchema = Yup.object().shape({
-    user_id: Yup.string().required("id is required"),
-    location: Yup.string().required("Location is required"),
-    user_type: Yup.string().required("user prefrence is treguired"),
+    user_id: Yup.string().nullable(),
+    location: Yup.string().nullable(),
+    user_type: Yup.string().nullable(),
   });
 
   switch (type) {
@@ -164,7 +177,8 @@ const index = () => {
 
                   property_for: propertyData?.data?.property_for || "",
                   property_type: propertyData?.data?.property_type || "",
-                  property_condition: propertyData?.data?.property_condition || "",
+                  property_condition:
+                    propertyData?.data?.property_condition || "",
 
                   min_price: propertyData?.data?.min_price
                     ? String(propertyData.data.min_price)
@@ -198,9 +212,13 @@ const index = () => {
                     ? String(propertyData.data.max_lot_size)
                     : "",
 
-                  min_age: propertyData?.data?.min_age ? String(propertyData.data.min_age) : "",
+                  min_age: propertyData?.data?.min_age
+                    ? String(propertyData.data.min_age)
+                    : "",
 
-                  max_age: propertyData?.data?.max_age ? String(propertyData.data.max_age) : "",
+                  max_age: propertyData?.data?.max_age
+                    ? String(propertyData.data.max_age)
+                    : "",
                 }}
                 onSubmit={async (values) => {
                   try {
@@ -228,6 +246,7 @@ const index = () => {
                   values,
                   errors,
                   touched,
+                  resetForm,
                 }) => (
                   <>
                     <DealingAreas
@@ -258,6 +277,7 @@ const index = () => {
                         width: hs(250),
                         fontWeight: 500,
                         marginTop: vs(10),
+                        fontFamily: "PopinRegula",
                       }}
                     >
                       Property for
@@ -288,7 +308,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Sale</Text>
+                        <Text style={{ marginLeft: hs(5) ,fontFamily: "PopinRegula",}}> Sale</Text>
                       </View>
 
                       {/* Rent */}
@@ -316,11 +336,11 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Rent</Text>
+                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Rent</Text>
                       </View>
                     </View>
                     {touched.property_for && errors.property_for && (
-                      <Text style={{ color: Colors.light.red }}>
+                      <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>
                         {errors.property_for}
                       </Text>
                     )}
@@ -394,7 +414,7 @@ const index = () => {
                               opacity: 0.2,
                             }}
                           />
-                          <Text style={{ fontWeight: 500 }}>Price Range </Text>
+                          <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Price Range </Text>
                         </>
                       ))}
 
@@ -571,7 +591,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 }}>
+                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>
                       Property size (sqft)
                     </Text>
                     <View className="flex-row justify-between items-start gap-3">
@@ -642,7 +662,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 }}>Lot size (acres)</Text>
+                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Lot size (acres)</Text>
 
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
@@ -703,7 +723,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 }}>Home age</Text>
+                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Home age</Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdownwithjson
@@ -773,11 +793,31 @@ const index = () => {
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
                         }}
+                        onPress={async () => {
+                          const formatdata = new FormData();
+                          formatdata.append("user_id", user.id.toString());
+                          try {
+                            const result = await ResetProperty(
+                              formatdata
+                            ).unwrap();
+
+                            if (result?.success) {
+                              renderToastSuccess(result?.message);
+                              resetForm();
+  refetchPropertyPreference();
+                            } else {
+                              renderToastError(result?.message);
+                            }
+                          } catch (error) {
+                            renderToastError(error?.data?.message);
+                          }
+                        }}
                       >
                         <Text
                           style={{
                             color: Colors.light.DarkGreen,
                             fontWeight: 500,
+                            fontFamily: "PopinRegula",
                           }}
                         >
                           Reset all filters
@@ -792,10 +832,11 @@ const index = () => {
                           paddingVertical: vs(10),
                         }}
                       >
-                        <Text style={{ color: "white", fontWeight: 500 }}>
+                        <Text style={{ color: "white", fontWeight: 500 ,fontFamily: "PopinRegula",}}>
                           Apply
                         </Text>
                       </TouchableOpacity>
+                      
                     </View>
                   </>
                 )}
@@ -803,7 +844,8 @@ const index = () => {
             </View>
           </View>
           <Loading text="Prefrence setting" isLoading={PropertyLoading} />
-          <Loading text="Loading..." isLoading={propertyprefLoading}/>
+          <Loading text="Loading..." isLoading={propertyprefLoading} />
+                   <Loading isLoading={resetPropertyLoading} text="Loading..." />
         </ScrollView>
       );
       break;
@@ -856,6 +898,7 @@ const index = () => {
                   handleBlur,
                   handleSubmit,
                   setFieldValue,
+                  resetForm,
                   values,
                   errors,
                   touched,
@@ -884,7 +927,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ width: hs(250), marginTop: vs(10) }}>
+                    <Text style={{ width: hs(250), marginTop: vs(10),fontFamily: "PopinRegula", }}>
                       Community type
                     </Text>
                     <View
@@ -913,7 +956,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Residential</Text>
+                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Residential</Text>
                       </View>
 
                       {/* Commercial */}
@@ -941,7 +984,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Commercial</Text>
+                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Commercial</Text>
                       </View>
 
                       {/*  Mix */}
@@ -969,11 +1012,11 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Mix</Text>
+                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Mix</Text>
                       </View>
                     </View>
                     {touched.community_type && errors.community_type && (
-                      <Text style={{ color: Colors.light.red }}>
+                      <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>
                         {errors.community_type}
                       </Text>
                     )}
@@ -986,7 +1029,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ width: hs(250), marginTop: vs(10) }}>
+                    <Text style={{ width: hs(250), marginTop: vs(10),fontFamily: "PopinRegula", }}>
                       Development Stage
                     </Text>
 
@@ -1016,7 +1059,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Completed</Text>
+                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Completed</Text>
                       </View>
 
                       {/* Constructed */}
@@ -1044,7 +1087,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Constructed</Text>
+                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Constructed</Text>
                       </View>
 
                       {/* Inplanning */}
@@ -1072,13 +1115,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) }}> Inplanning</Text>
+                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Inplanning</Text>
                       </View>
                     </View>
 
                     {/* Error */}
                     {touched.community_status && errors.community_status && (
-                      <Text style={{ color: Colors.light.red }}>
+                      <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>
                         {errors.community_status}
                       </Text>
                     )}
@@ -1092,7 +1135,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 }}>Price Range</Text>
+                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Price Range</Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdownwithjson
@@ -1194,7 +1237,27 @@ const index = () => {
                           style={{
                             color: Colors.light.DarkGreen,
                             fontWeight: 500,
+                            fontFamily: "PopinRegula",
                           }}
+                          onPress={async () => {
+                          const formatdata = new FormData();
+                          formatdata.append("user_id", user.id.toString());
+                          try {
+                            const result = await ResetCommunity(
+                              formatdata
+                            ).unwrap();
+
+                            if (result?.success) {
+                              renderToastSuccess(result?.message);
+                              resetForm();
+  refetchCommunityPreference();
+                            } else {
+                              renderToastError(result?.message);
+                            }
+                          } catch (error) {
+                            renderToastError(error?.data?.message);
+                          }
+                        }}
                         >
                           Reset all filters
                         </Text>
@@ -1211,7 +1274,7 @@ const index = () => {
                           paddingVertical: vs(10),
                         }}
                       >
-                        <Text style={{ color: "white", fontWeight: 500 }}>
+                        <Text style={{ color: "white", fontWeight: 500,fontFamily: "PopinRegula", }}>
                           Apply
                         </Text>
                       </TouchableOpacity>
@@ -1223,6 +1286,7 @@ const index = () => {
           </View>
           <Loading isLoading={CommunityLoading} text="Setting Prefrence" />
           <Loading isLoading={communityprefLoading} text="Loading" />
+            <Loading isLoading={resetCommunityLoading} text="Loading..." />
         </ScrollView>
       );
       break;
@@ -1265,6 +1329,7 @@ const index = () => {
                   values,
                   errors,
                   touched,
+                  resetForm,
                 }) => (
                   <>
                     <DealingAreas
@@ -1287,6 +1352,7 @@ const index = () => {
                         marginTop: vs(10),
                         fontWeight: 600,
                         fontSize: ms(18),
+                        fontFamily: "PopinRegula",
                       }}
                     >
                       Property for
@@ -1320,7 +1386,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
                           {" "}
                           Electricians
                         </Text>
@@ -1351,7 +1417,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) ,fontFamily: "PopinRegula",}}>
                           {" "}
                           Builder
                         </Text>
@@ -1382,7 +1448,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
                           {" "}
                           Property agents
                         </Text>
@@ -1412,7 +1478,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
                           {" "}
                           Plumbers
                         </Text>
@@ -1442,7 +1508,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) ,fontFamily: "PopinRegula",}}>
                           {" "}
                           Mortgage Advisors
                         </Text>
@@ -1472,7 +1538,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
                           {" "}
                           Decors
                         </Text>
@@ -1502,7 +1568,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
                           {" "}
                           Painters
                         </Text>
@@ -1532,7 +1598,7 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) }}>
+                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) ,fontFamily: "PopinRegula",}}>
                           {" "}
                           Investors
                         </Text>
@@ -1555,11 +1621,31 @@ const index = () => {
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
                         }}
+                             onPress={async () => {
+                          const formatdata = new FormData();
+                          formatdata.append("user_id", user.id.toString());
+                          try {
+                            const result = await ResetConnection(
+                              formatdata
+                            ).unwrap();
+
+                            if (result?.success) {
+                              renderToastSuccess(result?.message);
+                              resetForm();
+  refetchConnectionPreference();
+                            } else {
+                              renderToastError(result?.message);
+                            }
+                          } catch (error) {
+                            renderToastError(error?.data?.message);
+                          }
+                        }}
                       >
                         <Text
                           style={{
                             color: Colors.light.DarkGreen,
                             fontWeight: 500,
+                            fontFamily: "PopinRegula",
                           }}
                         >
                           Reset all filters
@@ -1577,7 +1663,7 @@ const index = () => {
                           paddingVertical: vs(10),
                         }}
                       >
-                        <Text style={{ color: "white", fontWeight: 500 }}>
+                        <Text style={{ color: "white", fontWeight: 500,fontFamily: "PopinRegula", }}>
                           Apply
                         </Text>
                       </TouchableOpacity>
@@ -1589,6 +1675,7 @@ const index = () => {
           </View>
           <Loading isLoading={ConnectionLoading} text="Setting Prefrence ..." />
           <Loading isLoading={conectioLoading} text="Loading..." />
+   <Loading isLoading={resetConnectionLoading} text="Loading..." />
         </ScrollView>
       );
       break;

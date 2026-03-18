@@ -243,6 +243,7 @@ const styles = StyleSheet.create({
     fontSize: ms(37),
     fontWeight: "400",
     color: "black",
+        fontFamily: "PopinRegula",
     marginTop: vs(35),
   },
   subtitle: {
@@ -251,6 +252,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginTop: vs(10),
     lineHeight: vs(20),
+        fontFamily: "PopinRegula",
   },
   input: {
     height: vs(60),
@@ -262,9 +264,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     fontSize: ms(14),
     color: "#333",
+        fontFamily: "PopinRegula",
   },
   errorInput: {
     borderColor: "red",
+        fontFamily: "PopinRegula",
   },
   passwordContainer: {
     flexDirection: "row",
@@ -281,6 +285,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: ms(14),
     color: "#333",
+        fontFamily: "PopinRegula",
   },
   forgotContainer: {
     alignItems: "flex-end",
@@ -291,6 +296,7 @@ const styles = StyleSheet.create({
     fontSize: ms(14),
     color: "#4A90A4",
     fontWeight: "600",
+        fontFamily: "PopinRegula",
   },
   forgotLine: {
     height: 2,
@@ -309,6 +315,7 @@ const styles = StyleSheet.create({
     fontSize: ms(19),
     color: "black",
     fontWeight: "bold",
+        fontFamily: "PopinRegula",
   },
   line: {
     flex: 1,
@@ -332,16 +339,19 @@ const styles = StyleSheet.create({
     fontSize: ms(14),
     color: "#666",
     marginTop: vs(10),
+        fontFamily: "PopinRegula",
   },
   loginTextGreen: {
     fontSize: ms(14),
     color: "#4A90A4",
     fontWeight: "600",
     marginTop: vs(10),
+        fontFamily: "PopinRegula",
   },
   error: {
     color: "red",
     marginBottom: vs(8),
+        fontFamily: "PopinRegula",
   },
   form: {
     marginTop: vs(20),

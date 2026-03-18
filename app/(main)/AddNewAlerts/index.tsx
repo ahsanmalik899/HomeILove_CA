@@ -81,8 +81,8 @@ const index = () => {
       <View className="flex-1 bg-white">
         <HeaderWithBack title="Add Alerts" />
         <View style={{ marginHorizontal: hs(20) }}>
-          <Text style={{ fontSize: ms(20), fontWeight: 600 }}>
-            Create<Text style={{ color: Colors.light.red }}> Alert </Text>for
+          <Text style={{ fontSize: ms(20), fontWeight: 600,fontFamily: "PopinRegula", }}>
+            Create<Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> Alert </Text>for
             your home move
           </Text>
           <Formik

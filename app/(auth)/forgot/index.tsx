@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: 'black',
     marginTop: vs(50),
+        fontFamily: "PopinRegula",
   },
   subtitle: {
     fontSize: ms(18),
@@ -113,6 +114,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: vs(20),
     lineHeight: vs(20),
+        fontFamily: "PopinRegula",
   },
   input: {
     height: vs(60),
@@ -124,6 +126,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     fontSize: ms(14),
     color: '#333',
+        fontFamily: "PopinRegula",
   },
   form: {
     marginTop: vs(20),
