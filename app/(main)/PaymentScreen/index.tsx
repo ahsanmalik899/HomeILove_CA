@@ -65,9 +65,6 @@ const handleNavigationChange = async (navState: any) => {
       const purchaseUnit = result.data.purchase_units[0];
       const capture = purchaseUnit.payments.captures[0];
 
-      console.log("Status:", capture.status);
-      console.log("Amount:", capture.amount.value);
-      console.log("Currency:", capture.amount.currency_code);
 
     } catch (err) {
       renderToastError("error");

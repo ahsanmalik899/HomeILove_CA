@@ -21,7 +21,9 @@ export const MainApi = createApi({
     "NewsFeeds",
     "MypostCount",
     "CheckProfile",
-    "otherPastData"
+    "otherPastData",
+    "myPost",
+    "myProfile",
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -143,6 +145,7 @@ export const MainApi = createApi({
         url: `get/userProperty?page=${page}&per_page=${per_page}&type=${type}&user_id=${user_id}&profile_type=${profile_type}`,
         method: "GET",
       }),
+      providesTags:["myPost"]
     }),
     userAgentPastPostsApi: builder.query<any, any>({
       query: ({ page, per_page, user_id }) => ({
@@ -253,6 +256,7 @@ export const MainApi = createApi({
         url: `getSingleProfile?type=${type}&id=${id}`,
         method: "GET",
       }),
+      providesTags:["myProfile"]
     }),
     getDeveloperNames: builder.query({
       query: () => ({
@@ -638,7 +642,7 @@ export const MainApi = createApi({
       }),
     }),
     getMessagesApi: builder.query({
-      query: ({ userId, chatUserId, page = 1 }) => ({
+      query: ({ userId, chatUserId, page = 1,per_page = 20 }) => ({
         url: `getMessages`,
         params: {
           user_id: userId,
@@ -706,28 +710,43 @@ export const MainApi = createApi({
       }),
       invalidatesTags: ["CheckProfile"],
     }),
-     savePastWork: builder.mutation<any, FormData>({
+    savePastWork: builder.mutation<any, FormData>({
       query: (formatData) => ({
         url: `savePastWork`,
         method: "POST",
         body: formatData,
       }),
     }),
-      getotherPastWork: builder.query<any, any>({
-      query: ({user_id,work_section}) => ({
+    getotherPastWork: builder.query<any, any>({
+      query: ({ user_id, work_section }) => ({
         url: `getPastWork?user_id=${user_id}&work_section=${work_section}`,
         method: "GET",
-       
       }),
-      providesTags:["otherPastData"]
+      providesTags: ["otherPastData"],
     }),
-    deletePastWork:builder.mutation<any, FormData>({
+    deletePastWork: builder.mutation<any, FormData>({
       query: (formatData) => ({
         url: `deletePastWork`,
         method: "POST",
         body: formatData,
       }),
-      invalidatesTags:["otherPastData"]
+      invalidatesTags: ["otherPastData"],
+    }),
+    upgradePostApi: builder.mutation({
+      query: (data) => ({
+        url: "upgradePost",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags:["myPost"]
+    }),
+    upgradeProfileApi: builder.mutation({
+      query: (data) => ({
+        url: "upgradeProfile",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags:["myProfile"]
     }),
   }),
 });
@@ -779,6 +798,7 @@ export const {
   useDeleteCommunityPreferencesApiMutation,
   useGetPostCommentsApiQuery,
   usePostCommentApiMutation,
+  useUpgradeProfileApiMutation,
   useDeleteCommentApiMutation,
   usePostReplyApiMutation,
   useGetMyTrendingProfilesQuery,
@@ -801,7 +821,7 @@ export const {
   useCapturePaymentMutation,
   useGetUserWalletQuery,
   useSendMessageApiMutation,
-  useGetMessagesApiQuery,
+  useLazyGetMessagesApiQuery,
   useMarkAsReadApiMutation,
   useWriteReviewApiMutation,
   useUpdateReviewApiMutation,
@@ -816,4 +836,5 @@ export const {
   useDeletePastWorkMutation,
   useLazyGetotherPastWorkQuery,
   useLazyUserAgentPastPostsApiQuery,
+  useUpgradePostApiMutation,
 } = MainApi;

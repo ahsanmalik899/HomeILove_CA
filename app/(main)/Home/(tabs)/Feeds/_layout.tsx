@@ -16,6 +16,7 @@ const _layout = () => {
       lazyPreloadDistance:100,
   tabBarActiveTintColor: Colors.light.red,
   tabBarInactiveTintColor: 'black',
+  
   tabBarIndicatorStyle: {
     backgroundColor: Colors.light.red,
     height: vs(3),

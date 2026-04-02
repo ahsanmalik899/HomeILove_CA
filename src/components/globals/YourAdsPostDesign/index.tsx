@@ -1,4 +1,8 @@
-import { useDeletePostMutation } from "@/store/api/user/MainApi";
+import {
+  useDeletePostMutation,
+  useGetUserWalletQuery,
+  useUpgradePostApiMutation,
+} from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
 import Camera from "@assets/Feedimg/camera.svg";
@@ -9,9 +13,12 @@ import Edit from "@assets/icons/MypostListing/edit.svg";
 import Shower from "@assets/icons/MypostListing/shower.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
+import Paypal from "@assets/SideBar/paypal-icon.svg";
+import { MaterialIcons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
@@ -32,6 +39,7 @@ import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
 import LargeButton from "../LaregeButton";
 import Loading from "../Loading";
+import PapPalPayment from "../PapPalPayment";
 import { postDataType } from "./type";
 const YourAdsPostDesign = ({
   data,
@@ -47,12 +55,33 @@ const YourAdsPostDesign = ({
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteType, setDeleteType] = useState("");
+  const [visible, setvisible] = useState(false);
+  const [orderId, setOrderid] = useState("");
   const [selectedPost, setSelectedPost] = useState(null);
   const user = useAppSelector(userdata);
+  const [upgradeId, setUpgradeId] = useState(0);
+  const advertiseOptions = [
+    { id: "1", type: "15", price: "50" },
+    { id: "2", type: "30", price: "100" },
+    { id: "3", type: "60", price: "150" },
+  ];
   const listRef = useRef<any>(null);
   const [deletePost, { isLoading }] = useDeletePostMutation();
   const insets = useSafeAreaInsets();
   const [scrollable, setscrollable] = useState(true);
+  const [timePeriod, setTimeperiod] = useState("");
+  const [SelectedAmount, setSelectedAmount] = useState("");
+  const [upgradePost, { isLoading: upgradeLoading }] =
+    useUpgradePostApiMutation();
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const {
+    data: amount,
+    isLoading: AmountLoading,
+    isFetching,
+  } = useGetUserWalletQuery({
+    id: user.id,
+  });
+  const [showoption, setShowoption] = useState(false);
   const handleDelete = async (post, type, postType) => {
     try {
       await deletePost({
@@ -71,6 +100,22 @@ const YourAdsPostDesign = ({
       );
     } catch (e) {
       console.log(e);
+    }
+  };
+  const handelSubmit = async () => {
+    try {
+      const response = await upgradePost({
+        post_id: upgradeId,
+        type: type,
+        days: timePeriod,
+        user_id:user.id,
+        paymentMethod:paymentMethod,
+        amount:SelectedAmount
+      }).unwrap();
+       setShowoption(false)
+      renderToastSuccess(response.message);
+    } catch (e) {
+      Alert.alert("Error", "Upgrade failed");
     }
   };
   const renderItem = ({ item }) => {
@@ -314,10 +359,18 @@ const YourAdsPostDesign = ({
                   Size={35}
                 />
               </View>
-              <LargeButton
-                handleSubmit={() => {}}
-                text="Upgrade ad to trending"
-              />
+              {item.post_type === "Normal" && (
+                <LargeButton
+                  handleSubmit={() => {
+                    setShowoption(true);
+                    setUpgradeId(
+                      item.post_community_id || item.post_property_id
+                    );
+                  }}
+                  text="Upgrade ad to trending"
+                />
+              )}
+
               <View
                 className="flex-row justify-between items-center"
                 style={{ marginTop: vs(10), paddingHorizontal: hs(10) }}
@@ -354,27 +407,26 @@ const YourAdsPostDesign = ({
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      if(item.ad_by==="agent"){
+                      if (item.ad_by === "agent") {
+                        setSelectedPost(item);
+                        setDeleteType("Deleted");
 
-                      setSelectedPost(item);
-                     setDeleteType("Deleted");
-             
-
-                Alert.alert("Confirm", "Are you sure you want to delete?", [
-                  { text: "No" },
-                  {
-                    text: "Yes",
-                    onPress: () => {
-                      handleDelete(selectedPost, "Deleted", type);
-                    },
-                  },
-                ]);
-              
-                    
-                      }
-                      else{
-                          setSelectedPost(item);
-                      setDeleteModal(true);
+                        Alert.alert(
+                          "Confirm",
+                          "Are you sure you want to delete?",
+                          [
+                            { text: "No" },
+                            {
+                              text: "Yes",
+                              onPress: () => {
+                                handleDelete(selectedPost, "Deleted", type);
+                              },
+                            },
+                          ]
+                        );
+                      } else {
+                        setSelectedPost(item);
+                        setDeleteModal(true);
                       }
                     }}
                   >
@@ -439,13 +491,206 @@ const YourAdsPostDesign = ({
           }}
         />
       )}
+      <Modal visible={showoption} animationType="fade" transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(31, 31, 31, 0.5)", // semi-transparent background
+            justifyContent: "center",
+            paddingHorizontal: hs(5),
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: ms(10),
+              padding: hs(5),
+              maxHeight: "90%",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                top: hs(10),
+                right: hs(10),
+                zIndex: 10,
+              }}
+              onPress={() => setShowoption(false)}
+            >
+              <Text style={{ fontSize: ms(20), fontWeight: "bold" }}>×</Text>
+            </TouchableOpacity>
+
+            {/* LegendList */}
+            <LegendList
+              data={advertiseOptions}
+              keyExtractor={(item) => item.id}
+              estimatedItemSize={50}
+              ListHeaderComponent={
+                <View
+                  className="flex-row justify-between items-center"
+                  style={{
+                    borderBottomWidth: 1,
+                    borderColor: Colors.light.textGray,
+                    borderRadius: ms(5),
+                    paddingHorizontal: hs(10),
+                    paddingVertical: vs(10),
+                  }}
+                >
+                  <Text style={{ fontFamily: "PopinRegula" }}>
+                    Advertise Time
+                  </Text>
+                  <Text style={{ fontFamily: "PopinRegula" }}>Price</Text>
+                </View>
+              }
+              renderItem={({ item: valueitem }) => (
+                <View
+                  className="flex-row justify-between items-center"
+                  style={{ paddingHorizontal: hs(10), paddingVertical: vs(10) }}
+                >
+                  <View className="flex-row items-center">
+                    <TouchableOpacity
+                      onPress={() => {
+                        setTimeperiod(valueitem.type);
+                        setSelectedAmount(valueitem.price);
+                      }}
+                    >
+                      <MaterialIcons
+                        size={20}
+                        color={Colors.light.DarkGreen}
+                        name={
+                          timePeriod === valueitem.type
+                            ? "radio-button-checked"
+                            : "radio-button-unchecked"
+                        }
+                      />
+                    </TouchableOpacity>
+                    <Text
+                      style={{
+                        marginLeft: hs(10),
+                        fontFamily: "PopinRegula",
+                      }}
+                    >
+                      For {valueitem.type} Days
+                    </Text>
+                  </View>
+                  <Text style={{ fontFamily: "PopinRegula" }}>
+                    ${valueitem.price}
+                  </Text>
+                </View>
+              )}
+            />
+
+            <View
+              style={{
+                height: vs(1),
+                marginTop: vs(20),
+                marginBottom: vs(10),
+                backgroundColor: Colors.light.textGray,
+                opacity: 0.2,
+              }}
+            />
+
+            <Text
+              style={{
+                fontSize: ms(15),
+                fontWeight: "600",
+                fontFamily: "PopinRegula",
+              }}
+            >
+              Select your payment method
+            </Text>
+            <View style={styles.card2} className="items-center">
+              <Text
+                style={{
+                  fontSize: ms(15),
+                  fontWeight: "600",
+                  fontFamily: "PopinRegula",
+                }}
+              >
+                Your Homeilove account balance
+              </Text>
+              {AmountLoading || isFetching ? (
+                <ActivityIndicator size="small" color={Colors.light.red} />
+              ) : (
+                <Text
+                  style={{
+                    marginVertical: vs(10),
+                    color: Colors.light.red,
+                    fontSize: ms(15),
+                    fontWeight: "600",
+                    fontFamily: "PopinRegula",
+                  }}
+                >
+                  {amount.amount}
+                </Text>
+              )}
+              <Text
+                className="text-center mb-5"
+                style={{
+                  color: Colors.light.textGray,
+                  fontFamily: "PopinRegula",
+                }}
+              >
+                Have more ads to post then buy bundle and get extra discount.
+                You’ can use credit any time means no expiry!
+              </Text>
+              <LargeButton
+                text="Add Credits"
+                handleSubmit={() => router.push("/BuyCredit")}
+              />
+            </View>
+
+            <View style={styles.card2}>
+              <Text style={styles.title}>Pay and Ad post Atomaticlly</Text>
+
+              <TouchableOpacity
+                className="mb-4"
+                style={styles.paypalMainButton}
+                onPress={async () => {
+                  if (!SelectedAmount) {
+                    alert("Please select bundle first");
+                    return;
+                  }
+                  setvisible(true);
+                }}
+              >
+                <View style={styles.paypalContent}>
+                  <Paypal />
+                  <Text style={styles.paypalText}>
+                    Pay with PayPal or Debit/Credit Card
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <LargeButton
+                handleSubmit={() => {
+                  if (!SelectedAmount) {
+                    alert("Please select bundle first");
+                    return;
+                  }
+                  if (amount.amount >= Number(SelectedAmount)) {
+                    setPaymentMethod("Wallet");
+                    handelSubmit();
+                  } else {
+                    renderToastError(
+                      "You don't have enough amount in wallet, please recharge"
+                    );
+                  }
+                }}
+                text="Pay with wallet"
+              />
+            </View>
+          </View>
+        </View>
+            <Loading isLoading={upgradeLoading} text="Loading.." />
+      </Modal>
       <Modal visible={deleteModal} transparent={true} animationType="fade">
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: "rgba(54, 52, 52, 0.5)",
           }}
         >
           <View
@@ -513,6 +758,23 @@ const YourAdsPostDesign = ({
         </View>
       </Modal>
       <Loading isLoading={isLoading} text="Deleting.." />
+   
+      <PapPalPayment
+        amount={SelectedAmount}
+        onPress={(order_id, setApproveUrl) => {
+          try {
+            setPaymentMethod("Paypal");
+            setOrderid(order_id);
+            handelSubmit();
+            setvisible(false);
+            setApproveUrl(null);
+          } catch {
+            renderToastError("Some thing went rong");
+          }
+        }}
+        setVisible={setvisible}
+        visible={visible}
+      />
     </View>
   );
 };
@@ -544,5 +806,62 @@ const styles = StyleSheet.create({
     color: Colors.light.DarkGreen,
     fontWeight: "600",
     fontFamily: "PopinRegula",
+  },
+  title: {
+    fontSize: ms(14),
+    textAlign: "center",
+    fontWeight: "500",
+    marginBottom: vs(15),
+    fontFamily: "PopinRegula",
+  },
+
+  paymentOptions: {
+    marginTop: vs(30),
+  },
+  paymentButton: {
+    flexDirection: "row",
+    borderRadius: ms(8),
+    alignItems: "center",
+    justifyContent: "center",
+    height: vs(40),
+    marginBottom: vs(10),
+  },
+  paymentText: {
+    color: "white",
+    fontSize: ms(14),
+    fontWeight: "600",
+    marginLeft: hs(8),
+  },
+
+  paypalMainButton: {
+    backgroundColor: Colors.light.Yellow,
+    borderRadius: ms(8),
+    height: vs(48),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  paypalContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  paypalText: {
+    marginLeft: hs(10),
+    fontSize: ms(14),
+    fontWeight: "600",
+    color: "#003087",
+    fontFamily: "PopinRegula",
+  },
+  card2: {
+    marginVertical: vs(20),
+    backgroundColor: "white",
+    borderRadius: ms(8),
+    elevation: 5,
+    paddingVertical: vs(10),
+    paddingHorizontal: hs(15),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
   },
 });

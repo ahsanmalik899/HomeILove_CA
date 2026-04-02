@@ -199,7 +199,7 @@ const index = () => {
                     pathname: "/PaymentScreen",
                     params: {
                       amount: selectedAmount,
-                      type:"Bundel",
+                      type:"Bundle",
                       upgrade_amount:upgradeAmount,
                     },
                   });

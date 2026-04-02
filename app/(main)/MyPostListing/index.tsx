@@ -104,6 +104,7 @@ const index = () => {
           initialLoadDone={initialLoadDone}
         />
       </View>
+      
     </View>
   );
 };

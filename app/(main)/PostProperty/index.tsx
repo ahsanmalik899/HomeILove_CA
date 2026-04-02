@@ -1,4 +1,5 @@
 import {
+  useCapturePaymentMutation,
   useGetDataForEditQuery,
   useGetProfilesQuery,
   useGetUserWalletQuery,
@@ -46,6 +47,7 @@ const index = () => {
   const params = useLocalSearchParams();
   const type = params.type as string;
   const id = Number(params.id);
+    const [capturePayment, { isLoading: isCapturing }] = useCapturePaymentMutation();
   const edit = params.edit === "true";
   const [selectedAmount, setSelectedAmount] = useState("");
   const { data: EditData, isLoading: EditLoading } = useGetDataForEditQuery(
@@ -283,7 +285,7 @@ const index = () => {
   });
 
   const { data } = useGetProfilesQuery({ id: user.id });
-
+  const [visible,setvisible]=useState(false);
   const [UpdateProperty, { isLoading: UpdateLoading }] =
     useUpdatePropertyMutation();
   const [postProperty, { isLoading }] = usePostPropertyMutation();
@@ -384,12 +386,15 @@ const index = () => {
                   for (const pair of formData.entries()) {
                     console.log(pair[0], pair[1]);
                   }
-                  // Call API
+                
                   const result = edit
                     ? await UpdateProperty(formData)
                     : await postProperty(formData);
 
                   if (result?.data?.success) {
+                    if(edit||values.normal_trending==="Normal"||values.payment_method==="Wallet"){
+  
+
                     renderToastSuccess(result.data.message);
 
                     router.replace({
@@ -399,6 +404,26 @@ const index = () => {
                         id: result?.data?.post_id,
                       },
                     });
+                  }
+                  else{
+                     await capturePayment({
+                    order_id:values.order_id,
+                    user_id: user.id,
+                    upgrade_type: "Post",
+                    profile_type:values.ad_by  || "",
+                    upgrade_id:result?.data?.post_id  ,
+                    upgrade_amount: selectedAmount || 0,
+                  }).unwrap();
+          
+              renderToastSuccess(result.data.message);
+                router.replace({
+                      pathname: "/AddSingleView",
+                      params: {
+                        type: values.property_for,
+                        id: result?.data?.post_id,
+                      },
+                    });
+                  }
                   } else {
                     console.log(result);
                     renderToastError("Something went wrong!");
@@ -1732,16 +1757,16 @@ const index = () => {
                               className="mb-4"
                               style={styles.paypalMainButton}
                               onPress={async () => {
-                                // run form validation
+                                
                                 const errors = await validateForm();
 
-                                // mark fields touched so errors show
                                 setTouched({
                                   time_period: true,
-                                  // add other required fields here
+                                 
                                 });
 
                                 if (Object.keys(errors).length > 0) {
+                                  console.log(errors)
                                   renderToastError(
                                     "Please fill all required fields"
                                   );
@@ -1755,13 +1780,7 @@ const index = () => {
                                   return;
                                 }
 
-                                router.navigate({
-                                  pathname: "/PaymentScreen",
-                                  params: {
-                                    amount: selectedAmount,
-                                    type:"Post"
-                                  },
-                                });
+                            setvisible(true)
                               }}
                             >
                               <View style={styles.paypalContent}>
@@ -1804,8 +1823,10 @@ const index = () => {
                         )}
                  
                   <View className="my-4"></View>
+    
                 </>
               )}
+              
             </Formik>
           </View>
         </View>
@@ -1813,6 +1834,7 @@ const index = () => {
       <Loading isLoading={isLoading} text={"Creating Property Post"} />
       <Loading isLoading={EditLoading} text={"Loading..."} />
       <Loading isLoading={UpdateLoading} text={"Updating Property Post..."} />
+    
     </View>
   );
 };

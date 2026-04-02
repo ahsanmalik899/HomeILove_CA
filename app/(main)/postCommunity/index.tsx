@@ -1,4 +1,5 @@
 import {
+  useCapturePaymentMutation,
   useGetDataForEditQuery,
   useGetProfilesQuery,
   useGetUserWalletQuery,
@@ -22,6 +23,7 @@ import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
+import PapPalPayment from "@src/components/globals/PapPalPayment";
 import PdfPicker from "@src/components/globals/PdfPicker";
 import SelecteAdType from "@src/components/globals/TablikeButton";
 import UploadPic from "@src/components/globals/UploadPic";
@@ -47,6 +49,7 @@ const index = () => {
   const [saleType, setSaleType] = useState(true);
   const [count, setCount] = useState(1);
   const [selectedAmount, setSelectedAmount] = useState("");
+  const [visible, setvisible] = useState(false);
   const params = useLocalSearchParams();
   const type = params.type as string;
   const id = Number(params.id);
@@ -121,7 +124,7 @@ const index = () => {
 
     user_type: Yup.string().required("User type is required"),
 
-    payment_method: Yup.string().required("Payment method is required"),
+    payment_method: Yup.string().nullable(),
 
     ad_life: Yup.number().nullable(),
 
@@ -403,7 +406,7 @@ const index = () => {
           video_link: editData.post.video_link || "",
           user_id: editData.post.user_id,
           user_type: editData.post.user_type,
-          payment_method: editData.post.payment_method ,
+          payment_method: editData.post.payment_method,
           ad_life: editData.post.ad_life || 1,
           ad_by: editData.post.ad_by || "",
           post_status: editData.post.post_status || "Pending",
@@ -537,7 +540,8 @@ const index = () => {
           floorimg: [],
           broucherimg: [],
         };
-
+  const [capturePayment, { isLoading: isCapturing }] =
+    useCapturePaymentMutation();
   const pickImage = async (setFieldValue: any, name: string) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -571,7 +575,13 @@ const index = () => {
         className="bg-white flex-1"
       >
         <HeaderWithBack header="Sell Property" />
-        <View style={{ marginHorizontal: hs(10), marginVertical: vs(20), paddingBottom:vs(10)}}>
+        <View
+          style={{
+            marginHorizontal: hs(10),
+            marginVertical: vs(20),
+            paddingBottom: vs(10),
+          }}
+        >
           <Text
             style={{
               fontWeight: 600,
@@ -707,14 +717,37 @@ const index = () => {
                     : await postCommunity(formData);
 
                   if (result.data?.success) {
-                    renderToastSuccess(result.data?.message);
-                    router.replace({
-                      pathname: "/AddSingleView",
-                      params: {
-                        type: "community",
-                        id: result?.data?.post_id,
-                      },
-                    });
+                    if (
+                      edit ||
+                      values.post_type === "Normal" ||
+                      values.payment_method === "Wallet"
+                    ) {
+                      renderToastSuccess(result.data?.message);
+                      router.replace({
+                        pathname: "/AddSingleView",
+                        params: {
+                          type: "community",
+                          id: result?.data?.post_id,
+                        },
+                      });
+                    } else {
+                      await capturePayment({
+                        order_id: values.order_id,
+                        user_id: user.id,
+                        upgrade_type: "Post",
+                        profile_type: values.ad_by || "",
+                        upgrade_id: result?.data?.post_id,
+                        upgrade_amount: selectedAmount || 0,
+                      }).unwrap();
+                      renderToastSuccess(result.data?.message);
+                      router.replace({
+                        pathname: "/AddSingleView",
+                        params: {
+                          type: "community",
+                          id: result?.data?.post_id,
+                        },
+                      });
+                    }
                   } else {
                     renderToastError(
                       result?.data?.message || "Something went wrong!"
@@ -1477,131 +1510,123 @@ const index = () => {
                       opacity: 0.2,
                     }}
                   />
-                  {edit?( <LargeButton
-                          handleSubmit={() => {
-                            handleSubmit();
-                            console.log(errors);
-                          }}
-                          text="Submit Ad"
-                        />):(
-                           <SelecteAdType
-                    title1="Select Ad Type"
-                    title2=""
-                    btnTxt1="Free Ad"
-                    btnTxt2="Trending Ad"
-                    btn1value="Normal"
-                    btn2value="Trending"
-                    Componet1={
-                      <>
-                        <Text
-                          style={{
-                            marginTop: vs(10),
-                            color: Colors.light.textGray,
-                            fontFamily: "PopinRegula",
-                            marginBottom: vs(10),
-                          }}
-                        >
-                          Post your ad for free.You can upgrade your ad to
-                          trending from your dashboard any time to make deal
-                          done more quickly
-                        </Text>
-                        <LargeButton
-                          handleSubmit={() => {
-                            handleSubmit();
-                            console.log(errors);
-                          }}
-                          text="Submit Ad"
-                        />
-                      </>
-                    }
-                    Componet2={
-                      <View>
-                        <LegendList
-                          data={advertiseOptions}
-                          keyExtractor={(item) => item.id}
-                          estimatedItemSize={50}
-                          ListHeaderComponent={
-                            <View
-                              className="flex-row justify-between items-center"
-                              style={{
-                                borderBottomWidth: 1,
-                                borderColor: Colors.light.textGray,
-                                borderRadius: ms(5),
-                                paddingHorizontal: hs(10),
-                                paddingVertical: vs(10),
-                              }}
-                            >
-                              <Text style={{ fontFamily: "PopinRegula" }}>
-                                Advertise Time
-                              </Text>
-                              <Text style={{ fontFamily: "PopinRegula" }}>
-                                Price
-                              </Text>
-                            </View>
-                          }
-                          renderItem={({ item }) => (
-                            <View
-                              className="flex-row justify-between items-center"
-                              style={{
-                                paddingHorizontal: hs(10),
-                                paddingVertical: vs(10),
-                              }}
-                            >
-                              <View className="flex-row items-center">
-                                <TouchableOpacity
-                                  onPress={() => {
-                                    setFieldValue("ad_life", item.type);
-
-                                    setSelectedAmount(item.price);
-                                  }}
-                                >
-                                  <MaterialIcons
-                                    size={20}
-                                    color={Colors.light.DarkGreen}
-                                    name={
-                                      values.ad_life === item.type
-                                        ? "radio-button-checked"
-                                        : "radio-button-unchecked"
-                                    }
-                                  />
-                                </TouchableOpacity>
-
-                                <Text
-                                  style={{
-                                    marginLeft: hs(10),
-                                    fontFamily: "PopinRegula",
-                                  }}
-                                >
-                                  For {item.type} Days
+                  {edit ? (
+                    <LargeButton
+                      handleSubmit={() => {
+                        handleSubmit();
+                        console.log(errors);
+                      }}
+                      text="Submit Ad"
+                    />
+                  ) : (
+                    <SelecteAdType
+                      title1="Select Ad Type"
+                      title2=""
+                      btnTxt1="Free Ad"
+                      btnTxt2="Trending Ad"
+                      btn1value="Normal"
+                      btn2value="Trending"
+                      Componet1={
+                        <>
+                          <Text
+                            style={{
+                              marginTop: vs(10),
+                              color: Colors.light.textGray,
+                              fontFamily: "PopinRegula",
+                              marginBottom: vs(10),
+                            }}
+                          >
+                            Post your ad for free.You can upgrade your ad to
+                            trending from your dashboard any time to make deal
+                            done more quickly
+                          </Text>
+                          <LargeButton
+                            handleSubmit={() => {
+                              handleSubmit();
+                              console.log(errors);
+                            }}
+                            text="Submit Ad"
+                          />
+                        </>
+                      }
+                      Componet2={
+                        <View>
+                          <LegendList
+                            data={advertiseOptions}
+                            keyExtractor={(item) => item.id}
+                            estimatedItemSize={50}
+                            ListHeaderComponent={
+                              <View
+                                className="flex-row justify-between items-center"
+                                style={{
+                                  borderBottomWidth: 1,
+                                  borderColor: Colors.light.textGray,
+                                  borderRadius: ms(5),
+                                  paddingHorizontal: hs(10),
+                                  paddingVertical: vs(10),
+                                }}
+                              >
+                                <Text style={{ fontFamily: "PopinRegula" }}>
+                                  Advertise Time
+                                </Text>
+                                <Text style={{ fontFamily: "PopinRegula" }}>
+                                  Price
                                 </Text>
                               </View>
+                            }
+                            renderItem={({ item }) => (
+                              <View
+                                className="flex-row justify-between items-center"
+                                style={{
+                                  paddingHorizontal: hs(10),
+                                  paddingVertical: vs(10),
+                                }}
+                              >
+                                <View className="flex-row items-center">
+                                  <TouchableOpacity
+                                    onPress={() => {
+                                      setFieldValue("ad_life", item.type);
 
-                              <Text style={{ fontFamily: "PopinRegula" }}>
-                                ${item.price}
-                              </Text>
-                            </View>
-                          )}
-                        />
+                                      setSelectedAmount(item.price);
+                                    }}
+                                  >
+                                    <MaterialIcons
+                                      size={20}
+                                      color={Colors.light.DarkGreen}
+                                      name={
+                                        values.ad_life === item.type
+                                          ? "radio-button-checked"
+                                          : "radio-button-unchecked"
+                                      }
+                                    />
+                                  </TouchableOpacity>
 
-                        <View
-                          style={{
-                            height: vs(1),
-                            marginTop: vs(20),
-                            marginBottom: vs(10),
-                            backgroundColor: Colors.light.textGray,
-                            opacity: 0.2,
-                          }}
-                        />
-                        <Text
-                          style={{
-                            fontSize: ms(15),
-                            fontWeight: "600",
-                            fontFamily: "PopinRegula",
-                          }}
-                        >
-                          Select your payment method
-                        </Text>
-                        <View style={styles.card} className="items-center">
+                                  <Text
+                                    style={{
+                                      marginLeft: hs(10),
+                                      fontFamily: "PopinRegula",
+                                    }}
+                                  >
+                                    For {item.type} Days
+                                  </Text>
+                                </View>
+
+                                <Text style={{ fontFamily: "PopinRegula" }}>
+                                  ${item.price}
+                                </Text>
+                              </View>
+                            )}
+                          />
+
+                          <View
+                            style={{
+                              height: vs(1),
+                              marginTop: vs(20),
+                              marginBottom: vs(10),
+                              backgroundColor: Colors.light.textGray,
+                              opacity: 0.2,
+                            }}
+                          />
                           <Text
                             style={{
                               fontSize: ms(15),
@@ -1609,124 +1634,147 @@ const index = () => {
                               fontFamily: "PopinRegula",
                             }}
                           >
-                            Your Homeilove account balance
+                            Select your payment method
                           </Text>
-                          {AmountLoading || isFetching ? (
-                            <ActivityIndicator
-                              size="small"
-                              color={Colors.light.red}
-                            />
-                          ) : (
+                          <View style={styles.card} className="items-center">
                             <Text
                               style={{
-                                marginVertical: vs(10),
-                                color: Colors.light.red,
                                 fontSize: ms(15),
                                 fontWeight: "600",
                                 fontFamily: "PopinRegula",
                               }}
                             >
-                              {amount.amount}
+                              Your Homeilove account balance
                             </Text>
-                          )}
-                          <Text
-                            className="text-center mb-5"
-                            style={{
-                              color: Colors.light.textGray,
-                              fontFamily: "PopinRegula",
-                            }}
-                          >
-                            Have more ads to post then buy bundle and get extra
-                            discount. You’ can use credit any time means no
-                            expiry!
-                          </Text>
-                          <LargeButton
-                            text="Add Credits"
-                            handleSubmit={() => {
-                              router.push("/BuyCredit");
-                            }}
-                          />
-                        </View>
-                        <View>
-                          <View style={styles.card}>
-                            <Text style={styles.title}>
-                              Pay and Ad post Atomaticlly
-                            </Text>
-
-                            <TouchableOpacity
-                              className="mb-4"
-                              style={styles.paypalMainButton}
-                              onPress={async () => {
-                                // run form validation
-                                const errors = await validateForm();
-
-                                // mark fields touched so errors show
-                                setTouched({
-                                  ad_life: true,
-                                  // add other required fields here
-                                });
-
-                                if (Object.keys(errors).length > 0) {
-                                  renderToastError(
-                                    "Please fill all required fields"
-                                  );
-                                  return;
-                                }
-
-                                if (!selectedAmount) {
-                                  renderToastError(
-                                    "Please select bundle first"
-                                  );
-                                  return;
-                                }
-
-                                router.navigate({
-                                  pathname: "/PaymentScreen",
-                                  params: {
-                                    amount: selectedAmount,
-                                    type: "Post",
-                                  },
-                                });
+                            {AmountLoading || isFetching ? (
+                              <ActivityIndicator
+                                size="small"
+                                color={Colors.light.red}
+                              />
+                            ) : (
+                              <Text
+                                style={{
+                                  marginVertical: vs(10),
+                                  color: Colors.light.red,
+                                  fontSize: ms(15),
+                                  fontWeight: "600",
+                                  fontFamily: "PopinRegula",
+                                }}
+                              >
+                                {amount.amount}
+                              </Text>
+                            )}
+                            <Text
+                              className="text-center mb-5"
+                              style={{
+                                color: Colors.light.textGray,
+                                fontFamily: "PopinRegula",
                               }}
                             >
-                              <View style={styles.paypalContent}>
-                                <Paypal />
-
-                                <Text style={styles.paypalText}>
-                                  Pay with PayPal or Debit/Credit Card
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
+                              Have more ads to post then buy bundle and get
+                              extra discount. You’ can use credit any time means
+                              no expiry!
+                            </Text>
                             <LargeButton
+                              text="Add Credits"
                               handleSubmit={() => {
-                                if (!selectedAmount && selectedAmount === "") {
-                                  renderToastError(
-                                    "Please select bundle first"
-                                  );
-                                  return;
-                                }
-                                if (amount.amount >= Number(selectedAmount)) {
-                                  setFieldValue("payment_method", "Wallet");
-                                  setFieldValue("amount", selectedAmount);
-                                  handleSubmit();
-                                } else {
-                                  renderToastError(
-                                    "You dont have enought amount in wallet plz recharge"
-                                  );
-                                }
+                                router.push("/BuyCredit");
                               }}
-                              text="Pay with wallet"
                             />
                           </View>
+                          <View>
+                            <View style={styles.card}>
+                              <Text style={styles.title}>
+                                Pay and Ad post Atomaticlly
+                              </Text>
+
+                              <TouchableOpacity
+                                className="mb-4"
+                                style={styles.paypalMainButton}
+                                onPress={async () => {
+                                  // run form validation
+                                  const errors = await validateForm();
+
+                                  // mark fields touched so errors show
+                                  setTouched({
+                                    ad_life: true,
+                                  });
+                                  setFieldValue("payment_method", "Paypal");
+                                  setFieldValue("amount", selectedAmount);
+                                  console.log(errors);
+                                  if (Object.keys(errors).length > 0) {
+                                    renderToastError(
+                                      "Please fill all required fields"
+                                    );
+                                    return;
+                                  }
+
+                                  if (!selectedAmount) {
+                                    renderToastError(
+                                      "Please select bundle first"
+                                    );
+                                    return;
+                                  }
+
+                                  setvisible(true)
+                                }}
+                              >
+                                <View style={styles.paypalContent}>
+                                  <Paypal />
+
+                                  <Text style={styles.paypalText}>
+                                    Pay with PayPal or Debit/Credit Card
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                              <LargeButton
+                                handleSubmit={() => {
+                                  if (
+                                    !selectedAmount &&
+                                    selectedAmount === ""
+                                  ) {
+                                    renderToastError(
+                                      "Please select bundle first"
+                                    );
+                                    return;
+                                  }
+                                  if (amount.amount >= Number(selectedAmount)) {
+                                    setFieldValue("payment_method", "Wallet");
+                                    setFieldValue("amount", selectedAmount);
+                                    handleSubmit();
+                                  } else {
+                                    renderToastError(
+                                      "You dont have enought amount in wallet plz recharge"
+                                    );
+                                  }
+                                }}
+                                text="Pay with wallet"
+                              />
+                            </View>
+                          </View>
                         </View>
-                      </View>
-                    }
-                    value={values.post_type}
-                    onPress={(selected) => setFieldValue("post_type", selected)}
+                      }
+                      value={values.post_type}
+                      onPress={(selected) =>
+                        setFieldValue("post_type", selected)
+                      }
+                    />
+                  )}
+                  <PapPalPayment
+                    amount={selectedAmount}
+                    onPress={(order_id, setApproveUrl) => {
+                      try {
+                        setFieldValue("payment_method", "Paypal");
+                        setFieldValue("order_id", order_id);
+                        handleSubmit();
+                        setApproveUrl(null);
+                      } catch {
+                        renderToastError("Some thing went rong");
+                      }
+                    }}
+                    setVisible={setvisible}
+                    visible={visible}
                   />
-                        )}
-                 
-               
                 </>
               )}
             </Formik>

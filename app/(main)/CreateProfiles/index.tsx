@@ -1,13 +1,15 @@
 import {
+  useCapturePaymentMutation,
   useCreateProfileMutation,
   useGetSingleProfileQuery,
+  useGetUserWalletQuery,
   useUpdateProfileMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import ImageUpload from "@assets/CreateProfile/uploadimage.svg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
+import Paypal from "@assets/SideBar/paypal-icon.svg";
 import { MaterialIcons } from "@expo/vector-icons";
-
 import { AdressInput } from "@src/components/globals/AddressInput";
 import DatePickerField from "@src/components/globals/DatePickerField";
 import { DealingAreas } from "@src/components/globals/DealingAreas";
@@ -17,6 +19,7 @@ import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwi
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
+import PapPalPayment from "@src/components/globals/PapPalPayment";
 import SelecteAdType from "@src/components/globals/TablikeButton";
 import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
@@ -24,10 +27,12 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 
+import { LegendList } from "@legendapp/list";
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -72,18 +77,32 @@ const Index = () => {
     multilicence: true,
     licence: true,
   };
+  const advertiseOptions = [
+    { id: "1", type: "15", price: "50" },
+    { id: "2", type: "30", price: "100" },
+    { id: "3", type: "60", price: "150" },
+  ];
   const user = useAppSelector(userdata);
   const { type } = useLocalSearchParams();
   const [valuationFor, setValuationFor] = useState(false);
   const params = useLocalSearchParams();
+    const [capturePayment, { isLoading: isCapturing }] = useCapturePaymentMutation();
   const ProfileType = params.ProfileType as string;
   const id = Number(params.id);
   const edit = params.edit === "true";
+  const [selectedAmount, setSelectedAmount] = useState("");
+  const [visible, setvisible] = useState(false);
   const { data, isLoading: LodingEditData } = useGetSingleProfileQuery(
     { type: ProfileType, id },
     { skip: !edit }
   );
-
+  const {
+    data: amount,
+    isLoading: AmountLoading,
+    isFetching,
+  } = useGetUserWalletQuery({
+    id: user.id,
+  });
   switch (type) {
     case "Builder Profile":
       dataAccordingType = {
@@ -437,10 +456,10 @@ const Index = () => {
               investor_type: "",
               invest_in: "",
 
-              issuing_authority:edit? data?.data?.issuing_authority: "",
+              issuing_authority: edit ? data?.data?.issuing_authority : "",
 
-              min_invest: edit? data?.data?.min_invest:"",
-              max_invest:edit? data?.data?.max_invest :"",
+              min_invest: edit ? data?.data?.min_invest : "",
+              max_invest: edit ? data?.data?.max_invest : "",
 
               advisory_service: edit
                 ? data?.data?.valuation_for
@@ -509,16 +528,31 @@ const Index = () => {
                   } as any);
                 }
 
-                // Call RTK Query mutation
                 const res = edit
                   ? await updateProfile(formData).unwrap()
                   : await createprofile(formData).unwrap();
 
                 if (res?.success) {
+                    if(edit||values.post_type ==="Normal"||values.payment_method==="Wallet"){
                   renderToastSuccess(
                     res?.message || "Profile created successfully"
                   );
                   router.replace("/BusenessProfiles");
+                }
+                else{
+                   await capturePayment({
+                    order_id:values.order_id,
+                    user_id: user.id,
+                    upgrade_type: "Profile",
+                    profile_type:dataAccordingType.profileType  || "",
+                    upgrade_id:res?.data?.id  ,
+                    upgrade_amount: selectedAmount || 0,
+                  }).unwrap();
+                    renderToastSuccess(
+                    res?.message || "Profile created successfully"
+                  );
+                  router.replace("/BusenessProfiles");
+                }
                 } else {
                   renderToastError(res?.message || "Profile creation failed");
                 }
@@ -537,6 +571,8 @@ const Index = () => {
               values,
               errors,
               touched,
+              setTouched,
+              validateForm,
             }) => (
               <>
                 {dataAccordingType.isInvestor && (
@@ -989,7 +1025,7 @@ const Index = () => {
                       btnTxt1="Normal Ad"
                       btnTxt2="Trending Ad"
                       btn1value="Normal"
-                      btn2value="Promoted"
+                      btn2value="Trending"
                       Componet1={
                         <>
                           <Text
@@ -1013,18 +1049,206 @@ const Index = () => {
                         </>
                       }
                       Componet2={
-                        <Text
-                          style={{
-                            marginTop: vs(10),
-                            fontSize: ms(11),
-                            color: Colors.light.textGray,
-                            fontFamily: "PopinRegula",
-                          }}
-                        >
-                          Post your ad for free.You can upgrade your ad to
-                          trending from your dashboard any time to make deal
-                          done more quickly
-                        </Text>
+                        <View>
+                          <LegendList
+                            data={advertiseOptions}
+                            keyExtractor={(item) => item.id}
+                            estimatedItemSize={50}
+                            ListHeaderComponent={
+                              <View
+                                className="flex-row justify-between items-center"
+                                style={{
+                                  borderBottomWidth: 1,
+                                  borderColor: Colors.light.textGray,
+                                  borderRadius: ms(5),
+                                  paddingHorizontal: hs(10),
+                                  paddingVertical: vs(10),
+                                }}
+                              >
+                                <Text style={{ fontFamily: "PopinRegula" }}>
+                                  Advertise Time
+                                </Text>
+                                <Text style={{ fontFamily: "PopinRegula" }}>
+                                  Price
+                                </Text>
+                              </View>
+                            }
+                            renderItem={({ item }) => (
+                              <View
+                                className="flex-row justify-between items-center"
+                                style={{
+                                  paddingHorizontal: hs(10),
+                                  paddingVertical: vs(10),
+                                }}
+                              >
+                                <View className="flex-row items-center">
+                                  <TouchableOpacity
+                                    onPress={() => {
+                                      setFieldValue("time_period", item.type);
+
+                                      setSelectedAmount(item.price);
+                                    }}
+                                  >
+                                    <MaterialIcons
+                                      size={20}
+                                      color={Colors.light.DarkGreen}
+                                      name={
+                                        values.time_period === item.type
+                                          ? "radio-button-checked"
+                                          : "radio-button-unchecked"
+                                      }
+                                    />
+                                  </TouchableOpacity>
+
+                                  <Text
+                                    style={{
+                                      marginLeft: hs(10),
+                                      fontFamily: "PopinRegula",
+                                    }}
+                                  >
+                                    For {item.type} Days
+                                  </Text>
+                                </View>
+
+                                <Text style={{ fontFamily: "PopinRegula" }}>
+                                  ${item.price}
+                                </Text>
+                              </View>
+                            )}
+                          />
+
+                          <View
+                            style={{
+                              height: vs(1),
+                              marginTop: vs(20),
+                              marginBottom: vs(10),
+                              backgroundColor: Colors.light.textGray,
+                              opacity: 0.2,
+                            }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: ms(15),
+                              fontWeight: "600",
+                              fontFamily: "PopinRegula",
+                            }}
+                          >
+                            Select your payment method
+                          </Text>
+                          <View style={styles.card} className="items-center">
+                            <Text
+                              style={{
+                                fontSize: ms(15),
+                                fontWeight: "600",
+                                fontFamily: "PopinRegula",
+                              }}
+                            >
+                              Your Homeilove account balance
+                            </Text>
+                            {AmountLoading || isFetching ? (
+                              <ActivityIndicator
+                                size="small"
+                                color={Colors.light.red}
+                              />
+                            ) : (
+                              <Text
+                                style={{
+                                  marginVertical: vs(10),
+                                  color: Colors.light.red,
+                                  fontSize: ms(15),
+                                  fontWeight: "600",
+                                  fontFamily: "PopinRegula",
+                                }}
+                              >
+                                {amount.amount}
+                              </Text>
+                            )}
+                            <Text
+                              className="text-center mb-5"
+                              style={{
+                                color: Colors.light.textGray,
+                                fontFamily: "PopinRegula",
+                              }}
+                            >
+                              Have more ads to post then buy bundle and get
+                              extra discount. You’ can use credit any time means
+                              no expiry!
+                            </Text>
+                            <LargeButton
+                              text="Add Credits"
+                              handleSubmit={() => {
+                                router.push("/BuyCredit");
+                              }}
+                            />
+                          </View>
+                          <View>
+                            <View style={styles.card}>
+                              <Text style={styles.title}>
+                                Pay and Ad post Atomaticlly
+                              </Text>
+
+                              <TouchableOpacity
+                                className="mb-4"
+                                style={styles.paypalMainButton}
+                                onPress={async () => {
+                                  const errors = await validateForm();
+
+                                  setTouched({
+                                    time_period: true,
+                                  });
+
+                                  if (Object.keys(errors).length > 0) {
+                                    console.log(errors);
+                                    renderToastError(
+                                      "Please fill all required fields"
+                                    );
+                                    return;
+                                  }
+
+                                  if (!selectedAmount) {
+                                    renderToastError(
+                                      "Please select bundle first"
+                                    );
+                                    return;
+                                  }
+
+                                  setvisible(true);
+                                }}
+                              >
+                                <View style={styles.paypalContent}>
+                                  <Paypal />
+
+                                  <Text style={styles.paypalText}>
+                                    Pay with PayPal or Debit/Credit Card
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                              <LargeButton
+                                handleSubmit={() => {
+                                  if (
+                                    !selectedAmount &&
+                                    selectedAmount === ""
+                                  ) {
+                                    renderToastError(
+                                      "Please select bundle first"
+                                    );
+                                    return;
+                                  }
+                                  if (amount.amount >= Number(selectedAmount)) {
+                                    setFieldValue("payment_method", "Wallet");
+                                    setFieldValue("amount", selectedAmount);
+                                    handleSubmit();
+                                  } else {
+                                    renderToastError(
+                                      "You dont have enought amount in wallet plz recharge"
+                                    );
+                                  }
+                                }}
+                                text="Pay with wallet"
+                              />
+                            </View>
+                          </View>
+                        </View>
                       }
                       value={values.post_type}
                       onPress={(selected) =>
@@ -1042,13 +1266,28 @@ const Index = () => {
                     opacity: 0.2,
                   }}
                 />
+                <PapPalPayment
+                  amount={selectedAmount}
+                  onPress={(order_id, setApproveUrl) => {
+                    try {
+                      setFieldValue("payment_method", "Paypal");
+                      setFieldValue("order_id", order_id);
+                      handleSubmit();
+                      setApproveUrl(null);
+                    } catch {
+                      renderToastError("Some thing went rong");
+                    }
+                  }}
+                  setVisible={setvisible}
+                  visible={visible}
+                />
               </>
             )}
           </Formik>
         </View>
       </ScrollView>
       <Loading isLoading={isLoading} text={`Creating ${type}....`} />
-      <Loading isLoading={LodingEditData} text="Loading..." />
+      <Loading isLoading={LodingEditData||UpdateLoading} text="Loading..." />
     </View>
   );
 };
@@ -1057,4 +1296,37 @@ export default Index;
 
 const styles = StyleSheet.create({
   title: { fontSize: ms(14), fontWeight: 600 },
+
+  paypalContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  paypalText: {
+    marginLeft: hs(10),
+    fontSize: ms(14),
+    fontWeight: "600",
+    color: "#003087",
+    fontFamily: "PopinRegula",
+  },
+
+  card: {
+    marginVertical: vs(20),
+    backgroundColor: "white",
+    borderRadius: ms(8),
+    elevation: 5,
+    paddingVertical: vs(10),
+    paddingHorizontal: hs(15),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+  },
+  paypalMainButton: {
+    backgroundColor: Colors.light.Yellow,
+    borderRadius: ms(8),
+    height: vs(48),
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
