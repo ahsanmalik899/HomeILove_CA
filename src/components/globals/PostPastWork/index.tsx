@@ -2,6 +2,7 @@ import { Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { userdata } from "@/store/slices/selector/user";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
+import { Ionicons } from "@expo/vector-icons";
 import LargeButton from "@src/components/globals/LaregeButton";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, vs } from "@utils/design/design";
@@ -79,11 +80,14 @@ const PastWorkModal = ({
 
   return (
     <Modal visible={visible} animationType="slide">
+     
       <View style={styles.container}>
-        <Text style={styles.title}>
+        <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",paddingVertical:vs(10)}}>
+          <Text style={styles.title}>
           {editData ? "Edit Past Work" : "Add Past Work"}
         </Text>
-
+        <Ionicons name="close-circle" size={30} color="black" style={{}} onPress={closeModal} />
+        </View>
         <Formik
           initialValues={initialValues}
           validationSchema={PastWorkSchema}
@@ -296,8 +300,8 @@ const PastWorkModal = ({
                 border
                 setValue={setFieldValue}
               />
-              <View className="flex-row justify-between">
-                <LargeButton text="Close" handleSubmit={closeModal} />
+              
+              
                 <LargeButton
                   text="Submit"
                   handleSubmit={() => {
@@ -305,7 +309,7 @@ const PastWorkModal = ({
                     console.log(errors);
                   }}
                 />
-              </View>
+              
             </ScrollView>
           )}
         </Formik>
@@ -321,13 +325,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    padding: hs(20),
+    paddingHorizontal: hs(15),
+    paddingVertical: vs(15),
   },
 
   title: {
     fontSize: 20,
     fontWeight: "700",
-    marginBottom: vs(20),
+  
   },
 
   input: {

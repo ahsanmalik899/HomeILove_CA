@@ -1,4 +1,4 @@
-import { useGetYourpostQuery } from "@/store/api/user/MainApi";
+import { useGetYourpostQuery, useLikePostMutation, useUnlikePostMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Cross from "@assets/CreateProfile/cross.svg";
 import Camera from "@assets/Feedimg/camera.svg";
@@ -6,6 +6,7 @@ import Comment from "@assets/icons/Comment.svg";
 import Like from "@assets/icons/Like.svg";
 import Share from "@assets/icons/share.svg";
 import ThreeDots from "@assets/icons/threedots.svg";
+import Liked from "@assets/icons/ThumbUpRed.svg";
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import CommentInput from "@src/components/globals/CommentInput";
@@ -13,10 +14,12 @@ import CreatePost from "@src/components/globals/CreatePost/createPost";
 import ImageSlider from "@src/components/globals/ImageSlider";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -33,6 +36,8 @@ const YourPosts = () => {
   const limit = 10;
    const [loading,setLoading]=useState(false);
   const [Posts, setPosts] = useState<[]>([]);
+    const [likePost, { isLoading: liking }] = useLikePostMutation();
+    const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
     const [showImages, setShowImages] = useState(false);
       const [showViedio, setShowViedio] = useState(false);
       const [SelectedViedio,setSelectedViedio]=useState('');
@@ -42,13 +47,59 @@ const YourPosts = () => {
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
-    
+      const [alreadyLiked, setAlreadyLiked] = useState(item.is_liked);
+        const [likeCount, setLikeCount] = useState(item.likes);
+        const handleLikeToggle = async (item) => {
+          try {
+            if (alreadyLiked) {
+             const res = await unlikePost({
+                post_id: item.id,
+                user_id: user.id,
+              }).unwrap();
+    if(res.success){
+      renderToastSuccess(res.message)
+      setAlreadyLiked(false)
+      setLikeCount(likeCount - 1)
+    }else{
+      renderToastError(res.message) 
+    }
+              
+            } else {
+           const res =   await likePost({
+                post_id: item.id,
+                user_id: user.id,
+                creater_id: item.post_creater_id,
+              }).unwrap();
+         if(res.success){
+          renderToastSuccess(res.message)
+          setAlreadyLiked(true)
+          setLikeCount(likeCount + 1)
+         }else{
+          renderToastError(res.message)
+         }
+            }
+          } catch (error) {
+            renderToastError("Something went wrong");
+          }
+        };
   const Images = item.post_images
     ? item.post_images.split(',').filter(img => img.trim() !== '')
     : [];
 
     return (
-      <View className="bg-white" style={styles.card}>
+          <TouchableOpacity
+                className="bg-white"
+                style={styles.card}
+                onPress={() => {
+                  router.navigate({
+                    pathname: "/GeneralPostSingleView",
+                    params: {
+                      id: item.id,
+                     
+                    },
+                  });
+                }}
+              >
         <View className="flex-row items-center justify-between">
                     <View className="flex-row">
                       <CircleImage
@@ -122,6 +173,7 @@ const YourPosts = () => {
     }}
   >
     {/* LEFT SIDE - Camera Count */}
+    {Images.length>0 && (
     <View
       style={{
         backgroundColor: "rgba(0,0,0,0.6)",
@@ -143,7 +195,7 @@ const YourPosts = () => {
       >
         {Images.length}
       </Text>
-    </View>
+    </View>)}
 
     {/* RIGHT SIDE - Auto Playing Muted Video */}
     {item.post_video && (
@@ -178,9 +230,22 @@ const YourPosts = () => {
             >
               <View className="flex-row">
                 <View className="flex-row items-center ">
-                  <TouchableOpacity>
-                    <Like />
-                  </TouchableOpacity>
+                  <TouchableOpacity
+                                    disabled={liking || unliking}
+                                    onPress={() => handleLikeToggle(item)}
+                                  >
+                                   { alreadyLiked?
+                <Liked
+                                      width={22}
+                                      height={22}
+                                    />
+                                    :
+                                    <Like
+                                      width={22}
+                                      height={22}
+                                    
+                                    />}
+                                  </TouchableOpacity>
                   <Text
                     style={{
                       color: Colors.light.DarkGreen,
@@ -188,7 +253,7 @@ const YourPosts = () => {
                       fontFamily: "PopinRegula",
                     }}
                   >
-                    {item.likes}
+                    {likeCount}
                   </Text>
                 </View>
                 <View
@@ -205,7 +270,7 @@ const YourPosts = () => {
                       fontFamily: "PopinRegula",
                     }}
                   >
-                    16
+                     {item.comment_count}
                   </Text>
                 </View>
               </View>
@@ -216,7 +281,7 @@ const YourPosts = () => {
             <View>
         
             </View>
-            <CommentInput />
+            <CommentInput postId={item.id} creatorId={item.post_creater_id} />
           </View>
         {menuVisible && (
           <TouchableOpacity
@@ -247,12 +312,12 @@ const YourPosts = () => {
               <TouchableOpacity
                 onPress={() => {
                   setMenuVisible(false);
-                  console.log("Hide Post clicked", item.id);
+                  console.log("Edit clicked", item.id);
                 }}
                 style={{ paddingVertical: 12, paddingHorizontal: 15 }}
               >
                 <Text style={{ fontSize: 15, fontWeight: "500",fontFamily: "PopinRegula", }}>
-                  Hide Post
+                  Edit
                 </Text>
               </TouchableOpacity>
 
@@ -261,18 +326,18 @@ const YourPosts = () => {
               <TouchableOpacity
                 onPress={() => {
                   setMenuVisible(false);
-                  console.log("Report clicked", item.id);
+                  console.log("Delete clicked", item.id);
                 }}
                 style={{ paddingVertical: 12, paddingHorizontal: 15 }}
               >
                 <Text style={{ fontSize: 15, fontWeight: "500", color: "red",fontFamily: "PopinRegula", }}>
-                  Report
+                  Delete
                 </Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
-      </View>
+   </TouchableOpacity>
     );
   };
 

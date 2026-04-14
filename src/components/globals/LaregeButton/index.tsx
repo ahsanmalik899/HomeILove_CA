@@ -1,5 +1,5 @@
 import Colors from '@src/constants/Colors';
-import { hs, vs } from '@utils/design/design';
+import { hs, ms, vs } from '@utils/design/design';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 interface ButtonProps {
@@ -28,7 +28,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontWeight: '600',
-    fontFamily: "PopinRegula",
+    fontFamily: "PopinBold",
+    fontWeight:"700",
+    fontSize:ms(16)
   },
 });

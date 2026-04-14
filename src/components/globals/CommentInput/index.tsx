@@ -1,9 +1,9 @@
 import { usePostCommentApiMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Send from "@assets/icons/send.svg";
-import image from "@assets/test/test.jpeg";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
+import { ImageFormater } from "@utils/ImageFormat";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
@@ -23,7 +23,7 @@ const Index = ({
   const user = useSelector(userdata);
 
   const [comment, setComment] = useState("");
-
+  
   const [postCommentApi, { isLoading }] =
     usePostCommentApiMutation();
 
@@ -50,7 +50,7 @@ const Index = ({
   return (
     <View className="flex-row items-center">
 
-      <CircleImage source={image} Size={30} />
+      <CircleImage source={{uri:ImageFormater(user?.logo)}} Size={30} />
 
       <View
         className="flex-row items-center"

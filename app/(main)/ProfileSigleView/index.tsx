@@ -10,13 +10,13 @@ import Call from "@assets/Buy/call.svg";
 import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
+import { Ionicons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
 import { AdressInput } from "@src/components/globals/AddressInput";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
-import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
 import PastDealsagent from "@src/components/globals/PastDealsagent";
 import SetRating from "@src/components/globals/SetRating";
@@ -27,7 +27,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import {
@@ -106,7 +106,7 @@ const Index = () => {
   const latitude = Number(profile?.user_lat);
   const longitude = Number(profile?.user_lng);
   const showMap = !isNaN(latitude) && !isNaN(longitude);
-
+  const [showMortgage, setShowMortgage] = useState(false);
   const rating = Number(profile?.rating || 0);
   const totalReviews = profile?.total_reviews || 0;
   const submitReview = async (values: {
@@ -151,6 +151,8 @@ const Index = () => {
       setReview(false);
     }
   };
+ 
+
   return (
     <>
       <ScrollView className="flex-1 bg-white">
@@ -239,7 +241,20 @@ const Index = () => {
               </Text>
             )}
           </Text>
-
+<View style={{backgroundColor:Colors.light.lightGray ,padding:hs(10),borderRadius:hs(10),marginVertical:hs(10),gap:hs(10)}}>
+  <Text style={{color:Colors.light.textGray,fontSize:hs(16),fontWeight:'bold',textAlign:'center'}}>Total post by <Text style={{color:Colors.light.red}}>{profile?.business_name}</Text></Text>
+  <View style={styles.row}>
+    <TouchableOpacity style={{flex:1,alignItems:'center'}}>
+      <Text style={{color:Colors.light.textGray,fontSize:hs(14),fontWeight:'bold'}}>Rent post</Text>
+      <Text style={{color:Colors.light.textGray,fontSize:hs(13)}}>{profile?.rent_posts}</Text>
+    </TouchableOpacity>
+    <View style={{width:hs(1),height:hs(50),backgroundColor:Colors.light.textGray}}/>
+    <TouchableOpacity style={{flex:1,alignItems:'center'}}>
+      <Text style={{color:Colors.light.textGray,fontSize:hs(14),fontWeight:'bold'}}>Sale post</Text>
+      <Text style={{color:Colors.light.textGray,fontSize:hs(13)}}>{profile?.sale_posts}</Text>
+    </TouchableOpacity>
+  </View>
+</View>
           {/* Map */}
           {showMap && (
             <MapView
@@ -257,89 +272,111 @@ const Index = () => {
 
           <VideoSection url={profile?.youtube_link} />
           {profile?.advisory_service === "Yes" && (
-            <View style={styles.mortgageCard}>
-              <Text style={styles.mortgageTitle}>
-                Ask for FREE home mortgage advice from
-              </Text>
+            <>
+            <TouchableOpacity 
+onPress={() => setShowMortgage(!showMortgage)} 
+style={{
+backgroundColor:Colors.light.LightGreen,
+padding:hs(10),
+borderRadius:hs(10),
+marginVertical:hs(10),
+flexDirection:'row',
+justifyContent:'space-between',
+alignItems:'center'
+}}
+>
 
-              <Text style={styles.mortgageCompany}>
-                {profile?.business_name}
-              </Text>
+<Text style={{
+color:Colors.light.textGray,
+fontSize:hs(16),
+fontWeight:'bold'
+}}>
+Ask for FREE
+</Text>
 
-              <Formik
-                initialValues={{
-                  address: "",
-                  city: "",
-                  state: "",
-                  zip: "",
-                  lat: 0,
-                  lng: 0,
-                  advice_for: "Home purchase",
-                  name: "",
-                  email: "",
-                  contact: "",
-                  message: "",
-                }}
-                onSubmit={(values) => {
-                  console.log(values);
-                  renderToastSuccess("Request sent successfully");
-                }}
-              >
-                {({
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  values,
-                  errors,
-                  touched,
-                  setFieldValue,
-                }) => (
-                  <>
-                    <AdressInput
-                      city={"city"}
-                      zip={"zip"}
-                      state={"state"}
-                      lat={"lat"}
-                      long={"lng"}
-                      latValue={values.lat}
-                      longValue={values.lng}
-                      name="address"
-                      setValue={setFieldValue}
-                      onSelect={() => {}}
-                      title="Property Location"
-                      placeholder="Enter complete address or street"
-                      value={values.address}
-                      touched={!!touched.address}
-                      errors={!!errors.address}
-                      required
-                      withmap={false}
-                      errorText={errors.address}
-                    />
-                    {type === "agent" ||
-                      (type === "mortgage" && (
-                        <FormikDropdownwithjson
-                          title={"I need advice on?"}
-                          key={values.advice_for}
-                          setValue={setFieldValue}
-                          required
-                          placeholder="Select"
-                          value={values.advice_for}
-                          options={
-                            type === "mortgage"
+<Ionicons 
+name={showMortgage ? "chevron-up" : "chevron-down"} 
+size={22} 
+color={Colors.light.textGray}
+/>
+
+</TouchableOpacity>
+            {showMortgage && <View style={styles.mortgageCard}>
+                <Text style={styles.mortgageTitle}>
+                  Ask for FREE home <Text style={{color:Colors.light.red,fontWeight:'bold'}}>{type?.toLocaleUpperCase()}</Text> advice from 
+                   <Text style={styles.mortgageCompany}>
+                  {" "}{profile?.business_name}
+                </Text>
+                </Text>
+
+               
+
+                <Formik
+                  initialValues={{
+                    address: "",
+                    city: "",
+                    state: "",
+                    zip: "",
+                    lat: 0,
+                    lng: 0,
+                    advice_for: "Home purchase",
+                    name: "",
+                    email: "",
+                    contact: "",
+                    message: "",
+                  }}
+                  onSubmit={(values) => {
+                    console.log(values);
+                    renderToastSuccess("Request sent successfully");
+                  } }
+                >
+                  {({
+                    handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue,
+                  }) => (
+                    <>
+                      <AdressInput
+                        city={"city"}
+                        zip={"zip"}
+                        state={"state"}
+                        lat={"lat"}
+                        long={"lng"}
+                        latValue={values.lat}
+                        longValue={values.lng}
+                        name="address"
+                        setValue={setFieldValue}
+                        onSelect={() => { } }
+                        title="Property Location"
+                        placeholder="Enter complete address or street"
+                        value={values.address}
+                        touched={!!touched.address}
+                        errors={!!errors.address}
+                        required
+                        withmap={false}
+                        errorText={errors.address} />
+                      {type === "agent" ||
+                        (type === "mortgage" && (
+                          <FormikDropdownwithjson
+                            title={"I need advice on?"}
+                            key={values.advice_for}
+                            setValue={setFieldValue}
+                            required
+                            placeholder="Select"
+                            value={values.advice_for}
+                            options={type === "mortgage"
                               ? [
-                                  {
-                                    label: "Home purchase property",
-                                    value: "Home purchase",
-                                  },
-                                  { label: "Refinance", value: "Refinance" },
-                                  {
-                                    label: "Home equity",
-                                    value: "Home equity",
-                                  },
-                                  { label: "Others", value: "Others" },
-                                ]
+                                {
+                                  label: "Home purchase property",
+                                  value: "Home purchase",
+                                },
+                                { label: "Refinance", value: "Refinance" },
+                                {
+                                  label: "Home equity",
+                                  value: "Home equity",
+                                },
+                                { label: "Others", value: "Others" },
+                              ]
                               : type === "agent"
-                              ? [
+                                ? [
                                   {
                                     label: "Selling property",
                                     value: "Selling property",
@@ -354,96 +391,105 @@ const Index = () => {
                                   },
                                   { label: "others", value: "others" },
                                 ]
-                              : []
-                          }
-                          name="advice_for"
-                          onSelect={() => {}}
-                        />
-                      ))}
-                    <View style={styles.dottedDivider} />
+                                : []}
+                            name="advice_for"
+                            onSelect={() => { } } />
+                        ))}
+                      <View style={styles.dottedDivider} />
 
-                    <FormikInput
-                      title="Name"
-                      placeholder="Please enter name"
-                      onChangeText={handleChange("name")}
-                      onBlur={handleBlur("name")}
-                      value={values.name}
-                      touched={!!touched.name}
-                      errors={!!errors.name}
-                      errorText={errors.name}
-                      required={false}
-                    />
+                      <FormikInput
+                        title="Name"
+                        placeholder="Please enter name"
+                        onChangeText={handleChange("name")}
+                        onBlur={handleBlur("name")}
+                        value={values.name}
+                        touched={!!touched.name}
+                        errors={!!errors.name}
+                        errorText={errors.name}
+                        required={false} />
 
-                    <FormikInput
-                      title="Email"
-                      placeholder="Please enter email"
-                      onChangeText={handleChange("email")}
-                      onBlur={handleBlur("email")}
-                      value={values.email}
-                      touched={!!touched.email}
-                      errors={!!errors.email}
-                      errorText={errors.email}
-                      required={false}
-                    />
+                      <FormikInput
+                        title="Email"
+                        placeholder="Please enter email"
+                        onChangeText={handleChange("email")}
+                        onBlur={handleBlur("email")}
+                        value={values.email}
+                        touched={!!touched.email}
+                        errors={!!errors.email}
+                        errorText={errors.email}
+                        required={false} />
 
-                    <FormikInput
-                      title="Contact"
-                      placeholder="Please enter contact"
-                      onChangeText={handleChange("contact")}
-                      onBlur={handleBlur("contact")}
-                      value={values.contact}
-                      touched={!!touched.contact}
-                      errors={!!errors.contact}
-                      errorText={errors.contact}
-                      required={false}
-                    />
+                      <FormikInput
+                        title="Contact"
+                        placeholder="Please enter contact"
+                        onChangeText={handleChange("contact")}
+                        onBlur={handleBlur("contact")}
+                        value={values.contact}
+                        touched={!!touched.contact}
+                        errors={!!errors.contact}
+                        errorText={errors.contact}
+                        required={false} />
 
-                    <FormikInput
-                      title="Message"
-                      placeholder="Write your message"
-                      multiline
-                      onChangeText={handleChange("message")}
-                      onBlur={handleBlur("message")}
-                      value={values.message}
-                      touched={!!touched.message}
-                      errors={!!errors.message}
-                      errorText={errors.message}
-                      required={false}
-                    />
+                      <FormikInput
+                        title="Message"
+                        placeholder="Write your message"
+                        multiline
+                        onChangeText={handleChange("message")}
+                        onBlur={handleBlur("message")}
+                        value={values.message}
+                        touched={!!touched.message}
+                        errors={!!errors.message}
+                        errorText={errors.message}
+                        required={false} />
 
-                    <TouchableOpacity
-                      style={styles.mortgageBtn}
-                      onPress={() => handleSubmit()}
-                    >
-                      <Text style={styles.mortgageBtnText}>Send</Text>
-                    </TouchableOpacity>
-                  </>
-                )}
-              </Formik>
+                      <TouchableOpacity
+                        style={styles.mortgageBtn}
+                        onPress={() => handleSubmit()}
+                      >
+                        <Text style={styles.mortgageBtnText}>Send</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </Formik>
 
-              {/* Agent Image */}
-              <View style={styles.agentContainer}>
-                <CircleImage
-                  Size={120}
-                  source={{
-                    uri: ImageFormater(profile?.logo),
-                  }}
-                />
-              </View>
-            </View>
+
+
+              </View>}</>
           )}
+          
           {profile?.post_type && (
             <>
-              <LargeButton
-                handleSubmit={() => {
-                  setShowpast(!showPast);
-                }}
-                text={
-                  showPast
-                    ? "Hide my past deals (jobs)"
-                    : "Show my past deals (jobs) "
-                }
-              />
+            {posts?.length > 0 && (
+             <TouchableOpacity
+onPress={() => setShowpast(!showPast)}
+style={{
+backgroundColor: Colors.light.LightGreen,
+padding: hs(12),
+borderRadius: hs(10),
+marginVertical: hs(10),
+flexDirection: 'row',
+justifyContent: 'space-between',
+alignItems: 'center'
+}}
+>
+
+<Text style={{
+color: Colors.light.textGray,
+fontSize: hs(16),
+fontWeight: 'bold'
+}}>
+{showPast
+? "Hide  past deals (jobs)"
+: "Show  past deals (jobs)"}
+</Text>
+
+<Ionicons
+name={showPast ? "chevron-up" : "chevron-down"}
+size={22}
+color={Colors.light.textGray}
+/>
+
+</TouchableOpacity>)}
               {showPast && type === "agent" && (
                 <View>
                   <PastDealsagent
@@ -540,7 +586,34 @@ const Index = () => {
         </View>
         <Loading isLoading={isLoading} text="Loading.." />
       </ScrollView>
-      <Modal visible={reviewModal} transparent animationType="slide">
+
+      
+      <TouchableOpacity
+        style={styles.stickyBottomBtn}
+        onPress={() => {
+          router.navigate({
+            pathname: "/ChatScreen",
+            params: {
+              userId: profile?.users_id,
+              name: profile?.business_name,
+            },
+          });
+        }}
+      >
+        <View style={styles.agentContainer}>
+          <CircleImage
+            Size={40}
+            source={{
+              uri: ImageFormater(profile?.logo),
+            }}
+          />
+          <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
+            Send Message to {profile?.business_name}
+          </Text>
+        </View>
+      </TouchableOpacity>
+      <Modal visible={reviewModal} transparent animationType="fade">
+        <ScrollView>
         <Formik
           initialValues={{
             review: "",
@@ -679,6 +752,7 @@ const Index = () => {
             </View>
           )}
         </Formik>
+        </ScrollView>
       </Modal>
     </>
   );
@@ -846,6 +920,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginVertical: 12,
     elevation: 3,
+    marginBottom:hs(70)
   },
 
   ratingTitle: {
@@ -882,7 +957,7 @@ const styles = StyleSheet.create({
 
   reviewBtn: {
     marginTop: 15,
-    backgroundColor: Colors.light.DarkGreen,
+    backgroundColor: Colors.light.red,
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
@@ -939,9 +1014,20 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
+  stickyBottomBtn: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: Colors.light.DarkGreen,
+   paddingVertical:vs(10),
+ },
+
   agentContainer: {
     alignItems: "center",
-    marginTop: 20,
+    flexDirection: "row",
+    paddingHorizontal:hs(20),
+    gap: hs(10),
   },
 
   dottedDivider: {

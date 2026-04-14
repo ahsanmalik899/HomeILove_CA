@@ -4,6 +4,7 @@ import {
   useSendMessageApiMutation
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
+import Send from "@assets/icons/send.svg";
 import { LegendList } from "@legendapp/list";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Colors from "@src/constants/Colors";
@@ -11,12 +12,13 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { db } from "@src/utils/firebse";
 import { vs } from "@utils/design/design";
 import { useLocalSearchParams } from "expo-router";
-import { and, collection, onSnapshot, or, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 const ChatScreen = () => {
 
   const { userId, name } = useLocalSearchParams();
+  console.log("userId",userId);
   const user = useAppSelector(userdata);
 const [markAsRead] = useMarkAsReadApiMutation();
   const [message, setMessage] = useState("");
@@ -29,65 +31,41 @@ const [hasMore,setHasMore]=useState(true);
 const listRef = useRef<any>(null);
 useEffect(() => {
 
-  const messagesRef = collection(db, "chats");
+const chatId =
+  Number(user.id) < Number(userId)
+    ? `${user.id}-${userId}`
+    : `${userId}-${user.id}`;
 
-  const q = query(
-    messagesRef,
-    or(
+const messagesRef = collection(db,"chats",chatId,"messages");
 
-      and(where("sender_id", "==", user.id), where("receiver_id", "==", Number(userId))),
-      and(where("sender_id", "==", user.id), where("receiver_id", "==", String(userId))),
-      and(where("sender_id", "==", String(user.id)), where("receiver_id", "==", Number(userId))),
-      and(where("sender_id", "==", String(user.id)), where("receiver_id", "==", String(userId))),
-      
-  
-      and(where("sender_id", "==", Number(userId)), where("receiver_id", "==", user.id)),
-      and(where("sender_id", "==", Number(userId)), where("receiver_id", "==", String(user.id))),
-      and(where("sender_id", "==", String(userId)), where("receiver_id", "==", user.id)),
-      and(where("sender_id", "==", String(userId)), where("receiver_id", "==", String(user.id)))
-    )
+const q = query(messagesRef);
 
-  );
+const unsubscribe = onSnapshot(q,(snapshot)=>{
 
-  const unsubscribe = onSnapshot(
-    q,
-    (snapshot) => {
-      let list: any[] = [];
-      snapshot.forEach((doc) => {
-        list.push({ id: doc.id, ...doc.data() });
-      });
-   
-      list.sort((a,b) => {
-         const tA = a.timestamp || parseInt(a.created_at) || 0;
-         const tB = b.timestamp || parseInt(b.created_at) || 0;
-         return tB - tA;
-      });
-      
-      // Take only the newest 20
-      list = list.slice(0, 20);
-      
-      // Reverse to show oldest first visually
-      const visualList = list.reverse();
-      setMessages(visualList);
-      setInitialLoading(false);
-      setPage(2);
-      console.log("Firebase latest messages:", visualList);
-      
-      // Automatically scroll to the bottom when new messages arrive from Firebase
-      setTimeout(() => {
-        if (listRef.current) {
-          listRef.current.scrollToEnd({ animated: true });
-        }
-      }, 300);
-    },
-    (error) => {
-      console.error("Firestore error:", error);
-      setInitialLoading(false);
-    }
-  );
+ let list:any[]=[];
 
-  return () => unsubscribe();
-}, [user.id, userId]);
+ snapshot.forEach(doc=>{
+   list.push({
+     id:doc.id,
+     ...doc.data()
+   });
+ });
+
+ list.sort((a,b)=>a.timestamp - b.timestamp);
+
+ setMessages(list);
+
+ setTimeout(()=>{
+   listRef.current?.scrollToEnd({animated:true});
+ },100);
+
+ setInitialLoading(false);
+
+});
+
+return ()=>unsubscribe();
+
+},[user.id,userId]);
 const fetchOlderMessages = async () => {
 
  if(loadingMore || isFetching || !hasMore) return;
@@ -150,12 +128,7 @@ useEffect(() => {
 
     setMessage("");
     
-    // Smoothly scroll down after sending
-    setTimeout(() => {
-      if (listRef.current) {
-        listRef.current.scrollToEnd({ animated: true });
-      }
-    }, 100);
+  
     
   };
 
@@ -230,10 +203,10 @@ useEffect(() => {
 
         <TouchableOpacity
           onPress={handleSend}
-          className="ml-2  px-4 justify-center rounded-full"
-          style={{backgroundColor:Colors.light.DarkGreen}}
+          className="ml-2  px-3 justify-center rounded-full"
+         
         >
-          <Text className="text-white">Send</Text>
+      <Send height={30} width={30}/>
         </TouchableOpacity>
       </View>
 

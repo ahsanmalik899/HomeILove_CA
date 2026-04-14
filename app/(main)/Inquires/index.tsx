@@ -3,10 +3,15 @@ import {
   useDeletSendedInquiryMutation,
   useGetRecivedInquieryQuery,
   useGetsendedInquieryQuery,
+  useInquirymarkAsReadMutation,
+  useLazyGetInquireyMessagesApiQuery,
+  useSendInquireyMessageApiMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
+import Back from "@assets/icons/BackArrow.svg";
+import Send from "@assets/icons/send.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
@@ -17,12 +22,14 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -30,8 +37,21 @@ import {
 const index = () => {
   const user = useAppSelector(userdata);
   const [value, setValue] = useState("Sent");
+  const [sendInquireyMessageApi, { isLoading: sendInquireyMessageLoading }] = useSendInquireyMessageApiMutation();
+  const [getInquireyMessagesApi, { isLoading: getInquireyMessagesLoading }] = useLazyGetInquireyMessagesApiQuery();
+  const [message, setMessage] = useState("");
   const [ids, setIds] = useState<number[]>([]);
+  const [showchatModal, setShowchatModal] = useState(false);
+  const [selectedChatProfile, setSelectedChatProfile] = useState<any>(null);
+  const [selectedChatItem, setSelectedChatItem] = useState<any>(null);
   const [recivesIds, setReciveIds] = useState<number[]>([]);
+  const [page, setPage] = useState(1);
+  const [inquirymarkAsRead] = useInquirymarkAsReadMutation();
+  const [messages, setMessages] = useState<any[]>([]);
+  const [chatHasMore, setChatHasMore] = useState(true);
+  const [chatLoadingMore, setChatLoadingMore] = useState(false);
+  const [chatInitialLoading, setChatInitialLoading] = useState(false);
+  const chatListRef = useRef<any>(null);
   const [deletsended, { isLoading }] = useDeletSendedInquiryMutation();
   const [deletrecived, { isLoading: loadingRecivedDelet }] =
     useDeleterecivedInquiriesMutation();
@@ -41,7 +61,14 @@ const index = () => {
   const [deleteType, setDeleteType] = useState<"sent" | "received" | null>(
     null
   );
+  useEffect(() => {
 
+    inquirymarkAsRead({
+      userId: user.id,
+      chatUserId: selectedChatProfile?.users_id,
+      postId: selectedChatItem?.inquiry_id,
+    });
+  }, [messages, selectedChatProfile, selectedChatItem]);
   const handleSelect = (id: number | string) => {
     const numId = Number(id);
     setIds((prev) => {
@@ -66,56 +93,185 @@ const index = () => {
   const [recivedpage, setrecivedPage] = useState(1);
   const [sended, setsended] = useState([]);
   const [recived, setrecived] = useState([]);
-  const { isFetching, data,refetch:refetchSended } = useGetsendedInquieryQuery({
+  const [expanded, setExpanded] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const { isFetching, data, refetch: refetchSended } = useGetsendedInquieryQuery({
     id: user.id,
     page: sendpage,
   });
-    const confirmDelete = async () => {
-      try {
-        if (deleteType === "sent") {
-          const formData = new FormData();
-          formData.append("ids", ids.join(","));
+  const confirmDelete = async () => {
+    try {
+      if (deleteType === "sent") {
+        const formData = new FormData();
+        formData.append("ids", ids.join(","));
 
-          const result = await deletsended(formData).unwrap();
-          renderToastSuccess("Deleted successfully!");
+        const result = await deletsended(formData).unwrap();
+        renderToastSuccess("Deleted successfully!");
 
-          setsended((prev) =>
-            prev.filter((item) => !ids.includes(Number(item.inquiry_id)))
-          );
+        setsended((prev) =>
+          prev.filter((item) => !ids.includes(Number(item.inquiry_id)))
+        );
 
-          setIds([]);
-          setSellectall(false);
-        }
-
-        if (deleteType === "received") {
-          const formData = new FormData();
-          formData.append("ids", recivesIds.join(","));
-          formData.append("user_id", user.id.toString());
-
-          const result = await deletrecived(formData).unwrap();
-          renderToastSuccess("Deleted successfully!");
-
-          setrecived((prev) =>
-            prev.filter((item) => !recivesIds.includes(Number(item.inquiry_id)))
-          );
-
-          setReciveIds([]);
-          setSellectallcomp2(false);
-        }
-
-        setShowConfirm(false);
-      } catch (err) {
-        console.log("Delete Error:", err);
-        renderToastError("Failed to delete inquiries");
-        setShowConfirm(false);
+        setIds([]);
+        setSellectall(false);
       }
+
+      if (deleteType === "received") {
+        const formData = new FormData();
+        formData.append("ids", recivesIds.join(","));
+        formData.append("user_id", user.id.toString());
+
+        const result = await deletrecived(formData).unwrap();
+        renderToastSuccess("Deleted successfully!");
+
+        setrecived((prev) =>
+          prev.filter((item) => !recivesIds.includes(Number(item.inquiry_id)))
+        );
+
+        setReciveIds([]);
+        setSellectallcomp2(false);
+      }
+
+      setShowConfirm(false);
+    } catch (err) {
+      console.log("Delete Error:", err);
+      renderToastError("Failed to delete inquiries");
+      setShowConfirm(false);
+    }
+  };
+  useEffect(() => {
+    if (showchatModal && selectedChatProfile) {
+
+      if (page === 1) {
+        setChatInitialLoading(true);
+      } else {
+        setChatLoadingMore(true);
+      }
+
+      getInquireyMessagesApi({
+        user_id: user.id,
+        chat_user_id: selectedChatProfile.users_id,
+        page: page,
+        per_page: 20,
+        post_id: selectedChatItem?.inquiry_id,
+      })
+        .unwrap()
+        .then((res: any) => {
+
+          if (res.success) {
+
+            const msgs = res?.data ? [...res.data].reverse() : [];
+
+            if (page === 1) {
+              setMessages(msgs);
+            }
+            else {
+              setMessages(prev => [...msgs, ...prev]);
+            }
+
+            setChatHasMore(res.pagination?.has_more ?? false);
+          }
+
+        })
+        .finally(() => {
+          setChatInitialLoading(false);
+          setChatLoadingMore(false);
+        });
+
+    }
+
+  }, [showchatModal, selectedChatProfile, page]);
+
+
+  const handleSend = async () => {
+    if (!message.trim()) return;
+
+    // Optimistic update
+    const optimisticMsg = {
+      msg_id: `temp-${Date.now()}`,
+      sender_id: user.id,
+      sender_name: user.name,
+      recevier_id: selectedChatProfile.users_id,
+      recevier_name: selectedChatProfile?.business_name,
+      msg_description: message,
+      last_activity: new Date().toISOString(),
     };
+    setMessages((prev) => [...prev, optimisticMsg]);
+    setMessage("");
+
+    setTimeout(() => {
+      chatListRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+
+    try {
+      const res: any = await sendInquireyMessageApi({
+        sender_id: user.id,
+        sender_name: user.name,
+        recevier_id: selectedChatProfile.users_id,
+        recevier_name: selectedChatProfile?.business_name,
+        msg_description: message,
+        recevier_post_id: selectedChatItem?.inquiry_id,
+      }).unwrap();
+
+      if (res.success && res.message) {
+        // Replace optimistic message with real one
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.msg_id === optimisticMsg.msg_id ? res.message : m
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Send message error:", err);
+      // Remove failed optimistic message
+      setMessages((prev) =>
+        prev.filter((m) => m.msg_id !== optimisticMsg.msg_id)
+      );
+      renderToastError("Failed to send message");
+    }
+  };
+
+  // Chat message bubble renderer
+  const renderChatMessage = ({ item }: any) => {
+    const isMe = item.sender_id == user.id;
+    return (
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingVertical: 4,
+          alignItems: isMe ? "flex-end" : "flex-start",
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: isMe ? Colors.light.DarkGreen : "#e5e5e5",
+            paddingHorizontal: 14,
+            paddingVertical: 8,
+            borderRadius: 16,
+            borderBottomRightRadius: isMe ? 4 : 16,
+            borderBottomLeftRadius: isMe ? 16 : 4,
+            maxWidth: "80%",
+          }}
+        >
+          <Text style={{ color: isMe ? "#fff" : "#000", fontSize: 14, fontFamily: "PopinRegula" }}>
+            {item.msg_description || item.content}
+          </Text>
+        </View>
+        {item.last_activity && (
+          <Text style={{ fontSize: 10, color: "#999", marginTop: 2, marginHorizontal: 4 }}>
+            {new Date(item.last_activity).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </Text>
+        )}
+      </View>
+    );
+  };
   const { isFetching: recivedLoading, data: recivedData, refetch: refetchRecived } =
     useGetRecivedInquieryQuery({ id: user.id, page: recivedpage });
   const renderItem = ({ item }) => {
     const profileCount = item.profiles?.length || 0;
     const [showprofile, setShowprofile] = useState(false);
-  
+    const [expanded, setExpanded] = useState({});
+    const [showMore, setShowMore] = useState({});
 
     return (
       <TouchableOpacity
@@ -134,10 +290,13 @@ const index = () => {
         activeOpacity={0.9}
         onPress={() => handleSelect(item.inquiry_id)}
       >
+        {item.total_unread > 0 && <Text style={{ color: "white", height: 30, width: 30, textAlign: "center", backgroundColor: Colors.light.red, fontWeight: "bold", position: "absolute", top: 5, right: 10, fontSize: 12, padding: 5, borderRadius: 15 }}>{item.total_unread}</Text>}
         <View style={styles.topRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>
-              {item.inquiry_for}
+              Request for {item.inquiry_for || "Property"}
+              {item.property_type && ` ${item.property_type}`}
+
               {item.inquiry_type && (
                 <Text style={styles.subTitle}> • {item.inquiry_type}</Text>
               )}
@@ -173,23 +332,56 @@ const index = () => {
           </View>
         )}
 
-        {item.message && (
-          <Text numberOfLines={2} style={styles.message}>
-            {item.message}
-          </Text>
-        )}
 
+        <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
+        {item.message && (
+          <>
+            <Text
+              numberOfLines={expanded[item.inquiry_id] ? undefined : 2}
+              onTextLayout={(e) => {
+                setShowMore(prev => ({
+                  ...prev,
+                  [item.inquiry_id]: e.nativeEvent.lines.length > 2
+                }));
+              }}
+              style={styles.message}
+            >
+              {item.message}
+            </Text>
+
+            {showMore[item.inquiry_id] && (
+              <Text
+                style={styles.seeMore}
+                onPress={() => {
+                  setExpanded(prev => ({
+                    ...prev,
+                    [item.inquiry_id]: !prev[item.inquiry_id]
+                  }));
+                }}
+              >
+                {expanded[item.inquiry_id] ? "See less" : "See more"}
+              </Text>
+            )}
+
+          </>
+        )}
+        <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
         <TouchableOpacity
           onPress={() => setShowprofile(showprofile ? false : true)}
         >
-          {showprofile ? (
-            <Text style={styles.subTitle}>Hide</Text>
-          ) : (
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={styles.subTitle}>
-              {profileCount} {profileCount > 1 ? "profiles" : "profile"}{" "}
-              received your inquiry:
+              {profileCount} {profileCount > 1 ? "Businesses" : "Business"}{" "}
+              received your inquiry
             </Text>
-          )}
+            <Ionicons
+              name={showprofile ? "chevron-up" : "chevron-down"}
+              size={22}
+              color={Colors.light.DarkGreen}
+            />
+          </View>
+
         </TouchableOpacity>
         {showprofile && item.profiles?.length > 0 && (
           <LegendList
@@ -201,23 +393,62 @@ const index = () => {
               item.users_id?.toString() || Math.random().toString()
             }
             renderItem={({ item: profile }) => (
-              <TouchableOpacity style={styles.card}>
-                <View style={styles.topRow}>
-                  <CircleImage
-                    Size={45}
-                    source={{ uri: ImageFormater(profile?.logo) }}
-                  />
+              <TouchableOpacity style={styles.card} onPress={() => {
+                setSelectedChatProfile(profile);
+                setSelectedChatItem(item);
+                setShowchatModal(true);
+              }}>
+              <View style={styles.topRow}>
 
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.name}>{profile?.business_name}</Text>
-                    <Text style={styles.address}>{profile?.address}</Text>
-                  </View>
-                </View>
+<View style={{position:'relative'}}>
+
+{profile?.unread_count > 0 && (
+
+<Text style={{
+position:'absolute',
+top:-5,
+left:-5,
+zIndex:10,
+color:"white",
+fontWeight:'bold',
+fontSize:11,
+height:22,
+width:22,
+textAlign:"center",
+backgroundColor:Colors.light.red,
+borderRadius:11,
+paddingTop:3
+}}>
+{profile?.unread_count}
+</Text>
+
+)}
+
+<CircleImage
+Size={45}
+source={{ uri: ImageFormater(profile?.logo) }}
+/>
+
+</View>
+
+<View style={{ flex: 1 , marginLeft:10 }}>
+<Text style={styles.name}>
+{profile?.business_name}
+</Text>
+
+<Text style={styles.address}>
+{profile?.address}
+</Text>
+
+</View>
+
+</View>
                 {profile?.inquiry_closed && (
                   <View style={styles.closedBadge}>
                     <Text style={styles.closedText}>Inquiry Closed</Text>
                   </View>
                 )}
+                
               </TouchableOpacity>
             )}
           />
@@ -226,6 +457,9 @@ const index = () => {
     );
   };
   const renderrecived = ({ item }) => {
+
+    const [expanded, setExpanded] = useState({});
+    const [showMore, setShowMore] = useState({});
     return (
       <TouchableOpacity
         style={[
@@ -280,10 +514,77 @@ const index = () => {
           </Text>
         </View>
 
-        {/* ADDRESS */}
-        {item.address && <Text style={styles.address}>📍 {item.address}</Text>}
 
-        {item.message && <Text style={styles.message}>💬 {item.message}</Text>}
+        {item.address && <Text style={styles.address}>📍 {item.address}</Text>}
+        <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
+
+        {item.message && (
+          <>
+            <Text
+              numberOfLines={expanded[item.msg_id] ? undefined : 2}
+              onTextLayout={(e) => {
+                if (!showMore[item.msg_id]) {
+                  setShowMore(prev => ({
+                    ...prev,
+                    [item.msg_id]: e.nativeEvent.lines.length > 2
+                  }));
+                }
+              }}
+              style={styles.message}
+            >
+              💬 {item.message}
+            </Text>
+
+            {showMore[item.msg_id] && (
+              <Text
+                style={styles.seeMore}
+                onPress={() => {
+                  setExpanded(prev => ({
+                    ...prev,
+                    [item.msg_id]: !prev[item.msg_id]
+                  }));
+                }}
+              >
+                {expanded[item.msg_id] ? "See less" : "See more"}
+              </Text>
+            )}
+
+          </>
+        )}
+
+
+        <TouchableOpacity
+          style={styles.replyBtn}
+          onPress={() => {
+            setSelectedChatProfile({
+              business_name: item.sender_name,
+              logo: item.sender_image,
+              users_id: item.sender_id,
+
+            });
+            setSelectedChatItem(item);
+            setShowchatModal(true);
+          }}
+        >
+          <MaterialIcons name="reply" size={18} color="#fff" />
+          <Text style={styles.replyBtnText}>Reply</Text>
+          {item.unread_count > 0 && (
+            <View style={{
+              backgroundColor: 'red',
+              borderRadius: 10,
+              minWidth: 20,
+              height: 20,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 5,
+              marginLeft: 6,
+            }}>
+              <Text style={{ color: '#fff', fontSize: 11, fontWeight: 'bold' }}>
+                {item.unread_count}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
@@ -360,10 +661,10 @@ const index = () => {
             refreshControl={
               <RefreshControl
                 refreshing={isFetching}
-                onRefresh={()=>{
-   setsendPage(1);
-   refetchSended();
-}} 
+                onRefresh={() => {
+                  setsendPage(1);
+                  refetchSended();
+                }}
               />
             }
           />
@@ -446,11 +747,11 @@ const index = () => {
             }
             refreshControl={
               <RefreshControl
-              refreshing={recivedLoading}
-               onRefresh={()=>{
-   setrecivedPage(1);
-   refetchRecived();
-}}
+                refreshing={recivedLoading}
+                onRefresh={() => {
+                  setrecivedPage(1);
+                  refetchRecived();
+                }}
               />
             }
           />
@@ -459,7 +760,7 @@ const index = () => {
     </View>
   );
   return (
-    <View className="flex-1 bg-white" style={{backgroundColor:"#F4F0F0"}}>
+    <View className="flex-1 bg-white" style={{ backgroundColor: "#F4F0F0" }}>
       <HeaderWithBack title="Inquiries" />
       <View className="flex-1" style={{ marginHorizontal: hs(10) }}>
         <TablikeButton
@@ -486,45 +787,198 @@ const index = () => {
           right: 0,
         }}
       >
-       {showConfirm && (
-  <View
-    style={{
-      width: "100%",
-      height: "100%",
-      position: "absolute",
-      backgroundColor: "rgba(0,0,0,0.4)",
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <View
-      style={{
-        width: "80%",
-        backgroundColor: "white",
-        padding: 20,
-        borderRadius: 12,
-      }}
-    >
-      <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 20 }}>
-        Are you sure you want to delete{" "}
-        {deleteType === "sent" ? ids.length : recivesIds.length} inquiries?
-      </Text>
+        {showConfirm && (
+          <View
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              backgroundColor: "rgba(0,0,0,0.4)",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                width: "80%",
+                backgroundColor: "white",
+                padding: 20,
+                borderRadius: 12,
+              }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 20 }}>
+                Are you sure you want to delete{" "}
+                {deleteType === "sent" ? ids.length : recivesIds.length} inquiries?
+              </Text>
 
-      <View style={{ flexDirection: "row",justifyContent:"space-between" }}>
-        <TouchableOpacity onPress={() => setShowConfirm(false)}>
-          <Text style={{ color: "gray", fontWeight: "600" }}>Cancel</Text>
-        </TouchableOpacity>
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <TouchableOpacity onPress={() => setShowConfirm(false)}>
+                  <Text style={{ color: "gray", fontWeight: "600" }}>Cancel</Text>
+                </TouchableOpacity>
 
-        <TouchableOpacity onPress={confirmDelete}>
-          <Text style={{ color: Colors.light.red, fontWeight: "700" }}>Delete</Text>
-        </TouchableOpacity>
+                <TouchableOpacity onPress={confirmDelete}>
+                  <Text style={{ color: Colors.light.red, fontWeight: "700" }}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+        <Modal visible={showchatModal} animationType="slide" transparent>
+          <View style={{ flex: 1, backgroundColor: "#F4F0F0" }}>
+
+
+            {selectedChatProfile && (
+              <View style={{ backgroundColor: '#fff', paddingBottom: vs(12), borderBottomLeftRadius: 16, borderBottomRightRadius: 16, elevation: 3 }}>
+                <View className="flex-row items-center gap-3" style={{ marginHorizontal: hs(10), paddingTop: vs(10), justifyContent: 'space-between' }}>
+                  <TouchableOpacity onPress={() => {
+                    setShowchatModal(false);
+                    setMessages([]);
+                    setPage(1);
+                    setChatHasMore(true);
+                  }}>
+                    <Back />
+                  </TouchableOpacity>
+
+
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.name}>{selectedChatProfile?.business_name}</Text>
+                  </View>
+                  <CircleImage
+                    Size={45}
+                    source={{ uri: ImageFormater(selectedChatProfile?.logo) }}
+                  />
+                  {selectedChatProfile?.inquiry_closed && (
+                    <View style={styles.closedBadge}>
+                      <Text style={styles.closedText}>Closed</Text>
+                    </View>
+                  )}
+                </View>
+
+                {selectedChatItem && (
+                  <View style={{ marginHorizontal: hs(10), marginTop: vs(10), paddingTop: vs(8), borderTopWidth: 1, borderColor: '#eee' }}>
+                    <Text style={styles.title}>
+                      Request for {selectedChatItem.inquiry_for || "Property"}
+                      {selectedChatItem.property_type && ` ${selectedChatItem.property_type}`}
+
+                      {selectedChatItem.inquiry_type && (
+                        <Text style={styles.subTitle}> • {selectedChatItem.inquiry_type}</Text>
+                      )}
+                    </Text>
+                    {selectedChatItem.address && (
+                      <Text style={styles.address}>📍 {selectedChatItem.address}</Text>
+                    )}
+                    {(selectedChatItem.property_type || selectedChatItem.min_price || selectedChatItem.min_bed) && (
+                      <View style={styles.infoRow}>
+                        {selectedChatItem.property_type && (
+                          <View style={styles.tag}>
+                            <Text style={styles.tagText}>{selectedChatItem.property_type}</Text>
+                          </View>
+                        )}
+                        {selectedChatItem.min_price && selectedChatItem.max_price && (
+                          <View style={styles.tag}>
+                            <Text style={styles.tagText}>
+                              ${selectedChatItem.min_price} - ${selectedChatItem.max_price}
+                            </Text>
+                          </View>
+                        )}
+                        {selectedChatItem.min_bed && (
+                          <View style={styles.tag}>
+                            <Text style={styles.tagText}>
+                              {selectedChatItem.min_bed}-{selectedChatItem.max_bed} Beds
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
+                    <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
+                    {selectedChatItem.message && (
+                      <>
+
+                        <Text
+                          numberOfLines={expanded ? undefined : 2}
+                          onTextLayout={(e) => {
+                            setShowMore(e.nativeEvent.lines.length > 2);
+                          }}
+                          style={styles.message}
+                        >
+                          {selectedChatItem.message}
+                        </Text>
+
+                        {showMore && (
+                          <Text
+                            style={styles.seeMore}
+                            onPress={() => setExpanded(!expanded)}
+                          >
+                            {expanded ? "See less" : "See more"}
+                          </Text>
+                        )}
+                      </>
+                    )}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {chatInitialLoading ? (
+              <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color={Colors.light.DarkGreen} />
+              </View>
+            ) : (
+              <>
+                {chatLoadingMore && (
+                  <View style={{ paddingVertical: 8, alignItems: "center" }}>
+                    <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
+                  </View>
+                )}
+                <LegendList
+                  ref={chatListRef}
+                  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
+                  data={messages}
+                  renderItem={renderChatMessage}
+                  keyExtractor={(item: any) => item.msg_id?.toString()}
+                  estimatedItemSize={60}
+                  onEndReachedThreshold={0.1}
+                  onScroll={(e: any) => {
+
+                    const offset = e.nativeEvent.contentOffset.y;
+
+                    if (
+                      offset <= 0 &&
+                      chatHasMore &&
+                      !chatLoadingMore &&
+                      !chatInitialLoading
+                    ) {
+
+                      setPage(prev => prev + 1);
+
+                    }
+
+                  }}
+                />
+              </>
+            )}
+            <View className="flex-row p-3 border-t border-gray-200 mb-1 ">
+              <TextInput
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Type message..."
+                placeholderTextColor={Colors.light.textGray}
+                className="flex-1 rounded-full px-5 text-lg"
+                style={{ borderColor: Colors.light.DarkGreen, borderWidth: 1, height: vs(52) }}
+              />
+
+              <TouchableOpacity
+                onPress={handleSend}
+                className="ml-2  px-3 justify-center rounded-full"
+
+              >
+                <Send height={30} width={30} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
-    </View>
-  </View>
-)}
-
-      </View>
-      <Loading isLoading={loadingRecivedDelet||isLoading} text="Deleting ..."/>
+      <Loading isLoading={loadingRecivedDelet || isLoading} text="Deleting ..." />
     </View>
   );
 };
@@ -571,6 +1025,7 @@ const styles = StyleSheet.create({
   },
 
   topRow: {
+    marginTop: vs(10),
     flexDirection: "row",
     alignItems: "center",
   },
@@ -584,7 +1039,7 @@ const styles = StyleSheet.create({
 
   subTitle: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "700",
     color: Colors.light.DarkGreen,
     fontFamily: "PopinRegula",
   },
@@ -647,7 +1102,12 @@ const styles = StyleSheet.create({
     color: Colors.light.red,
     fontFamily: "PopinRegula",
   },
-
+  seeMore: {
+    color: Colors.light.DarkGreen,
+    marginTop: 4,
+    fontWeight: "600",
+    fontFamily: "PopinRegula",
+  },
   senderInfo: {
     fontSize: 12,
     color: "#666",
@@ -666,6 +1126,26 @@ const styles = StyleSheet.create({
   closedText: {
     color: Colors.light.red,
     fontSize: 12,
+    fontWeight: "600",
+    fontFamily: "PopinRegula",
+  },
+
+  replyBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: Colors.light.DarkGreen,
+    paddingVertical: vs(8),
+    paddingHorizontal: hs(16),
+    borderRadius: 8,
+    marginTop: vs(10),
+    alignSelf: "flex-end",
+  },
+
+  replyBtnText: {
+    color: "#fff",
+    fontSize: 14,
     fontWeight: "600",
     fontFamily: "PopinRegula",
   },

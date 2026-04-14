@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useGetReceivedRequestsApiQuery, useGetSentRequestsApiQuery } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
+import FollowButton from "@src/components/globals/FollowButton";
+import Loading from "@src/components/globals/Loading";
 import StarRating from '@src/components/globals/StarRating';
 import TablikeButton from '@src/components/globals/TablikeButton';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
@@ -15,8 +17,8 @@ const RequestsScreen = () => {
   const user = useAppSelector(userdata);
   const [value, setValue] = useState("Recieved");
 
-  const { data: sentData } = useGetSentRequestsApiQuery({ id: user.id });
-  const { data: recivedData } = useGetReceivedRequestsApiQuery({ id: user.id });
+  const { data: sentData,isFetching:sentFetching } = useGetSentRequestsApiQuery({ id: user.id });
+  const { data: recivedData,isFetching:recivedFetching } = useGetReceivedRequestsApiQuery({ id: user.id });
 
   /* ===== Render Each Request Item ===== */
   const renderRequestItem = ({ item }) => {
@@ -38,11 +40,7 @@ const RequestsScreen = () => {
         </View>
 
         <View style={{ marginTop: vs(10) }}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>
-              Accept / Reject
-            </Text>
-          </TouchableOpacity>
+          <FollowButton id={item.receiver_id} onPress={()=>{}} status={item.status} />
         </View>
       </View>
     );
@@ -82,6 +80,7 @@ const RequestsScreen = () => {
         Componet1={receivedComponent}
         Componet2={sentComponent}
       />
+      <Loading isLoading={recivedFetching||sentFetching} text="Loading..."/>
     </View>
   );
 };

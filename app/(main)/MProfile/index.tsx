@@ -302,15 +302,17 @@ setShowoption(false)
             }}
             text={
               showPast
-                ? "Hide my past deals (jobs)"
-                : "Show my past deals (jobs) "
+                ? "Hide my past jobs"
+                : "Show my past jobs "
             }
           />
           {Profiletype !== "agent" && (
-            <LargeButton
-              handleSubmit={() => openPastWorkModal()}
-              text="Add Past Jobs"
-            />
+            <TouchableOpacity
+              onPress={() => openPastWorkModal()}
+              style={{backgroundColor:Colors.light.DarkGreen,paddingHorizontal:hs(10),paddingVertical:vs(10),borderRadius:hs(10),alignItems:"center",justifyContent:"center"}}
+            >
+              <Text style={{color:"white",fontSize:16,fontWeight:700}}>Add past jobs</Text>
+            </TouchableOpacity>
           )}
         </View>
         {showPast && Profiletype === "agent" && (

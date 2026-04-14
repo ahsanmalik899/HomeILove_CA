@@ -1,5 +1,4 @@
 import { Drawer } from "@/layouts/drawer";
-import { useGetUnreadNotificationsCountQuery } from "@/store/api/user/MainApi";
 import { setNotificationCount } from "@/store/slices/Notification";
 import { Notification } from "@/store/slices/selector/Notification";
 import { userdata } from "@/store/slices/selector/user";
@@ -11,23 +10,48 @@ import { MaterialIcons } from "@expo/vector-icons";
 import SideBarUser from "@src/components/globals/SideBarUser";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { db } from "@src/utils/firebse";
 import { hs, vs } from "@utils/design/design";
 import { router } from "expo-router";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useDispatch } from "react-redux";
 const _layout = () => {
   const user=useAppSelector(userdata);
-   const dispatch=useDispatch();
+     const dispatch=useDispatch();
   const notifiation = useAppSelector(Notification)
  
-  const {data,isFetching}=useGetUnreadNotificationsCountQuery({user_id:user.id})
-  useEffect(() => {
-  if (data && data.unread_count !== notifiation.NotificationCount) {
-    dispatch(setNotificationCount(data.unread_count));
-  }
-}, []);
- console.log(notifiation)
+useEffect(()=>{
+
+if(!user?.id) return;
+
+const ref = collection(
+  db,
+  "Notification",
+  String(user.id),
+  "notifications"
+);
+
+const q = query(
+  ref,
+  where("is_seen","==",0)
+);
+
+const unsub = onSnapshot(q,(snapshot)=>{
+
+const count = snapshot.size;
+
+dispatch(setNotificationCount(count));
+
+});
+
+return ()=>unsub();
+
+},[user.id]);
+
+ 
+
   return (
       <Drawer
       screenOptions={{
@@ -100,7 +124,7 @@ const _layout = () => {
           fontWeight: "bold",
         }}
       >
-        {notifiation.NotificationCount > 99 ? "99+" : notifiation.NotificationCount}
+        {notifiation.NotificationCount > 19 ? "19+" : notifiation.NotificationCount}
       </Text>
     </View>
   )}
@@ -141,3 +165,7 @@ const _layout = () => {
 };
 
 export default _layout;
+function dispatch(arg0: { payload: any; type: "Notification/setNotificationCount"; }) {
+  throw new Error("Function not implemented.");
+}
+

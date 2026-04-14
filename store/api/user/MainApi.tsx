@@ -33,6 +33,12 @@ export const MainApi = createApi({
         method: "GET",
       }),
     }),
+     getSingleGeneralPost: builder.query<FeedResponse, any>({
+      query: ({ userid, post_id }) => ({
+        url: `getSingleGeneralPost?user_id=${userid}&post_id=${post_id}`,
+        method: "GET",
+      }),
+    }),
     getHomepost: builder.query<FeedResponse, GetPostType>({
       query: ({ userid, page }) => ({
         url: `getHomeFeed/?userid=${userid}&page=${page}`,
@@ -462,7 +468,27 @@ export const MainApi = createApi({
         body: formatdata,
       }),
     }),
-
+  unfollowApi: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "unfollowApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
+  cancelRequestApi: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "cancelRequestApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
+  acceptRequestApi: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "acceptRequestApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
     deletePropertyPreferencesApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
         url: "deletePropertyPreferencesApi",
@@ -651,7 +677,18 @@ export const MainApi = createApi({
         },
       }),
     }),
-
+   getInquireyMessagesApi: builder.query({
+      query: ({ user_id, chat_user_id, page = 1,per_page = 20,post_id }) => ({
+        url: `getInquireyMessages`,
+        params: {
+          user_id: user_id,
+          chat_user_id: chat_user_id,
+          page,
+          post_id:post_id,
+          per_page:per_page,
+        },
+      }),
+    }),
     sendMessageApi: builder.mutation({
       query: (data) => ({
         url: `sendMessageApi`,
@@ -659,9 +696,25 @@ export const MainApi = createApi({
         body: data,
       }),
     }),
+     sendInquireyMessageApi: builder.mutation({
+      query: (data) => ({
+        url: `sendInquireyMessageApi`,
+        method: "POST",
+        body: data,
+        
+      }),
+      
+    }),
     markAsReadApi: builder.mutation({
       query: (data) => ({
         url: "markAsRead",
+        method: "POST",
+        body: data,
+      }),
+    }),
+     InquirymarkAsRead: builder.mutation({
+      query: (data) => ({
+        url: "InquirymarkAsRead",
         method: "POST",
         body: data,
       }),
@@ -808,8 +861,8 @@ export const {
   useUnlikePostMutation,
   useGetConnectedUsersApiQuery,
   useGetReceivedRequestsApiQuery,
-  useGetSentRequestsApiQuery,
   useGetNotificationsQuery,
+  useLazyGetNotificationsQuery,
   useMarkReadMutation,
   useGetChatListApiQuery,
   useHidePostMutation,
@@ -835,6 +888,14 @@ export const {
   useGetotherPastWorkQuery,
   useDeletePastWorkMutation,
   useLazyGetotherPastWorkQuery,
+  useGetSentRequestsApiQuery,
   useLazyUserAgentPastPostsApiQuery,
   useUpgradePostApiMutation,
+  useSendInquireyMessageApiMutation,
+  useLazyGetInquireyMessagesApiQuery,
+  useInquirymarkAsReadMutation,
+  useGetSingleGeneralPostQuery,
+  useUnfollowApiMutation,
+  useCancelRequestApiMutation,
+  useAcceptRequestApiMutation,
 } = MainApi;

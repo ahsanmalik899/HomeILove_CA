@@ -86,9 +86,15 @@ const Index = () => {
         <View style={styles.divider} />
 
         <View style={{ marginTop: vs(6) }}>
+          {item.dealing_city ?(
           <Text numberOfLines={1} style={styles.area}>
-            📍 {item.dealing_city}
+            📍{item.dealing_city}
           </Text>
+          ):(
+            <Text numberOfLines={1} style={styles.area}>
+              📍{item.dealing_areas}
+            </Text>
+          )}
 
           <View style={styles.ratingRow}>
             <StarRating rating={item.rating} size={20}/>
@@ -777,7 +783,7 @@ const map = {
                   data={agents ?? []}
                   extraData={ids}
                   renderItem={renderItem}
-                  keyExtractor={(item) => item.agent_id?.toString()}
+                  keyExtractor={(item) => item.id?.toString()}
                   onEndReached={() => {
                     if (agents?.length > 9) setPage((prev) => prev + 1);
                   }}

@@ -1,8 +1,11 @@
 import {
+  useAcceptRequestApiMutation,
+  useCancelRequestApiMutation,
   useGetProfilesForConectionQuery,
   useHidePostMutation,
   useLikePostMutation,
   useSendRequestMutation,
+  useUnfollowApiMutation,
   useUnlikePostMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
@@ -11,6 +14,7 @@ import Comment from "@assets/icons/Comment.svg";
 import Like from "@assets/icons/Like.svg";
 import Share from "@assets/icons/share.svg";
 import ThreeDots from "@assets/icons/threedots.svg";
+import Liked from "@assets/icons/ThumbUpRed.svg";
 import image from "@assets/test/test.jpeg";
 import { LegendList } from "@legendapp/list";
 import CommentInput from "@src/components/globals/CommentInput";
@@ -19,17 +23,21 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
+import { Video } from "expo-av";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CircleImage from "../CircleImage/CircleImage";
 import CreatePost from "../CreatePost/createPost";
@@ -43,7 +51,7 @@ const PostDesign = ({
   setPage,
   isfetching,
   withCreatePost = false,
-  refetch,
+
   setData,
 }: postDataType) => {
   const user = useAppSelector(userdata);
@@ -55,10 +63,15 @@ const PostDesign = ({
   const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
   const { data: Profiles, isLoading: ProfilesLoading } =
     useGetProfilesForConectionQuery({ id: user.id });
+  const isSmallList = Profiles?.profiles?.length <= 3;
   const insets = useSafeAreaInsets();
   const [showConnection, setShowConnection] = useState(false);
   const [scrollable, setscrollable] = useState(true);
   const [showImages, setShowImages] = useState(false);
+  const [statuse, setStatus] = useState("");
+  const [unfollowApi, { isLoading: unfollowing }] = useUnfollowApiMutation();
+  const [cancelRequestApi, { isLoading: canceling }] = useCancelRequestApiMutation();
+  const [acceptRequestApi, { isLoading: accepting }] = useAcceptRequestApiMutation();
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [imageNo, setImageNo] = useState(0);
 
@@ -75,8 +88,6 @@ const PostDesign = ({
       renderToastSuccess("Post hidden successfully");
     } catch (error) {
       renderToastError("Failed to hide post");
-
-      // rollback if failed
       setHiddenPosts((prev) => prev.filter((id) => id !== item.post_id));
     }
   };
@@ -84,10 +95,13 @@ const PostDesign = ({
     sender_type,
     sender_ProfileId,
     reciverProfile,
+    statusi,
   }) => {
     try {
+      let status = statusi;
+      console.log(status);
       const formData = new FormData();
-
+if(status === "Connect"||status === "Cancel Request"){
       formData.append("sender_id", String(user?.id ?? ""));
       formData.append("receiver_id", String(reciverProfile?.users_id ?? ""));
       formData.append("sender_profile_id", String(sender_ProfileId ?? ""));
@@ -97,15 +111,66 @@ const PostDesign = ({
         "receiver_profile_type",
         String(reciverProfile?.connection_type ?? "")
       );
-
+    }
+    else {
+      formData.append("sender_id", String(reciverProfile?.sender_id ?? ""));
+      formData.append("receiver_id", String(reciverProfile?.receiver_id ?? ""));
+      formData.append("sender_profile_id", String(reciverProfile?.sender_profile_id ?? ""));
+      formData.append("sender_profile_type", String(reciverProfile?.sender_profile_type ?? ""));
+      formData.append("receiver_profile_id", String(reciverProfile?.receiver_profile_id ?? ""));
+      formData.append(
+        "receiver_profile_type",
+        String(reciverProfile?.receiver_profile_type ?? "")
+      );
+    }
       formData._parts?.forEach((p) => console.log(p[0], p[1]));
 
-      const result = await sendRequest(formData).unwrap();
-      if (result.success) {
+      let result;
+
+      if (status === "Connect") {
+        result = await sendRequest(formData).unwrap();
+      }
+      else if (status === "Unfollow") {
+        result = await unfollowApi(formData).unwrap();
+      }
+      else if (status === "Accept Request") {
+        result = await acceptRequestApi(formData).unwrap();
+      }
+      else if (status === "Cancel Request") {
+        result = await cancelRequestApi(formData).unwrap();
+      }
+
+      if (result?.success) {
         renderToastSuccess(result.message);
+
+       setData((prevData) =>
+  prevData.map((post) => {
+    if (
+      post.users_id === reciverProfile?.users_id &&
+      post.connection_type === reciverProfile?.connection_type
+    ) {
+      let newStatus = post.connection_status;
+
+      if (status === "Connect") {
+        newStatus = "pending";
+      } else if (status === "Accept Request") {
+        newStatus = "accepted";
+      } else if (status === "Unfollow" || status === "Cancel Request") {
+        newStatus = "";
+      }
+
+      return {
+        ...post,
+        connection_status: newStatus,
+      };
+    }
+    return post;
+  })
+);
+
         setShowConnection(false);
       } else {
-        renderToastError(result.message);
+        renderToastError(result?.message || "Something went wrong");
         setShowConnection(false);
       }
     } catch (error) {
@@ -115,24 +180,36 @@ const PostDesign = ({
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
 
-    const alreadyLiked = false;
+    const [alreadyLiked, setAlreadyLiked] = useState(item.is_liked);
+    const [likeCount, setLikeCount] = useState(item.likes);
     const handleLikeToggle = async (item) => {
       try {
         if (alreadyLiked) {
-          await unlikePost({
+          const res = await unlikePost({
             post_id: item.post_id,
             user_id: user.id,
           }).unwrap();
+          if (res.success) {
+            renderToastSuccess(res.message)
+            setAlreadyLiked(false)
+            setLikeCount(likeCount - 1)
+          } else {
+            renderToastError(res.message)
+          }
 
-          renderToastSuccess("Post unliked");
         } else {
-          await likePost({
+          const res = await likePost({
             post_id: item.post_id,
             user_id: user.id,
             creater_id: item.users_id,
           }).unwrap();
-
-          renderToastSuccess("Post liked");
+          if (res.success) {
+            renderToastSuccess(res.message)
+            setAlreadyLiked(true)
+            setLikeCount(likeCount + 1)
+          } else {
+            renderToastError(res.message)
+          }
         }
       } catch (error) {
         renderToastError("Something went wrong");
@@ -142,9 +219,10 @@ const PostDesign = ({
     const [menuVisible, setMenuVisible] = useState(false);
     if (item.type === "Shared Connection") {
       return (
-        <TouchableOpacity className="bg-white" style={styles.card} onPress={()=>{
-          router.navigate({pathname:"/ProfileSigleView",
-            params:{id:item.id,type:item.connection_type.toLowerCase()}
+        <TouchableOpacity className="bg-white" style={styles.card} onPress={() => {
+          router.navigate({
+            pathname: "/ProfileSigleView",
+            params: { id: item.id, type: item.connection_type.toLowerCase() }
           })
         }}>
           <View className="flex-row items-center justify-between">
@@ -219,19 +297,42 @@ const PostDesign = ({
           />
           <View style={{ alignItems: "flex-end", marginTop: vs(10) }}>
             <FollowButton
-              id={112}
-              onPress={() => {
+              id={item.receiver_id}
+              status={item.connection_status}
+              onPress={(status) => {
+
+                setStatus(status)
+
                 if (user.user_type === "Business") {
                   setSelectedReceiver(item);
-                  setShowConnection(true);
+
+
+                  if (status === "Connect") {
+                    setShowConnection(true);
+                  }
+                  else {
+                    requestSend({
+                      reciverProfile: item,
+                      sender_ProfileId: "",
+                      sender_type: "Business",
+                      statusi: status,
+                    });
+                  }
                 } else {
+                  setStatus(status)
                   requestSend({
                     reciverProfile: item,
                     sender_ProfileId: "",
                     sender_type: "Private",
+                    statusi: status,
                   });
+
                 }
-              }}
+              }
+
+
+
+              }
             />
           </View>
           {menuVisible && (
@@ -303,7 +404,207 @@ const PostDesign = ({
           )}
         </TouchableOpacity>
       );
-    } else {
+    } else if(item.type==="General Post") {
+      return(
+            <TouchableOpacity
+                        className="bg-white"
+                        style={styles.card}
+                        onPress={() => {
+                          router.navigate({
+                            pathname: "/GeneralPostSingleView",
+                            params: {
+                              id: item.id,
+                             
+                            },
+                          });
+                        }}
+                      >
+    <View className="flex-row items-center justify-between">
+                    <View className="flex-row">
+                      <CircleImage
+                        source={{ uri: ImageFormater(item.logo) }}
+                        Size={40}
+                      />
+                      <View style={styles.uperSection}>
+                        <View className="flex-row">
+                          <Text style={styles.name}>
+                            {item.business_name || item.name}
+                          </Text>
+                          {item.connection_type && (
+                            <Text style={{fontFamily: "PopinRegula",}}> ({item.connection_type})</Text>
+                          )}
+                        </View>
+                        <Text style={{fontFamily: "PopinRegula",}}>{item.post_created_date || item.created_date}</Text>
+                      </View>
+                    </View>
+                   <TouchableOpacity onPress={() => setMenuVisible(true)}>
+          <ThreeDots />
+        </TouchableOpacity>
+        
+                  </View>
+                                  <View>
+                              <Text style={styles.description}>
+                                {expanded
+                                  ? item.description
+                                  : item.description?.slice(0, 70) +
+                                    (item.description?.length > 70 ? "...." : " ")}
+                                {item.description?.length > 70 && (
+                                  <Text
+                                    style={styles.moreText}
+                                    onPress={() => setExpanded(!expanded)}
+                                  >
+                                    {expanded ? " Show Less" : " Read More"}
+                                  </Text>
+                                )}
+                              </Text>
+                     <View style={{ alignSelf: "center" }}>
+                  
+                    {item.images.length > 0 && (
+                      <TouchableOpacity 
+                     onPress={() => {
+                      setSelectedImages(item.images || []);
+                      setShowImages(true);
+                      setscrollable(false);
+                    }}
+                      >
+                      <Image
+                        source={{ uri: ImageFormater(item.images[0]) }}
+                        style={{
+                          height: vs(200),
+                          width: hs(350),
+                          borderRadius: ms(12),
+                          resizeMode: "cover",
+                        }}
+                      />
+                      </TouchableOpacity>
+                    )}
+                  
+                    {/* Overlay Container */}
+                    <View
+                      style={{
+                        position: "absolute",
+                        bottom: vs(8),
+                        left: hs(8),
+                        right: hs(8),
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                      }}
+                    >
+                      {/* LEFT SIDE - Camera Count */}
+                      <View
+                        style={{
+                          backgroundColor: "rgba(0,0,0,0.6)",
+                          paddingHorizontal: hs(8),
+                          paddingVertical: vs(4),
+                          flexDirection: "row",
+                          alignItems: "center",
+                          borderRadius: ms(20),
+                        }}
+                      >
+                        <Camera />
+                        <Text
+                          style={{
+                            color: "white",
+                            marginLeft: 4,
+                            fontWeight: "600",
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {item.images.length}
+                        </Text>
+                      </View>
+                  
+                      {/* RIGHT SIDE - Auto Playing Muted Video */}
+                      {item.post_video && (
+                            <TouchableOpacity 
+                    //  onPress={() => {
+                    //   setSelectedViedio(ViedioUrlFormat(item.post_video) );
+                    //   setShowViedio(true);
+                    //   setscrollable(false);
+                    // }}
+                      >
+                        <Video
+                          source={{ uri: ViedioUrlFormat(item.post_video) }}
+                          style={{
+                            width: hs(100),
+                            height: vs(100),
+                            borderRadius: ms(12),
+                          }}
+                          resizeMode="cover"
+                          shouldPlay
+                          isLooping
+                          isMuted
+                        />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  
+                  </View>
+                  
+                              <View
+                                className="flex-row justify-between"
+                                style={{ marginTop: vs(20), marginBottom: vs(10) }}
+                              >
+                                <View className="flex-row">
+                                  <View className="flex-row items-center ">
+                                    <TouchableOpacity
+                                                      disabled={liking || unliking}
+                                                      onPress={() => handleLikeToggle(item)}
+                                                    >
+                                                     { alreadyLiked?
+                                  <Liked
+                                                        width={22}
+                                                        height={22}
+                                                      />
+                                                      :
+                                                      <Like
+                                                        width={22}
+                                                        height={22}
+                                                      
+                                                      />}
+                                                    </TouchableOpacity>
+                                    <Text
+                                      style={{
+                                        color: Colors.light.DarkGreen,
+                                        paddingLeft: hs(2),
+                                        fontFamily: "PopinRegula",
+                                      }}
+                                    >
+                                      {likeCount}
+                                    </Text>
+                                  </View>
+                                  <View
+                                    className="flex-row items-center"
+                                    style={{ paddingLeft: hs(10) }}
+                                  >
+                                    <TouchableOpacity>
+                                      <Comment />
+                                    </TouchableOpacity>
+                                    <Text
+                                      style={{
+                                        color: Colors.light.DarkGreen,
+                                        paddingLeft: hs(2),
+                                        fontFamily: "PopinRegula",
+                                      }}
+                                    >
+                                       {item.comment_count}
+                                    </Text>
+                                  </View>
+                                </View>
+                                <TouchableOpacity>
+                                  <Share />
+                                </TouchableOpacity>
+                              </View>
+                              <View>
+                          
+                              </View>
+                              <CommentInput postId={item.id} creatorId={item.post_creater_id} />
+                            </View>
+        </TouchableOpacity>
+      )
+    }
+    else {
       return (
         <TouchableOpacity
           className="bg-white"
@@ -352,7 +653,7 @@ const PostDesign = ({
               {expanded
                 ? item.description
                 : item.description?.slice(0, 70) +
-                  (item.description?.length > 70 ? "...." : " ")}
+                (item.description?.length > 70 ? "...." : " ")}
               {item.description?.length > 70 && (
                 <Text
                   style={styles.moreText}
@@ -482,11 +783,17 @@ const PostDesign = ({
                     disabled={liking || unliking}
                     onPress={() => handleLikeToggle(item)}
                   >
-                    <Like
-                      width={22}
-                      height={22}
-                      fill={alreadyLiked ? Colors.light.DarkGreen : "none"}
-                    />
+                    {alreadyLiked ?
+                      <Liked
+                        width={22}
+                        height={22}
+                      />
+                      :
+                      <Like
+                        width={22}
+                        height={22}
+
+                      />}
                   </TouchableOpacity>
                   <Text
                     style={{
@@ -495,7 +802,7 @@ const PostDesign = ({
                       fontFamily: "PopinRegula",
                     }}
                   >
-                    {item.likes}
+                    {likeCount}
                   </Text>
                 </View>
                 <View
@@ -524,7 +831,7 @@ const PostDesign = ({
             <CommentInput
               creatorId={item.users_id}
               postId={item.post_id}
-              refetch={refetch}
+
             />
           </View>
           {menuVisible && (
@@ -600,7 +907,7 @@ const PostDesign = ({
   };
 
   return (
-    <View style={{ paddingBottom: insets.bottom, flex: 1,backgroundColor: "#F4F0F0" }}>
+    <View style={{ paddingBottom: insets.bottom, flex: 1, backgroundColor: "#F4F0F0" }}>
       <LegendList
         className="flex-1 bg-red"
         contentContainerStyle={{
@@ -637,42 +944,64 @@ const PostDesign = ({
           }}
         />
       )}
-      {showConnection && (
-       
+      <Modal
+        visible={showConnection}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowConnection(false)}
+      >
         <TouchableOpacity
           style={styles.overlay}
-          onPress={() => setShowConnection(false)}
+          activeOpacity={1}
+          onPressOut={() => setShowConnection(false)}
         >
-          <View style={styles.profileContainer}>
-            <Text style={{ fontFamily: "PopinRegula" }}>Connect As</Text>
-            {Profiles?.profiles?.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.profileCard}
-                onPress={() => {
-                  requestSend({
-                    reciverProfile: selectedReceiver,
-                    sender_ProfileId: item.profile_id,
-                    sender_type: item.profile_type,
-                  });
-                }}
-              >
-                <CircleImage
-                  Size={50}
-                  source={{ uri: ImageFormater(item.logo) }}
-                />
+          <View
+            style={[
+              styles.profileContainer,
+              isSmallList ? styles.centerModal : styles.fullModal,
+            ]}
+          >
+            <Text style={styles.title}>Connect As</Text>
 
-                <View style={{ marginLeft: 12 }}>
-                  <Text style={styles.businessName}>{item.business_name}</Text>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ flexGrow: 1 }}
+            >
+              {Profiles?.profiles?.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.profileCard}
+                  onPress={() => {
+                    requestSend({
+                      reciverProfile: selectedReceiver,
+                      sender_ProfileId: item.profile_id,
+                      sender_type: item.profile_type,
+                      statusi: statuse,
+                    });
 
-                  <Text style={styles.profileType}>{item.profile_type}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+                    setShowConnection(false);
+                  }}
+                >
+                  <CircleImage
+                    Size={50}
+                    source={{ uri: ImageFormater(item.logo) }}
+                  />
+
+                  <View style={{ marginLeft: 12 }}>
+                    <Text style={styles.businessName}>
+                      {item.business_name}
+                    </Text>
+
+                    <Text style={styles.profileType}>
+                      {item.profile_type}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </TouchableOpacity>
-     
-      )}
+      </Modal>
       <Loading isLoading={isLoading} text="Sending request..." />
     </View>
   );
@@ -681,16 +1010,7 @@ const PostDesign = ({
 export default PostDesign;
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    
-    position: "absolute",
-    zIndex: 10000,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-  },
+
   card: {
     marginHorizontal: hs(10),
     marginVertical: vs(10),
@@ -714,12 +1034,6 @@ const styles = StyleSheet.create({
     color: Colors.light.DarkGreen,
     fontWeight: "600",
     fontFamily: "PopinRegula",
-  },
-  profileContainer: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 15,
   },
 
   profileCard: {
@@ -748,5 +1062,34 @@ const styles = StyleSheet.create({
     color: "#777",
     marginTop: 2,
     fontFamily: "PopinRegula",
+  },
+
+  title: {
+    fontSize: 18,
+    fontFamily: "PopinSemiBold",
+    marginBottom: 10
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  profileContainer: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+  },
+
+  // 👇 small list (centered modal)
+  centerModal: {
+    maxHeight: "50%",
+  },
+
+  // 👇 large list (full screen feel)
+  fullModal: {
+    height: "80%", // or "90%"
   },
 });

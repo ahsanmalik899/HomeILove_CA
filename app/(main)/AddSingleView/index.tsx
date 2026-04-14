@@ -29,7 +29,7 @@ import VideoSection from "@src/components/globals/ViedioSection";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Formik } from "formik";
 import { useState } from "react";
@@ -55,6 +55,7 @@ const index = () => {
   };
 
   console.log(type);
+  console.log(id);
   const openPDF = async (url: string) => {
     const googleViewer = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
       url
@@ -1225,6 +1226,15 @@ const index = () => {
                 width: "100%",
                 borderRadius: 8,
                 alignItems: "center",
+              }}
+              onPress={()=>{
+                router.navigate({
+                  pathname:"/ChatScreen",
+                  params:{
+                    userId:data?.post?.user_id,
+                   name:data?.posted_by?.business_name,
+                  }
+                })
               }}
             >
               <Text style={{ color: "#fff", fontWeight: "600" }}>

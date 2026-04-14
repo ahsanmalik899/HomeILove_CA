@@ -1,10 +1,51 @@
 
+import { userdata } from "@/store/slices/selector/user";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Colors from "@src/constants/Colors";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { db } from "@src/utils/firebse";
 import { hs, ms, vs } from "@utils/design/design";
 import { Tabs } from "expo-router";
+import { collection, documentId, onSnapshot, query, where } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { Platform, Text } from "react-native";
 const _layout = () => {
+  const user = useAppSelector(userdata);
+ 
+    const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!user.id) return;
+
+    const chatsRef = collection(db, "userChats");
+
+    const q = query(
+      chatsRef,
+       where(documentId(),">=",user.id+"-"),
+
+   where(documentId(),"<=",user.id+"-\uf8ff"),
+
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let count = 0;
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if ((data.unread_count ?? 0) > 0) {
+          count += 1; // Count rooms with unread messages
+        }
+      });
+
+      setUnreadCount(count);
+      console.log("Unread chat rooms:", count);
+    });
+
+    return () => unsubscribe();
+  }, [user.id]);
+
+  
+  
   return (
    <Tabs
       screenOptions={{
@@ -47,7 +88,13 @@ const _layout = () => {
       <Tabs.Screen
         name="Message"
         options={{
-           tabBarLabel: ({ focused }) => (
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: Colors.light.red,
+            fontSize: ms(10),
+            fontFamily: "PopinRegula",
+          },
+          tabBarLabel: ({ focused }) => (
             <Text
               style={{
                color: focused? Colors.light.red:Colors.light.DarkGreen,

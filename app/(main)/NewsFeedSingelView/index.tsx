@@ -201,11 +201,11 @@ const index = () => {
             <TouchableOpacity
               onPress={() =>
                 router.push({
-                  pathname: "/SinglePost",
+                  pathname: "/AddSingleView",
                   params: {
-                    id: data?.post?.id,
+                    id: data?.post?.post_property_id||data?.post?.post_community_id,
                     type: type,
-                    post_id: data?.post?.post_id,
+              
                   },
                 })
               }

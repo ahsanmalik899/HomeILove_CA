@@ -4,6 +4,7 @@ import ThreeDots from "@assets/icons/threedots.svg";
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import FollowButton from "@src/components/globals/FollowButton";
+import Loading from "@src/components/globals/Loading";
 import StarRating from "@src/components/globals/StarRating";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { ImageFormater } from "@utils/ImageFormat";
@@ -48,7 +49,7 @@ const Connected = () => {
         </View>
 
         <View style={styles.follow}>
-          <FollowButton id={item.user_id} onPress={()=>{}} />
+          <FollowButton id={item.user_id} onPress={()=>{}} status="accepted" />
         </View>
       </View>
     );
@@ -59,10 +60,11 @@ const Connected = () => {
       <LegendList
         data={data?.data || []}
         renderItem={renderItem}
-        estimatedItemSize={140} // 🔑 critical for performance
+        estimatedItemSize={140} 
         keyExtractor={(item) => item.connection_id.toString()}
         showsVerticalScrollIndicator={false}
       />
+      <Loading isLoading={isLoading} text="Loading..."/>
     </View>
   );
 };
