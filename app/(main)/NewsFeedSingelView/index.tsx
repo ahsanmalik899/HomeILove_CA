@@ -1,12 +1,14 @@
 import {
   useDeleteCommentApiMutation,
   useGetHomeFeedsQuery,
+  useGetPostByIdQuery,
   useGetPostCommentsApiQuery,
-  useGetSinglePostQuery,
   usePostReplyApiMutation,
+  useShare_postApiMutation
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
+import Cross from "@assets/CreateProfile/cross.svg";
 import Camera from "@assets/Feedimg/camera.svg";
 import Heart from "@assets/icons/heart.svg";
 import Area from "@assets/icons/MypostListing/area.svg";
@@ -18,16 +20,25 @@ import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
+import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import ImageSlider from "@src/components/globals/ImageSlider";
+import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
 import Colors from "@src/constants/Colors";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
+import { Video } from "expo-av";
+import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from "expo-router";
+import { Formik } from "formik";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -36,16 +47,18 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
-
+import * as yup from "yup";
 const index = () => {
   const params = useLocalSearchParams();
   const type = params.type as string;
   const id = Number(params.id);
   const post_id = Number(params.post_id);
+  const [showShare,setShowShare]=useState(false);
   const formatPdfUrl = (file: string) => {
     return ImageFormater(file);
   };
-
+  const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
+ const [loading,setLoading]=useState(false);
   const CommentItem = ({ item, refetch }) => {
     const user = useSelector(userdata);
 
@@ -176,7 +189,7 @@ const index = () => {
   };
 
   const [imageNo, setImageNo] = useState(0);
-  const { data, isFetching, refetch } = useGetSinglePostQuery({ type, id });
+  const { data, isFetching, refetch } = useGetPostByIdQuery({ post_id:post_id });
   const { data: comments, isFetching: commentFetching } =
     useGetPostCommentsApiQuery({ post_id: post_id });
   const [showImages, setShowImages] = useState(false);
@@ -198,22 +211,25 @@ const index = () => {
             <Text style={[styles.heading, { color: Colors.light.red }]}>
               {data?.posted_by?.business_name}
             </Text>
+            {data?.type!=="general" && (
             <TouchableOpacity
               onPress={() =>
                 router.push({
                   pathname: "/AddSingleView",
                   params: {
                     id: data?.post?.post_property_id||data?.post?.post_community_id,
-                    type: type,
+                    type: data?.type,
               
                   },
                 })
               }
             >
               <Text style={styles.fullDetailText}>See Full Details</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>)}
           </View>
-          {type === "community" ? (
+          {data?.type!=="general" && (
+            <>
+          {data?.type === "community" ? (
             <View className="flex-row justify-between">
               <Text style={{ color: "black", fontWeight: "600", flex: 1 }}>
                 {data?.post?.community_title ?? ""}
@@ -221,10 +237,10 @@ const index = () => {
 
               {data?.post?.community_price?.length > 0 && (
                 <Text style={{ color: Colors.light.red, fontWeight: "600" }}>
-                  From $ {data.post.community_price[0]} To ${" "}
+                  From $ {data?.post?.community_price[0]} To ${" "}
                   {
-                    data.post.community_price[
-                      data.post.community_price.length - 1
+                    data?.post?.community_price[
+                      data?.post?.community_price?.length - 1
                     ]
                   }
                 </Text>
@@ -252,22 +268,29 @@ const index = () => {
                 }}
               >
                 $ {data?.post?.asking_price ?? 0}
-                {type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
+                {data?.type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
               </Text>
             </View>
           )}
-          <Text style={styles.description}>
+          </>)}
+          
+          {data?.type==="general" ?(
+            <Text style={styles.description}>
+              {data?.post?.description}
+            </Text>
+          ):(
+            <Text style={styles.description}>
             {expanded
-              ? type === "community"
+              ? data?.type === "community"
                 ? data?.post?.community_details
                 : data?.post?.property_details
-              : type === "community"
+              : data?.type === "community"
               ? data?.post.community_details?.slice(0, 300) +
                 (data?.post?.community_details?.length > 300 ? "...." : "")
               : data?.post?.property_details?.slice(0, 300) +
                 (data?.post?.property_details?.length > 300 ? "...." : "")}
 
-            {(type === "Community"
+            {(data?.type === "community"
               ? data?.post?.community_details?.length
               : data?.post?.property_details?.length) > 300 && (
               <Text
@@ -277,7 +300,9 @@ const index = () => {
                 {expanded ? " Show Less" : " Read More"}
               </Text>
             )}
+
           </Text>
+          )}
           <TouchableOpacity
             className="mt-4"
             onPress={() => {
@@ -286,7 +311,7 @@ const index = () => {
           >
             <Image
               source={
-                data?.post_images && data?.post_images.length > 0
+                data?.post_images && data?.post_images?.length > 0
                   ? { uri: ImageFormater(data?.post_images[0]) }
                   : NoImage
               }
@@ -299,7 +324,7 @@ const index = () => {
                 backgroundColor: "gray",
               }}
             />
-            {type !== "community" && data?.floor_images.length > 0 && (
+            {data?.type !== "community" && data?.floor_images?.length > 0 && (
               <TouchableOpacity
                 style={{
                   position: "absolute",
@@ -316,7 +341,7 @@ const index = () => {
               >
                 <Text style={{ color: "white", fontWeight: 600 }}>
                   Floor Images{" "}
-                  {data?.floor_images ? data?.floor_images.length : 0}
+                  {data?.floor_images ? data?.floor_images?.length : 0}
                 </Text>
               </TouchableOpacity>
             )}
@@ -332,7 +357,7 @@ const index = () => {
             >
               <Camera />
               <Text style={{ color: "white", fontWeight: 600 }}>
-                {data?.post_images ? data?.post_images.length : 0}
+                {data?.post_images ? data?.post_images?.length : 0}
               </Text>
             </View>
           </TouchableOpacity>
@@ -374,7 +399,8 @@ const index = () => {
               marginTop: vs(10),
             }}
           >
-            {type === "community" ? (
+            {data?.type !== "general" && (<>
+            {data?.type === "community" ? (
               <>
                 <View className="flex-row items-center">
                   <CommunityType />
@@ -411,6 +437,8 @@ const index = () => {
                 </View>
               </>
             )}
+            </>
+            )}
           </View>
           <View className="flex-row items-center justify-between mt-4">
             <Text
@@ -425,12 +453,50 @@ const index = () => {
               <TouchableOpacity>
                 <Heart />
               </TouchableOpacity>
-              <TouchableOpacity>
+             <TouchableOpacity onPress={()=>{setShowShare(true)}}>
                 <Share />
               </TouchableOpacity>
             </View>
           </View>
         </View>
+            {data?.post?.post_video && (
+                                    <View
+                          style={{
+                           height:vs(400),
+                           width:"95%",
+                           backgroundColor:Colors.light.lightGray,
+                           borderRadius:ms(10),
+                           marginHorizontal:hs(10),
+                          }}
+                        >
+                          <Video
+                        source={{ uri: ViedioUrlFormat(data?.post?.post_video) }}
+                        style={{
+                          width: "100%",
+                          height: "90%",  
+                          borderRadius: ms(16),
+                          marginBottom:vs(50),
+                        }}
+                        resizeMode="contain"
+                        useNativeControls  
+                        shouldPlay ={false}        
+                        
+                        isLooping={false}   
+                        isMuted={false}
+                        onLoadStart={() => setLoading(true)}
+                        onLoad={() => setLoading(false)}
+                      />
+                            {loading && (
+                              <ActivityIndicator
+                                size="large"
+                                color={Colors.light.DarkGreen}
+                                style={StyleSheet.absoluteFillObject}
+                              />
+                            )}
+                              
+                                   
+                            </View>
+                                  )}
         <View style={{ marginTop: vs(20) }}>
           <Text style={styles.heading}>
             Comments ({comments?.data?.length || 0})
@@ -465,7 +531,212 @@ const index = () => {
           }}
         />
       )}
+                 <Modal visible={showShare} animationType="slide" transparent>
+  <View style={{
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  }}>
 
+    <View style={{
+      backgroundColor: "#fff",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      minHeight: "80%",
+    }}>
+
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 15
+      }}>
+        <Text style={{ fontSize: 18, fontWeight: "600" }}>
+          Share Post
+        </Text>
+
+        <TouchableOpacity onPress={() => setShowShare(false)}>
+          <Cross height={vs(24)} width={vs(24)} />
+        </TouchableOpacity>
+      </View>
+
+      <Formik
+        initialValues={{
+          recepient_email: "",
+          message: "",
+          link:`https://homeilove.us/NewsFeedSingelView?post_id=${post_id}`,
+          post_id:post_id,
+          post_type:data?.type,
+          post_image:data?.post_images?.[0]?? "",
+        }}
+        validationSchema={yup.object({
+          recepient_email: yup
+            .string()
+            .email("Invalid email")
+            .required("Email is required"),
+          message: yup
+            .string()
+            .required("Message is required")
+        })}
+        onSubmit={async(values) => {
+          try {
+            const formData = new FormData();
+            formData.append("email", values.recepient_email);
+            formData.append("message", values.message);
+            formData.append("link", values.link);
+            formData.append("post_id", post_id.toString());
+            formData.append("post_type", values.post_type);
+            formData.append("post_img", values.post_image);
+            console.log(formData);
+            const result = await share_postApi(formData).unwrap();
+            if (result?.success) {
+              renderToastSuccess(result.message);
+              setShowShare(false);
+            }
+          } catch (error) {
+            renderToastError("Failed to share post");
+          }
+        }}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          touched,
+          errors
+        }) => (
+
+          <View style={{ flex: 1 }}>
+
+         
+            <FormikInput
+                    name="recepient_email"
+                    placeholder="Recipient Email"
+                    value={values.recepient_email}
+                    onChangeText={handleChange("recepient_email")}
+                    onBlur={handleBlur("recepient_email")}
+                    touched={!!touched.recepient_email}
+                    errors={!!errors.recepient_email}
+                    errorText={errors.recepient_email} title={"Email"} required={true}            />
+
+           
+            <FormikInput
+                    name="message"
+                    placeholder="Write your message..."
+                    value={values.message}
+                    onChangeText={handleChange("message")}
+                    onBlur={handleBlur("message")}
+                    multiline
+                    touched={!!touched.message}
+                    errors={!!errors.message}
+                    errorText={errors.message} title={"Message"} required={true}            />
+
+            <View style={{
+              backgroundColor: "#f5f5f5",
+              padding: 12,
+              borderRadius: 10,
+              marginTop: 10,
+              marginBottom: 20
+            }}>
+              <Text style={{ fontWeight: "600" }}>
+                Sharing this post
+              </Text>
+              <Text style={{ color: "#666", fontSize: 12 }}>
+                Property / Community link will be sent
+              </Text>
+            </View>  
+     <View
+  style={{
+    backgroundColor: "#f5f6f8",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 15,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  }}
+>
+  {/* Label */}
+  <Text
+    style={{
+      fontSize: 13,
+      color: "#6b7280",
+      marginBottom: 6,
+      fontFamily: "PopinRegula",
+    }}
+  >
+    Shareable Link
+  </Text>
+
+  {/* Input Row */}
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#fff",
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: "#e5e7eb",
+    }}
+  >
+    <TextInput
+      editable={false}
+      value={values.link}
+      numberOfLines={1}
+      style={{
+        flex: 1,
+        fontSize: 12,
+        color: "#374151",
+        fontFamily: "PopinRegula",
+      }}
+      ellipsizeMode="middle"
+    />
+
+    {/* Copy Button */}
+    <TouchableOpacity
+      onPress={async () => {
+        await Clipboard.setStringAsync(values.link);
+        renderToastSuccess("Link copied");
+      }}
+      style={{
+        backgroundColor: "#0f766e",
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+        marginLeft: 8,
+      }}
+    >
+      <Text
+        style={{
+          color: "#fff",
+          fontSize: 12,
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        Copy
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
+        
+            <LargeButton
+              text="Send"
+              handleSubmit={handleSubmit}
+            />
+
+          </View>
+
+        )}
+      </Formik>
+
+    </View>
+  </View>
+  <Loading isLoading={sharing} text="Sharing..."/>
+</Modal>
       <Loading isLoading={isFetching} text="Loading..." />
     </>
   );

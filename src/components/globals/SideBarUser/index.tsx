@@ -1,13 +1,19 @@
+import { useLogoutApiMutation } from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import { resetUserData } from "@/store/slices/user";
 import SidebarLogo from "@assets/SideBar/sideBarLogo.svg";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { View } from "react-native";
 import { useDispatch } from "react-redux";
 import LargeButton from "../LaregeButton";
+import Loading from "../Loading";
 import SideBarButtons from "../SideBarButtons";
 const index = () => {
   const dispatch = useDispatch();
+  const user= useAppSelector(userdata)
+  const [logoutApi,{isLoading}] = useLogoutApiMutation();
   return (
     <View
       style={{
@@ -64,12 +70,20 @@ const index = () => {
       <View style={{ marginTop: vs(20), width: hs(150) }}>
         <LargeButton
           handleSubmit={async()=> {
-            dispatch(resetUserData());
-            router.replace("/(auth)/signin")
+            try{
+              const res = await logoutApi({user_id:user?.id});
+              if(res?.data?.status){
+                dispatch(resetUserData());
+                router.replace("/(auth)/signin")
+              }
+            }catch(error){
+              console.log(error);
+            }
           }}
           text="Logout"
         />
       </View>
+      <Loading isLoading={isLoading} text="Logging out..."/>
     </View>
   );
 };

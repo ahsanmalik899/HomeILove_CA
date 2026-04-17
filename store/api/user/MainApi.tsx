@@ -109,6 +109,20 @@ export const MainApi = createApi({
         body: data,
       }),
     }),
+     deleteGeneralPost: builder.mutation<any, FormData>({
+      query: (data) => ({
+        url: `deleteGeneralPost`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    editGeneralPost: builder.mutation<any, FormData>({
+      query: (data) => ({
+        url: `editGeneralPost`,
+        method: "POST",
+        body: data,
+      }),
+    }),
     setPropertyPrefrence: builder.mutation<any, any>({
       query: (data) => ({
         url: `setPropertyPrefrence`,
@@ -475,6 +489,13 @@ export const MainApi = createApi({
         body: formatdata,
       }),
     }),
+      UpdateConnectionApi: builder.mutation<any, any>({
+      query: (formatdata: FormData) => ({
+        url: "UpdateConnectionApi",
+        method: "POST",
+        body: formatdata,
+      }),
+    }),
   cancelRequestApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
         url: "cancelRequestApi",
@@ -628,6 +649,13 @@ export const MainApi = createApi({
         body: data,
       }),
     }),
+    LogoutApi: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "logoutUser",
+        method: "POST",
+        body: data,
+      }),
+    }),
     PaybyPaypal: builder.mutation<any, any>({
       query: (data) => ({
         url: "create-paypal-order",
@@ -777,6 +805,14 @@ export const MainApi = createApi({
       }),
       providesTags: ["otherPastData"],
     }),
+    askvaluationapi:builder.mutation<any, FormData>({
+      query: (formatData) => ({
+        url: `askvaluationapi`,
+        method: "POST",
+        body: formatData,
+      }),
+
+    }),
     deletePastWork: builder.mutation<any, FormData>({
       query: (formatData) => ({
         url: `deletePastWork`,
@@ -784,6 +820,13 @@ export const MainApi = createApi({
         body: formatData,
       }),
       invalidatesTags: ["otherPastData"],
+    }),
+    share_postApi: builder.mutation<any,FormData>({
+      query: (formatData) => ({
+        url: "share_postApi",
+        method: "POST",
+        body: formatData,
+      }),
     }),
     upgradePostApi: builder.mutation({
       query: (data) => ({
@@ -793,6 +836,14 @@ export const MainApi = createApi({
       }),
       invalidatesTags:["myPost"]
     }),
+    shareDetailPostApi: builder.mutation<any,FormData>({
+      query: (formatData) => ({
+        url: "shareDetailPostApi",
+        method: "POST",
+        body: formatData,
+      }),
+      
+    }),
     upgradeProfileApi: builder.mutation({
       query: (data) => ({
         url: "upgradeProfile",
@@ -800,6 +851,12 @@ export const MainApi = createApi({
         body: data,
       }),
       invalidatesTags:["myProfile"]
+    }),
+    getPostById: builder.query<any, any>({
+      query: ({ post_id }) => ({
+        url: `getPostById?post_id=${post_id}`,
+        method: "GET",
+      }),
     }),
   }),
 });
@@ -898,4 +955,12 @@ export const {
   useUnfollowApiMutation,
   useCancelRequestApiMutation,
   useAcceptRequestApiMutation,
+  useUpdateConnectionApiMutation,
+  useLogoutApiMutation,
+  useDeleteGeneralPostMutation,
+  useEditGeneralPostMutation,
+  useAskvaluationapiMutation,
+  useGetPostByIdQuery,
+  useShare_postApiMutation,
+  useShareDetailPostApiMutation,
 } = MainApi;

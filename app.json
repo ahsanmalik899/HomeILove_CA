@@ -79,6 +79,36 @@
             "BROWSABLE",
             "DEFAULT"
           ]
+        },
+         {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "homeilove.us",
+              "pathPrefix": "/NewsFeedSingelView"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "homeilove.us",
+              "pathPrefix": "/AddSingleView"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "package": "com.revnosoft.homeilove"

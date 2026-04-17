@@ -487,7 +487,7 @@ const index = () => {
           user_type: user.user_type,
           payment_method: "",
           ad_life: 1,
-          ad_by: "",
+          ad_by: user.user_type === "Business" ? "" : "Private",
           post_status: "Pending",
           post_type: "Normal",
           approved_by: "",
@@ -1542,6 +1542,7 @@ const index = () => {
                           </Text>
                           <LargeButton
                             handleSubmit={() => {
+                              console.log(values);
                               handleSubmit();
                               console.log(errors);
                             }}

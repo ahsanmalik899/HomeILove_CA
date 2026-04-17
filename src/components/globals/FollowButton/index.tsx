@@ -15,7 +15,7 @@ const FollowButton = ({ id, status = 'none', onPress }: ButtonProps) => {
   const getButtonText = () => {
    
     if (status === 'accepted') return 'Unfollow';
-    if (status === 'pending') {if(id===user?.id.toString()) return 'Accept Request'; else return 'Cancel Request';}
+    if (status === 'pending') {if(id.toString()===user?.id.toString()) return 'Accept Request'; else return 'Cancel Request';}
     return 'Connect';
   };
 
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
 
   connected: {
-    backgroundColor: '#4CAF50', // 🟢 Connected
+    backgroundColor: Colors.light.DarkGreen, // 🟢 Connected
   },
 
   pending: {

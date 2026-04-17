@@ -1,8 +1,10 @@
 import {
   useGetSinglePostQuery,
   useSendVisistRequestMutation,
+  useShareDetailPostApiMutation
 } from "@/store/api/user/MainApi";
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
+import Cross from "@assets/CreateProfile/cross.svg";
 import RedHeart from "@assets/CreateProfile/heart-red.svg";
 import Camera from "@assets/Feedimg/camera.svg";
 import Heart from "@assets/icons/heart.svg";
@@ -27,8 +29,10 @@ import StarRating from "@src/components/globals/StarRating";
 import TimePickerField from "@src/components/globals/TimePickerField";
 import VideoSection from "@src/components/globals/ViedioSection";
 import Colors from "@src/constants/Colors";
+import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import * as Clipboard from "expo-clipboard";
 import { router, useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Formik } from "formik";
@@ -36,14 +40,17 @@ import { useState } from "react";
 import {
   Dimensions,
   Image,
+  Modal,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Yup from "yup";
+
 
 const index = () => {
   const params = useLocalSearchParams();
@@ -73,9 +80,10 @@ const index = () => {
   const [expanded, setExpanded] = useState(false);
   const latitude = parseFloat(data?.post?.lat);
   const longitude = parseFloat(data?.post?.lng);
-
+  const [showShare, setShowShare] = useState(false);
   const showMap = !isNaN(latitude) && !isNaN(longitude);
   const facts = data?.post?.imp_facts ?? data?.post?.facts ?? "";
+    const [shareDetailPostApi, { isLoading: sharing }] = useShareDetailPostApiMutation();
   const visitAdSchema = Yup.object().shape({
     visitor_email: Yup.string()
       .email("Enter a valid email address")
@@ -334,7 +342,7 @@ const index = () => {
               <TouchableOpacity>
                 <Heart />
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowShare(true)}>
                 <Share />
               </TouchableOpacity>
             </View>
@@ -1027,8 +1035,10 @@ const index = () => {
               opacity: 0.2,
             }}
           />
-          <Text style={styles.heading}>VISIT PROPERTY IN PERSON</Text>
+          
           {data?.post.property_visit && data?.post.property_visit === "Yes" && (
+            <>
+            <Text style={styles.heading}>VISIT PROPERTY IN PERSON</Text>
             <Formik
               initialValues={{
                 visitor_email: "",
@@ -1162,6 +1172,7 @@ const index = () => {
                 </>
               )}
             </Formik>
+            </>
           )}
           <View
             style={{
@@ -1263,7 +1274,210 @@ const index = () => {
           }}
         />
       )}
+             <Modal visible={showShare} animationType="slide" transparent>
+  <View style={{
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  }}>
 
+    <View style={{
+      backgroundColor: "#fff",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      minHeight: "80%",
+    }}>
+
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 15
+      }}>
+        <Text style={{ fontSize: 18, fontWeight: "600" }}>
+          Share Post
+        </Text>
+
+        <TouchableOpacity onPress={() => setShowShare(false)}>
+          <Cross height={vs(24)} width={vs(24)} />
+        </TouchableOpacity>
+      </View>
+
+      <Formik
+        initialValues={{
+          recepient_email: "",
+          message: "",
+          link:`https://homeilove.us/AddSingleView?id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type}`,
+          post_id:type==="community"?data?.post?.post_community_id:data?.post?.post_property_id,
+          type:type,
+        }}
+        validationSchema={Yup.object({
+          recepient_email: Yup
+            .string()
+            .email("Invalid email")
+            .required("Email is required"),
+          message: Yup
+            .string()
+            .required("Message is required")
+        })}
+        onSubmit={async(values) => {
+          try {
+            const formData = new FormData();
+            formData.append("email", values.recepient_email);
+            formData.append("message", values.message);
+            formData.append("link", values.link);
+            formData.append("post_id", values.post_id);
+            formData.append("type", values.type);
+            console.log(formData);
+            const result = await shareDetailPostApi(formData).unwrap();
+            if (result?.success) {
+              renderToastSuccess(result.message);
+              setShowShare(false);
+            }
+          } catch (error) {
+            renderToastError("Failed to share post");
+          }
+        }}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          touched,
+          errors
+        }) => (
+
+          <View style={{ flex: 1 }}>
+
+         
+            <FormikInput
+                    name="recepient_email"
+                    placeholder="Recipient Email"
+                    value={values.recepient_email}
+                    onChangeText={handleChange("recepient_email")}
+                    onBlur={handleBlur("recepient_email")}
+                    touched={!!touched.recepient_email}
+                    errors={!!errors.recepient_email}
+                    errorText={errors.recepient_email} title={"Email"} required={true}            />
+
+           
+            <FormikInput
+                    name="message"
+                    placeholder="Write your message..."
+                    value={values.message}
+                    onChangeText={handleChange("message")}
+                    onBlur={handleBlur("message")}
+                    multiline
+                    touched={!!touched.message}
+                    errors={!!errors.message}
+                    errorText={errors.message} title={"Message"} required={true}            />
+
+            <View style={{
+              backgroundColor: "#f5f5f5",
+              padding: 12,
+              borderRadius: 10,
+              marginTop: 10,
+              marginBottom: 20
+            }}>
+              <Text style={{ fontWeight: "600" }}>
+                Sharing this post
+              </Text>
+              <Text style={{ color: "#666", fontSize: 12 }}>
+                Property / Community link will be sent
+              </Text>
+            </View>  
+     <View
+  style={{
+    backgroundColor: "#f5f6f8",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 15,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  }}
+>
+  {/* Label */}
+  <Text
+    style={{
+      fontSize: 13,
+      color: "#6b7280",
+      marginBottom: 6,
+      fontFamily: "PopinRegula",
+    }}
+  >
+    Shareable Link
+  </Text>
+
+  {/* Input Row */}
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#fff",
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: "#e5e7eb",
+    }}
+  >
+    <TextInput
+      editable={false}
+      value={values.link}
+      numberOfLines={1}
+      style={{
+        flex: 1,
+        fontSize: 12,
+        color: "#374151",
+        fontFamily: "PopinRegula",
+      }}
+      ellipsizeMode="middle"
+    />
+
+    {/* Copy Button */}
+    <TouchableOpacity
+      onPress={async () => {
+        await Clipboard.setStringAsync(values.link);
+        renderToastSuccess("Link copied");
+      }}
+      style={{
+        backgroundColor: "#0f766e",
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+        marginLeft: 8,
+      }}
+    >
+      <Text
+        style={{
+          color: "#fff",
+          fontSize: 12,
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        Copy
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
+        
+            <LargeButton
+              text="Send"
+              handleSubmit={handleSubmit}
+            />
+
+          </View>
+
+        )}
+      </Formik>
+
+    </View>
+  </View>
+  <Loading isLoading={sharing} text="Sharing..."/>
+</Modal>
       <Loading isLoading={isFetching} text="Loading..." />
       <Loading isLoading={isLoading} text="Sending..." />
     </>

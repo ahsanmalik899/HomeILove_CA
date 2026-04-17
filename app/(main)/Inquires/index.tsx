@@ -22,6 +22,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -36,6 +37,7 @@ import {
 
 const index = () => {
   const user = useAppSelector(userdata);
+  const params = useLocalSearchParams();
   const [value, setValue] = useState("Sent");
   const [sendInquireyMessageApi, { isLoading: sendInquireyMessageLoading }] = useSendInquireyMessageApiMutation();
   const [getInquireyMessagesApi, { isLoading: getInquireyMessagesLoading }] = useLazyGetInquireyMessagesApiQuery();
@@ -61,6 +63,11 @@ const index = () => {
   const [deleteType, setDeleteType] = useState<"sent" | "received" | null>(
     null
   );
+  useEffect(() => {
+    if (params?.inquierychat?.toString()=="1") {
+      setShowchatModal(true);
+    }
+  }, [params]);
   useEffect(() => {
 
     inquirymarkAsRead({
@@ -119,7 +126,7 @@ const index = () => {
       if (deleteType === "received") {
         const formData = new FormData();
         formData.append("ids", recivesIds.join(","));
-        formData.append("user_id", user.id.toString());
+        formData.append("user_id", user?.id?.toString());
 
         const result = await deletrecived(formData).unwrap();
         renderToastSuccess("Deleted successfully!");
@@ -398,57 +405,57 @@ const index = () => {
                 setSelectedChatItem(item);
                 setShowchatModal(true);
               }}>
-              <View style={styles.topRow}>
+                <View style={styles.topRow}>
 
-<View style={{position:'relative'}}>
+                  <View style={{ position: 'relative' }}>
 
-{profile?.unread_count > 0 && (
+                    {profile?.unread_count > 0 && (
 
-<Text style={{
-position:'absolute',
-top:-5,
-left:-5,
-zIndex:10,
-color:"white",
-fontWeight:'bold',
-fontSize:11,
-height:22,
-width:22,
-textAlign:"center",
-backgroundColor:Colors.light.red,
-borderRadius:11,
-paddingTop:3
-}}>
-{profile?.unread_count}
-</Text>
+                      <Text style={{
+                        position: 'absolute',
+                        top: -5,
+                        left: -5,
+                        zIndex: 10,
+                        color: "white",
+                        fontWeight: 'bold',
+                        fontSize: 11,
+                        height: 22,
+                        width: 22,
+                        textAlign: "center",
+                        backgroundColor: Colors.light.red,
+                        borderRadius: 11,
+                        paddingTop: 3
+                      }}>
+                        {profile?.unread_count}
+                      </Text>
 
-)}
+                    )}
 
-<CircleImage
-Size={45}
-source={{ uri: ImageFormater(profile?.logo) }}
-/>
+                    <CircleImage
+                      Size={45}
+                      source={{ uri: ImageFormater(profile?.logo) }}
+                    />
 
-</View>
+                  </View>
 
-<View style={{ flex: 1 , marginLeft:10 }}>
-<Text style={styles.name}>
-{profile?.business_name}
-</Text>
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text style={styles.name}>
+                      {profile?.business_name}
+                    </Text>
 
-<Text style={styles.address}>
-{profile?.address}
-</Text>
+                    <Text style={styles.address}>
+                      {profile?.address}
+                    </Text>
 
-</View>
+                  </View>
 
-</View>
+                </View>
                 {profile?.inquiry_closed && (
                   <View style={styles.closedBadge}>
                     <Text style={styles.closedText}>Inquiry Closed</Text>
                   </View>
                 )}
-                
+
               </TouchableOpacity>
             )}
           />

@@ -28,10 +28,12 @@ const Account = () => {
       </View>
       <View>
         <ScrollView style={{ paddingTop: vs(45) }}>
-          <HomeCard
-            title="Business Profiles"
-            onpress={() => router.navigate("/(main)/BusenessProfiles")}
-          />
+          {user.user_type === "Business" && (
+            <HomeCard
+              title="Business Profiles"
+              onpress={() => router.navigate("/(main)/BusenessProfiles")}
+            />
+          )}
           <HomeCard
             title="Your Ads"
             onpress={() => router.navigate("/(main)/YouAds")}

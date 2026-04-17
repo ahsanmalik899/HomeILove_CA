@@ -5,10 +5,12 @@ import {
   useHidePostMutation,
   useLikePostMutation,
   useSendRequestMutation,
+  useShare_postApiMutation,
   useUnfollowApiMutation,
   useUnlikePostMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
+import Cross from "@assets/CreateProfile/cross.svg";
 import Camera from "@assets/Feedimg/camera.svg";
 import Comment from "@assets/icons/Comment.svg";
 import Like from "@assets/icons/Like.svg";
@@ -25,7 +27,9 @@ import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
+import * as Clipboard from 'expo-clipboard';
 import { router } from "expo-router";
+import { Formik } from "formik";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -34,15 +38,19 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as yup from "yup";
 import CircleImage from "../CircleImage/CircleImage";
 import CreatePost from "../CreatePost/createPost";
 import FollowButton from "../FollowButton";
+import { FormikInput } from "../FormictInput";
 import ImageSlider from "../ImageSlider";
+import LargeButton from "../LaregeButton";
 import Loading from "../Loading";
 import StarRating from "../StarRating";
 import { postDataType } from "./type";
@@ -60,6 +68,11 @@ const PostDesign = ({
   const [hiddenPosts, setHiddenPosts] = useState<number[]>([]);
   const [selectedReceiver, setSelectedReceiver] = useState<any>(null);
   const [likePost, { isLoading: liking }] = useLikePostMutation();
+  const [showViedio, setShowViedio] = useState(false);
+  const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
+  const [SelectedViedio,setSelectedViedio]=useState('');
+     const [loading,setLoading]=useState(false);
+     const [shareData,setShareData]=useState('');
   const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
   const { data: Profiles, isLoading: ProfilesLoading } =
     useGetProfilesForConectionQuery({ id: user.id });
@@ -74,7 +87,7 @@ const PostDesign = ({
   const [acceptRequestApi, { isLoading: accepting }] = useAcceptRequestApiMutation();
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [imageNo, setImageNo] = useState(0);
-
+const [showShare,setShowShare]=useState(false);
   const handleHidePost = async (item) => {
     try {
       setHiddenPosts((prev) => [...prev, item.post_id]);
@@ -91,6 +104,7 @@ const PostDesign = ({
       setHiddenPosts((prev) => prev.filter((id) => id !== item.post_id));
     }
   };
+
   const requestSend = async ({
     sender_type,
     sender_ProfileId,
@@ -101,28 +115,28 @@ const PostDesign = ({
       let status = statusi;
       console.log(status);
       const formData = new FormData();
-if(status === "Connect"||status === "Cancel Request"){
-      formData.append("sender_id", String(user?.id ?? ""));
-      formData.append("receiver_id", String(reciverProfile?.users_id ?? ""));
-      formData.append("sender_profile_id", String(sender_ProfileId ?? ""));
-      formData.append("sender_profile_type", String(sender_type ?? ""));
-      formData.append("receiver_profile_id", String(reciverProfile?.id ?? ""));
-      formData.append(
-        "receiver_profile_type",
-        String(reciverProfile?.connection_type ?? "")
-      );
-    }
-    else {
-      formData.append("sender_id", String(reciverProfile?.sender_id ?? ""));
-      formData.append("receiver_id", String(reciverProfile?.receiver_id ?? ""));
-      formData.append("sender_profile_id", String(reciverProfile?.sender_profile_id ?? ""));
-      formData.append("sender_profile_type", String(reciverProfile?.sender_profile_type ?? ""));
-      formData.append("receiver_profile_id", String(reciverProfile?.receiver_profile_id ?? ""));
-      formData.append(
-        "receiver_profile_type",
-        String(reciverProfile?.receiver_profile_type ?? "")
-      );
-    }
+      if (status === "Connect" || status === "Cancel Request") {
+        formData.append("sender_id", String(user?.id ?? ""));
+        formData.append("receiver_id", String(reciverProfile?.users_id ?? ""));
+        formData.append("sender_profile_id", String(sender_ProfileId ?? ""));
+        formData.append("sender_profile_type", String(sender_type ?? ""));
+        formData.append("receiver_profile_id", String(reciverProfile?.id ?? ""));
+        formData.append(
+          "receiver_profile_type",
+          String(reciverProfile?.connection_type ?? "")
+        );
+      }
+      else {
+        formData.append("sender_id", String(reciverProfile?.sender_id ?? ""));
+        formData.append("receiver_id", String(reciverProfile?.receiver_id ?? ""));
+        formData.append("sender_profile_id", String(reciverProfile?.sender_profile_id ?? ""));
+        formData.append("sender_profile_type", String(reciverProfile?.sender_profile_type ?? ""));
+        formData.append("receiver_profile_id", String(reciverProfile?.receiver_profile_id ?? ""));
+        formData.append(
+          "receiver_profile_type",
+          String(reciverProfile?.receiver_profile_type ?? "")
+        );
+      }
       formData._parts?.forEach((p) => console.log(p[0], p[1]));
 
       let result;
@@ -143,30 +157,30 @@ if(status === "Connect"||status === "Cancel Request"){
       if (result?.success) {
         renderToastSuccess(result.message);
 
-       setData((prevData) =>
-  prevData.map((post) => {
-    if (
-      post.users_id === reciverProfile?.users_id &&
-      post.connection_type === reciverProfile?.connection_type
-    ) {
-      let newStatus = post.connection_status;
+        setData((prevData) =>
+          prevData.map((post) => {
+            if (
+              post.users_id === reciverProfile?.users_id &&
+              post.connection_type === reciverProfile?.connection_type
+            ) {
+              let newStatus = post.connection_status;
 
-      if (status === "Connect") {
-        newStatus = "pending";
-      } else if (status === "Accept Request") {
-        newStatus = "accepted";
-      } else if (status === "Unfollow" || status === "Cancel Request") {
-        newStatus = "";
-      }
+              if (status === "Connect") {
+                newStatus = "pending";
+              } else if (status === "Accept Request") {
+                newStatus = "accepted";
+              } else if (status === "Unfollow" || status === "Cancel Request") {
+                newStatus = "";
+              }
 
-      return {
-        ...post,
-        connection_status: newStatus,
-      };
-    }
-    return post;
-  })
-);
+              return {
+                ...post,
+                connection_status: newStatus,
+              };
+            }
+            return post;
+          })
+        );
 
         setShowConnection(false);
       } else {
@@ -404,203 +418,274 @@ if(status === "Connect"||status === "Cancel Request"){
           )}
         </TouchableOpacity>
       );
-    } else if(item.type==="General Post") {
-      return(
-            <TouchableOpacity
-                        className="bg-white"
-                        style={styles.card}
-                        onPress={() => {
-                          router.navigate({
-                            pathname: "/GeneralPostSingleView",
-                            params: {
-                              id: item.id,
-                             
-                            },
-                          });
-                        }}
-                      >
-    <View className="flex-row items-center justify-between">
-                    <View className="flex-row">
-                      <CircleImage
-                        source={{ uri: ImageFormater(item.logo) }}
-                        Size={40}
-                      />
-                      <View style={styles.uperSection}>
-                        <View className="flex-row">
-                          <Text style={styles.name}>
-                            {item.business_name || item.name}
-                          </Text>
-                          {item.connection_type && (
-                            <Text style={{fontFamily: "PopinRegula",}}> ({item.connection_type})</Text>
-                          )}
-                        </View>
-                        <Text style={{fontFamily: "PopinRegula",}}>{item.post_created_date || item.created_date}</Text>
-                      </View>
-                    </View>
-                   <TouchableOpacity onPress={() => setMenuVisible(true)}>
-          <ThreeDots />
-        </TouchableOpacity>
-        
-                  </View>
-                                  <View>
-                              <Text style={styles.description}>
-                                {expanded
-                                  ? item.description
-                                  : item.description?.slice(0, 70) +
-                                    (item.description?.length > 70 ? "...." : " ")}
-                                {item.description?.length > 70 && (
-                                  <Text
-                                    style={styles.moreText}
-                                    onPress={() => setExpanded(!expanded)}
-                                  >
-                                    {expanded ? " Show Less" : " Read More"}
-                                  </Text>
-                                )}
-                              </Text>
-                     <View style={{ alignSelf: "center" }}>
-                  
-                    {item.images.length > 0 && (
-                      <TouchableOpacity 
-                     onPress={() => {
-                      setSelectedImages(item.images || []);
-                      setShowImages(true);
-                      setscrollable(false);
+    } else if (item.type === "General Post") {
+      return (
+        <TouchableOpacity
+          className="bg-white"
+          style={styles.card}
+          onPress={() => {
+            router.navigate({
+              pathname: "/NewsFeedSingelView",
+              params: {
+                post_id: item.post_id,
+
+              },
+            });
+          }}
+        >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row">
+              <CircleImage
+                source={{ uri: ImageFormater(item.logo) }}
+                Size={40}
+              />
+              <View style={styles.uperSection}>
+                <View className="flex-row">
+                  <Text style={styles.name}>
+                    {item.business_name || item.name}
+                  </Text>
+                  {item.connection_type && (
+                    <Text style={{ fontFamily: "PopinRegula", }}> ({item.connection_type})</Text>
+                  )}
+                </View>
+                <Text style={{ fontFamily: "PopinRegula", }}>{item.post_created_date || item.created_date}</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={() => setMenuVisible(true)}>
+              <ThreeDots />
+            </TouchableOpacity>
+
+          </View>
+          <View>
+            <Text style={styles.description}>
+              {expanded
+                ? item.description
+                : item.description?.slice(0, 70) +
+                (item.description?.length > 70 ? "...." : " ")}
+              {item.description?.length > 70 && (
+                <Text
+                  style={styles.moreText}
+                  onPress={() => setExpanded(!expanded)}
+                >
+                  {expanded ? " Show Less" : " Read More"}
+                </Text>
+              )}
+            </Text>
+            <View style={{ alignSelf: "center" }}>
+
+              {item.images.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedImages(item.images || []);
+                    setShowImages(true);
+                    setscrollable(false);
+                  }}
+                >
+                  <Image
+                    source={{ uri: ImageFormater(item.images[0]) }}
+                    style={{
+                      height: vs(200),
+                      width: hs(350),
+                      borderRadius: ms(12),
+                      resizeMode: "cover",
                     }}
-                      >
-                      <Image
-                        source={{ uri: ImageFormater(item.images[0]) }}
-                        style={{
-                          height: vs(200),
-                          width: hs(350),
-                          borderRadius: ms(12),
-                          resizeMode: "cover",
-                        }}
-                      />
-                      </TouchableOpacity>
-                    )}
-                  
-                    {/* Overlay Container */}
-                    <View
+                  />
+                </TouchableOpacity>
+              )}
+
+              {/* Overlay Container */}
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: vs(8),
+                  left: hs(8),
+                  right: hs(8),
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                }}
+              >
+                {/* LEFT SIDE - Camera Count */}
+                <View
+                  style={{
+                    backgroundColor: "rgba(0,0,0,0.6)",
+                    paddingHorizontal: hs(8),
+                    paddingVertical: vs(4),
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderRadius: ms(20),
+                  }}
+                >
+                  <Camera />
+                  <Text
+                    style={{
+                      color: "white",
+                      marginLeft: 4,
+                      fontWeight: "600",
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    {item.images.length}
+                  </Text>
+                </View>
+
+                {/* RIGHT SIDE - Auto Playing Muted Video */}
+                {item.post_video && (
+                  <TouchableOpacity
+                   onPress={() => {
+                    setSelectedViedio(ViedioUrlFormat(item.post_video) );
+                    setShowViedio(true);
+                    setscrollable(false);
+                  }}
+                  >
+                    <Video
+                      source={{ uri: ViedioUrlFormat(item.post_video) }}
                       style={{
-                        position: "absolute",
-                        bottom: vs(8),
-                        left: hs(8),
-                        right: hs(8),
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "flex-end",
+                        width: hs(100),
+                        height: vs(100),
+                        borderRadius: ms(12),
                       }}
-                    >
-                      {/* LEFT SIDE - Camera Count */}
-                      <View
-                        style={{
-                          backgroundColor: "rgba(0,0,0,0.6)",
-                          paddingHorizontal: hs(8),
-                          paddingVertical: vs(4),
-                          flexDirection: "row",
-                          alignItems: "center",
-                          borderRadius: ms(20),
-                        }}
-                      >
-                        <Camera />
-                        <Text
-                          style={{
-                            color: "white",
-                            marginLeft: 4,
-                            fontWeight: "600",
-                            fontFamily: "PopinRegula",
-                          }}
-                        >
-                          {item.images.length}
-                        </Text>
-                      </View>
-                  
-                      {/* RIGHT SIDE - Auto Playing Muted Video */}
-                      {item.post_video && (
-                            <TouchableOpacity 
-                    //  onPress={() => {
-                    //   setSelectedViedio(ViedioUrlFormat(item.post_video) );
-                    //   setShowViedio(true);
-                    //   setscrollable(false);
-                    // }}
-                      >
-                        <Video
-                          source={{ uri: ViedioUrlFormat(item.post_video) }}
-                          style={{
-                            width: hs(100),
-                            height: vs(100),
-                            borderRadius: ms(12),
-                          }}
-                          resizeMode="cover"
-                          shouldPlay
-                          isLooping
-                          isMuted
-                        />
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  
-                  </View>
-                  
-                              <View
-                                className="flex-row justify-between"
-                                style={{ marginTop: vs(20), marginBottom: vs(10) }}
-                              >
-                                <View className="flex-row">
-                                  <View className="flex-row items-center ">
-                                    <TouchableOpacity
-                                                      disabled={liking || unliking}
-                                                      onPress={() => handleLikeToggle(item)}
-                                                    >
-                                                     { alreadyLiked?
-                                  <Liked
-                                                        width={22}
-                                                        height={22}
-                                                      />
-                                                      :
-                                                      <Like
-                                                        width={22}
-                                                        height={22}
-                                                      
-                                                      />}
-                                                    </TouchableOpacity>
-                                    <Text
-                                      style={{
-                                        color: Colors.light.DarkGreen,
-                                        paddingLeft: hs(2),
-                                        fontFamily: "PopinRegula",
-                                      }}
-                                    >
-                                      {likeCount}
-                                    </Text>
-                                  </View>
-                                  <View
-                                    className="flex-row items-center"
-                                    style={{ paddingLeft: hs(10) }}
-                                  >
-                                    <TouchableOpacity>
-                                      <Comment />
-                                    </TouchableOpacity>
-                                    <Text
-                                      style={{
-                                        color: Colors.light.DarkGreen,
-                                        paddingLeft: hs(2),
-                                        fontFamily: "PopinRegula",
-                                      }}
-                                    >
-                                       {item.comment_count}
-                                    </Text>
-                                  </View>
-                                </View>
-                                <TouchableOpacity>
-                                  <Share />
-                                </TouchableOpacity>
-                              </View>
-                              <View>
-                          
-                              </View>
-                              <CommentInput postId={item.id} creatorId={item.post_creater_id} />
-                            </View>
+                      resizeMode="cover"
+                      shouldPlay
+                      isLooping
+                      isMuted
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+
+            </View>
+
+            <View
+              className="flex-row justify-between"
+              style={{ marginTop: vs(20), marginBottom: vs(10) }}
+            >
+              <View className="flex-row">
+                <View className="flex-row items-center ">
+                  <TouchableOpacity
+                    disabled={liking || unliking}
+                    onPress={() => handleLikeToggle(item)}
+                  >
+                    {alreadyLiked ?
+                      <Liked
+                        width={22}
+                        height={22}
+                      />
+                      :
+                      <Like
+                        width={22}
+                        height={22}
+
+                      />}
+                  </TouchableOpacity>
+                  <Text
+                    style={{
+                      color: Colors.light.DarkGreen,
+                      paddingLeft: hs(2),
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    {likeCount}
+                  </Text>
+                </View>
+                <View
+                  className="flex-row items-center"
+                  style={{ paddingLeft: hs(10) }}
+                >
+                  <TouchableOpacity>
+                    <Comment />
+                  </TouchableOpacity>
+                  <Text
+                    style={{
+                      color: Colors.light.DarkGreen,
+                      paddingLeft: hs(2),
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    {item.comment_count}
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity onPress={()=>{setShareData(item);setShowShare(true)}}>
+                <Share />
+              </TouchableOpacity>
+            </View>
+            <View>
+
+            </View>
+            <CommentInput
+              creatorId={item.users_id}
+              postId={item.post_id}
+
+            />
+          </View>
+            {menuVisible && (
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => setMenuVisible(false)}
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                justifyContent: "flex-start",
+                alignItems: "flex-end",
+                paddingTop: vs(40),
+                paddingRight: hs(15),
+                zIndex: 999,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 12,
+                  width: 160,
+                  paddingVertical: 10,
+                  elevation: 8,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setMenuVisible(false);
+                    handleHidePost(item);
+                  }}
+                  style={{ paddingVertical: 12, paddingHorizontal: 15 }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "500",
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    Hide Post
+                  </Text>
+                </TouchableOpacity>
+
+                <View style={{ height: 1, backgroundColor: "#eee" }} />
+
+                <TouchableOpacity
+                  onPress={() => {
+                    setMenuVisible(false);
+                    console.log("Report clicked", item.id);
+                  }}
+                  style={{ paddingVertical: 12, paddingHorizontal: 15 }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "500",
+                      color: "red",
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    Report
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          )}
         </TouchableOpacity>
       )
     }
@@ -823,7 +908,7 @@ if(status === "Connect"||status === "Cancel Request"){
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={()=>{setShowShare(true); setShareData(item)}}>
                 <Share />
               </TouchableOpacity>
             </View>
@@ -1003,6 +1088,259 @@ if(status === "Connect"||status === "Cancel Request"){
         </TouchableOpacity>
       </Modal>
       <Loading isLoading={isLoading} text="Sending request..." />
+        {
+                    showViedio&&(
+                    <View
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.9)",
+            zIndex: 9999,
+            elevation: 9999,
+          }}
+        >
+          <Video
+        source={{ uri: SelectedViedio }}
+        style={{
+          width: "100%",
+          height: "80%",  
+          borderRadius: ms(16),
+          marginBottom:vs(50),
+        }}
+        resizeMode="contain"
+        useNativeControls  
+        shouldPlay         
+        isLooping={false}   
+        isMuted={false}
+        onLoadStart={() => setLoading(true)}
+        onLoad={() => setLoading(false)}
+      />
+            {loading && (
+              <ActivityIndicator
+                size="large"
+                color={Colors.light.DarkGreen}
+                style={StyleSheet.absoluteFillObject}
+              />
+            )}
+               <TouchableOpacity onPress={()=>setShowViedio(false)} style={{position:'absolute',backgroundColor:'white',borderRadius:ms(10),zIndex:10,top:vs(50),right:hs(10)}}>
+                         <Cross height={vs(30)} width={vs(30)} />
+                    </TouchableOpacity>
+                   
+            </View>
+                    )
+                  }
+                 <Modal visible={showShare} animationType="slide" transparent>
+  <View style={{
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  }}>
+
+    <View style={{
+      backgroundColor: "#fff",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      minHeight: "80%",
+    }}>
+
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 15
+      }}>
+        <Text style={{ fontSize: 18, fontWeight: "600" }}>
+          Share Post
+        </Text>
+
+        <TouchableOpacity onPress={() => setShowShare(false)}>
+          <Cross height={vs(24)} width={vs(24)} />
+        </TouchableOpacity>
+      </View>
+
+      <Formik
+        initialValues={{
+          recepient_email: "",
+          message: "",
+          link:`https://homeilove.us/NewsFeedSingelView?post_id=${shareData?.post_id}`,
+          post_id:shareData?.post_id,
+          post_type:shareData?.type,
+          post_image:shareData?.images?.[0]?? "",
+        }}
+        validationSchema={yup.object({
+          recepient_email: yup
+            .string()
+            .email("Invalid email")
+            .required("Email is required"),
+          message: yup
+            .string()
+            .required("Message is required")
+        })}
+        onSubmit={async(values) => {
+          try {
+            const formData = new FormData();
+            formData.append("email", values.recepient_email);
+            formData.append("message", values.message);
+            formData.append("link", values.link);
+            formData.append("post_id", values.post_id);
+            formData.append("post_type", values.post_type);
+            formData.append("post_img", values.post_image);
+            console.log(formData);
+            const result = await share_postApi(formData).unwrap();
+            if (result?.success) {
+              renderToastSuccess(result.message);
+              setShowShare(false);
+            }
+          } catch (error) {
+            renderToastError("Failed to share post");
+          }
+        }}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          touched,
+          errors
+        }) => (
+
+          <View style={{ flex: 1 }}>
+
+         
+            <FormikInput
+                    name="recepient_email"
+                    placeholder="Recipient Email"
+                    value={values.recepient_email}
+                    onChangeText={handleChange("recepient_email")}
+                    onBlur={handleBlur("recepient_email")}
+                    touched={!!touched.recepient_email}
+                    errors={!!errors.recepient_email}
+                    errorText={errors.recepient_email} title={"Email"} required={true}            />
+
+           
+            <FormikInput
+                    name="message"
+                    placeholder="Write your message..."
+                    value={values.message}
+                    onChangeText={handleChange("message")}
+                    onBlur={handleBlur("message")}
+                    multiline
+                    touched={!!touched.message}
+                    errors={!!errors.message}
+                    errorText={errors.message} title={"Message"} required={true}            />
+
+            <View style={{
+              backgroundColor: "#f5f5f5",
+              padding: 12,
+              borderRadius: 10,
+              marginTop: 10,
+              marginBottom: 20
+            }}>
+              <Text style={{ fontWeight: "600" }}>
+                Sharing this post
+              </Text>
+              <Text style={{ color: "#666", fontSize: 12 }}>
+                Property / Community link will be sent
+              </Text>
+            </View>  
+     <View
+  style={{
+    backgroundColor: "#f5f6f8",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 15,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  }}
+>
+  {/* Label */}
+  <Text
+    style={{
+      fontSize: 13,
+      color: "#6b7280",
+      marginBottom: 6,
+      fontFamily: "PopinRegula",
+    }}
+  >
+    Shareable Link
+  </Text>
+
+  {/* Input Row */}
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#fff",
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: "#e5e7eb",
+    }}
+  >
+    <TextInput
+      editable={false}
+      value={values.link}
+      numberOfLines={1}
+      style={{
+        flex: 1,
+        fontSize: 12,
+        color: "#374151",
+        fontFamily: "PopinRegula",
+      }}
+      ellipsizeMode="middle"
+    />
+
+    {/* Copy Button */}
+    <TouchableOpacity
+      onPress={async () => {
+        await Clipboard.setStringAsync(values.link);
+        renderToastSuccess("Link copied");
+      }}
+      style={{
+        backgroundColor: "#0f766e",
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+        marginLeft: 8,
+      }}
+    >
+      <Text
+        style={{
+          color: "#fff",
+          fontSize: 12,
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        Copy
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
+        
+            <LargeButton
+              text="Send"
+              handleSubmit={handleSubmit}
+            />
+
+          </View>
+
+        )}
+      </Formik>
+
+    </View>
+  </View>
+  <Loading isLoading={sharing} text="Sharing..."/>
+</Modal>
+
     </View>
   );
 };

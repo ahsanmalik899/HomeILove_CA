@@ -7,6 +7,7 @@ import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import { db } from "@src/utils/firebse";
 import { vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { router } from "expo-router";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -26,7 +27,7 @@ const Index = () => {
 
   useEffect(() => {
     dispatch(setNotificationCount(0));
-    
+
     const markSeen = async () => {
       if (user?.id) {
         await markAllAsSeen({ user_id: user.id });
@@ -34,44 +35,44 @@ const Index = () => {
     };
 
     markSeen();
-  }, []);  
-const [firebaseNotifications, setFirebaseNotifications] = useState<any[]>([]);
-const [sqlNotifications, setSqlNotifications] = useState<any[]>([]);
-const [initialLoading, setInitialLoading] = useState(true);
-useEffect(() => {
+  }, []);
+  const [firebaseNotifications, setFirebaseNotifications] = useState<any[]>([]);
+  const [sqlNotifications, setSqlNotifications] = useState<any[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
+  useEffect(() => {
 
- if(!user?.id) return;
+    if (!user?.id) return;
 
- const messagesRef = collection(
-   db,
-   "Notification",
-   String(user.id),
-   "notifications"
- );
+    const messagesRef = collection(
+      db,
+      "Notification",
+      String(user.id),
+      "notifications"
+    );
 
-const q = query(messagesRef,orderBy("created_at","desc"),limit(20));
+    const q = query(messagesRef, orderBy("created_at", "desc"), limit(20));
 
- const unsubscribe = onSnapshot(q,(snapshot)=>{
+    const unsubscribe = onSnapshot(q, (snapshot) => {
 
-   let list:any[]=[];
+      let list: any[] = [];
 
-   snapshot.forEach(doc=>{
-     list.push({
-       id:doc.id,
-       ...doc.data()
-     });
-   });
+      snapshot.forEach(doc => {
+        list.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
 
-   console.log("list",list);
+      console.log("list", list);
 
-   setFirebaseNotifications(list);
-   setInitialLoading(false);
+      setFirebaseNotifications(list);
+      setInitialLoading(false);
 
- });
+    });
 
- return ()=>unsubscribe();
+    return () => unsubscribe();
 
-},[user?.id]);
+  }, [user?.id]);
   const [markRead] = useMarkReadMutation();
 
   const handlePress = async (item: any) => {
@@ -81,69 +82,73 @@ const q = query(messagesRef,orderBy("created_at","desc"),limit(20));
         user_id: user?.id,
       });
     }
+    if (item.app_url === "/(main)/Inquires") {
+      router.push({ pathname: item.app_url, params: { post_id: item.post_id, userId: item.sender_id, name: item.sender_name, inquierychat: "1" } });
+    }
+    else {
+      router.push({ pathname: item.app_url, params: { post_id: item.post_id, userId: item.sender_id, name: item.sender_name } });
+    }
 
-    
   };
-const [loadingMore,setLoadingMore]=useState(false);
-const [page,setPage]=useState(2);
-const [hasMore,setHasMore]=useState(true);
-const fetchOlderNotifications = async () => {
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(2);
+  const [hasMore, setHasMore] = useState(true);
+  const fetchOlderNotifications = async () => {
 
- if (loadingMore || !hasMore) return;
- setLoadingMore(true);
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
 
- try {
+    try {
 
-   const res = await triggerGetNotifications({
-     user_id: user.id,
-     page:page
-   }).unwrap();
-   
-console.log("res",res);
-   if(res.success || res.data){
-     const newMessages = res?.data?.data ? [...res.data.data] : res?.data ? [...res.data] : [];
- console.log("newMessages",newMessages);
-     if(!newMessages || newMessages.length === 0){
-       setHasMore(false);
-     } else {
-       setSqlNotifications(prev=>[
-         ...prev,
-         ...newMessages
-       ]);
-       setPage(prev=>prev+1);
-     }
-   }
+      const res = await triggerGetNotifications({
+        user_id: user.id,
+        page: page
+      }).unwrap();
 
- } catch(err){
-   console.error("SQL fetch error:",err);
- } finally {
-   setLoadingMore(false);
- }
+      console.log("res", res);
+      if (res.success || res.data) {
+        const newMessages = res?.data?.data ? [...res.data.data] : res?.data ? [...res.data] : [];
+        console.log("newMessages", newMessages);
+        if (!newMessages || newMessages.length === 0) {
+          setHasMore(false);
+        } else {
+          setSqlNotifications(prev => [
+            ...prev,
+            ...newMessages
+          ]);
+          setPage(prev => prev + 1);
+        }
+      }
 
-};
+    } catch (err) {
+      console.error("SQL fetch error:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+
+  };
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
       onPress={() => handlePress(item)}
-      style={{marginVertical:vs(2)}}
-      className={`flex-row items-center p-4 border-b border-gray-100 ${
-        item.is_read ? "bg-white" : "bg-blue-50"
-      }`}
+      style={{ marginVertical: vs(2) }}
+      className={`flex-row items-center p-4 border-b border-gray-100 ${item.is_read ? "bg-white" : "bg-blue-50"
+        }`}
     >
-    <CircleImage    source={{
-          uri: ImageFormater( item.sender_logo),
-        }} Size={40}/>
+      <CircleImage source={{
+        uri: ImageFormater(item.sender_logo),
+      }} Size={40} />
 
       {/* Text */}
       <View className="flex-1 ml-3">
-        <Text className="font-semibold text-black" style={{fontFamily: "PopinRegula",}}>
+        <Text className="font-semibold text-black" style={{ fontFamily: "PopinRegula", }}>
           {item.sender_name}
         </Text>
 
-        <Text className="text-gray-600" style={{fontFamily: "PopinRegula",}}>
+        <Text className="text-gray-600" style={{ fontFamily: "PopinRegula", }}>
           {item.data}
         </Text>
 
-        <Text className="text-xs text-gray-400 mt-1" style={{fontFamily: "PopinRegula",}}>
+        <Text className="text-xs text-gray-400 mt-1" style={{ fontFamily: "PopinRegula", }}>
           {(() => {
             const timeObj = item.created_at || item.timestamp;
             if (!timeObj) return "";
@@ -175,24 +180,24 @@ console.log("res",res);
   }, [firebaseNotifications, sqlNotifications]);
 
   return (
-    <View className="flex-1 bg-white" style={{backgroundColor:"#F4F0F0"}}>
+    <View className="flex-1 bg-white" style={{ backgroundColor: "#F4F0F0" }}>
       <HeaderWithBack title="Current Alerts" />
- {initialLoading?( 
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" />
-      </View>):(
-  <View className="mt-4 flex-1">
-      <LegendList
-        data={notifications}
-        renderItem={renderItem}
-        estimatedItemSize={80}
-        refreshing={false}
-        keyExtractor={(item)=>item.id}
-        onEndReached={()=>fetchOlderNotifications()}
-      />
-          </View>)}
+      {initialLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" />
+        </View>) : (
+        <View className="mt-4 flex-1">
+          <LegendList
+            data={notifications}
+            renderItem={renderItem}
+            estimatedItemSize={80}
+            refreshing={false}
+            keyExtractor={(item) => item.id}
+            onEndReached={() => fetchOlderNotifications()}
+          />
+        </View>)}
     </View>
-    
+
   );
 };
 

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { useGetReceivedRequestsApiQuery, useGetSentRequestsApiQuery } from '@/store/api/user/MainApi';
+import { useGetReceivedRequestsApiQuery, useGetSentRequestsApiQuery, useUpdateConnectionApiMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
@@ -10,6 +10,7 @@ import Loading from "@src/components/globals/Loading";
 import StarRating from '@src/components/globals/StarRating';
 import TablikeButton from '@src/components/globals/TablikeButton';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
+import { renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, vs } from '@utils/design/design';
 import { ImageFormater } from "@utils/ImageFormat";
 
@@ -19,7 +20,19 @@ const RequestsScreen = () => {
 
   const { data: sentData,isFetching:sentFetching } = useGetSentRequestsApiQuery({ id: user.id });
   const { data: recivedData,isFetching:recivedFetching } = useGetReceivedRequestsApiQuery({ id: user.id });
-
+  const [sentlist,setsentList] = useState([]);
+  const [recivedlist,setrecivedList] = useState([]);
+  useEffect(() => {
+    if (sentData?.data) {
+      setsentList(sentData.data);
+    }
+  }, [sentData]);
+  useEffect(() => {
+    if (recivedData?.data) {
+      setrecivedList(recivedData.data);
+    }
+  }, [recivedData]);
+  const [updateConnectionApi, { isLoading: unfollowing }] = useUpdateConnectionApiMutation();
   /* ===== Render Each Request Item ===== */
   const renderRequestItem = ({ item }) => {
     const profile = item.profile || {};
@@ -40,7 +53,44 @@ const RequestsScreen = () => {
         </View>
 
         <View style={{ marginTop: vs(10) }}>
-          <FollowButton id={item.receiver_id} onPress={()=>{}} status={item.status} />
+          <FollowButton id={item.receiver_id} onPress={async(status)=>{
+            if(status==="Accept Request"){
+              const formData = new FormData();
+              formData.append("connection_id", String(item.connection_id ?? ""));
+              formData.append("type", "accept");
+
+              try {
+                const result = await updateConnectionApi(formData).unwrap();
+
+                if (result?.success) {
+                  renderToastSuccess(result.message);
+                  setrecivedList(prev =>
+                    prev.filter(i => i.connection_id.toString() !== item.connection_id.toString())
+                  );
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            }
+            if(status==="Cancel Request"){
+              const formData = new FormData();
+              formData.append("connection_id", String(item.connection_id ?? ""));
+              formData.append("type", "cancel");
+
+              try {
+                const result = await updateConnectionApi(formData).unwrap();
+
+                if (result?.success) {
+                  renderToastSuccess(result.message);
+                  setsentList(prev =>
+                    prev.filter(i => i.connection_id.toString() !== item.connection_id.toString())
+                  );
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          }} status={item.status} />
         </View>
       </View>
     );
@@ -48,7 +98,7 @@ const RequestsScreen = () => {
 
   const receivedComponent = (
     <LegendList
-      data={recivedData?.data || []}
+      data={recivedlist || []}
       renderItem={renderRequestItem}
       keyExtractor={(item) => item.connection_id.toString()}
       estimatedItemSize={140}
@@ -59,7 +109,7 @@ const RequestsScreen = () => {
 
   const sentComponent = (
     <LegendList
-      data={sentData?.data || []}
+      data={sentlist || []}
       renderItem={renderRequestItem}
       keyExtractor={(item) => item.connection_id.toString()}
       estimatedItemSize={140}

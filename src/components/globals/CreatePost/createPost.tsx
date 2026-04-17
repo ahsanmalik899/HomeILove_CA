@@ -1,4 +1,4 @@
-import { usePostGeneralPostMutation } from "@/store/api/user/MainApi";
+import { useEditGeneralPostMutation, usePostGeneralPostMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Cross from "@assets/CreateProfile/cross.svg";
 import ChatIcon from "@assets/icons/chaticon.svg";
@@ -9,6 +9,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
+import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import { Formik } from "formik";
@@ -17,7 +18,8 @@ import { TextInput } from "react-native-gesture-handler";
 import * as Yup from "yup";
 import Loading from "../Loading";
 import UploadPic from "../UploadPic";
-const createPost = () => {
+const createPost = ({edit=false,item}:{edit?:boolean,item?:any}) => {
+  console.log(item,"item")
   const UploadButton = () => (
     <View className="flex-row">
       <ImageIcon />
@@ -25,6 +27,7 @@ const createPost = () => {
     </View>
   );
 const [CreatePost,{isError,isLoading}]= usePostGeneralPostMutation()
+const [Editpost,{isError:editIsError,isLoading:editIsLoading}]= useEditGeneralPostMutation()
 const user =useAppSelector(userdata)
   const postValidation = Yup.object().shape({
     post_description: Yup.string().required("Description is required"),
@@ -70,46 +73,100 @@ const user =useAppSelector(userdata)
   };
 
   return (
+    <>
     <Formik
-      initialValues={{
-        post_description: "",
-        images: [],
-        post_video: null,
-      }}
-    onSubmit={async (values,{resetForm}) => {
+    enableReinitialize
+    initialValues={{
+  post_description: edit ? item?.description || "" : "",
+
+ images: edit && item?.post_images
+  ? item.post_images.split(",")
+  : [],
+
+  post_video: edit && item?.post_video
+  ? {
+      uri: ViedioUrlFormat(item.post_video),
+      name: item.post_video,
+      type: "video/mp4",
+      isExisting: true, 
+    }
+  : null,
+}}
+onSubmit={async (values, { resetForm }) => {
   try {
     const formData = new FormData();
 
-    formData.append("user_id",user.id ); // or from auth
-    formData.append("post_description", values.post_description);
-
-  
-    values.images.forEach((img: any) => {
-      formData.append("file[]", {
-        uri: img.uri,
-        name: img.name,
-        type: img.type,
-      } as any);
+    // ✅ 1. Append normal fields safely (like property form)
+    Object.keys(values).forEach((key) => {
+      if (
+        key !== "images" &&
+        key !== "post_video" &&
+        values[key] !== undefined &&
+        values[key] !== null
+      ) {
+        formData.append(key, String(values[key]));
+      }
     });
 
-    // ✅ Video
-    if (values.post_video) {
-      formData.append("post_video", {
-        uri: values.post_video.uri,
-        name: values.post_video.name,
-        type: values.post_video.type,
-      } as any);
+    // ✅ 2. Add user_id
+    formData.append("user_id", String(user.id));
+
+    // ✅ 3. Edit ID
+    if (edit && item?.id) {
+      formData.append("post_id", String(item.id));
     }
 
-    const result = await CreatePost(formData).unwrap();
-    if(result.success){
-      renderToastSuccess(result.message);
-      resetForm()
+    // ✅ 4. IMAGES (like propertyimg logic)
+    if (Array.isArray(values.images) && values.images.length > 0) {
+      values.images.forEach((img, index) => {
+        if (img?.uri) {
+          formData.append("file[]", {
+            uri: img.uri,
+            name: img.name || `post_${index}.jpg`,
+            type: img.type || "image/jpeg",
+          } as any);
+        }
+      });
+    } else {
+      formData.append("file", JSON.stringify([]));
+    }
+
+  if (values.post_video === null && edit) {
+  // User removed video
+  formData.append("remove_video", "1");
+}
+else if (values.post_video?.uri && !values.post_video?.isExisting) {
+  // New video uploaded
+  formData.append("post_video", {
+    uri: values.post_video.uri,
+    name: values.post_video.name || "video.mp4",
+    type: values.post_video.type || "video/mp4",
+  } as any);
+}
+
+   
+    for (const pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
     }
 
     
-  } catch (err: any) {
-    renderToastError(err?.data?.message || "Post failed");
+    const result = edit
+      ? await Editpost(formData).unwrap()
+      : await CreatePost(formData).unwrap();
+
+    console.log(result, "result");
+
+    
+    if (result?.success) {
+      renderToastSuccess(result.message);
+      resetForm();
+    } else {
+      renderToastError("Something went wrong!");
+    }
+
+  } catch (error) {
+    console.log("Error:", error);
+    renderToastError("Failed to process post. Please try again.");
   }
 }}
 
@@ -186,7 +243,7 @@ const user =useAppSelector(userdata)
                    <View className="flex-row flex-wrap gap-2 justify-center">
     <View className="relative">
       
-      {/* Remove button */}
+    
       <TouchableOpacity
         onPress={() => setFieldValue("post_video", null)}
         className="absolute right-0 top-0 z-10 bg-white"
@@ -195,7 +252,7 @@ const user =useAppSelector(userdata)
         <Cross />
       </TouchableOpacity>
 
-      {/* Video Preview */}
+    
       <Video
         source={{ uri: values.post_video?.uri }}
         style={{
@@ -232,7 +289,7 @@ const user =useAppSelector(userdata)
               }}
               onPress={() => handleSubmit()}
             >
-              <Text style={{ color: "white", fontWeight: "600",textAlign:'center',fontFamily: "PopinRegula", }}>Post</Text>
+              <Text style={{ color: "white", fontWeight: "600",textAlign:'center',fontFamily: "PopinRegula", }}>{edit? "Update":"Post"}</Text>
             </TouchableOpacity>
           </View>
            
@@ -242,6 +299,8 @@ const user =useAppSelector(userdata)
       )}
      
     </Formik>
+    <Loading isLoading={editIsLoading} text={edit?"Updating post":"Creating post"}/>
+    </>
   );
 };
 

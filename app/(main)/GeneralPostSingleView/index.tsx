@@ -18,9 +18,12 @@ import Loading from "@src/components/globals/Loading";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
+import { Video } from "expo-av";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -36,6 +39,7 @@ const index = () => {
   const type = params.type as string;
   const id = Number(params.id);
   const user = useSelector(userdata);
+     const [loading,setLoading]=useState(false);
   const post_id = Number(params.post_id);
   const formatPdfUrl = (file: string) => {
     return ImageFormater(file);
@@ -228,27 +232,7 @@ const index = () => {
                 backgroundColor: "gray",
               }}
             />
-            {type !== "community" && data?.floor_images.length > 0 && (
-              <TouchableOpacity
-                style={{
-                  position: "absolute",
-                  bottom: vs(5),
-                  right: hs(10),
-                  paddingHorizontal: hs(8),
-                  paddingVertical: vs(8),
-                  borderRadius: ms(10),
-                  alignItems: "center",
-                  backgroundColor: "rgba(29, 29, 29, 0.27)",
-                }}
-                className="flex-row"
-                onPress={() => setShowFloor(true)}
-              >
-                <Text style={{ color: "white", fontWeight: 600 }}>
-                  Floor Images{" "}
-                  {data?.floor_images ? data?.floor_images.length : 0}
-                </Text>
-              </TouchableOpacity>
-            )}
+           
 
             <View
               style={{
@@ -324,6 +308,46 @@ const index = () => {
             </View>
           </View>
         </View>
+         
+                          {data?.post?.post_video && (
+                            <View
+                  style={{
+                   height:vs(400),
+                   width:"95%",
+                   backgroundColor:Colors.light.lightGray,
+                   borderRadius:ms(10),
+                   marginHorizontal:hs(10),
+                  }}
+                >
+                  <Video
+                source={{ uri: ViedioUrlFormat(data?.post?.post_video) }}
+                style={{
+                  width: "100%",
+                  height: "90%",  
+                  borderRadius: ms(16),
+                  marginBottom:vs(50),
+                }}
+                resizeMode="contain"
+                useNativeControls  
+                shouldPlay ={false}        
+                
+                isLooping={false}   
+                isMuted={false}
+                onLoadStart={() => setLoading(true)}
+                onLoad={() => setLoading(false)}
+              />
+                    {loading && (
+                      <ActivityIndicator
+                        size="large"
+                        color={Colors.light.DarkGreen}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                    )}
+                      
+                           
+                    </View>
+                          )}
+                            
         <View style={{ marginTop: vs(20) }}>
           <Text style={styles.heading}>
             Comments ({comments?.data?.length || 0})
@@ -349,15 +373,7 @@ const index = () => {
         />
       )}
 
-      {showFloor && (
-        <ImageSlider
-          imageNo={imageNo}
-          images={data?.floor_images}
-          setShowImage={(val: boolean) => {
-            setShowFloor(val);
-          }}
-        />
-      )}
+    
 
       <Loading isLoading={isFetching} text="Loading..." />
     </>
@@ -465,7 +481,7 @@ const styles = StyleSheet.create({
 
   actionText: {
     fontSize: ms(12),
-    color: Colors.light.textGray,
+    color: Colors.light.DarkGreen,
     fontWeight: "600",
     fontFamily: "PopinRegula",
   },
@@ -495,6 +511,7 @@ const styles = StyleSheet.create({
     marginTop: vs(8),
     backgroundColor: "#F1F3F5",
     borderRadius: 25,
+    paddingVertical: vs(5),
     paddingHorizontal: hs(12),
   },
 
@@ -508,13 +525,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.red,
     paddingHorizontal: hs(14),
     paddingVertical: vs(6),
-    borderRadius: 20,
+    borderRadius: ms(18),
   },
 
   sendText: {
     color: "white",
     fontWeight: "600",
-    fontSize: ms(12),
+    fontSize: ms(14),
     fontFamily: "PopinRegula",
   },
     name: {
