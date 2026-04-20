@@ -4,6 +4,7 @@ import {
   useGetProfilesForConectionQuery,
   useHidePostMutation,
   useLikePostMutation,
+  useReportPostMutation,
   useSendRequestMutation,
   useShare_postApiMutation,
   useUnfollowApiMutation,
@@ -68,8 +69,10 @@ const PostDesign = ({
   const [hiddenPosts, setHiddenPosts] = useState<number[]>([]);
   const [selectedReceiver, setSelectedReceiver] = useState<any>(null);
   const [likePost, { isLoading: liking }] = useLikePostMutation();
+  const [reportPostApi, { isLoading: reporting }] = useReportPostMutation();
   const [showViedio, setShowViedio] = useState(false);
   const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
+  const [showReport,setShowReport]=useState(false);
   const [SelectedViedio,setSelectedViedio]=useState('');
      const [loading,setLoading]=useState(false);
      const [shareData,setShareData]=useState('');
@@ -77,6 +80,7 @@ const PostDesign = ({
   const { data: Profiles, isLoading: ProfilesLoading } =
     useGetProfilesForConectionQuery({ id: user.id });
   const isSmallList = Profiles?.profiles?.length <= 3;
+  const [reportData,setReportData]=useState<any>(null);
   const insets = useSafeAreaInsets();
   const [showConnection, setShowConnection] = useState(false);
   const [scrollable, setscrollable] = useState(true);
@@ -87,6 +91,16 @@ const PostDesign = ({
   const [acceptRequestApi, { isLoading: accepting }] = useAcceptRequestApiMutation();
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [imageNo, setImageNo] = useState(0);
+   const [selectedType, setSelectedType] = useState("");
+  const [description, setDescription] = useState("");
+
+  const reportOptions = [
+    "Copyright violation",
+    "Scam, fraud or spam",
+    "False Information",
+    "Voilence, hate or exploitation",
+    "Other",
+  ];
 const [showShare,setShowShare]=useState(false);
   const handleHidePost = async (item) => {
     try {
@@ -396,9 +410,10 @@ const [showShare,setShowShare]=useState(false);
                 <View style={{ height: 1, backgroundColor: "#eee" }} />
 
                 <TouchableOpacity
-                  onPress={() => {
-                    setMenuVisible(false);
-                    console.log("Report clicked", item.id);
+                  onPress={async()=> {
+                setMenuVisible(false);
+                    setReportData(item);
+                    setShowReport(true);
                   }}
                   style={{ paddingVertical: 12, paddingHorizontal: 15 }}
                 >
@@ -668,7 +683,8 @@ const [showShare,setShowShare]=useState(false);
                 <TouchableOpacity
                   onPress={() => {
                     setMenuVisible(false);
-                    console.log("Report clicked", item.id);
+                    setReportData(item);
+                    setShowReport(true);
                   }}
                   style={{ paddingVertical: 12, paddingHorizontal: 15 }}
                 >
@@ -968,7 +984,8 @@ const [showShare,setShowShare]=useState(false);
                 <TouchableOpacity
                   onPress={() => {
                     setMenuVisible(false);
-                    console.log("Report clicked", item.id);
+                    setReportData(item);
+                    setShowReport(true);
                   }}
                   style={{ paddingVertical: 12, paddingHorizontal: 15 }}
                 >
@@ -1260,7 +1277,7 @@ const [showShare,setShowShare]=useState(false);
     borderColor: "#e5e7eb",
   }}
 >
-  {/* Label */}
+
   <Text
     style={{
       fontSize: 13,
@@ -1272,7 +1289,6 @@ const [showShare,setShowShare]=useState(false);
     Shareable Link
   </Text>
 
-  {/* Input Row */}
   <View
     style={{
       flexDirection: "row",
@@ -1340,6 +1356,83 @@ const [showShare,setShowShare]=useState(false);
   </View>
   <Loading isLoading={sharing} text="Sharing..."/>
 </Modal>
+    <Modal visible={showReport} animationType="slide" onRequestClose={() => setShowReport(false)} >
+      <View style={{flex:1,backgroundColor:"#fff"}}>
+        <View style={styles.modalContainer}>
+          
+        
+<View style={styles.header}>
+            <Text style={styles.title}>Report Post</Text>
+            <TouchableOpacity onPress={() => setShowReport(false)}>
+              <Text style={styles.close}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{borderBottomWidth:1,borderColor:"#ddd",marginVertical:vs(10)}}/>
+          <ScrollView>
+
+            {reportOptions.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.option}
+                onPress={() => setSelectedType(item)}
+              >
+                <View style={styles.radioCircle}>
+                  {selectedType === item && <View style={styles.selectedRb} />}
+                </View>
+                <Text style={styles.optionText}>{item}</Text>
+              </TouchableOpacity>
+            ))}
+
+         
+            {selectedType === "Other" && (
+              <View style={styles.textAreaContainer}>
+                <Text style={styles.label}>Description</Text>
+                <TextInput
+                  style={styles.textArea}
+                  multiline
+                  maxLength={500}
+                  value={description}
+                  onChangeText={setDescription}
+                  placeholder="Enter description..."
+                />
+                <Text style={styles.remaining}>
+                  Characters remaining {500 - description.length}
+                </Text>
+              </View>
+            )}
+
+          </ScrollView>
+
+      
+          <LargeButton
+            text="Send"
+            handleSubmit={async()=>{
+                
+                   const formData=new FormData();
+                  
+                   formData.append("post_id",String(reportData.post_id));
+                   formData.append("report_type",selectedType);
+                   formData.append("user_id",String(user.id));
+                   formData.append("description",description||"");
+               
+                   const result=await reportPostApi(formData).unwrap();
+                   if(result?.success){
+                    renderToastSuccess(result.message);
+                    setShowReport(false);
+                    setSelectedType("");
+                    setDescription("");
+                   }
+                   else{
+                    renderToastError(result.message);
+                   }
+            }}  
+          />
+           
+
+        </View>
+      </View>
+      <Loading isLoading={reporting} text="Reporting..."/>
+    </Modal>
 
     </View>
   );
@@ -1377,35 +1470,35 @@ const styles = StyleSheet.create({
   profileCard: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: vs(12),
     borderBottomWidth: 0.5,
     borderColor: "#ddd",
   },
 
   logo: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: hs(50),
+    height: vs(50),
+    borderRadius: ms(25),
   },
 
   businessName: {
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: "600",
     color: "#000",
     fontFamily: "PopinRegula",
   },
 
   profileType: {
-    fontSize: 13,
+    fontSize: ms(13),
     color: "#777",
-    marginTop: 2,
+    marginTop: vs(2),
     fontFamily: "PopinRegula",
   },
 
   title: {
-    fontSize: 18,
+    fontSize: ms(18),
     fontFamily: "PopinSemiBold",
-    marginBottom: 10
+    marginBottom: vs(10)
   },
   overlay: {
     flex: 1,
@@ -1417,17 +1510,88 @@ const styles = StyleSheet.create({
   profileContainer: {
     width: "90%",
     backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: ms(16),
+    padding: hs(16),
   },
 
-  // 👇 small list (centered modal)
   centerModal: {
     maxHeight: "50%",
   },
 
-  // 👇 large list (full screen feel)
+
   fullModal: {
-    height: "80%", // or "90%"
+    height: "80%", 
+  },
+    
+  modalContainer: {
+    margin: 20,
+    backgroundColor: "#fff",
+    borderRadius: ms(12),
+  maxHeight: "90%",
+  
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  close: {
+    fontSize: ms(20),
+  },
+  option: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: vs(10),
+  },
+  radioCircle: {
+    height: vs(20),
+    width: hs(20),
+    borderRadius: ms(10),
+    borderWidth: 2,
+    borderColor: "#444",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: hs(10),
+  },
+  selectedRb: {
+    width: hs(10),
+    height:vs(10),
+    borderRadius: 5,
+    backgroundColor: "#444",
+  },
+  optionText: {
+    fontSize: ms(14),
+  },
+  textAreaContainer: {
+    marginVertical: vs(10),
+  },
+  label: {
+    fontSize: ms(14),
+    marginBottom: vs(5),
+  },
+  textArea: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: ms(8),
+    padding: 10,
+    height: vs(100),
+    textAlignVertical: "top",
+  },
+  remaining: {
+    fontSize: ms(12),
+    marginTop: vs(5),
+    color: "#888",
+  },
+  button: {
+    backgroundColor: "#ff4d6d",
+    padding: 12,
+    borderRadius:ms(10),
+    alignItems: "center",
+    marginTop: vs(15),
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });

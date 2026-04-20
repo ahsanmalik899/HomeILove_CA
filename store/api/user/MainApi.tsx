@@ -844,6 +844,14 @@ export const MainApi = createApi({
       }),
       
     }),
+    reportPost: builder.mutation<any,FormData>({
+      query: (formatData) => ({
+        url: "reportPost",
+        method: "POST",
+        body: formatData,
+      }),
+      
+    }),
     upgradeProfileApi: builder.mutation({
       query: (data) => ({
         url: "upgradeProfile",
@@ -963,4 +971,5 @@ export const {
   useGetPostByIdQuery,
   useShare_postApiMutation,
   useShareDetailPostApiMutation,
+  useReportPostMutation,
 } = MainApi;

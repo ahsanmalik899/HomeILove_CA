@@ -82,8 +82,8 @@ const Index = () => {
         user_id: user?.id,
       });
     }
-    if (item.app_url === "/(main)/Inquires") {
-      router.push({ pathname: item.app_url, params: { post_id: item.post_id, userId: item.sender_id, name: item.sender_name, inquierychat: "1" } });
+    if (item.app_url === "/(main)/Inquires/chat") {
+      router.push({ pathname: "/(main)/Inquires", params: { post_id: item.post_id, userId: item.sender_id, name: item.sender_name, inquierychat: "1", sender_image: item.sender_logo } });
     }
     else {
       router.push({ pathname: item.app_url, params: { post_id: item.post_id, userId: item.sender_id, name: item.sender_name } });

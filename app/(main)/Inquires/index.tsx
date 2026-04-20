@@ -63,11 +63,7 @@ const index = () => {
   const [deleteType, setDeleteType] = useState<"sent" | "received" | null>(
     null
   );
-  useEffect(() => {
-    if (params?.inquierychat?.toString()=="1") {
-      setShowchatModal(true);
-    }
-  }, [params]);
+
   useEffect(() => {
 
     inquirymarkAsRead({
@@ -193,7 +189,7 @@ const index = () => {
   const handleSend = async () => {
     if (!message.trim()) return;
 
-    // Optimistic update
+
     const optimisticMsg = {
       msg_id: `temp-${Date.now()}`,
       sender_id: user.id,
@@ -221,7 +217,6 @@ const index = () => {
       }).unwrap();
 
       if (res.success && res.message) {
-        // Replace optimistic message with real one
         setMessages((prev) =>
           prev.map((m) =>
             m.msg_id === optimisticMsg.msg_id ? res.message : m
@@ -238,7 +233,6 @@ const index = () => {
     }
   };
 
-  // Chat message bubble renderer
   const renderChatMessage = ({ item }: any) => {
     const isMe = item.sender_id == user.id;
     return (
@@ -766,6 +760,39 @@ const index = () => {
       )}
     </View>
   );
+useEffect(() => {
+  if (params?.inquierychat?.toString() !== "1") return;
+
+  const inquiryId = Number(params.post_id);
+
+  if (!inquiryId) return;
+
+  // wait until lists are loaded
+  if (!sended.length && !recived.length) return;
+
+  const foundItem =
+    sended.find(item => Number(item.inquiry_id) === inquiryId) ||
+    recived.find(item => Number(item.inquiry_id) === inquiryId);
+
+  setSelectedChatProfile({
+    business_name: params.name || params.sender_name,
+    logo: params.sender_image,
+    users_id: Number(params.userId),
+  });
+  console.log("foundItem", params.userId);
+  if (foundItem) {
+    setSelectedChatItem(foundItem);
+  } else {
+    setSelectedChatItem({ inquiry_id: inquiryId }); 
+  }
+
+  
+  setPage(1);
+  setMessages([]);
+  setChatHasMore(true);
+  setShowchatModal(true);
+
+}, [ sended, recived]);
   return (
     <View className="flex-1 bg-white" style={{ backgroundColor: "#F4F0F0" }}>
       <HeaderWithBack title="Inquiries" />
@@ -830,7 +857,12 @@ const index = () => {
             </View>
           </View>
         )}
-        <Modal visible={showchatModal} animationType="slide" transparent>
+        <Modal visible={showchatModal} animationType="slide" transparent onRequestClose={() => {
+          setShowchatModal(false);
+          setMessages([]);
+          setPage(1);
+          setChatHasMore(true);
+        }}>
           <View style={{ flex: 1, backgroundColor: "#F4F0F0" }}>
 
 
