@@ -323,6 +323,7 @@ const [showShare,setShowShare]=useState(false);
               marginHorizontal: hs(10),
             }}
           />
+          {item.user_id !== user.id && (
           <View style={{ alignItems: "flex-end", marginTop: vs(10) }}>
             <FollowButton
               id={item.receiver_id}
@@ -362,7 +363,7 @@ const [showShare,setShowShare]=useState(false);
 
               }
             />
-          </View>
+          </View>)}
           {menuVisible && (
             <TouchableOpacity
               activeOpacity={1}

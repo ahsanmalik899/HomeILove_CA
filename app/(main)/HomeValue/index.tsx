@@ -221,6 +221,7 @@ const map = {
               per_page: 10,
               page,
               type: selectedProfile,
+              user_id: user.id,
             });
             if (result.data?.success) {
               setStep(1);

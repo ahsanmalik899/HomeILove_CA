@@ -149,7 +149,7 @@ export const MainApi = createApi({
     }),
     getInquieryAgent: builder.query<any, any>({
       query: (data) => ({
-        url: `searchAgentForInquery?lat=${data.lat}&lng=${data.lng}&radius=${data.radius}&inquiry_type=${data.inquiry_type} &per_page=${data.per_page}&page=${data.page}&type=${data.type}`,
+        url: `searchAgentForInquery?lat=${data.lat}&lng=${data.lng}&radius=${data.radius}&inquiry_type=${data.inquiry_type} &per_page=${data.per_page}&page=${data.page}&type=${data.type}&user_id=${data.user_id}`,
         method: "GET",
       }),
     }),

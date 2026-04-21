@@ -214,6 +214,7 @@ const index = () => {
         recevier_name: selectedChatProfile?.business_name,
         msg_description: message,
         recevier_post_id: selectedChatItem?.inquiry_id,
+        chat_type: selectedChatItem?.chat_type,
       }).unwrap();
 
       if (res.success && res.message) {
@@ -396,7 +397,10 @@ const index = () => {
             renderItem={({ item: profile }) => (
               <TouchableOpacity style={styles.card} onPress={() => {
                 setSelectedChatProfile(profile);
-                setSelectedChatItem(item);
+                setSelectedChatItem({
+                  ...item,
+                  chat_type: "sent",
+                });
                 setShowchatModal(true);
               }}>
                 <View style={styles.topRow}>
@@ -563,7 +567,10 @@ const index = () => {
               users_id: item.sender_id,
 
             });
-            setSelectedChatItem(item);
+            setSelectedChatItem({
+              ...item,
+              chat_type: "received",
+            });
             setShowchatModal(true);
           }}
         >
@@ -760,39 +767,39 @@ const index = () => {
       )}
     </View>
   );
-useEffect(() => {
-  if (params?.inquierychat?.toString() !== "1") return;
+  useEffect(() => {
+    if (params?.inquierychat?.toString() !== "1") return;
 
-  const inquiryId = Number(params.post_id);
+    const inquiryId = Number(params.post_id);
 
-  if (!inquiryId) return;
+    if (!inquiryId) return;
 
-  // wait until lists are loaded
-  if (!sended.length && !recived.length) return;
 
-  const foundItem =
-    sended.find(item => Number(item.inquiry_id) === inquiryId) ||
-    recived.find(item => Number(item.inquiry_id) === inquiryId);
+    if (!sended.length && !recived.length) return;
 
-  setSelectedChatProfile({
-    business_name: params.name || params.sender_name,
-    logo: params.sender_image,
-    users_id: Number(params.userId),
-  });
-  console.log("foundItem", params.userId);
-  if (foundItem) {
-    setSelectedChatItem(foundItem);
-  } else {
-    setSelectedChatItem({ inquiry_id: inquiryId }); 
-  }
+    const foundItem =
+      sended.find(item => Number(item.inquiry_id) === inquiryId) ||
+      recived.find(item => Number(item.inquiry_id) === inquiryId);
 
-  
-  setPage(1);
-  setMessages([]);
-  setChatHasMore(true);
-  setShowchatModal(true);
+    setSelectedChatProfile({
+      business_name: params.name || params.sender_name,
+      logo: params.sender_image,
+      users_id: Number(params.userId),
+    });
+    console.log("foundItem", params.userId);
+    if (foundItem) {
+      setSelectedChatItem(foundItem);
+    } else {
+      setSelectedChatItem({ inquiry_id: inquiryId });
+    }
 
-}, [ sended, recived]);
+
+    setPage(1);
+    setMessages([]);
+    setChatHasMore(true);
+    setShowchatModal(true);
+
+  }, [sended, recived]);
   return (
     <View className="flex-1 bg-white" style={{ backgroundColor: "#F4F0F0" }}>
       <HeaderWithBack title="Inquiries" />
