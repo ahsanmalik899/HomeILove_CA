@@ -1,6 +1,7 @@
 import {
   useCapturePaymentMutation,
   useGetDataForEditQuery,
+  useGetPriceQuery,
   useGetProfilesQuery,
   useGetUserWalletQuery,
   usePostCommunityMutation,
@@ -65,11 +66,7 @@ const index = () => {
   } = useGetUserWalletQuery({
     id: user.id,
   });
-  const advertiseOptions = [
-    { id: "1", type: "15", price: "50" },
-    { id: "2", type: "30", price: "100" },
-    { id: "3", type: "60", price: "150" },
-  ];
+ const {data:advertisePrices}=useGetPriceQuery({price_type:"Project"})
   useEffect(() => {
     if (edit && editData) {
       const titlesLength = editData.post?.property_titles?.length;
@@ -1555,9 +1552,10 @@ const index = () => {
                       Componet2={
                         <View>
                           <LegendList
-                            data={advertiseOptions}
-                            keyExtractor={(item) => item.id}
+                            data={advertisePrices?.data}
+                            keyExtractor={(item) => item?.id}
                             estimatedItemSize={50}
+                            extraData={values.ad_life}
                             ListHeaderComponent={
                               <View
                                 className="flex-row justify-between items-center"
@@ -1588,16 +1586,16 @@ const index = () => {
                                 <View className="flex-row items-center">
                                   <TouchableOpacity
                                     onPress={() => {
-                                      setFieldValue("ad_life", item.type);
+                                      setFieldValue("ad_life", item?.life?.toString());
 
-                                      setSelectedAmount(item.price);
+                                      setSelectedAmount(item?.price?.toString());
                                     }}
                                   >
                                     <MaterialIcons
                                       size={20}
                                       color={Colors.light.DarkGreen}
                                       name={
-                                        values.ad_life === item.type
+                                        values.ad_life === item?.life?.toString()
                                           ? "radio-button-checked"
                                           : "radio-button-unchecked"
                                       }
@@ -1610,12 +1608,12 @@ const index = () => {
                                       fontFamily: "PopinRegula",
                                     }}
                                   >
-                                    For {item.type} Days
+                                    For {item?.life?.toString()} Days
                                   </Text>
                                 </View>
 
                                 <Text style={{ fontFamily: "PopinRegula" }}>
-                                  ${item.price}
+                                  ${item?.price?.toString()}
                                 </Text>
                               </View>
                             )}

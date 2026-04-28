@@ -1,6 +1,7 @@
 import {
   useCapturePaymentMutation,
   useGetDataForEditQuery,
+  useGetPriceQuery,
   useGetProfilesQuery,
   useGetUserWalletQuery,
   usePostPropertyMutation,
@@ -106,11 +107,8 @@ const index = () => {
     propertyimg: [],
     floorimg: [],
   };
-  const advertiseOptions = [
-    { id: "1", type: "15", price: "50" },
-    { id: "2", type: "30", price: "100" },
-    { id: "3", type: "60", price: "150" },
-  ];
+  const {data:advertisePrices}=useGetPriceQuery({price_type:"property_1"})
+  
   const EditinitialValues = useMemo(() => {
     if (!edit || !EditData?.success) return initialValues;
 
@@ -1618,9 +1616,10 @@ const index = () => {
                     Componet2={
                       <View>
                         <LegendList
-                          data={advertiseOptions}
+                          data={advertisePrices?.data}
                           keyExtractor={(item) => item.id}
                           estimatedItemSize={50}
+                          extraData={values.time_period}
                           ListHeaderComponent={
                             <View
                               className="flex-row justify-between items-center"
@@ -1652,16 +1651,16 @@ const index = () => {
                               <View className="flex-row items-center">
                                 <TouchableOpacity
                                   onPress={() => {
-                                    setFieldValue("time_period", item.type);
-
-                                    setSelectedAmount(item.price);
+                                  const life = item?.life?.toString();
+                                   setFieldValue("time_period", life);
+                                   setSelectedAmount(item?.price?.toString());
                                   }}
                                 >
                                   <MaterialIcons
                                     size={20}
                                     color={Colors.light.DarkGreen}
                                     name={
-                                      values.time_period === item.type
+                                      values.time_period === item.life.toString()
                                         ? "radio-button-checked"
                                         : "radio-button-unchecked"
                                     }
@@ -1674,12 +1673,12 @@ const index = () => {
                                     fontFamily: "PopinRegula",
                                   }}
                                 >
-                                  For {item.type} Days
+                                  For {item.life.toString()} Days
                                 </Text>
                               </View>
 
                               <Text style={{ fontFamily: "PopinRegula" }}>
-                                ${item.price}
+                                ${item.price.toString()}
                               </Text>
                             </View>
                           )}

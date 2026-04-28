@@ -2,6 +2,7 @@ import {
   useDeletePastWorkMutation,
   useDeleteProfileMutation,
   useGetotherPastWorkQuery,
+  useGetPriceQuery,
   useGetSingleProfileQuery,
   useGetUserWalletQuery,
   useSavePastWorkMutation,
@@ -79,11 +80,7 @@ const Index = () => {
     setEditingPastWork(null);
     setShowPastModal(false);
   };
-  const advertiseOptions = [
-    { id: "1", type: "15", price: "50" },
-    { id: "2", type: "30", price: "100" },
-    { id: "3", type: "60", price: "150" },
-  ];
+const {data:advertisePrices}=useGetPriceQuery({price_type:"Profile",profile_type:Profiletype.toLowerCase()})
   const [showPast, setShowpast] = useState(false);
   const { data, isLoading } = useGetSingleProfileQuery({
     type: Profiletype,
@@ -448,9 +445,10 @@ setShowoption(false)
 
             {/* LegendList */}
             <LegendList
-              data={advertiseOptions}
+              data={advertisePrices?.data}
               keyExtractor={(item) => item.id}
               estimatedItemSize={50}
+              extraData={timePeriod}
               ListHeaderComponent={
                 <View
                   className="flex-row justify-between items-center"
@@ -476,7 +474,7 @@ setShowoption(false)
                   <View className="flex-row items-center">
                     <TouchableOpacity
                       onPress={() => {
-                        setTimeperiod(valueitem.type);
+                        setTimeperiod(valueitem.life);
                         setSelectedAmount(valueitem.price);
                       }}
                     >
@@ -484,7 +482,7 @@ setShowoption(false)
                         size={20}
                         color={Colors.light.DarkGreen}
                         name={
-                          timePeriod === valueitem.type
+                          timePeriod === valueitem.life
                             ? "radio-button-checked"
                             : "radio-button-unchecked"
                         }
@@ -496,7 +494,7 @@ setShowoption(false)
                         fontFamily: "PopinRegula",
                       }}
                     >
-                      For {valueitem.type} Days
+                      For {valueitem.life} Days
                     </Text>
                   </View>
                   <Text style={{ fontFamily: "PopinRegula" }}>

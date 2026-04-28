@@ -1,6 +1,7 @@
 import {
   useCapturePaymentMutation,
   useCreateProfileMutation,
+  useGetPriceQuery,
   useGetSingleProfileQuery,
   useGetUserWalletQuery,
   useUpdateProfileMutation,
@@ -77,19 +78,17 @@ const Index = () => {
     multilicence: true,
     licence: true,
   };
-  const advertiseOptions = [
-    { id: "1", type: "15", price: "50" },
-    { id: "2", type: "30", price: "100" },
-    { id: "3", type: "60", price: "150" },
-  ];
+  
   const user = useAppSelector(userdata);
   const { type } = useLocalSearchParams();
   const [valuationFor, setValuationFor] = useState(false);
   const params = useLocalSearchParams();
+
     const [capturePayment, { isLoading: isCapturing }] = useCapturePaymentMutation();
   const ProfileType = params.ProfileType as string;
   const id = Number(params.id);
   const edit = params.edit === "true";
+     
   const [selectedAmount, setSelectedAmount] = useState("");
   const [visible, setvisible] = useState(false);
   const { data, isLoading: LodingEditData } = useGetSingleProfileQuery(
@@ -308,7 +307,7 @@ const Index = () => {
       };
       break;
   }
-
+ const {data:advertisePrices}=useGetPriceQuery({price_type:"Profile",profile_type:dataAccordingType?.profileType?.toLowerCase()})
   const [createprofile, { isLoading }] = useCreateProfileMutation();
   const [updateProfile, { isLoading: UpdateLoading }] =
     useUpdateProfileMutation();
@@ -485,6 +484,7 @@ const Index = () => {
               institution: edit ? data?.data?.institution : "",
               id: edit ? data?.data?.id : "",
               valuation_for: edit ? data?.data?.valuation_for || "" : "",
+              time_period: edit ? data?.data?.time_period || "" : "", 
             }}
             validationSchema={ProfileSchema}
             onSubmit={async (values) => {
@@ -1051,9 +1051,10 @@ const Index = () => {
                       Componet2={
                         <View>
                           <LegendList
-                            data={advertiseOptions}
+                            data={advertisePrices?.data}
                             keyExtractor={(item) => item.id}
                             estimatedItemSize={50}
+                            extraData={values.time_period}
                             ListHeaderComponent={
                               <View
                                 className="flex-row justify-between items-center"
@@ -1084,7 +1085,7 @@ const Index = () => {
                                 <View className="flex-row items-center">
                                   <TouchableOpacity
                                     onPress={() => {
-                                      setFieldValue("time_period", item.type);
+                                      setFieldValue("time_period", item.life);
 
                                       setSelectedAmount(item.price);
                                     }}
@@ -1093,7 +1094,7 @@ const Index = () => {
                                       size={20}
                                       color={Colors.light.DarkGreen}
                                       name={
-                                        values.time_period === item.type
+                                        values.time_period === item.life
                                           ? "radio-button-checked"
                                           : "radio-button-unchecked"
                                       }
@@ -1106,7 +1107,7 @@ const Index = () => {
                                       fontFamily: "PopinRegula",
                                     }}
                                   >
-                                    For {item.type} Days
+                                    For {item.life} Days
                                   </Text>
                                 </View>
 

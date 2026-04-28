@@ -1,5 +1,6 @@
 import {
   useDeletePostMutation,
+  useGetPriceQuery,
   useGetUserWalletQuery,
   useUpgradePostApiMutation,
 } from "@/store/api/user/MainApi";
@@ -66,11 +67,7 @@ const YourAdsPostDesign = ({
   const user = useAppSelector(userdata);
   const [singleView, setSingleView] = useState(false);
   const [upgradeId, setUpgradeId] = useState(0);
-  const advertiseOptions = [
-    { id: "1", type: "15", price: "50" },
-    { id: "2", type: "30", price: "100" },
-    { id: "3", type: "60", price: "150" },
-  ];
+ const{data:advertisePrices}=useGetPriceQuery({price_type:type==="community"?"Project":"property_1"})
   const listRef = useRef<any>(null);
   const [deletePost, { isLoading }] = useDeletePostMutation();
   const insets = useSafeAreaInsets();
@@ -536,7 +533,7 @@ const YourAdsPostDesign = ({
 
             {/* LegendList */}
             <LegendList
-              data={advertiseOptions}
+              data={advertisePrices?.data}
               keyExtractor={(item) => item.id}
               estimatedItemSize={50}
               ListHeaderComponent={
@@ -564,7 +561,7 @@ const YourAdsPostDesign = ({
                   <View className="flex-row items-center">
                     <TouchableOpacity
                       onPress={() => {
-                        setTimeperiod(valueitem.type);
+                        setTimeperiod(valueitem.life);
                         setSelectedAmount(valueitem.price);
                       }}
                     >
@@ -572,7 +569,7 @@ const YourAdsPostDesign = ({
                         size={20}
                         color={Colors.light.DarkGreen}
                         name={
-                          timePeriod === valueitem.type
+                          timePeriod === valueitem.life
                             ? "radio-button-checked"
                             : "radio-button-unchecked"
                         }
@@ -584,7 +581,7 @@ const YourAdsPostDesign = ({
                         fontFamily: "PopinRegula",
                       }}
                     >
-                      For {valueitem.type} Days
+                      For {valueitem.life} Days
                     </Text>
                   </View>
                   <Text style={{ fontFamily: "PopinRegula" }}>

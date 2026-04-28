@@ -874,6 +874,13 @@ export const MainApi = createApi({
         method: "GET",
       }),
     }),
+    getPrice:builder.query<any,any>({
+      query: ({price_type,profile_type}) => ({
+        url: "getPrice",
+        method: "GET",
+        params: {price_type,profile_type},
+      }),
+    })
   }),
 });
 
@@ -982,4 +989,6 @@ export const {
   useShareDetailPostApiMutation,
   useReportPostMutation,
   useLazyGetPostCommentsApiQuery,
+  useGetPriceQuery,
+  useLazyGetPriceQuery
 } = MainApi;
