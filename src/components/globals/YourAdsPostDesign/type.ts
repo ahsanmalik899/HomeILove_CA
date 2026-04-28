@@ -7,4 +7,7 @@ export type postDataType= {
     initialLoadDone:boolean;
     refetch:()=>void;
     setpost:(data:any)=>void;
+    isShowpost:boolean;
+    id:string;
+    post_type:string;
 }

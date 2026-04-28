@@ -32,7 +32,7 @@ const Index = () => {
 const renderItem = ({ item }: any) => {
   return (
     <TouchableOpacity
-      style={{ width:"100%", paddingHorizontal: hs(10), height: vs(320) }}
+      style={{ width:"100%", paddingHorizontal: hs(10), height: vs(320),marginBottom:vs(30) }}
       onPress={() =>
         router.navigate({
           pathname: "/ProfileSigleView",

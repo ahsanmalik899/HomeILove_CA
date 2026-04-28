@@ -6,10 +6,10 @@ import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import PropertyListingDesign from "@src/components/globals/PropertyListingDesign";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
-import { useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
-import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { BackHandler, StyleSheet, TouchableOpacity, View } from "react-native";
 import * as Yup from "yup";
 
 const index = () => {
@@ -179,10 +179,34 @@ const index = () => {
     );
     setInitialLoadDone(true);
   }, [propertyList, page]);
+useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      if (params?.isSingleView === "true") {
+        router.replace("/Home/Feeds/NewsFeed");
+        return true;
+      }
 
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/");
+      }
+
+      return true;
+    };
+
+    const sub = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    return () => sub.remove();
+  }, [params])
+);
   return (
     <View className=" flex-1" style={{ backgroundColor: "#F4F0F0" }}>
-      <HeaderWithBack />
+      <HeaderWithBack onBackpress={()=>{params?.isSingleView=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}} />
 
       <View
         className="flex-row justify-between gap-2"
@@ -224,6 +248,9 @@ const index = () => {
         type="sale"
         hasmore={hasMore}
         initialLoadDone={initialLoadDone}
+        isSingleView={params?.isSingleView=="true"}
+        post_id={params?.id?.toString()}
+        post_type={params?.type?.toString()}
       />
       {showFilter && (
         <Formik

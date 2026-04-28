@@ -3,11 +3,13 @@ import {
   useGetotherPastWorkQuery,
   useGetProfilesForConectionQuery,
   useGetSingleProfileQuery,
+  useShare_profileApiMutation,
   useUserAgentPastPostsApiQuery,
   useWriteReviewApiMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
+import Cross from "@assets/CreateProfile/cross.svg";
 import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
@@ -18,6 +20,7 @@ import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
 import PastDealsagent from "@src/components/globals/PastDealsagent";
 import SetRating from "@src/components/globals/SetRating";
@@ -28,6 +31,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import * as Clipboard from "expo-clipboard";
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -37,6 +41,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -56,7 +61,8 @@ const Index = () => {
   const [showConnection, setShowConnection] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [showPast, setShowpast] = useState(false);
-  const[askEvaluation,{isLoading:askEvaluationLoading}]=useAskvaluationapiMutation();
+  const [showShare, setShowShare] = useState(false);
+  const [askEvaluation, { isLoading: askEvaluationLoading }] = useAskvaluationapiMutation();
   const ReviewSchema = Yup.object().shape({
     review: Yup.string()
       .required("Review is required")
@@ -73,7 +79,7 @@ const Index = () => {
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const { data, isLoading } = useGetSingleProfileQuery({ type, id });
- 
+  const [share_profileApi, { isLoading: sharing }] = useShare_profileApiMutation();
   const profile = data?.data;
   const { data: Profiles, isLoading: ProfilesLoading } =
     useGetProfilesForConectionQuery({ id: user.id });
@@ -83,7 +89,7 @@ const Index = () => {
     refetch: pastRefetch,
   } = useGetotherPastWorkQuery(
     { user_id: profile?.users_id, work_section: type },
-    { skip: !profile?.users_id || type === "agent"||profile?.post_type!=="Trending" }
+    { skip: !profile?.users_id || type === "agent" || profile?.post_type !== "Trending" }
   );
 
   const {
@@ -92,7 +98,7 @@ const Index = () => {
     refetch,
   } = useUserAgentPastPostsApiQuery(
     { page, per_page: perPage, user_id: profile?.users_id },
-    { skip: !profile?.users_id || type !== "agent" ||profile?.post_type!=="Trending"}
+    { skip: !profile?.users_id || type !== "agent" || profile?.post_type !== "Trending" }
   );
   useEffect(() => {
     if (!pastData?.data) return;
@@ -153,14 +159,16 @@ const Index = () => {
       setReview(false);
     }
   };
- 
+
+
+
 
   return (
     <>
       <ScrollView className="flex-1 bg-white">
         {/* Cover */}
         <View style={{ position: "relative" }}>
-          <HeaderWithBack />
+          <HeaderWithBack onBackpress={() => router.navigate("/Home/Feeds/NewsFeed")} />
           <Image
             source={{
               uri: ImageFormater(profile?.cover),
@@ -213,7 +221,7 @@ const Index = () => {
               <Heart />
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowShare(true)}>
               <Share />
             </TouchableOpacity>
           </View>
@@ -232,7 +240,7 @@ const Index = () => {
             {expanded
               ? profile?.remarks
               : profile?.remarks?.slice(0, 90) +
-                (profile?.remarks?.length > 90 ? "..." : "")}
+              (profile?.remarks?.length > 90 ? "..." : "")}
 
             {profile?.remarks?.length > 90 && (
               <Text
@@ -243,20 +251,20 @@ const Index = () => {
               </Text>
             )}
           </Text>
-<View style={{backgroundColor:Colors.light.lightGray ,padding:hs(10),borderRadius:hs(10),marginVertical:hs(10),gap:hs(10)}}>
-  <Text style={{color:Colors.light.textGray,fontSize:hs(16),fontWeight:'bold',textAlign:'center'}}>Total post by <Text style={{color:Colors.light.red}}>{profile?.business_name}</Text></Text>
-  <View style={styles.row}>
-    <TouchableOpacity style={{flex:1,alignItems:'center'}}>
-      <Text style={{color:Colors.light.textGray,fontSize:hs(14),fontWeight:'bold'}}>Rent post</Text>
-      <Text style={{color:Colors.light.textGray,fontSize:hs(13)}}>{profile?.rent_posts}</Text>
-    </TouchableOpacity>
-    <View style={{width:hs(1),height:hs(50),backgroundColor:Colors.light.textGray}}/>
-    <TouchableOpacity style={{flex:1,alignItems:'center'}}>
-      <Text style={{color:Colors.light.textGray,fontSize:hs(14),fontWeight:'bold'}}>Sale post</Text>
-      <Text style={{color:Colors.light.textGray,fontSize:hs(13)}}>{profile?.sale_posts}</Text>
-    </TouchableOpacity>
-  </View>
-</View>
+          <View style={{ backgroundColor: Colors.light.lightGray, padding: hs(10), borderRadius: hs(10), marginVertical: hs(10), gap: hs(10) }}>
+            <Text style={{ color: Colors.light.textGray, fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>Total post by <Text style={{ color: Colors.light.red }}>{profile?.business_name}</Text></Text>
+            <View style={styles.row}>
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center' }}>
+                <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Rent post</Text>
+                <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.rent_posts}</Text>
+              </TouchableOpacity>
+              <View style={{ width: hs(1), height: hs(50), backgroundColor: Colors.light.textGray }} />
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center' }}>
+                <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Sale post</Text>
+                <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.sale_posts}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
           {/* Map */}
           {showMap && (
             <MapView
@@ -275,43 +283,43 @@ const Index = () => {
           <VideoSection url={profile?.youtube_link} />
           {profile?.advisory_service === "Yes" && (
             <>
-            <TouchableOpacity 
-onPress={() => setShowMortgage(!showMortgage)} 
-style={{
-backgroundColor:Colors.light.LightGreen,
-padding:hs(10),
-borderRadius:hs(10),
-marginVertical:hs(10),
-flexDirection:'row',
-justifyContent:'space-between',
-alignItems:'center'
-}}
->
+              <TouchableOpacity
+                onPress={() => setShowMortgage(!showMortgage)}
+                style={{
+                  backgroundColor: Colors.light.LightGreen,
+                  padding: hs(10),
+                  borderRadius: hs(10),
+                  marginVertical: hs(10),
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
 
-<Text style={{
-color:Colors.light.textGray,
-fontSize:hs(16),
-fontWeight:'bold'
-}}>
-Ask for FREE
-</Text>
+                <Text style={{
+                  color: Colors.light.textGray,
+                  fontSize: hs(16),
+                  fontWeight: 'bold'
+                }}>
+                  Ask for FREE
+                </Text>
 
-<Ionicons 
-name={showMortgage ? "chevron-up" : "chevron-down"} 
-size={22} 
-color={Colors.light.textGray}
-/>
+                <Ionicons
+                  name={showMortgage ? "chevron-up" : "chevron-down"}
+                  size={22}
+                  color={Colors.light.textGray}
+                />
 
-</TouchableOpacity>
-            {showMortgage && <View style={styles.mortgageCard}>
+              </TouchableOpacity>
+              {showMortgage && <View style={styles.mortgageCard}>
                 <Text style={styles.mortgageTitle}>
-                  Ask for FREE home <Text style={{color:Colors.light.red,fontWeight:'bold'}}>{type?.toLocaleUpperCase()}</Text> advice from 
-                   <Text style={styles.mortgageCompany}>
-                  {" "}{profile?.business_name}
-                </Text>
+                  Ask for FREE home <Text style={{ color: Colors.light.red, fontWeight: 'bold' }}>{type?.toLocaleUpperCase()}</Text> advice from
+                  <Text style={styles.mortgageCompany}>
+                    {" "}{profile?.business_name}
+                  </Text>
                 </Text>
 
-               
+
 
                 <Formik
                   initialValues={{
@@ -327,27 +335,27 @@ color={Colors.light.textGray}
                     contact: "",
                     message: "",
                   }}
-                 onSubmit={(values, { resetForm }) => {
-  const payload = {
-    ...values,
-    agent_email: profile?.email,
-    agent_name: profile?.business_name,
-    agent_cover: profile?.logo,
-  };
+                  onSubmit={(values, { resetForm }) => {
+                    const payload = {
+                      ...values,
+                      agent_email: profile?.email,
+                      agent_name: profile?.business_name,
+                      agent_cover: profile?.logo,
+                    };
 
-  askEvaluation(payload)
-    .unwrap()
-    .then((res) => {
-      renderToastSuccess(res.message || "Request sent successfully");
-      resetForm();
-    })
-    .catch((err) => {
-      renderToastError(err?.data?.message || "Something went wrong");
-    });
-}}
+                    askEvaluation(payload)
+                      .unwrap()
+                      .then((res) => {
+                        renderToastSuccess(res.message || "Request sent successfully");
+                        resetForm();
+                      })
+                      .catch((err) => {
+                        renderToastError(err?.data?.message || "Something went wrong");
+                      });
+                  }}
                 >
                   {({
-                    handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue,resetForm
+                    handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue, resetForm
                   }) => (
                     <>
                       <AdressInput
@@ -360,7 +368,7 @@ color={Colors.light.textGray}
                         longValue={values.lng}
                         name="address"
                         setValue={setFieldValue}
-                        onSelect={() => { } }
+                        onSelect={() => { }}
                         title="Property Location"
                         placeholder="Enter complete address or street"
                         value={values.address}
@@ -409,7 +417,7 @@ color={Colors.light.textGray}
                                 ]
                                 : []}
                             name="advice_for"
-                            onSelect={() => { } } />
+                            onSelect={() => { }} />
                         ))}
                       <View style={styles.dottedDivider} />
 
@@ -472,40 +480,40 @@ color={Colors.light.textGray}
 
               </View>}</>
           )}
-          
+
           {profile?.post_type && (
             <>
-            {posts?.length > 0 && (
-             <TouchableOpacity
-onPress={() => setShowpast(!showPast)}
-style={{
-backgroundColor: Colors.light.LightGreen,
-padding: hs(12),
-borderRadius: hs(10),
-marginVertical: hs(10),
-flexDirection: 'row',
-justifyContent: 'space-between',
-alignItems: 'center'
-}}
->
+              {posts?.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => setShowpast(!showPast)}
+                  style={{
+                    backgroundColor: Colors.light.LightGreen,
+                    padding: hs(12),
+                    borderRadius: hs(10),
+                    marginVertical: hs(10),
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
 
-<Text style={{
-color: Colors.light.textGray,
-fontSize: hs(16),
-fontWeight: 'bold'
-}}>
-{showPast
-? "Hide  past deals (jobs)"
-: "Show  past deals (jobs)"}
-</Text>
+                  <Text style={{
+                    color: Colors.light.textGray,
+                    fontSize: hs(16),
+                    fontWeight: 'bold'
+                  }}>
+                    {showPast
+                      ? "Hide  past deals (jobs)"
+                      : "Show  past deals (jobs)"}
+                  </Text>
 
-<Ionicons
-name={showPast ? "chevron-up" : "chevron-down"}
-size={22}
-color={Colors.light.textGray}
-/>
+                  <Ionicons
+                    name={showPast ? "chevron-up" : "chevron-down"}
+                    size={22}
+                    color={Colors.light.textGray}
+                  />
 
-</TouchableOpacity>)}
+                </TouchableOpacity>)}
               {showPast && type === "agent" && (
                 <View>
                   <PastDealsagent
@@ -603,7 +611,7 @@ color={Colors.light.textGray}
         <Loading isLoading={isLoading} text="Loading.." />
       </ScrollView>
 
-      
+
       <TouchableOpacity
         style={styles.stickyBottomBtn}
         onPress={() => {
@@ -630,145 +638,350 @@ color={Colors.light.textGray}
       </TouchableOpacity>
       <Modal visible={reviewModal} transparent animationType="fade">
         <ScrollView>
-        <Formik
-          initialValues={{
-            review: "",
-            imp_facts: "",
-            sender_profile_type: "",
-            sender_profile_id: "",
-          }}
-          validationSchema={ReviewSchema}
-          onSubmit={(values) => submitReview(values)}
-        >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-            setFieldValue,
-          }) => (
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContainer}>
-                <Text style={styles.modalTitle}>Write Review</Text>
+          <Formik
+            initialValues={{
+              review: "",
+              imp_facts: "",
+              sender_profile_type: "",
+              sender_profile_id: "",
+            }}
+            validationSchema={ReviewSchema}
+            onSubmit={(values) => submitReview(values)}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+              setFieldValue,
+            }) => (
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                  <Text style={styles.modalTitle}>Write Review</Text>
 
-                <SetRating
-                  rating={postrating}
-                  setRating={setpostRating}
-                  size={30}
-                />
+                  <SetRating
+                    rating={postrating}
+                    setRating={setpostRating}
+                    size={30}
+                  />
 
-                <FormikInput
-                  title="More Description"
-                  placeholder="Write here (Upto 5000 characters)"
-                  onChangeText={handleChange("review")}
-                  onBlur={handleBlur("review")}
-                  value={values.review}
-                  touched={!!touched.review}
-                  errors={!!errors.review}
-                  errorText={errors.review}
-                  multiline
-                  required={false}
-                />
+                  <FormikInput
+                    title="More Description"
+                    placeholder="Write here (Upto 5000 characters)"
+                    onChangeText={handleChange("review")}
+                    onBlur={handleBlur("review")}
+                    value={values.review}
+                    touched={!!touched.review}
+                    errors={!!errors.review}
+                    errorText={errors.review}
+                    multiline
+                    required={false}
+                  />
 
-                <FormikInput
-                  placeholder=" important facts or your experience about "
-                  onChangeText={handleChange("imp_facts")}
-                  onBlur={handleBlur("imp_facts")}
-                  value={values.imp_facts}
-                  mulipleFields
-                  name="imp_facts"
-                  setValue={setFieldValue}
-                  title={""}
-                  touched={!!touched.imp_facts}
-                  errors={!!errors}
-                  required={false}
-                  errorText={errors.imp_facts}
-                />
+                  <FormikInput
+                    placeholder=" important facts or your experience about "
+                    onChangeText={handleChange("imp_facts")}
+                    onBlur={handleBlur("imp_facts")}
+                    value={values.imp_facts}
+                    mulipleFields
+                    name="imp_facts"
+                    setValue={setFieldValue}
+                    title={""}
+                    touched={!!touched.imp_facts}
+                    errors={!!errors}
+                    required={false}
+                    errorText={errors.imp_facts}
+                  />
 
-                <View style={{ marginTop: 20 }}>
-                  <Text style={{ fontWeight: "600", marginBottom: 10 }}>
-                    Select Profile
-                  </Text>
+                  <View style={{ marginTop: 20 }}>
+                    <Text style={{ fontWeight: "600", marginBottom: 10 }}>
+                      Select Profile
+                    </Text>
 
-                  {Profiles?.profiles?.map((item, index) => {
-                    const selected =
-                      values.sender_profile_type === item.profile_type;
+                    {Profiles?.profiles?.map((item, index) => {
+                      const selected =
+                        values.sender_profile_type === item.profile_type;
 
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        style={[
-                          styles.profileCard,
-                          selected && {
-                            borderColor: "#0F9D58",
-                            borderWidth: 2,
-                          },
-                        ]}
-                        onPress={() => {
-                          setFieldValue(
-                            "sender_profile_type",
-                            item.profile_type
-                          );
-                          setFieldValue("sender_profile_id", item.profile_id);
-                        }}
-                      >
-                        <CircleImage
-                          Size={50}
-                          source={{
-                            uri: ImageFormater(item.logo),
+                      return (
+                        <TouchableOpacity
+                          key={index}
+                          style={[
+                            styles.profileCard,
+                            selected && {
+                              borderColor: "#0F9D58",
+                              borderWidth: 2,
+                            },
+                          ]}
+                          onPress={() => {
+                            setFieldValue(
+                              "sender_profile_type",
+                              item.profile_type
+                            );
+                            setFieldValue("sender_profile_id", item.profile_id);
                           }}
-                        />
+                        >
+                          <CircleImage
+                            Size={50}
+                            source={{
+                              uri: ImageFormater(item.logo),
+                            }}
+                          />
 
-                        <View style={{ marginLeft: 12 }}>
-                          <Text style={styles.businessName}>
-                            {item.business_name}
-                          </Text>
+                          <View style={{ marginLeft: 12 }}>
+                            <Text style={styles.businessName}>
+                              {item.business_name}
+                            </Text>
 
-                          <Text style={styles.profileType}>
-                            {item.profile_type}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  })}
+                            <Text style={styles.profileType}>
+                              {item.profile_type}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
 
-                  {touched.sender_profile_type &&
-                    errors.sender_profile_type && (
-                      <Text
-                        style={{
-                          color: "red",
-                          marginTop: 5,
-                        }}
-                      >
-                        {errors.sender_profile_type}
-                      </Text>
-                    )}
-                </View>
+                    {touched.sender_profile_type &&
+                      errors.sender_profile_type && (
+                        <Text
+                          style={{
+                            color: "red",
+                            marginTop: 5,
+                          }}
+                        >
+                          {errors.sender_profile_type}
+                        </Text>
+                      )}
+                  </View>
 
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setReviewModal(false);
-                    }}
-                    style={styles.cancelBtn}
-                  >
-                    <Text>Cancel</Text>
-                  </TouchableOpacity>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setReviewModal(false);
+                      }}
+                      style={styles.cancelBtn}
+                    >
+                      <Text>Cancel</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity
-                    onPress={handleSubmit}
-                    style={styles.submitBtn}
-                  >
-                    <Text style={{ color: "white" }}>Submit</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleSubmit}
+                      style={styles.submitBtn}
+                    >
+                      <Text style={{ color: "white" }}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
-        </Formik>
+            )}
+          </Formik>
         </ScrollView>
+      </Modal>
+      <Modal visible={showShare} animationType="slide" transparent>
+        <View style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          justifyContent: "flex-end",
+        }}>
+
+          <View style={{
+            backgroundColor: "#fff",
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 20,
+            minHeight: "80%",
+          }}>
+
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 15
+            }}>
+              <Text style={{ fontSize: 18, fontWeight: "600" }}>
+                Share Post
+              </Text>
+
+              <TouchableOpacity onPress={() => setShowShare(false)}>
+                <Cross height={vs(24)} width={vs(24)} />
+              </TouchableOpacity>
+            </View>
+
+            <Formik
+              initialValues={{
+                recepient_email: "",
+                message: "",
+                link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${type}`,
+                post_id: id.toString(),
+                type: type,
+              }}
+              validationSchema={Yup.object({
+                recepient_email: Yup
+                  .string()
+                  .email("Invalid email")
+                  .required("Email is required"),
+                message: Yup
+                  .string()
+                  .required("Message is required")
+              })}
+              onSubmit={async (values) => {
+                try {
+                  const formData = new FormData();
+                  formData.append("email", values.recepient_email);
+                  formData.append("message", values.message);
+                  formData.append("link", values.link);
+                  formData.append("post_id", values.post_id);
+                  formData.append("type", "profile");
+                  formData.append("profile_type", type);
+                  console.log(formData);
+                  const result = await share_profileApi(formData).unwrap();
+                  if (result?.success) {
+                    renderToastSuccess(result.message);
+                    setShowShare(false);
+                  }
+                } catch (error) {
+                  renderToastError("Failed to share post");
+                }
+              }}
+            >
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                touched,
+                errors
+              }) => (
+
+                <View style={{ flex: 1 }}>
+
+
+                  <FormikInput
+                    name="recepient_email"
+                    placeholder="Recipient Email"
+                    value={values.recepient_email}
+                    onChangeText={handleChange("recepient_email")}
+                    onBlur={handleBlur("recepient_email")}
+                    touched={!!touched.recepient_email}
+                    errors={!!errors.recepient_email}
+                    errorText={errors.recepient_email} title={"Email"} required={true} />
+
+
+                  <FormikInput
+                    name="message"
+                    placeholder="Write your message..."
+                    value={values.message}
+                    onChangeText={handleChange("message")}
+                    onBlur={handleBlur("message")}
+                    multiline
+                    touched={!!touched.message}
+                    errors={!!errors.message}
+                    errorText={errors.message} title={"Message"} required={true} />
+
+                  <View style={{
+                    backgroundColor: "#f5f5f5",
+                    padding: 12,
+                    borderRadius: 10,
+                    marginTop: 10,
+                    marginBottom: 20
+                  }}>
+                    <Text style={{ fontWeight: "600" }}>
+                      Sharing this post
+                    </Text>
+                    <Text style={{ color: "#666", fontSize: 12 }}>
+                      Property / Community link will be sent
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      backgroundColor: "#f5f6f8",
+                      borderRadius: 12,
+                      padding: 12,
+                      marginTop: 15,
+                      borderWidth: 1,
+                      borderColor: "#e5e7eb",
+                    }}
+                  >
+                    {/* Label */}
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: "#6b7280",
+                        marginBottom: 6,
+                        fontFamily: "PopinRegula",
+                      }}
+                    >
+                      Shareable Link
+                    </Text>
+
+                    {/* Input Row */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        backgroundColor: "#fff",
+                        borderRadius: 10,
+                        paddingHorizontal: 10,
+                        paddingVertical: 8,
+                        borderWidth: 1,
+                        borderColor: "#e5e7eb",
+                      }}
+                    >
+                      <TextInput
+                        editable={false}
+                        value={values.link}
+                        numberOfLines={1}
+                        style={{
+                          flex: 1,
+                          fontSize: 12,
+                          color: "#374151",
+                          fontFamily: "PopinRegula",
+                        }}
+                        ellipsizeMode="middle"
+                      />
+
+                      {/* Copy Button */}
+                      <TouchableOpacity
+                        onPress={async () => {
+                          await Clipboard.setStringAsync(values.link);
+                          renderToastSuccess("Link copied");
+                        }}
+                        style={{
+                          backgroundColor: "#0f766e",
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 8,
+                          marginLeft: 8,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#fff",
+                            fontSize: 12,
+                            fontWeight: "600",
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          Copy
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <LargeButton
+                    text="Send"
+                    handleSubmit={handleSubmit}
+                  />
+
+                </View>
+
+              )}
+            </Formik>
+
+          </View>
+        </View>
+        <Loading isLoading={sharing} text="Sharing..." />
       </Modal>
     </>
   );
@@ -936,7 +1149,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginVertical: 12,
     elevation: 3,
-    marginBottom:hs(70)
+    marginBottom: hs(70)
   },
 
   ratingTitle: {
@@ -1036,13 +1249,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: Colors.light.DarkGreen,
-   paddingVertical:vs(10),
- },
+    paddingVertical: vs(10),
+  },
 
   agentContainer: {
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal:hs(20),
+    paddingHorizontal: hs(20),
     gap: hs(10),
   },
 

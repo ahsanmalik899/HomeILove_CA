@@ -5,4 +5,7 @@ export type postDataType= {
     type:string;
     hasmore:boolean;
     initialLoadDone:boolean;
+    isSingleView:boolean;
+    post_id:string;
+    post_type:string;
 }

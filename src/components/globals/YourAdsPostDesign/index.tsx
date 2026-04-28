@@ -22,7 +22,7 @@ import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -35,6 +35,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
 import LargeButton from "../LaregeButton";
@@ -50,6 +51,9 @@ const YourAdsPostDesign = ({
   refetch,
   setpost,
   initialLoadDone,
+  isShowpost,
+  id,
+  post_type,
 }: postDataType) => {
   const [showImages, setShowImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -57,8 +61,10 @@ const YourAdsPostDesign = ({
   const [deleteType, setDeleteType] = useState("");
   const [visible, setvisible] = useState(false);
   const [orderId, setOrderid] = useState("");
+  const[singlePost,setSinglePost] = useState<any>(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const user = useAppSelector(userdata);
+  const [singleView, setSingleView] = useState(false);
   const [upgradeId, setUpgradeId] = useState(0);
   const advertiseOptions = [
     { id: "1", type: "15", price: "50" },
@@ -71,6 +77,7 @@ const YourAdsPostDesign = ({
   const [scrollable, setscrollable] = useState(true);
   const [timePeriod, setTimeperiod] = useState("");
   const [SelectedAmount, setSelectedAmount] = useState("");
+
   const [upgradePost, { isLoading: upgradeLoading }] =
     useUpgradePostApiMutation();
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -118,6 +125,15 @@ const YourAdsPostDesign = ({
       Alert.alert("Error", "Upgrade failed");
     }
   };
+  useEffect(() => {
+   if(isShowpost){
+    setSingleView(true)
+          setSinglePost({
+            type: post_type,
+            id:id,
+          })
+   }
+  }, [isShowpost]);
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -125,16 +141,14 @@ const YourAdsPostDesign = ({
       <>
         <TouchableOpacity
           onPress={() => {
-            router.navigate({
-              pathname: "/AddSingleView",
-              params: {
-                type: type,
+            setSingleView(true)
+            setSinglePost({
+              type: type,
                 id:
                   type === "community"
                     ? item.post_community_id
                     : item.post_property_id,
-              },
-            });
+            })
           }}
         >
           <View className="bg-white" style={styles.card}>
@@ -775,6 +789,10 @@ const YourAdsPostDesign = ({
         setVisible={setvisible}
         visible={visible}
       />
+        <Modal visible={singleView} animationType="slide" onRequestClose={() => setSingleView(false)} transparent={true}
+                      statusBarTranslucent={true}  >
+                      <AddSingleView id={singlePost?.id} type={singlePost?.type} setshowModel={setSingleView} />
+                    </Modal>
     </View>
   );
 };

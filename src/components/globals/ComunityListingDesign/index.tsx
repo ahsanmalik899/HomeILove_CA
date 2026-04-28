@@ -12,11 +12,11 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { router } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
@@ -24,6 +24,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
 import { postDataType } from "./type";
@@ -34,15 +35,19 @@ const YourAdsPostDesign = ({
   setposts,
   type,
   hasmore,
-  initialLoadDone
+  initialLoadDone,
+  isSingleView,
+  post_id,
+  post_type,
 }: postDataType) => {
   const [showImages, setShowImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-
+  const[singleView,setSingleView]=useState(false);
   const user = useAppSelector(userdata);
   const listRef = useRef<any>(null);
   const [imageNo, setImageNo] = useState(0);
   const insets = useSafeAreaInsets();
+  const[singlePost,setSinglePost]=useState<any>(null);
   const [scrollable, setscrollable] = useState(true);
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
@@ -52,18 +57,21 @@ const YourAdsPostDesign = ({
       setscrollable(false);
       setImageNo(index);
     };
+    useEffect(() => {
+      if(isSingleView){
+        setSingleView(true);
+        setSinglePost({ type: post_type, id: post_id});
+      }
+    }, [isSingleView]);
+    
       const facts = item.imp_facts ?? item.facts ?? "";
     return (
       <>
         <TouchableOpacity
           onPress={() => {
-            router.navigate({
-              pathname: "/AddSingleView",
-              params: {
-                type: type,
-                id: item.post_community_id,
-              },
-            });
+            setSingleView(true);
+           setSinglePost({ type: type,
+                id: item.post_community_id});
           }}
         >
           <View className="bg-white" style={styles.card}>
@@ -398,6 +406,10 @@ const YourAdsPostDesign = ({
             }}
           />
         )}
+        <Modal visible={singleView} animationType="slide" onRequestClose={() => setSingleView(false)} transparent={true}
+          statusBarTranslucent={true}  >
+          <AddSingleView id={singlePost?.id} type={singlePost?.type} setshowModel={setSingleView} />
+        </Modal>
       </View>
   );
 };

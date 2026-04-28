@@ -1,15 +1,15 @@
 import {
-  useGetProfilesQuery,
-  useGetYorSalePostsQuery,
+  useGetYorSalePostsQuery
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import YourAdsPostDesign from "@src/components/globals/YourAdsPostDesign";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
+  BackHandler,
   FlatList,
   StyleSheet,
   Text,
@@ -19,21 +19,52 @@ import {
 
 const index = () => {
   const user = useAppSelector(userdata);
-  const { data: ProfilesData } = useGetProfilesQuery({ id: user.id });
+
   const rawType = useLocalSearchParams().type;
+  const isShowpost = useLocalSearchParams().isShowpost;
+  const id = useLocalSearchParams().id;
+  const post_type = useLocalSearchParams().type;
   const [ProfileType, SetProfilrType] = useState("");
   const type = String(rawType).toLowerCase();
     const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(ProfileType);
-  const filter = ProfilesData?.profiles_exist
-    ? Object.entries(ProfilesData.profiles_exist)
-        .filter(([_, value]) => value === true)
-        .map(([key], index) => ({
-          id: index,
-          name: key,
-        }))
-    : [];
+  // const filter = [
+  //   { id: 1, name: "All" },
+  //   { id: 3, name: "Agents" },
+  //   { id: 4, name: "Builders" },
+  //   { id: 5, name: "Mortgages" },
+  //   { id: 6, name: "Electricians" },
+  //   { id: 7, name: "Decor" },
+  //   { id: 8, name: "Plumbers" },
+  //   { id: 9, name: "Painters" },
+  //   { id: 10, name: "Investors" },
+  // ];
+useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      if (isShowpost === "true") {
+        router.replace("/Home/Feeds/NewsFeed");
+        return true;
+      }
 
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/");
+      }
+
+      return true;
+    };
+
+    const sub = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    return () => sub.remove();
+  }, [isShowpost])
+);
+const filter = []
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
   const [posts, setPosts] = useState<[]>([]);
@@ -76,7 +107,7 @@ const index = () => {
   }, [data]);
   return (
     <View className="flex-1 bg-white" style={{backgroundColor:"#F4F0F0"}}>
-      <HeaderWithBack title={type + " Listing"} />
+      <HeaderWithBack title={type + " Listing"} onBackpress={()=>{isShowpost=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}}/>
       <View className="flex-1">
         {filter.length > 0 && (
           <View style={styles.filterContainer}>
@@ -102,6 +133,9 @@ const index = () => {
           setpost={setPosts}
           refetch={refetch}
           initialLoadDone={initialLoadDone}
+          isShowpost={isShowpost=="true"?true:false}
+          id={id?.toString()}
+          post_type={post_type?.toString()}
         />
       </View>
       

@@ -724,10 +724,11 @@ const index = () => {
                     ) {
                       renderToastSuccess(result.data?.message);
                       router.replace({
-                        pathname: "/AddSingleView",
+                        pathname: "/MyPostListing",
                         params: {
                           type: "community",
                           id: result?.data?.post_id,
+                          isShowpost: "true",
                         },
                       });
                     } else {
@@ -741,10 +742,11 @@ const index = () => {
                       }).unwrap();
                       renderToastSuccess(result.data?.message);
                       router.replace({
-                        pathname: "/AddSingleView",
+                        pathname: "/MyPostListing",
                         params: {
                           type: "community",
                           id: result?.data?.post_id,
+                          isShowpost: "true",
                         },
                       });
                     }

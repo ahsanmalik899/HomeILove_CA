@@ -8,11 +8,11 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { router } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CircleImage from "../CircleImage/CircleImage";
+import ProfileSingleView from "../ProfileSingleView";
 import StarRating from "../StarRating";
 import { postDataType } from "./type";
 const YourAdsPostDesign = ({
@@ -31,6 +32,9 @@ const YourAdsPostDesign = ({
   type,
   hasmore,
    initialLoadDone,
+   isSingleView,
+   post_id,
+   post_type,
 }: postDataType) => {
  
 
@@ -39,23 +43,23 @@ const YourAdsPostDesign = ({
   const [imageNo, setImageNo] = useState(0);
   const insets = useSafeAreaInsets();
   const [scrollable, setscrollable] = useState(true);
+    const [singleView, setSingleView] = useState(false);
+    const [profileData, setProfileData] = useState<any>(null);
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
-   
+   useEffect(()=>{
+if(isSingleView){
+  setSingleView(true)
+  setProfileData({id:post_id,type:post_type})
+}
+    
+   },[isSingleView])
     const facts = item.imp_facts ?? item.facts ?? "";
     return (
       <>
         <TouchableOpacity
-          onPress={() => {
-            router.navigate({
-              pathname: "/ProfileSigleView",
-              params: {
-                type: item.type,
-                id: item.id,
-                userid:item.users_id,
-              },
-            });
-          }}
+          onPress={()=>openProfileModal(item)}
+            onLongPress={()=>openProfileModal(item)}
         >
           <View className="bg-white" style={styles.card}>
             <View
@@ -151,7 +155,7 @@ const YourAdsPostDesign = ({
 
               <TouchableOpacity
                 onPress={() => {
-                  setscrollable(false);
+                 
                 }}
               >
                 <Image
@@ -238,6 +242,14 @@ const YourAdsPostDesign = ({
       </>
     );
   };
+    const openProfileModal = async(item: any) => {
+    setProfileData({
+    type: item.type,
+    id: item.id,
+    userid:item.users_id,
+    });
+    setSingleView(true);
+  };
   return (
       <View style={{ flex: 1, marginBottom: insets.bottom }}>
          {!initialLoadDone ? (
@@ -270,7 +282,16 @@ const YourAdsPostDesign = ({
               No Data Found
             </Text>
           )}
-    
+          <Modal
+            visible={singleView}
+            animationType="slide"
+            onRequestClose={() => setSingleView(false)}
+            transparent={true}
+            statusBarTranslucent={true}
+          >
+     <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+          </Modal>
+          
         </View>
   );
 };

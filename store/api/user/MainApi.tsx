@@ -273,7 +273,7 @@ export const MainApi = createApi({
     }),
     getSingleProfile: builder.query<any, GetMyPostsOnly>({
       query: ({ type, id }) => ({
-        url: `getSingleProfile?type=${type}&id=${id}`,
+        url: `getSingleProfile?type=${type}&id=${Number(id)}`,
         method: "GET",
       }),
       providesTags:["myProfile"]
@@ -844,6 +844,14 @@ export const MainApi = createApi({
       }),
       
     }),
+    share_profileApi:builder.mutation<any,FormData>({
+      query: (formatData) => ({
+        url: "share_profileApi",
+        method: "POST",
+        body: formatData,
+      }),
+      
+    }),
     reportPost: builder.mutation<any,FormData>({
       query: (formatData) => ({
         url: "reportPost",
@@ -967,9 +975,11 @@ export const {
   useLogoutApiMutation,
   useDeleteGeneralPostMutation,
   useEditGeneralPostMutation,
+  useShare_profileApiMutation,
   useAskvaluationapiMutation,
   useGetPostByIdQuery,
   useShare_postApiMutation,
   useShareDetailPostApiMutation,
   useReportPostMutation,
+  useLazyGetPostCommentsApiQuery,
 } = MainApi;

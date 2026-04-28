@@ -61,8 +61,6 @@ const index = () => {
     return ImageFormater(file);
   };
 
-  console.log(type);
-  console.log(id);
   const openPDF = async (url: string) => {
     const googleViewer = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
       url
@@ -145,7 +143,8 @@ const index = () => {
   return (
     <>
       <ScrollView className="flex-1 bg-white">
-        <HeaderWithBack />
+        <HeaderWithBack  onBackpress={()=>{router.navigate("/(main)/Home/(tabs)/Feeds")}}
+        />
         <View
           className="flex-1"
           style={{ marginHorizontal: hs(10), paddingVertical: vs(20) }}
@@ -1308,7 +1307,7 @@ const index = () => {
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.us/AddSingleView?id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type}`,
+          link:`https://homeilove.us/postRedirect?post_id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type==="community"?"community":"property"}`,
           post_id:type==="community"?data?.post?.post_community_id:data?.post?.post_property_id,
           type:type,
         }}

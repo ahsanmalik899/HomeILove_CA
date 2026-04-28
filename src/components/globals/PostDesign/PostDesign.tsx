@@ -1,14 +1,21 @@
 import {
   useAcceptRequestApiMutation,
+  useAskvaluationapiMutation,
   useCancelRequestApiMutation,
+  useDeleteCommentApiMutation,
+  useGetHomeFeedsQuery,
   useGetProfilesForConectionQuery,
   useHidePostMutation,
+  useLazyGetotherPastWorkQuery,
+  useLazyGetPostCommentsApiQuery,
+  useLazyUserAgentPastPostsApiQuery,
   useLikePostMutation,
+  usePostReplyApiMutation,
   useReportPostMutation,
   useSendRequestMutation,
   useShare_postApiMutation,
   useUnfollowApiMutation,
-  useUnlikePostMutation,
+  useUnlikePostMutation
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Cross from "@assets/CreateProfile/cross.svg";
@@ -18,7 +25,7 @@ import Like from "@assets/icons/Like.svg";
 import Share from "@assets/icons/share.svg";
 import ThreeDots from "@assets/icons/threedots.svg";
 import Liked from "@assets/icons/ThumbUpRed.svg";
-import image from "@assets/test/test.jpeg";
+import Delete from "@assets/SideBar/deletbaskit.svg";
 import { LegendList } from "@legendapp/list";
 import CommentInput from "@src/components/globals/CommentInput";
 import Colors from "@src/constants/Colors";
@@ -29,9 +36,8 @@ import { ImageFormater } from "@utils/ImageFormat";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
 import * as Clipboard from 'expo-clipboard';
-import { router } from "expo-router";
 import { Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -53,6 +59,8 @@ import { FormikInput } from "../FormictInput";
 import ImageSlider from "../ImageSlider";
 import LargeButton from "../LaregeButton";
 import Loading from "../Loading";
+import NewsFeedSingleview from "../NewsFeedSingleview";
+import ProfileSingleView from "../ProfileSingleView";
 import StarRating from "../StarRating";
 import { postDataType } from "./type";
 const PostDesign = ({
@@ -60,31 +68,45 @@ const PostDesign = ({
   setPage,
   isfetching,
   withCreatePost = false,
-
+  post_id,
+  isPostSingle,
   setData,
 }: postDataType) => {
+
   const user = useAppSelector(userdata);
+ 
   const [sendRequest, { isLoading }] = useSendRequestMutation();
   const [hidePostApi, { isLoading: hiding }] = useHidePostMutation();
   const [hiddenPosts, setHiddenPosts] = useState<number[]>([]);
+    const [posts, setPosts] = useState<[]>([]);
   const [selectedReceiver, setSelectedReceiver] = useState<any>(null);
   const [likePost, { isLoading: liking }] = useLikePostMutation();
   const [reportPostApi, { isLoading: reporting }] = useReportPostMutation();
   const [showViedio, setShowViedio] = useState(false);
+    const [showPast, setShowpast] = useState(false);
   const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
   const [showReport,setShowReport]=useState(false);
+  const [showFloor,setShowFloor]=useState(false);
+
   const [SelectedViedio,setSelectedViedio]=useState('');
      const [loading,setLoading]=useState(false);
      const [shareData,setShareData]=useState('');
+       const [showMortgage, setShowMortgage] = useState(false);
+     const [expanded,setExpanded]=useState(false);
   const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
   const { data: Profiles, isLoading: ProfilesLoading } =
     useGetProfilesForConectionQuery({ id: user.id });
   const isSmallList = Profiles?.profiles?.length <= 3;
   const [reportData,setReportData]=useState<any>(null);
+  const [showpostPostData,setShowpostPostData]=useState<any>(null);
   const insets = useSafeAreaInsets();
+    const [askEvaluation, { isLoading: askEvaluationLoading }] = useAskvaluationapiMutation();
   const [showConnection, setShowConnection] = useState(false);
   const [scrollable, setscrollable] = useState(true);
   const [showImages, setShowImages] = useState(false);
+    const [getComments, { data: comments, isFetching: commentFetching}] =
+      useLazyGetPostCommentsApiQuery();
+     
   const [statuse, setStatus] = useState("");
   const [unfollowApi, { isLoading: unfollowing }] = useUnfollowApiMutation();
   const [cancelRequestApi, { isLoading: canceling }] = useCancelRequestApiMutation();
@@ -93,7 +115,172 @@ const PostDesign = ({
   const [imageNo, setImageNo] = useState(0);
    const [selectedType, setSelectedType] = useState("");
   const [description, setDescription] = useState("");
+  const [showpost,setShowpost]=useState(false);
+  const [pastpage,setpastPage]=useState(1);
+  const [hasMore,setHasMore]=useState(true);
+    const [reviewModal, setReviewModal] = useState(false);
+    const[initialLoadDone,setInitialLoadDone]=useState(false);
+        const [getotherPastWork, {
+       data: othePastdata,
+       isLoading: otherWorkLoding,
+     }] = useLazyGetotherPastWorkQuery();
+      useEffect(() => {
+         if (!showpostPostData?.users_id  ) {
+           return;
+         }
+        getotherPastWork({ user_id: showpostPostData.users_id, work_section: showpostPostData?.connection_type });
+       }, [showpostPostData?.users_id]);
+      const [lazyUserAgentPastPostsApi, { data: pastData, isLoading: pastLoading }] = useLazyUserAgentPastPostsApiQuery();
+      useEffect(() => {
 
+        lazyUserAgentPastPostsApi({ user_id:showpostPostData?.users_id, page: pastpage, per_page: 10 });
+      }, [pastpage,showpostPostData]);
+      useEffect(() => {
+        if (!pastData?.data) return;
+    
+        setHasMore(pastData?.has_more);
+    
+        setPosts((prev) =>
+          pastpage === 1 ? pastData.data : [...prev, ...pastData.data]
+        );
+       setInitialLoadDone(true);
+      }, [pastData]);
+       useEffect(() => {
+    if (isPostSingle) {
+      setShowpost(true);
+      setShowpostPostData({post_id:post_id});
+    }
+  }, [isPostSingle]);
+    const CommentItem = ({ item }) => {
+ 
+
+    const [showReplyInput, setShowReplyInput] = useState(false);
+    const [replyText, setReplyText] = useState("");
+
+    const [postReply] = usePostReplyApiMutation();
+    const [deleteComment] = useDeleteCommentApiMutation();
+
+    const {
+      data,
+      isFetching,
+      refetch: refechfeeds,
+      isError,
+      error,
+    } = useGetHomeFeedsQuery({
+      id: user.id,
+      type: "All",
+      page: 1,
+      limit: 10,
+    });
+
+    const handleReply = async () => {
+      if (!replyText.trim()) return;
+
+      await postReply({
+        user_id: user?.id,
+        creator_id: user?.id,
+        comment_id: item.comment_id,
+        content: replyText,
+      });
+
+      setReplyText("");
+      setShowReplyInput(false);
+   getComments({ post_id: item.post_id });
+    };
+
+    return (
+      <View style={styles.commentWrapper}>
+        <CircleImage
+          Size={38}
+          source={{ uri: ImageFormater(item.profile_image) }}
+        />
+
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <View style={styles.commentCard}>
+            <View style={styles.commentHeader}>
+              <Text style={styles.userName}>{item.name}</Text>
+
+              {user?.id === item.sweetghar_user_id && (
+                <TouchableOpacity
+                  style={styles.deleteBtn}
+                  onPress={() =>
+                    deleteComment(item.comment_id)
+                      .unwrap()
+                      .then(() => {
+                        getComments({ post_id: showpostPostData?.post_id });
+                        refechfeeds();
+                      })
+                  }
+                >
+                  <Delete width={14} height={14} />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <Text style={styles.commentText}>{item.comment}</Text>
+          </View>
+
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              onPress={() => setShowReplyInput(!showReplyInput)}
+            >
+              <Text style={styles.actionText}>Reply</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.time}>{item.created_date}</Text>
+          </View>
+
+          {showReplyInput && (
+            <View style={styles.replyInputBox}>
+              <TextInput
+                value={replyText}
+                onChangeText={setReplyText}
+                placeholder="Write a reply..."
+                style={styles.replyInput}
+              />
+
+              <TouchableOpacity onPress={handleReply} style={styles.sendBtn}>
+                <Text style={styles.sendText}>Send</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {item.replies?.map((reply) => (
+            <View key={reply.comment_id} style={styles.replyWrapper}>
+              <CircleImage
+                Size={28}
+                source={{
+                  uri: ImageFormater(reply.profile_image),
+                }}
+              />
+
+              <View style={styles.replyCard}>
+                <View style={styles.commentHeader}>
+                  <Text style={styles.userName}>{reply.name}</Text>
+
+                
+                  {user?.id === reply.sweetghar_user_id && (
+                    <TouchableOpacity
+                      style={styles.deleteBtn}
+                      onPress={() =>
+                        deleteComment(reply.comment_id).unwrap().then(()=>{
+                          getComments({ post_id: showpostPostData?.post_id });
+                        })
+                      }
+                    >
+                      <Delete width={12} height={12} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                <Text style={styles.commentText}>{reply.comment}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
   const reportOptions = [
     "Copyright violation",
     "Scam, fraud or spam",
@@ -127,7 +314,6 @@ const [showShare,setShowShare]=useState(false);
   }) => {
     try {
       let status = statusi;
-      console.log(status);
       const formData = new FormData();
       if (status === "Connect" || status === "Cancel Request") {
         formData.append("sender_id", String(user?.id ?? ""));
@@ -205,6 +391,9 @@ const [showShare,setShowShare]=useState(false);
       renderToastError(error.message);
     }
   };
+  useEffect(() => {
+    getComments({ post_id: showpostPostData?.post_id });
+  }, [showpostPostData]);
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -248,10 +437,9 @@ const [showShare,setShowShare]=useState(false);
     if (item.type === "Shared Connection") {
       return (
         <TouchableOpacity className="bg-white" style={styles.card} onPress={() => {
-          router.navigate({
-            pathname: "/ProfileSigleView",
-            params: { id: item.id, type: item.connection_type.toLowerCase() }
-          })
+          setShowpostPostData(item);
+          setShowpost(true);
+         
         }}>
           <View className="flex-row items-center justify-between">
             <View className="flex-row">
@@ -440,13 +628,9 @@ const [showShare,setShowShare]=useState(false);
           className="bg-white"
           style={styles.card}
           onPress={() => {
-            router.navigate({
-              pathname: "/NewsFeedSingelView",
-              params: {
-                post_id: item.post_id,
-
-              },
-            });
+            setShowpostPostData(item);
+            setShowpost(true);
+           
           }}
         >
           <View className="flex-row items-center justify-between">
@@ -712,15 +896,9 @@ const [showShare,setShowShare]=useState(false);
           className="bg-white"
           style={styles.card}
           onPress={() => {
-            router.navigate({
-              pathname: "/NewsFeedSingelView",
-              params: {
-                id: item.id,
-                type:
-                  item.type === "Shared Property" ? "property" : "community",
-                post_id: item.post_id,
-              },
-            });
+            setShowpostPostData(item);
+            setShowpost(true);
+       
           }}
         >
           <View className="flex-row items-center justify-between">
@@ -1037,16 +1215,7 @@ const [showShare,setShowShare]=useState(false);
           />
         }
       />
-      {showImages && (
-        <ImageSlider
-          imageNo={imageNo}
-          images={selectedImages}
-          setShowImage={(val: boolean) => {
-            setShowImages(val);
-            setscrollable(true);
-          }}
-        />
-      )}
+     
       <Modal
         visible={showConnection}
         transparent={true}
@@ -1186,7 +1355,7 @@ const [showShare,setShowShare]=useState(false);
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.us/NewsFeedSingelView?post_id=${shareData?.post_id}`,
+          link:`https://homeilove.us/postRedirect?post_id=${shareData?.post_id||shareData?.post_id}`,
           post_id:shareData?.post_id,
           post_type:shareData?.type,
           post_image:shareData?.images?.[0]?? "",
@@ -1434,7 +1603,27 @@ const [showShare,setShowShare]=useState(false);
       </View>
       <Loading isLoading={reporting} text="Reporting..."/>
     </Modal>
+<Modal visible={showpost} animationType="slide" onRequestClose={() => setShowpost(false)} transparent={true}
+  statusBarTranslucent={true}  >
 
+    {showpostPostData?.type==="Shared Connection" ? (
+    <ProfileSingleView id={showpostPostData?.id} type={showpostPostData?.connection_type} setshowModel={setShowpost}/>
+    ):(
+      <NewsFeedSingleview post_id={showpostPostData?.post_id} setshowModel={setShowpost}/>
+    )}
+ 
+   
+</Modal>
+ {showImages && (
+        <ImageSlider
+          imageNo={imageNo}
+          images={selectedImages}
+          setShowImage={(val: boolean) => {
+            setShowImages(val);
+            setscrollable(true);
+          }}
+        />
+      )}
     </View>
   );
 };
@@ -1468,6 +1657,11 @@ const styles = StyleSheet.create({
     fontFamily: "PopinRegula",
   },
 
+  
+
+  text: {
+    fontFamily: "PopinRegula",
+  },
   profileCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -1555,6 +1749,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: hs(10),
   },
+
+
+  
   selectedRb: {
     width: hs(10),
     height:vs(10),
@@ -1591,8 +1788,168 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: vs(15),
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+
+    
+    
+       time: {
+          fontSize: ms(11),
+          color: "#999",
+          fontFamily: "PopinRegula",
+        },
+      
+        deleteBtn: {
+          padding: 5,
+          borderRadius: 20,
+          backgroundColor: "#FFECEC",
+        },
+      
+        replyWrapper: {
+          flexDirection: "row",
+          marginTop: vs(10),
+          marginLeft: hs(25),
+          alignItems: "flex-start",
+        },
+      
+        replyInputBox: {
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: vs(8),
+          backgroundColor: "#F1F3F5",
+          borderRadius: 25,
+          paddingHorizontal: hs(12),
+        },
+      
+        replyInput: {
+          flex: 1,
+          paddingVertical: vs(8),
+          fontFamily: "PopinRegula",
+        },
+      
+        sendBtn: {
+          backgroundColor: Colors.light.red,
+          paddingHorizontal: hs(14),
+          paddingVertical: vs(6),
+          borderRadius: 20,
+        },
+      
+        sendText: {
+          color: "white",
+          fontWeight: "600",
+          fontSize: ms(12),
+          fontFamily: "PopinRegula",
+        },
+          action: {
+            fontSize: ms(12),
+            color: Colors.light.textGray,
+            fontWeight: "500",
+            fontFamily: "PopinRegula",
+          },
+        
+          commentWrapper: {
+            flexDirection: "row",
+            marginBottom: vs(18),
+            marginHorizontal: hs(20),
+          },
+        
+          commentCard: {
+            backgroundColor: "#F4F6F8",
+            padding: ms(12),
+            borderRadius: 14,
+          },
+        
+          replyCard: {
+            backgroundColor: "#FAFAFA",
+            padding: ms(10),
+            borderRadius: 12,
+            flex: 1,
+          },
+        
+          commentHeader: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: vs(3),
+          },
+        
+          userName: {
+            fontWeight: "600",
+            fontSize: ms(13),
+            color: "#222",
+            fontFamily: "PopinRegula",
+          },
+        
+          commentText: {
+            fontSize: ms(13),
+            color: "#444",
+            lineHeight: 18,
+            fontFamily: "PopinRegula",
+          },
+        
+          actionRow: {
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: vs(5),
+            gap: 15,
+          },
+        
+          actionText: {
+            fontSize: ms(12),
+            color: Colors.light.textGray,
+            fontWeight: "600",
+            fontFamily: "PopinRegula",
+          },
+     cover: {
+    height: vs(250),
+    width: "100%",
+    borderBottomLeftRadius: ms(20),
+    borderBottomRightRadius: ms(20),
+    resizeMode: "cover",
+    backgroundColor: "gray",
   },
+   row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+  
+
+ 
+
+ 
+  
+
+
+
+ 
+
+
+
+  
+
+ 
+  
+  
+
+ 
+
+ 
+
+ 
+
+
 });

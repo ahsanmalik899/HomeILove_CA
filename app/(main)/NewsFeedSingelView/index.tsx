@@ -198,7 +198,7 @@ const index = () => {
   return (
     <>
       <ScrollView className="flex-1 bg-white">
-        <HeaderWithBack />
+        <HeaderWithBack onBackpress={()=>{router.navigate("/Home/Feeds/NewsFeed")}}/>
         <View
           className="flex-1"
           style={{ marginHorizontal: hs(10), paddingVertical: vs(20) }}
@@ -565,7 +565,7 @@ const index = () => {
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.us/NewsFeedSingelView?post_id=${post_id}`,
+          link:`https://homeilove.us/postRedirect?post_id=${post_id}`,
           post_id:post_id,
           post_type:data?.type,
           post_image:data?.post_images?.[0]?? "",

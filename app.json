@@ -11,7 +11,7 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/logo/logo.png",
-      "resizeMode": "cover",
+      "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "experiments": {
@@ -103,6 +103,21 @@
               "scheme": "https",
               "host": "homeilove.us",
               "pathPrefix": "/AddSingleView"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "homeilove.us",
+              "pathPrefix": "/postRedirect"
             }
           ],
           "category": [

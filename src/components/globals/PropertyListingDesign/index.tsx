@@ -18,11 +18,11 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { formatPrice } from "@utils/PriceFormater";
-import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
@@ -30,6 +30,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
 import { postDataType } from "./type";
@@ -41,10 +42,14 @@ const YourAdsPostDesign = ({
   type,
   hasmore,
   initialLoadDone,
+  isSingleView,
+  post_id,
+  post_type,
 }: postDataType) => {
   const [showImages, setShowImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-
+  const[singlePost,setSinglePost]=useState<any>(null);
+  const[singleView,setSingleView]=useState(false);
   const user = useAppSelector(userdata);
   const listRef = useRef<any>(null);
   const [imageNo, setImageNo] = useState(0);
@@ -55,6 +60,13 @@ const YourAdsPostDesign = ({
   const [savingItems, setSavingItems] = useState<{ [key: number]: boolean }>(
     {}
   );
+  useEffect(() => {
+    if (isSingleView) {
+      setSingleView(true);
+      setSinglePost({     type: post_type,
+                id: post_id});
+    }
+  }, [isSingleView]);
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     const initialSaved: { [key: number]: boolean } = {};
@@ -106,15 +118,12 @@ const YourAdsPostDesign = ({
     return (
       <>
         <TouchableOpacity
-          onPress={() => {
-            router.navigate({
-              pathname: "/AddSingleView",
-              params: {
-                type: item.property_for,
-                id: item.post_property_id,
-              },
-            });
+         onPress={() => {
+            setSingleView(true);
+           setSinglePost({     type: item.property_for,
+                id: item.post_property_id});
           }}
+        
         >
           <View className="bg-white" style={styles.card}>
             <View
@@ -499,6 +508,12 @@ const YourAdsPostDesign = ({
           }}
         />
       )}
+       <Modal visible={singleView} animationType="slide" onRequestClose={() => {    setSingleView(false);
+    setSinglePost(null);
+  }} transparent={true}
+                statusBarTranslucent={true}  >
+                <AddSingleView id={singlePost?.id} type={singlePost?.type} setshowModel={setSingleView} />
+              </Modal>
     </View>
   );
 };

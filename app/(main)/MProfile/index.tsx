@@ -150,7 +150,8 @@ const Index = () => {
         days: timePeriod,
      user_id:user.id,
         paymentMethod:paymentMethod,
-        amount:SelectedAmount
+        amount:SelectedAmount,
+        
       }).unwrap();
 setShowoption(false)
    renderToastSuccess(response?.message)
@@ -260,7 +261,7 @@ setShowoption(false)
                 <Share />
               </TouchableOpacity>
             </View>
-            {profile?.post_type === "Normal" && (
+            {profile?.post_type === "Normal" ? (
               <LargeButton
                 handleSubmit={() => {
                   setShowoption(true);
@@ -268,7 +269,15 @@ setShowoption(false)
                 }}
                 text="Upgrade ad to trending"
               />
-            )}
+            ):profile?.post_type === "Trending"? (
+               <LargeButton
+                handleSubmit={() => {
+                  setShowoption(true);
+                  setUpgradeId(profile.id);
+                }}
+                text="Upgrade ad to Promoted"
+              />
+            ):(<></>)}
             <View style={styles.row}>
               <TouchableOpacity onPress={handleDelete}>
                 <Delete />

@@ -398,10 +398,11 @@ const index = () => {
                     renderToastSuccess(result.data.message);
 
                     router.replace({
-                      pathname: "/AddSingleView",
+                      pathname: "/MyPostListing",
                       params: {
                         type: values.property_for,
                         id: result?.data?.post_id,
+                        isShowpost:"true",
                       },
                     });
                   }
@@ -417,10 +418,11 @@ const index = () => {
           
               renderToastSuccess(result.data.message);
                 router.replace({
-                      pathname: "/AddSingleView",
+                      pathname: "/MyPostListing",
                       params: {
                         type: values.property_for,
                         id: result?.data?.post_id,
+                        isShowpost:"true",
                       },
                     });
                   }

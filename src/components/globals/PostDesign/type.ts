@@ -5,4 +5,6 @@ export type postDataType= {
     withCreatePost?:boolean;
       refetch: () => void;
       setData:(data:[])=>void;
+      isPostSingle?:boolean;
+      post_id:string;
 }

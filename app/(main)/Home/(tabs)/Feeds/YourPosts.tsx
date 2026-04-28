@@ -15,6 +15,7 @@ import { FormikInput } from "@src/components/globals/FormictInput";
 import ImageSlider from "@src/components/globals/ImageSlider";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
+import NewsFeedSingleview from "@src/components/globals/NewsFeedSingleview";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
@@ -22,7 +23,6 @@ import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
-import { router } from "expo-router";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import {
@@ -52,10 +52,12 @@ const YourPosts = () => {
    const [shareData,setShareData]=useState('');
     const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
   const [showViedio, setShowViedio] = useState(false);
+   const [showpostPostData,setShowpostPostData]=useState<any>(null);
   const [SelectedViedio, setSelectedViedio] = useState('');
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [scrollable, setscrollable] = useState(true);
   const user = useAppSelector(userdata);
+    const [showpost,setShowpost]=useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showShare,setShowShare]=useState(false);
   const renderItem = ({ item }) => {
@@ -105,13 +107,8 @@ const YourPosts = () => {
         className="bg-white"
         style={styles.card}
         onPress={() => {
-          router.navigate({
-            pathname: "/GeneralPostSingleView",
-            params: {
-              id: item.id,
-
-            },
-          });
+          setShowpostPostData({ post_id: item.id });
+          setShowpost(true);
         }}
       >
         <View className="flex-row items-center justify-between">
@@ -709,6 +706,10 @@ const YourPosts = () => {
   </View>
   <Loading isLoading={sharing} text="Sharing..."/>
   </>
+</Modal>
+<Modal visible={showpost} animationType="slide" onRequestClose={() => setShowpost(false)} transparent={true}
+  statusBarTranslucent={true}  >
+<NewsFeedSingleview post_id={showpostPostData?.post_id} setshowModel={setShowpost}/>
 </Modal>
     </View>
   );

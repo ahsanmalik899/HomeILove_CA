@@ -5,10 +5,10 @@ import ProfileFilter from "@src/components/globals/ProfileFilter";
 import ProfileListingDesign from "@src/components/globals/ProfileListingDesign";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
-import { useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { BackHandler, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Yup from "yup";
 const index = () => {
   const params = useLocalSearchParams();
@@ -89,10 +89,34 @@ const index = () => {
     );
       setInitialLoadDone(true);
   }, [profileList, page]);
+useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      if (params?.isSingleView === "true") {
+        router.replace("/Home/Feeds/NewsFeed");
+        return true;
+      }
 
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/");
+      }
+
+      return true;
+    };
+
+    const sub = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    return () => sub.remove();
+  }, [params])
+);
   return (
     <View className=" flex-1" style={{ backgroundColor: "#F4F0F0" }}>
-      <HeaderWithBack />
+       <HeaderWithBack onBackpress={()=>{params?.isSingleView=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}} />
      <View style={styles.filterBar}>
  
   <View style={{ flex: 1 }}>
@@ -119,6 +143,9 @@ const index = () => {
         type="community"
         hasmore={hasMore}
          initialLoadDone={initialLoadDone}
+         isSingleView={params?.isSingleView=="true"}
+         post_id={params?.id?.toString()}
+         post_type={params?.type?.toString()}
       />
        {showFilter && (
               <Formik

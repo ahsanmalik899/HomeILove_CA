@@ -3,6 +3,7 @@ import { userdata } from "@/store/slices/selector/user";
 import PostDesign from "@src/components/globals/PostDesign/PostDesign";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -14,6 +15,7 @@ import {
 
 const NewsFeeds = () => {
   const [page, setPage] = useState(1);
+   const { post_id ,isPostSingle} = useLocalSearchParams();
   const limit = 10;
   const [Posts, setPosts] = useState<[]>([]);
   const user = useAppSelector(userdata);
@@ -82,7 +84,7 @@ const NewsFeeds = () => {
         />
       </View>
 
-      <PostDesign data={Posts} isfetching={isFetching} setPage={setPage} refetch={refetch} setData={setPosts} />
+      <PostDesign data={Posts} isfetching={isFetching} setPage={setPage} refetch={refetch} setData={setPosts} isPostSingle={isPostSingle=="true"?true:false} post_id={post_id?.toString()} />
     </View>
   );
 };
