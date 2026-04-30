@@ -868,6 +868,14 @@ export const MainApi = createApi({
       }),
       invalidatesTags:["myProfile"]
     }),
+    PromoteProfile: builder.mutation({
+      query: (data) => ({
+        url: "PromoteProfile",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags:["myProfile"]
+    }),
     getPostById: builder.query<any, any>({
       query: ({ post_id }) => ({
         url: `getPostById?post_id=${post_id}`,
@@ -879,6 +887,13 @@ export const MainApi = createApi({
         url: "getPrice",
         method: "GET",
         params: {price_type,profile_type},
+      }),
+    }),
+     getAdvatizementPrice:builder.query<any,any>({
+      query: ({type}) => ({
+        url: "getAdvatizementPrice",
+        method: "GET",
+        params: {type},
       }),
     })
   }),
@@ -990,5 +1005,8 @@ export const {
   useReportPostMutation,
   useLazyGetPostCommentsApiQuery,
   useGetPriceQuery,
-  useLazyGetPriceQuery
+  useLazyGetPriceQuery,
+  useGetAdvatizementPriceQuery,
+  useLazyGetAdvatizementPriceQuery,
+  usePromoteProfileMutation,
 } = MainApi;

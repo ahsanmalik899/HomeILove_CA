@@ -67,7 +67,7 @@ const YourAdsPostDesign = ({
   const user = useAppSelector(userdata);
   const [singleView, setSingleView] = useState(false);
   const [upgradeId, setUpgradeId] = useState(0);
- const{data:advertisePrices}=useGetPriceQuery({price_type:type==="community"?"Project":"property_1"})
+ const{data:advertisePrices}=useGetPriceQuery({price_type:type==="community"?"community":"property"})
   const listRef = useRef<any>(null);
   const [deletePost, { isLoading }] = useDeletePostMutation();
   const insets = useSafeAreaInsets();
@@ -106,14 +106,14 @@ const YourAdsPostDesign = ({
       console.log(e);
     }
   };
-  const handelSubmit = async () => {
+  const handelSubmit = async (method) => {
     try {
       const response = await upgradePost({
         post_id: upgradeId,
         type: type,
         days: timePeriod,
         user_id:user.id,
-        paymentMethod:paymentMethod,
+        paymentMethod:method,
         amount:SelectedAmount
       }).unwrap();
        setShowoption(false)
@@ -530,12 +530,11 @@ const YourAdsPostDesign = ({
             >
               <Text style={{ fontSize: ms(20), fontWeight: "bold" }}>×</Text>
             </TouchableOpacity>
-
-            {/* LegendList */}
             <LegendList
               data={advertisePrices?.data}
               keyExtractor={(item) => item.id}
               estimatedItemSize={50}
+              extraData={timePeriod}
               ListHeaderComponent={
                 <View
                   className="flex-row justify-between items-center"
@@ -681,7 +680,7 @@ const YourAdsPostDesign = ({
                   }
                   if (amount.amount >= Number(SelectedAmount)) {
                     setPaymentMethod("Wallet");
-                    handelSubmit();
+                    handelSubmit("Wallet");
                   } else {
                     renderToastError(
                       "You don't have enough amount in wallet, please recharge"
@@ -776,7 +775,7 @@ const YourAdsPostDesign = ({
           try {
             setPaymentMethod("Paypal");
             setOrderid(order_id);
-            handelSubmit();
+            handelSubmit("Paypal");
             setvisible(false);
             setApproveUrl(null);
           } catch {

@@ -107,7 +107,7 @@ const index = () => {
     propertyimg: [],
     floorimg: [],
   };
-  const {data:advertisePrices}=useGetPriceQuery({price_type:"property_1"})
+  const {data:advertisePrices}=useGetPriceQuery({price_type:"property"})
   
   const EditinitialValues = useMemo(() => {
     if (!edit || !EditData?.success) return initialValues;

@@ -1,7 +1,5 @@
 import { usePaybyPaypalMutation } from "@/store/api/user/MainApi";
-import { userdata } from "@/store/slices/selector/user";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
-import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError } from "@src/hooks/useToasty";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Modal, View } from "react-native";
@@ -9,85 +7,104 @@ import WebView from "react-native-webview";
 
 interface PayPalProps {
   visible: boolean;
-  onPress: (order_id:string,setApproveUrl:(value:string|null)=>void) => void;
+  onPress: (order_id: string, setApproveUrl: (value: string | null) => void) => void;
   amount: string | number;
   type?: string;
   profileType?: string;
   upgrdeId?: number;
   upgrade_amount?: number;
-  setVisible:(value:boolean)=>void;
+  setVisible: (value: boolean) => void;
 }
 
-const PayPalScreen = ({ visible, onPress, amount,setVisible }: PayPalProps) => {
+const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => {
+  
+  // ✅ Reset every time modal opens
   const captureCalled = useRef(false);
-  const user = useAppSelector(userdata);
-
-  const selectedAmount = Number(amount);
-  if(visible){
-  if (isNaN(selectedAmount) || selectedAmount <= 0) {
-    renderToastError("Invalid amount");
-  }}
 
   const [createOrder, { isLoading: isCreating }] = usePaybyPaypalMutation();
   const [approveUrl, setApproveUrl] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
 
+  const selectedAmount = Number(amount);
+
   useEffect(() => {
-    if (selectedAmount > 0) handlePay();
-  }, [visible]);
+    if (!visible) return;
+
+    // ✅ Reset state on every open
+    captureCalled.current = false;
+    setApproveUrl(null);
+    setOrderId(null);
+
+    if (isNaN(selectedAmount) || selectedAmount <= 0) {
+      renderToastError("Invalid amount");
+      return;
+    }
+
+    handlePay();
+  }, [visible]); // only trigger on visibility change
 
   const handlePay = async () => {
     try {
       const response = await createOrder({ amount: selectedAmount }).unwrap();
-      const approve = response.links.find((l: any) => l.rel === "approve");
 
-      if (!approve?.href) {
+      // ✅ Fix 1: backend now returns approve_link + order_id directly
+      const { approve_link, order_id } = response;
+
+      if (!approve_link) {
         Alert.alert("Error", "Could not get PayPal approval URL");
         return;
       }
 
-      setApproveUrl(approve.href);
-      const token = new URL(approve.href).searchParams.get("token");
-      setOrderId(token);
+      setApproveUrl(approve_link);
+      setOrderId(order_id);
+
     } catch (err) {
       console.log("Payment creation error:", err);
-      Alert.alert("Error", "Payment failed");
+      Alert.alert("Error", "Could not initiate payment. Please try again.");
     }
   };
 
   const handleNavigationChange = async (navState: any) => {
     const url = navState.url;
 
-    if (url.includes("success") && !captureCalled.current) {
-      captureCalled.current = true;
-      try {
-        if (!orderId) throw new Error("Order ID not found");
-  onPress(orderId,setApproveUrl);
-       
-      
-      } catch (err) {
-        renderToastError("Failed to capture payment");
-        console.log("Capture error:", err);
+    // ✅ Fix 2: match your exact return_url domain, not just "success"
+    const isSuccess = url.startsWith("https://example.com/success");
+    const isCancel  = url.startsWith("https://example.com/cancel");
+
+    if (isSuccess && !captureCalled.current) {
+      captureCalled.current = true; // ✅ prevent double-capture
+
+      if (!orderId) {
+        renderToastError("Order ID missing");
+        return;
       }
+
+      onPress(orderId, setApproveUrl);
     }
 
-    if (url.includes("cancel")) {
+    if (isCancel) {
       setApproveUrl(null);
+      setVisible(false);
       Alert.alert("Payment Cancelled ❌", "You cancelled the payment.");
     }
+  };
+
+  const handleClose = () => {
+    setApproveUrl(null);
+    setOrderId(null);
+    captureCalled.current = false;
+    setVisible(false);
   };
 
   return (
     <Modal
       visible={visible}
       animationType="slide"
-      onRequestClose={() => {
-        setApproveUrl(null);
-        setVisible(false);
-      }}
+      onRequestClose={handleClose}
     >
-      <HeaderWithBack title="PayPal Payment" onBackpress={()=>setVisible(false)}/>
-      {(isCreating ) ? (
+      <HeaderWithBack title="PayPal Payment" onBackpress={handleClose} />
+
+      {isCreating ? (
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <ActivityIndicator size="large" color="#0070ba" />
         </View>
@@ -101,7 +118,9 @@ const PayPalScreen = ({ visible, onPress, amount,setVisible }: PayPalProps) => {
           domStorageEnabled
           originWhitelist={["*"]}
           renderLoading={() => (
-            <ActivityIndicator size="large" color="#0070ba" style={{ flex: 1, justifyContent: "center" }} />
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+              <ActivityIndicator size="large" color="#0070ba" />
+            </View>
           )}
         />
       ) : null}

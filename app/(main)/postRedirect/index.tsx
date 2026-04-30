@@ -10,7 +10,7 @@ const index = () => {
     const id = Number(params.post_id);
     const type=params.type as string;
     const profileType= params.profile_type
-    console.log(profileType,"profileType");
+    const token= params.token
     useEffect(()=>{
       switch(type){
         case "post":
@@ -24,6 +24,12 @@ const index = () => {
           break;
         case "profile":
           router.navigate({pathname:"/ProfileListings",params:{id:id,type:profileType,isSingleView:"true"}})
+          break;
+           case "forgot":
+          router.navigate({pathname:"/CreateNewpass",params:{token:token}})
+          break;
+           case "verify":
+          router.navigate({pathname:"/Account",params:{token:token}})
           break;
       }
 

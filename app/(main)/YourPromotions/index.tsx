@@ -26,9 +26,7 @@ const Index = () => {
   const { data, isFetching } =
     useGetMyTrendingProfilesQuery({ id: user.id })
 
-  /**
-   * ✅ Render Item
-   */
+
 const renderItem = ({ item }: any) => {
   return (
     <TouchableOpacity
@@ -58,7 +56,7 @@ const renderItem = ({ item }: any) => {
           </View>
         </ImageBackground>
 
-        {/* ===== CONTENT BELOW COVER ===== */}
+     
         <View style={styles.content}>
           <Text numberOfLines={1} style={styles.businessName} >
             {item.business_name}
@@ -79,12 +77,7 @@ const renderItem = ({ item }: any) => {
             Dealing Area: {item.dealing_areas ?? "N/A"}
           </Text>
 
-          {/* ===== PROMOTE BUTTON ===== */}
-          <TouchableOpacity style={styles.promoteBtn} onPress={()=>{
-            router.navigate("/BuyCredit")
-          }}>
-            <Text style={styles.promoteText}>Promote Business</Text>
-          </TouchableOpacity>
+     
         </View>
       </View>
     </TouchableOpacity>

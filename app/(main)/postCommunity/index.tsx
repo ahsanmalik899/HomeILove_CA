@@ -66,7 +66,7 @@ const index = () => {
   } = useGetUserWalletQuery({
     id: user.id,
   });
- const {data:advertisePrices}=useGetPriceQuery({price_type:"Project"})
+ const {data:advertisePrices}=useGetPriceQuery({price_type:"community"})
   useEffect(() => {
     if (edit && editData) {
       const titlesLength = editData.post?.property_titles?.length;

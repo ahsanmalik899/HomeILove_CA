@@ -1,10 +1,12 @@
 import {
   useDeletePastWorkMutation,
   useDeleteProfileMutation,
+  useGetAdvatizementPriceQuery,
   useGetotherPastWorkQuery,
   useGetPriceQuery,
   useGetSingleProfileQuery,
   useGetUserWalletQuery,
+  usePromoteProfileMutation,
   useSavePastWorkMutation,
   useUpgradeProfileApiMutation,
   useUserAgentPastPostsApiQuery,
@@ -25,6 +27,7 @@ import Loading from "@src/components/globals/Loading";
 import PapPalPayment from "@src/components/globals/PapPalPayment";
 import PastDealsagent from "@src/components/globals/PastDealsagent";
 import PostPastWork from "@src/components/globals/PostPastWork";
+import PromotionPricingCard from "@src/components/globals/PromotionPricingCard";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
@@ -49,6 +52,8 @@ const Index = () => {
   const params = useLocalSearchParams();
   const [upgradeProfile, { isLoading: ugradeLoading }] =
     useUpgradeProfileApiMutation();
+       const [promoteProfile, { isLoading: promoteLoading }] =
+    usePromoteProfileMutation();
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
   const [posts, setPosts] = useState<[]>([]);
@@ -81,6 +86,7 @@ const Index = () => {
     setShowPastModal(false);
   };
 const {data:advertisePrices}=useGetPriceQuery({price_type:"Profile",profile_type:Profiletype.toLowerCase()})
+const {data:promotionPrices}=useGetAdvatizementPriceQuery({type:"Promotion"})
   const [showPast, setShowpast] = useState(false);
   const { data, isLoading } = useGetSingleProfileQuery({
     type: Profiletype,
@@ -98,6 +104,7 @@ const {data:advertisePrices}=useGetPriceQuery({price_type:"Profile",profile_type
   const [deleteProfile, { isLoading: deleting }] = useDeleteProfileMutation();
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [upgradeId, setUpgradeId] = useState(0);
+  const [isPromotion, setIsPromotion] = useState(false);
   const [showoption, setShowoption] = useState(false);
   const [deletePastWork, { isLoading: deletPastLoading }] =
     useDeletePastWorkMutation();
@@ -139,14 +146,32 @@ const {data:advertisePrices}=useGetPriceQuery({price_type:"Profile",profile_type
       ]
     );
   };
-  const handelSubmit = async () => {
+  const handelSubmit = async (method) => {
+    if(isPromotion){
+     console.log("promotion", timePeriod,SelectedAmount);
+ try {
+      const response = await promoteProfile({
+        profile_id: profile?.id,
+      profileType: Profiletype,
+        days: timePeriod,
+     user_id:user.id,
+        paymentMethod:method,
+        amount:SelectedAmount,
+        
+      }).unwrap();
+setShowoption(false)
+   renderToastSuccess(response?.message)
+    } catch (e) {
+      Alert.alert("Error", "Promotion failed");
+    }
+    }else{
     try {
       const response = await upgradeProfile({
         profile_id: profile?.id,
       profileType: Profiletype,
         days: timePeriod,
      user_id:user.id,
-        paymentMethod:paymentMethod,
+        paymentMethod:method,
         amount:SelectedAmount,
         
       }).unwrap();
@@ -155,6 +180,7 @@ setShowoption(false)
     } catch (e) {
       Alert.alert("Error", "Upgrade failed");
     }
+  }
   };
   const profile = data?.data;
   useEffect(() => {
@@ -264,15 +290,16 @@ setShowoption(false)
                   setShowoption(true);
                   setUpgradeId(profile.id);
                 }}
-                text="Upgrade ad to trending"
+                text="Upgrade Profile to trending"
               />
             ):profile?.post_type === "Trending"? (
                <LargeButton
                 handleSubmit={() => {
                   setShowoption(true);
                   setUpgradeId(profile.id);
+                  setIsPromotion(true);
                 }}
-                text="Upgrade ad to Promoted"
+                text="Upgrade Profile to Promoted"
               />
             ):(<></>)}
             <View style={styles.row}>
@@ -415,6 +442,7 @@ setShowoption(false)
         text="Loading.."
       />
       <Modal visible={showoption} animationType="fade" transparent={true}>
+        <ScrollView>
         <View
           style={{
             flex: 1,
@@ -428,7 +456,7 @@ setShowoption(false)
               backgroundColor: "white",
               borderRadius: ms(10),
               padding: hs(5),
-              maxHeight: "90%",
+           
             }}
           >
             <TouchableOpacity
@@ -443,7 +471,9 @@ setShowoption(false)
               <Text style={{ fontSize: ms(20), fontWeight: "bold" }}>×</Text>
             </TouchableOpacity>
 
-            {/* LegendList */}
+         {isPromotion?(
+          <PromotionPricingCard setprice={setSelectedAmount} setSelectedtimeprd={setTimeperiod}  promotionPrices={promotionPrices} />
+         ):(
             <LegendList
               data={advertisePrices?.data}
               keyExtractor={(item) => item.id}
@@ -502,8 +532,8 @@ setShowoption(false)
                   </Text>
                 </View>
               )}
-            />
-
+            />)}
+        
             <View
               style={{
                 height: vs(1),
@@ -594,7 +624,7 @@ setShowoption(false)
                   }
                   if (amount.amount >= Number(SelectedAmount)) {
                     setPaymentMethod("Wallet");
-                    handelSubmit();
+                    handelSubmit("Wallet");
                   } else {
                     renderToastError(
                       "You don't have enough amount in wallet, please recharge"
@@ -606,7 +636,8 @@ setShowoption(false)
             </View>
           </View>
         </View>
-         <Loading isLoading={ugradeLoading } text="Loading.." />
+        </ScrollView>
+         <Loading isLoading={ugradeLoading||promoteLoading } text="Loading.." />
       </Modal>
          <PapPalPayment
               amount={SelectedAmount}
@@ -614,7 +645,7 @@ setShowoption(false)
                 try {
                   setPaymentMethod("Paypal");
                   setOrderid(order_id);
-                  handelSubmit();
+                  handelSubmit("Paypal");
                    setvisible(false);
                   setApproveUrl(null);
                 } catch {

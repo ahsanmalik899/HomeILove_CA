@@ -89,7 +89,7 @@ const Index = () => {
     refetch: pastRefetch,
   } = useGetotherPastWorkQuery(
     { user_id: profile?.users_id, work_section: type },
-    { skip: !profile?.users_id || type === "agent" || profile?.post_type !== "Trending" }
+    { skip: !profile?.users_id || type === "agent" || profile?.post_type !== "Trending"||type===null }
   );
 
   const {
@@ -98,7 +98,7 @@ const Index = () => {
     refetch,
   } = useUserAgentPastPostsApiQuery(
     { page, per_page: perPage, user_id: profile?.users_id },
-    { skip: !profile?.users_id || type !== "agent" || profile?.post_type !== "Trending" }
+    { skip: !profile?.users_id || type !== "agent" || profile?.post_type !== "Trending"||type===null }
   );
   useEffect(() => {
     if (!pastData?.data) return;

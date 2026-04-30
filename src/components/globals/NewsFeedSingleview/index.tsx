@@ -19,12 +19,12 @@ import { ImageFormater } from '@utils/ImageFormat';
 import { ViedioUrlFormat } from '@utils/ViedioUrlFormater';
 import { Video } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
-import { router } from 'expo-router';
 import { Formik } from 'formik';
 import { useState } from 'react';
 import { ActivityIndicator, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import * as yup from "yup";
+import AddSingleView from '../AddSingleView';
 import CircleImage from '../CircleImage/CircleImage';
 import { FormikInput } from '../FormictInput';
 import HeaderWithBack from '../HeaderWithBack';
@@ -39,6 +39,8 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
     };
    const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
   const [loading,setLoading]=useState(false);
+  const [singleView, setSingleView] = useState(false);
+     const [singlePost, setSinglePost] = useState<any>(null);
    const CommentItem = ({ item, refetch }) => {
      const user = useSelector(userdata);
  
@@ -194,14 +196,7 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
              {data?.type!=="general" && (
              <TouchableOpacity
                onPress={() =>
-                 router.push({
-                   pathname: "/AddSingleView",
-                   params: {
-                     id: data?.post?.post_property_id||data?.post?.post_community_id,
-                     type: data?.type,
-               
-                   },
-                 })
+                setSingleView(true)
                }
              >
                <Text style={styles.fullDetailText}>See Full Details</Text>
@@ -717,6 +712,12 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
    </View>
    <Loading isLoading={sharing} text="Sharing..."/>
  </Modal>
+   <Modal visible={singleView} animationType="slide" onRequestClose={() => {    setSingleView(false);
+     setSinglePost(null);
+   }} transparent={true}
+                 statusBarTranslucent={true}  >
+                 <AddSingleView id={ data?.post?.post_property_id||data?.post?.post_community_id} type={data?.type} setshowModel={setSingleView} />
+               </Modal>
        <Loading isLoading={isFetching} text="Loading..." />
      </>
    );
