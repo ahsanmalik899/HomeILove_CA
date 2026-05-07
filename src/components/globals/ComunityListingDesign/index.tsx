@@ -8,6 +8,7 @@ import UnSelecteHeart from "@assets/Feedimg/unselected_heart.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { LegendList } from "@legendapp/list";
+import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
@@ -67,11 +68,12 @@ const YourAdsPostDesign = ({
       const facts = item.imp_facts ?? item.facts ?? "";
     return (
       <>
+      {item.type==="post"?(
         <TouchableOpacity
           onPress={() => {
             setSingleView(true);
            setSinglePost({ type: type,
-                id: item.post_community_id});
+                id: item?.data?.post_community_id});
           }}
         >
           <View className="bg-white" style={styles.card}>
@@ -99,14 +101,14 @@ const YourAdsPostDesign = ({
                   fontFamily: "PopinRegula",
                 }}
               >
-               From $ {item.price1}
+               From $ {item?.data?.price1}
                 {type === "rent" && (
                   <Text style={{ color: Colors.light.red , fontSize:ms(18),fontFamily: "PopinRegula",}}>
-                    /{item.rent_type}
+                    /{item.data.rent_type}
                   </Text>
                 )}
               </Text>
-              {item.post_type === "Trending" && (
+              {item?.data?.post_type === "Trending" && (
                 <Text
                   style={{ fontWeight: 600, color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}
                 >
@@ -116,10 +118,10 @@ const YourAdsPostDesign = ({
             </View>
 
             <Text style={{ color: "black",fontWeight:700,fontFamily: "PopinRegula", }}>
-              {item.community_title}
+              {item?.data?.community_title}
             </Text>
             <Text style={{ color: Colors.light.textGray, marginTop: vs(5),fontFamily: "PopinRegula", }}>
-              {item.address}
+              {item?.data?.address}
             </Text>
              <View
                                 style={{
@@ -133,7 +135,7 @@ const YourAdsPostDesign = ({
             <View>
               
               <View style={{marginTop:vs(5)}}>
-             {item.post_type === "Trending" && facts && (
+             {item?.data?.post_type === "Trending" && facts && (
   facts
     .split(",",4)
     .filter(Boolean)
@@ -169,11 +171,11 @@ const YourAdsPostDesign = ({
 
               <Text style={styles.description}>
                 {expanded
-                  ? item.community_details
-                  : item.community_details?.slice(0, 70) +
-                    (item.community_details?.length > 70 ? "..." : "")}
+                  ? item?.data?.community_details
+                  : item?.data?.community_details?.slice(0, 70) +
+                    (item?.data?.community_details?.length > 70 ? "..." : "")}
 
-                {item.community_details?.length > 70 && (
+                {item?.data?.community_details?.length > 70 && (
                   <Text
                     style={styles.moreText}
                     onPress={() => setExpanded(expanded ? false : true)}
@@ -185,15 +187,15 @@ const YourAdsPostDesign = ({
 
               <TouchableOpacity
                 onPress={() => {
-                  setSelectedImages(item.images || []);
+                  setSelectedImages(item?.data?.images || []);
                   setShowImages(true);
                   setscrollable(false);
                 }}
               >
                 <Image
                   source={
-                    item.images && item.images.length > 0
-                      ? { uri: ImageFormater(item.images[0]) }
+                    item?.data?.images && item?.data?.images.length > 0
+                      ? { uri: ImageFormater(item?.data?.images[0]) }
                       : NoImage
                   }
                   style={{
@@ -220,10 +222,10 @@ const YourAdsPostDesign = ({
                     <Camera />
                     <Text style={{ color: "white", fontWeight: 600 ,fontFamily: "PopinRegula",}}>
                       {" "}
-                      {item.images ? item.images.length : 0}
+                      {item?.data?.images ? item?.data?.images.length : 0}
                     </Text>
                   </View>
-                  {item.saleprice_type === "Reduced Price" && (
+                  {item?.data?.saleprice_type === "Reduced Price" && (
                     <Text
                       style={{
                         backgroundColor: "rgba(241, 28, 28, 0.41)",
@@ -235,7 +237,7 @@ const YourAdsPostDesign = ({
                         fontFamily: "PopinRegula",
                       }}
                     >
-                      {item.saleprice_type}
+                      {item?.data?.saleprice_type}
                     </Text>
                   )}
                 </View>
@@ -249,7 +251,7 @@ const YourAdsPostDesign = ({
                   }}
                   className="flex-row justify-between"
                 >
-                  {item.property_condition === "Newly build" && (
+                  {item?.data?.property_condition === "Newly build" && (
                     <Text
                       style={{
                         backgroundColor: "rgba(241, 28, 28, 0.41)",
@@ -261,7 +263,7 @@ const YourAdsPostDesign = ({
                         fontFamily: "PopinRegula",
                       }}
                     >
-                      {item.property_condition}
+                      {item?.data?.property_condition}
                     </Text>
                   )}
                   <TouchableOpacity style={{ marginLeft: "auto" }}>
@@ -269,10 +271,10 @@ const YourAdsPostDesign = ({
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
-              {item.post_type==="Trending"&&(
+              {item?.data?.post_type==="Trending"&&(
                 <>
                  <LegendList
-                data={item.images || []}
+                data={item?.data?.images || []}
                 horizontal
                 className="flex-1"
                 keyExtractor={(item, index) => `${item}-${index}`}
@@ -315,13 +317,13 @@ const YourAdsPostDesign = ({
                   <View className="flex-row items-center">
                                        <CommunityType />
                                        <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
-                                         {item.community_type}
+                                         {item?.data?.community_type}
                                        </Text>
                                      </View>
                                      <View className="flex-row items-center">
                                        <CommunitySatatus />
                                        <Text style={{ marginLeft: vs(5),fontFamily: "PopinRegula", }}>
-                                         {item.community_status}
+                                         {item?.data?.community_status}
                                        </Text>
                                      </View>
                 </>
@@ -347,13 +349,13 @@ const YourAdsPostDesign = ({
                 </TouchableOpacity>
 
                 <CircleImage
-                  source={{ uri: ImageFormater(item.posted_by.logo) }}
+                  source={{ uri: ImageFormater(item?.data?.posted_by.logo) }}
                   Size={40}
                 />
               </View>
             </View>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity>):(<AdCardWithoutAnimation  ad={item?.data}/>)}
       </>
     );
   };

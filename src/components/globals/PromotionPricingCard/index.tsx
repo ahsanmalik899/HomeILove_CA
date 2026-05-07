@@ -41,7 +41,14 @@ export default function PromotionPricingCard({
   const [endDate, setEndDate] = useState<Date>(tomorrow);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+const FormatDate = (date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
 
+  return `${year}-${month}-${day}`;
+};
 
   const diffMs = endDate.getTime() - startDate.getTime();
   const days = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
@@ -50,7 +57,7 @@ export default function PromotionPricingCard({
 
   useEffect(() => {
     setSelectedtimeprd?.(days);
-
+setfieldvalue?.('ad_life',days);
   }, [days]);
   useEffect(() => {
     setprice?.(totalPrice);
@@ -117,13 +124,12 @@ export default function PromotionPricingCard({
             setShowStartPicker(false);
             if (date) {
               setStartDate(date);
-              setfieldvalue?.("start_date",date);
-              // Ensure end is always after start
+              setfieldvalue?.("start_date",FormatDate(date));
               if (date >= endDate) {
                 const next = new Date(date);
                 next.setDate(date.getDate() + 1);
                 setEndDate(next);
-                setfieldvalue?.("end_date",next);
+                setfieldvalue?.("end_date",FormatDate(next));
               }
             }
           }}
@@ -143,7 +149,7 @@ export default function PromotionPricingCard({
           onChange={(_, date) => {
             setShowEndPicker(false);
             if (date) {setEndDate(date);
-             setfieldvalue?.("end_date",date);
+             setfieldvalue?.("end_date",FormatDate(date));
             }
           }}
         />

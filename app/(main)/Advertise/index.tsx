@@ -1,4 +1,4 @@
-import { useGetUserWalletQuery, useLazyGetAdvatizementPriceQuery, usePostAdvatizementMutation } from "@/store/api/user/MainApi";
+import { useGetUserAdvertisementsQuery, useGetUserWalletQuery, useLazyGetAdvatizementPriceQuery, usePostAdvatizementMutation, useUpdateAdvertisementMediaMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import AdvatiseBaner from "@assets/SideBar/advertisementpic.svg";
@@ -8,10 +8,13 @@ import Listipage1 from "@assets/SideBar/listingPage1.svg";
 import Listipage2 from "@assets/SideBar/listinpage2.svg";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import TimeLine from "@assets/SideBar/timeline.svg";
+import { Feather } from "@expo/vector-icons";
+import { LegendList } from "@legendapp/list";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
+import PapPalPayment from "@src/components/globals/PapPalPayment";
 import PromotionPricingCard from "@src/components/globals/PromotionPricingCard";
 import TablikeButton from "@src/components/globals/TablikeButton";
 import UploadPic from "@src/components/globals/UploadPic";
@@ -19,22 +22,29 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
+import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
+  const user = useAppSelector(userdata);
   const [showInfoPage, setShowInfopage] = useState(false);
   const [showAdvatizeFrom, setShowAdvatizeForm] = useState(false);
   const [advatizeinfoType, setAdvatizeinfoType] = useState("Homefeed");
   const [listingInfo, setListingInfo] = useState("ListingDetail");
+  const [EditAdData,setEditAdData]=useState(null)
   const [timePeriod, setTimeperiod] = useState("");
+  const [EditAd, setEditAd] = useState(false);
   const [getprice, { data: promotionPrices, isFetching: pricesFetching }] = useLazyGetAdvatizementPriceQuery()
   const [PostAdvatizement, { isLoading }] = usePostAdvatizementMutation();
+  const{data:Myadvatizemants,isFetching:myad_fetching}=  useGetUserAdvertisementsQuery({user_id:user.id})
   const [visible, setvisible] = useState(false);
-  const user = useAppSelector(userdata);
+  const [page,setpage]=useState("");
+  const [updateAdvertisementMedia,{isLoading:updateadloading}]= useUpdateAdvertisementMediaMutation()
+  const [showAdPreview, setShowAdPreview] = useState(false);
   const AdvatizeSchema = Yup.object().shape({
     start_date: Yup.string().required("Start date is required"),
 
@@ -43,8 +53,15 @@ const index = () => {
     ad_link: Yup.string()
       .url("Please enter a valid URL")
       .required("Ad link is required"),
-    business_cover: Yup.mixed().nullable(),
+    business_cover: Yup.mixed().required("Image is required"),
     on_page: Yup.string().required("Page selection is required"),
+  });
+    const EditAdvatizeSchema = Yup.object().shape({
+    ad_link: Yup.string()
+      .url("Please enter a valid URL")
+      .required("Ad link is required"),
+    business_cover: Yup.mixed().required("Image is required"),
+   
   });
   const {
     data: amount,
@@ -55,6 +72,8 @@ const index = () => {
   });
   const [SelectedAmount, setSelectedAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [orderid, setOrderid] = useState("");
+ 
   const Listingcomponenet1 = (
     <View style={{ marginTop: vs(10) }}>
       <Listipage1 height={vs(300)} width={hs(350)} />
@@ -205,7 +224,7 @@ const index = () => {
     return (
       <ScrollView>
         <View className="flex-1 bg-white">
-          <HeaderWithBack />
+          <HeaderWithBack onBackpress={()=>{setShowInfopage(false)}} />
           <View style={{ marginHorizontal: hs(20), marginTop: vs(30) }}>
             <Text className="font-bold" style={{ fontFamily: "PopinRegula", }}>
               Market your Brand or Business on Nation's smartest real-estate
@@ -316,14 +335,7 @@ const index = () => {
     connections: "Connection",
     listing: "Listing",
     listing_details: "Single View",
-    sale: "Listing",
-    rent: "Listing",
-    community: "Listing",
-    agent: "Listing",
-    developer: "Listing",
-    mortgage: "Listing",
-    maintenance: "Listing",
-    timeline: "Timeline",
+  
   };
 
   if (showAdvatizeFrom) {
@@ -331,7 +343,7 @@ const index = () => {
       <>
         <ScrollView>
           <View className="flex-1 bg-white">
-            <HeaderWithBack />
+            <HeaderWithBack onBackpress={()=>{setShowAdvatizeForm(false);}}/>
             <View style={{ marginHorizontal: hs(20), marginVertical: vs(20) }}>
               <Text style={{ fontSize: ms(20), fontWeight: "500", fontFamily: "PopinRegula", }}>
                 Making your brand more
@@ -346,13 +358,17 @@ const index = () => {
                   business_cover: null,
                   user_id: user.id,
                   total_price: 200,
+                  paymentMethod: "",
+                  order_id: "",
+                  ad_life: "",
+                 
                 }}
                 validationSchema={AdvatizeSchema}
                 onSubmit={async (values) => {
                   try {
                     const formData = new FormData();
 
-                    // Append normal fields
+
                     Object.keys(values).forEach((key) => {
                       if (
                         key !== 'business_cover' &&
@@ -372,25 +388,26 @@ const index = () => {
                       } as any);
                     }
 
-
-                    // 🔥 unwrap() throws error automatically if API fails
+                   
+                 
                     const response = await PostAdvatizement(formData).unwrap();
 
                     // ✅ SUCCESS TOAST
                     renderToastSuccess(
                       response?.message || 'Advertisement submitted successfully'
                     );
+                    router.back();
                   } catch (error: any) {
                     console.log('Submit error:', error);
 
-                    // ❌ Laravel validation errors
+
                     if (error?.data?.errors) {
                       const firstError = Object.values(error.data.errors)[0] as string[];
                       renderToastError(firstError[0]);
                       return;
                     }
 
-                    // ❌ Server error
+
                     renderToastError(
                       error?.data?.message || 'Something went wrong. Try again.'
                     );
@@ -475,6 +492,7 @@ const index = () => {
                         onPress={() => {
                           setFieldValue("on_page", "listing");
                           getprice({ type: pageTypeMap["listing"] });
+                          setpage("listing");
                         }}
                       >
                         <Text
@@ -497,6 +515,7 @@ const index = () => {
                         ]}
                         onPress={() => {
                           setFieldValue("on_page", "listing_details");
+                          setpage("listing_details")
                           getprice({ type: pageTypeMap["listing_details"] });
                         }}
                       >
@@ -539,20 +558,21 @@ const index = () => {
                             style={{ marginTop: vs(10), gap: hs(5) }}
                           >
                             <TouchableOpacity
-                              style={[
-                                styles.btn,
-                                values.on_page === "sale" && styles.btnselected,
-                                { flex: 1 },
-                              ]}
+                            style={[
+  styles.btn,
+  (values.on_page === "sale" || values.on_page === "sale_single") && styles.btnselected,
+  { flex: 1 },
+]}
                               onPress={() => {
-                                setFieldValue("on_page", "sale");
-                                getprice({ type: pageTypeMap["sale"] });
+                                {values.on_page==="listing_details"?setFieldValue("on_page", "sale"):setFieldValue("on_page", "sale_single")}
+                                
+                                getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "sale" ? "white" : "black",
+                                    values.on_page === "sale" ||values.on_page === "sale_single"  ? "white" : "black",
                                   fontWeight: 600,
                                   fontFamily: "PopinRegula",
                                 }}
@@ -564,18 +584,18 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                                values.on_page === "rent" && styles.btnselected,
+                               ( values.on_page === "rent"||values.on_page === "rent_single" ) && styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                                setFieldValue("on_page", "rent");
-                                getprice({ type: pageTypeMap["rent"] });
+                              {values.on_page==="listing_details"?setFieldValue("on_page", "rent"):setFieldValue("on_page", "rent_single")}
+                                getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "rent" ? "white" : "black",
+                                    values.on_page === "rent"||values.on_page === "rent_single" ? "white" : "black",
                                   fontWeight: 600,
                                   fontFamily: "PopinRegula",
                                 }}
@@ -591,19 +611,20 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                                values.on_page === "community" &&
+                               (values.on_page === "community"||  values.on_page === "community_single") &&
                                 styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                                setFieldValue("on_page", "community");
-                                getprice({ type: pageTypeMap["community"] });
+                            {values.on_page==="listing_details"?setFieldValue("on_page", "community"):setFieldValue("on_page", "community_single")}
+                                getprice({ type: pageTypeMap[page] });
+
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "community"
+                                    values.on_page === "community"||  values.on_page === "community_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -616,18 +637,18 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                                values.on_page === "agent" && styles.btnselected,
+                                  (values.on_page === "agent"||values.on_page === "agent_single") && styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                                setFieldValue("on_page", "agent");
-                                getprice({ type: pageTypeMap["agent"] });
+                               {values.on_page==="listing_details"?setFieldValue("on_page", "agent"):setFieldValue("on_page", "agent_single")}
+                                getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "agent"
+                                    values.on_page === "agent"||values.on_page === "agent_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -645,19 +666,19 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                                values.on_page === "developer" &&
+                               ( values.on_page === "developer"||values.on_page === "developer_single") &&
                                 styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                                setFieldValue("on_page", "developer");
-                                getprice({ type: pageTypeMap["developer"] });
+                                {values.on_page==="listing_details"?setFieldValue("on_page", "developer"):setFieldValue("on_page", "developer_single")}
+                                getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "developer"
+                                    values.on_page === "developer"||values.on_page === "developer_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -670,19 +691,19 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                                values.on_page === "mortgage" &&
+                                (values.on_page === "mortgage"|| values.on_page === "mortgage_single") &&
                                 styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                                setFieldValue("on_page", "mortgage");
-                                getprice({ type: pageTypeMap["mortgage"] });
+                              {values.on_page==="listing_details"?setFieldValue("on_page", "mortgage"):setFieldValue("on_page", "mortgage_single")}
+                                getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "mortgage"
+                                    values.on_page === "mortgage"|| values.on_page === "mortgage_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -697,19 +718,19 @@ const index = () => {
                           <TouchableOpacity
                             style={[
                               styles.btn,
-                              values.on_page === "maintenance" &&
+                              (values.on_page === "maintenance"||values.on_page === "maintenance_single") &&
                               styles.btnselected,
                               { width: hs(200), marginTop: vs(10) },
                             ]}
                             onPress={() => {
-                              setFieldValue("on_page", "maintenance");
-                              getprice({ type: pageTypeMap["maintenance"] });
+                             {values.on_page==="listing_details"?setFieldValue("on_page", "maintenance"):setFieldValue("on_page", "maintenance_single")}
+                              getprice({ type: pageTypeMap[page] });
                             }}
                           >
                             <Text
                               style={{
                                 color:
-                                  values.on_page === "maintenance"
+                                  values.on_page === "maintenance"||values.on_page === "maintenance_single"
                                     ? "white"
                                     : "black",
                                 fontWeight: 600,
@@ -781,7 +802,29 @@ const index = () => {
                       setValue={setFieldValue}
                       value={values.business_cover}
                     />
-                    <LargeButton handleSubmit={() => { }} text="View your Ad" />
+                    {errors.business_cover && (
+                      <Text style={{ color: "red" }}>{errors.business_cover}</Text>
+                    )}
+                    <LargeButton
+                      handleSubmit={() => {
+                        setShowAdPreview(!showAdPreview);
+                      }}
+                      text={showAdPreview ? "Hide your Ad" : "View your Ad"}
+                    />
+                    {showAdPreview && values.business_cover && (
+                      <View style={styles.adContainer}>
+                        <Image
+                          source={{
+                            uri:
+                              typeof values.business_cover === "string"
+                                ? values.business_cover
+                                : values.business_cover?.uri,
+                          }}
+                          style={styles.adImage}
+                          resizeMode="stretch"
+                        />
+                      </View>
+                    )}
                     <View
                       style={{
                         borderLeftWidth: 1,
@@ -805,7 +848,7 @@ const index = () => {
                           backgroundColor: "white",
                           borderRadius: ms(10),
                           padding: hs(5),
-                        
+
                         }}
                       >
 
@@ -853,7 +896,7 @@ const index = () => {
                                 fontFamily: "PopinRegula",
                               }}
                             >
-                              {amount.amount}
+                              {amount?.amount}
                             </Text>
                           )}
                           <Text
@@ -897,11 +940,12 @@ const index = () => {
                           <LargeButton
                             handleSubmit={() => {
                               if (!SelectedAmount) {
-                                renderToastError("Please select bundle first");
+                                renderToastError("Please select date from and to");
                                 return;
                               }
-                              if (amount.amount >= Number(SelectedAmount)) {
-                                setPaymentMethod("Wallet");
+                              if (amount?.amount >= Number(SelectedAmount)) {
+                                setFieldValue("paymentMethod", "Wallet");
+                                handleSubmit();
 
                               } else {
                                 renderToastError(
@@ -914,8 +958,22 @@ const index = () => {
                         </View>
                       </View>
                     </View>
-                    {/* <Loading isLoading={ugradeLoading } text="Loading.." /> */}
-                    <LargeButton handleSubmit={() => { handleSubmit(); console.log(errors, "erreor") }} text="Pay & Submit" />
+                    <PapPalPayment
+                      amount={SelectedAmount}
+                      onPress={(order_id, setApproveUrl) => {
+                        try {
+                          setFieldValue("paymentMethod","paypal");
+                         setFieldValue("order_id",order_id);
+                          handleSubmit();
+                          setvisible(false);
+                          setApproveUrl(null);
+                        } catch {
+                          renderToastError("Some thing went rong");
+                        }
+                      }}
+                      setVisible={setvisible}
+                      visible={visible}
+                    />
                   </>
                 )}
               </Formik>
@@ -930,11 +988,140 @@ const index = () => {
   return (
     <ScrollView scrollEnabled>
       <View className="flex-1 bg-white">
-        <HeaderWithBack title="Advertisements" />
+        <HeaderWithBack title="Advertisements" onBackpress={()=>router.back()}/>
+              {myad_fetching ?(<ActivityIndicator size="small" color={Colors.light.red} />):(
+                <>
+        {Myadvatizemants?.data?.length>0?(<View>
+              
+<View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: hs(16), marginTop: vs(10) }}>
+  
+  <Text style={{ flex: 1, fontSize: ms(14), color: "#333" }}>
+    Want to promote your ad?
+  </Text>
+
+  <View style={{ width: hs(140) }}>
+    <LargeButton text="Advertise new" handleSubmit={() => setShowInfopage(true)} />
+  </View>
+
+</View>
+
+          <LegendList
+          data={Myadvatizemants?.data}
+
+  renderItem={({ item }) => (
+  <View style={{
+    backgroundColor: "#fff",
+    borderRadius: ms(14),
+    marginHorizontal: hs(16),
+    marginVertical: vs(8),
+    overflow: "hidden",
+    borderWidth: 0.5,
+    borderColor: "#E0E0E0",
+  }}>
+  
+    <View style={{ position: "relative" }}>
+      <Image
+        source={{ uri: ImageFormater(item.ad_image) }}
+        style={{ height: vs(180), width: "100%", resizeMode: "cover", backgroundColor: "#C8C8C8" }}
+      />
+
+   
+      <View style={{
+        position: "absolute", top: vs(10), left: hs(10),
+        backgroundColor: Colors.light.LightGreen, borderRadius: ms(20),
+        paddingHorizontal: hs(10), paddingVertical: vs(3),
+        borderWidth: 0.5, borderColor: Colors.light.DarkGreen,
+      }}>
+        <Text style={{ fontFamily: "PopinRegula", fontSize: ms(11), color: "white" }}>
+          on: {item.on_page}
+        </Text>
+      </View>
+    </View>
+
+    <View style={{ padding: ms(14) }}>
+      {/* ID + Status */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: vs(12) }}>
+        <View>
+          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(11), color: "#888" }}>Ad ID</Text>
+          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(15), fontWeight: "500", color: "#1A1A1A" }}>
+            #{item.advertisement_id}
+          </Text>
+        </View>
+        <View style={{
+          backgroundColor: item.status === "Active" ? Colors.light.LightGreen :Colors.light.lightGray,
+          borderRadius: ms(20), paddingHorizontal: hs(12), paddingVertical: vs(4),
+          borderWidth: 0.5, borderColor: item.status === "Active" ? Colors.light.DarkGreen : Colors.light.red,
+        }}>
+          <Text style={{
+            fontFamily: "PopinRegula", fontSize: ms(11), fontWeight: "500",
+            color: item.status === "Active" ? Colors.light.DarkGreen : Colors.light.red,
+          }}>
+            {item.status}
+          </Text>
+        </View>
+      </View>
+
+      {/* Stats Grid */}
+      <View style={{ borderTopWidth: 0.5, borderTopColor: "#E0E0E0", paddingTop: vs(12), flexDirection: "row", flexWrap: "wrap", gap: ms(10) }}>
+        {[
+          { label: "Amount", value: `$ ${item.amount_received}` },
+          { label: "Payment", value: item.payment_status },
+          { label: "Ad life", value: `${item.ad_life} days` },
+          { label: "Posted", value: item.date_posted?.slice(0, 10) },
+            { label: "Expires on", value: item.expiry_date },
+        ].map(({ label, value }) => (
+          <View key={label} style={{ width: "47%" }}>
+            <Text style={{ fontFamily: "PopinRegula", fontSize: ms(11), color: "#888" }}>{label}</Text>
+            <Text style={{ fontFamily: "PopinRegula", fontSize: ms(13), fontWeight: "500", color: "#1A1A1A" }}>{value}</Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Ad Link */}
+      {item.ad_link ? (
+        <View style={{ borderTopWidth: 0.5, borderTopColor: Colors.light.DarkGreen, paddingVertical: vs(10),paddingHorizontal:hs(10),backgroundColor:Colors.light.DarkGreen,borderBottomRightRadius:ms(10),borderBottomLeftRadius:ms(10), marginTop: vs(12), flexDirection: "row", alignItems: "center", gap: hs(6) }}>
+          <Feather name="link" size={ms(13)} color="white" />
+          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(12), color: "white", flex: 1 }} numberOfLines={1}>
+            {item.ad_link}
+          </Text>
+        </View>
+      ) : null}
+
+      {/* Bottom Action Buttons */}
+      <View style={{ flexDirection: "row", gap: hs(8), marginTop: vs(14) }}>
+        <TouchableOpacity
+          onPress={() => { setEditAdData(item) ;setEditAd(true)}}
+          style={{
+            flex: 1, paddingVertical: vs(9), borderRadius: ms(8),
+            borderWidth: 0.5, borderColor: "#E0E0E0",
+            backgroundColor: Colors.light.red,
+            flexDirection: "row", alignItems: "center", justifyContent: "center", gap: hs(6),
+          }}
+        >
+          <Feather name="edit-2" size={ms(13)} color="white" />
+          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(13), fontWeight: "500", color: "white" }}>
+            Edit Ad
+          </Text>
+        </TouchableOpacity>
+
+     
+      </View>
+    </View>
+  </View>
+)}
+              keyExtractor={item => item.advertisement_id.toString()}
+
+          />
+            
+       
+ 
+        </View>):(
+          <>
         <View
           className="items-center"
           style={{ marginHorizontal: hs(20), marginTop: vs(20) }}
         >
+          
           <AdvatiseBaner />
           <Text style={{ fontWeight: 600, marginTop: vs(30), fontFamily: "PopinRegula", }}>
             You have no advertisement.
@@ -952,7 +1139,137 @@ const index = () => {
             }}
           />
         </View>
+        </>)}</> )}
       </View>
+      <Modal visible={EditAd} onRequestClose={()=>setEditAd(false)} animationType="slide">
+        <ScrollView style={{flex:1,backgroundColor:"white",paddingHorizontal:hs(20)}}>
+          <HeaderWithBack title="Edit Ad" onBackpress={()=>setEditAd(false)}/>
+               <Formik
+                initialValues={{
+                  ad_link: EditAdData?.ad_link,
+                  business_cover: EditAdData?.ad_image,
+                  advertisement_id:EditAdData?.advertisement_id,
+                  user_id: user.id,
+                }}
+                validationSchema={EditAdvatizeSchema}
+            onSubmit={async (values) => {
+  try {
+    const formData = new FormData();
+
+    
+
+    formData.append("advertisement_id", String(values.advertisement_id));
+    formData.append("ad_link", values.ad_link);
+
+   
+    if (
+      values.business_cover &&
+      typeof values.business_cover === "object" &&
+      values.business_cover.uri
+    ) {
+      formData.append("business_cover", {
+        uri: values.business_cover.uri,
+        name: values.business_cover.name ?? "advertisement.jpg",
+        type: values.business_cover.type ?? "image/jpeg",
+      });
+    }
+
+    const response = await updateAdvertisementMedia(formData).unwrap();
+
+    renderToastSuccess(response?.message);
+    router.back();
+
+  } catch (error) {
+    console.log("ERROR FULL:", error?.data || error);
+
+    if (error?.data?.errors) {
+      const firstError = Object.values(error.data.errors)[0];
+      renderToastError(firstError[0]);
+      return;
+    }
+
+    renderToastError("Something went wrong");
+  }
+}}
+
+
+              >
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  setFieldValue,
+                  values,
+                  errors,
+                  touched,
+                }) => (
+                  <>
+                   
+                  
+
+                  
+                
+                  
+                    <FormikInput
+                      title="Link of ad"
+                      placeholder="www.abc.com"
+                      onChangeText={handleChange("ad_link")}
+                      onBlur={handleBlur("ad_link")}
+                      value={values.ad_link}
+                      touched={!!touched.ad_link}
+                      errors={!!errors.ad_link}
+                      required
+                      errorText={errors.ad_link}
+
+                    />
+                    <View
+                      style={{
+                        borderLeftWidth: 1,
+                        borderBottomWidth: 1,
+                        borderRightWidth: 1,
+                        marginVertical: vs(20),
+                        borderColor: Colors.light.textGray,
+                        borderRadius: ms(5),
+                        opacity: 0.15,
+                      }}
+                    />
+                    <UploadPic
+                      Logo={Profilelogo}
+                      text1="Upload "
+                      text2="Ad"
+                      additionalText={
+                        "Recomended size 1based on selection\n above plz discuss"
+                      }
+                      border
+                      limt={1}
+                      name="business_cover"
+                      setValue={setFieldValue}
+                      value={values.business_cover}
+                    />
+                    {errors.business_cover && (
+                      <Text style={{ color: "red" }}>{errors.business_cover}</Text>
+                    )}
+                  
+                 
+                    <View
+                      style={{
+                        borderLeftWidth: 1,
+                        borderBottomWidth: 1,
+                        borderRightWidth: 1,
+                        marginVertical: vs(20),
+                        opacity: 0.15,
+                        borderColor: Colors.light.textGray,
+                        borderRadius: ms(5),
+                      }}
+                    />
+                   
+               <LargeButton handleSubmit={()=>{handleSubmit(); console.log(values, "values")  }} text="Update Ad"/>
+                <Loading isLoading={updateadloading} text="Updating Ad..." />
+                  </>
+                )}
+              </Formik>
+        </ScrollView>
+      </Modal>
     </ScrollView>
   );
 };
@@ -960,6 +1277,19 @@ const index = () => {
 export default index;
 
 const styles = StyleSheet.create({
+    card: {
+      marginHorizontal: hs(10),
+      marginVertical: vs(10),
+      paddingHorizontal: hs(10),
+      paddingVertical: vs(10),
+      borderRadius: ms(20),
+      elevation: 5,
+    },
+    stickyButton: {
+    backgroundColor: "#fff",
+    padding: 10,
+    zIndex: 10,
+  },
   btn: {
     borderWidth: 0.5,
     justifyContent: "center",
@@ -976,7 +1306,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-
+  adContainer: {
+    width: "100%",
+    height: 180,
+    marginTop: 15,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#eee",
+  },
+  adImage: {
+    width: "100%",
+    height: "100%",
+  },
   title: {
     fontSize: 18,
     fontWeight: "700",

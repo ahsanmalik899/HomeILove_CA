@@ -1,6 +1,6 @@
 import {
   useSaveItemApiMutation,
-  useUnsaveItemApiMutation,
+  useUnsaveItemApiMutation
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
@@ -13,6 +13,7 @@ import Bed from "@assets/icons/MypostListing/bed.svg";
 import Shower from "@assets/icons/MypostListing/shower.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { LegendList } from "@legendapp/list";
+import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
@@ -60,6 +61,7 @@ const YourAdsPostDesign = ({
   const [savingItems, setSavingItems] = useState<{ [key: number]: boolean }>(
     {}
   );
+
   useEffect(() => {
     if (isSingleView) {
       setSingleView(true);
@@ -77,7 +79,9 @@ const YourAdsPostDesign = ({
     setSavedItems(initialSaved);
   }, [data]);
 
+
   const [scrollable, setscrollable] = useState(true);
+
   const renderItem = ({ item }) => {
     const itemId = item.post_property_id || item.post_community_id;
     const isSaved = savedItems[itemId] ?? false;
@@ -115,13 +119,14 @@ const YourAdsPostDesign = ({
       setImageNo(index);
     };
     const facts = item.imp_facts ?? item.facts ?? "";
+   
     return (
       <>
-        <TouchableOpacity
+      {item.type==="ad"?(<AdCardWithoutAnimation ad={item.data} />):    (    <TouchableOpacity
          onPress={() => {
             setSingleView(true);
-           setSinglePost({     type: item.property_for,
-                id: item.post_property_id});
+           setSinglePost({     type: item?.data?.property_for,
+                id: item?.data?.post_property_id});
           }}
         
         >
@@ -142,7 +147,7 @@ const YourAdsPostDesign = ({
               <Text
                 style={{
                   color:
-                    item.post_type === "Trending"
+                    item?.data?.post_type === "Trending"
                       ? Colors.light.DarkGreen
                       : "black",
                   fontWeight: 700,
@@ -150,8 +155,8 @@ const YourAdsPostDesign = ({
                   fontFamily: "PopinRegular",
                 }}
               >
-                $ {formatPrice(item.asking_price)}
-                {item.property_for === "rent" && (
+                $ {formatPrice(item?.data?.asking_price)}
+                {item?.data?.property_for === "rent" && (
                   <Text
                     style={{
                       color: Colors.light.red,
@@ -159,11 +164,11 @@ const YourAdsPostDesign = ({
                       fontFamily: "PopinRegular",
                     }}
                   >
-                    /{item.rent_type}
+                    /{item?.data?.rent_type}
                   </Text>
                 )}
               </Text>
-              {item.post_type === "Trending" && (
+              {item?.data?.post_type === "Trending" && (
                 <Text
                   style={{
                     fontWeight: 600,
@@ -184,8 +189,8 @@ const YourAdsPostDesign = ({
                 fontFamily: "PopinRegular",
               }}
             >
-              {item.bedrooms} bedrooms {item.property_sub_type} for{" "}
-              {item.property_for}
+              {item?.data?.bedrooms} bedrooms {item?.data?.property_sub_type} for{" "}
+              {item?.data?.property_for}
             </Text>
             <Text
               style={{
@@ -194,7 +199,7 @@ const YourAdsPostDesign = ({
                 fontFamily: "PopinRegular",
               }}
             >
-              {item.address}
+              {item?.data?.address}
             </Text>
             <View
               style={{
@@ -207,7 +212,7 @@ const YourAdsPostDesign = ({
             />
             <View>
               <View style={{ marginTop: vs(5) }}>
-                {item.post_type === "Trending" &&
+                {item?.data?.post_type === "Trending" &&
                   facts &&
                   facts
                     .split(",", 4)
@@ -243,11 +248,11 @@ const YourAdsPostDesign = ({
 
               <Text style={styles.description}>
                 {expanded
-                  ? item.property_details
-                  : item.property_details?.slice(0, 70) +
-                    (item.property_details?.length > 70 ? "..." : "")}
+                  ? item?.data?.property_details
+                  : item?.data?.property_details?.slice(0, 70) +
+                    (item?.data?.property_details?.length > 70 ? "..." : "")}
 
-                {item.property_details?.length > 70 && (
+                {item?.data?.property_details?.length > 70 && (
                   <Text
                     style={styles.moreText}
                     onPress={() => setExpanded(expanded ? false : true)}
@@ -259,15 +264,15 @@ const YourAdsPostDesign = ({
 
               <TouchableOpacity
                 onPress={() => {
-                  setSelectedImages(item.images || []);
+                  setSelectedImages(item?.data?.images || []);
                   setShowImages(true);
                   setscrollable(false);
                 }}
               >
                 <Image
                   source={
-                    item.images && item.images.length > 0
-                      ? { uri: ImageFormater(item.images[0]) }
+                    item?.data?.images && item?.data?.images?.length > 0
+                      ? { uri: ImageFormater(item?.data?.images[0]) }
                       : NoImage
                   }
                   style={{
@@ -300,10 +305,10 @@ const YourAdsPostDesign = ({
                       }}
                     >
                       {" "}
-                      {item.images ? item.images.length : 0}
+                      {item?.data?.images ? item?.data?.images?.length : 0}
                     </Text>
                   </View>
-                  {item.saleprice_type === "Reduced Price" && (
+                  {item?.data?.saleprice_type === "Reduced Price" && (
                     <Text
                       style={{
                         backgroundColor: "rgba(241, 28, 28, 0.41)",
@@ -315,7 +320,7 @@ const YourAdsPostDesign = ({
                         fontFamily: "PopinRegular",
                       }}
                     >
-                      {item.saleprice_type}
+                      {item?.data?.saleprice_type}
                     </Text>
                   )}
                 </View>
@@ -329,7 +334,7 @@ const YourAdsPostDesign = ({
                   }}
                   className="flex-row justify-between"
                 >
-                  {item.property_condition === "Newly build" && (
+                  {item?.data?.property_condition === "Newly build" && (
                     <Text
                       style={{
                         backgroundColor: "rgba(241, 28, 28, 0.41)",
@@ -341,7 +346,7 @@ const YourAdsPostDesign = ({
                         fontFamily: "PopinRegular",
                       }}
                     >
-                      {item.property_condition}
+                      {item?.data?.property_condition}
                     </Text>
                   )}
                   <TouchableOpacity
@@ -358,10 +363,10 @@ const YourAdsPostDesign = ({
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
-              {item.post_type === "Trending" && (
+              {item?.data?.post_type === "Trending" && (
                 <>
                   <LegendList
-                    data={item.images || []}
+                    data={item?.data?.images || []}
                     horizontal
                     className="flex-1"
                     keyExtractor={(item, index) => `${item}-${index}`}
@@ -405,7 +410,7 @@ const YourAdsPostDesign = ({
                     <Text
                       style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
                     >
-                      {item.bedrooms}
+                      {item?.data?.bedrooms}
                     </Text>
                   </View>
                   <View className="flex-row items-center">
@@ -413,7 +418,7 @@ const YourAdsPostDesign = ({
                     <Text
                       style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
                     >
-                      {item.bathrooms}
+                      {item?.data?.bathrooms}
                     </Text>
                   </View>
                   <View className="flex-row items-center">
@@ -421,7 +426,7 @@ const YourAdsPostDesign = ({
                     <Text
                       style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
                     >
-                      {item.land_area} sqft
+                      {item?.data?.land_area} sqft
                     </Text>
                   </View>
                 </>
@@ -446,8 +451,8 @@ const YourAdsPostDesign = ({
                 </TouchableOpacity>
                 <CircleImage
                   source={
-                    item.posted_by?.logo
-                      ? { uri: ImageFormater(item.posted_by.logo) }
+                    item?.data?.posted_by?.logo
+                      ? { uri: ImageFormater(item?.data?.posted_by?.logo) }
                       : null
                   }
                   Size={40}
@@ -455,7 +460,7 @@ const YourAdsPostDesign = ({
               </View>
             </View>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity>)}
       </>
     );
   };
@@ -469,9 +474,7 @@ const YourAdsPostDesign = ({
           scrollEnabled={scrollable}
           ref={listRef}
           renderItem={renderItem}
-          keyExtractor={(item, index) =>
-            `${item.post_property_id || item.post_community_id}-${index}`
-          }
+   keyExtractor={(item, index) => (item.type === "ad" ? `ad-${index}` : `${item.data.post_property_id || item.data.post_community_id}-${index}`) }
           onEndReached={() => {
             if (!isfetching && hasmore) setPage((prev) => prev + 1);
           }}

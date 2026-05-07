@@ -24,6 +24,7 @@ export const MainApi = createApi({
     "otherPastData",
     "myPost",
     "myProfile",
+    "advertisementMedia"
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -152,6 +153,14 @@ export const MainApi = createApi({
         url: `searchAgentForInquery?lat=${data.lat}&lng=${data.lng}&radius=${data.radius}&inquiry_type=${data.inquiry_type} &per_page=${data.per_page}&page=${data.page}&type=${data.type}&user_id=${data.user_id}`,
         method: "GET",
       }),
+    }),
+    updateAdvertisementMedia: builder.mutation<any, FormData>({
+      query: (data) => ({
+        url: `updateAdvertisementMedia`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["advertisementMedia"],
     }),
     postAdvatizement: builder.mutation<any, FormData>({
       query: (data) => ({
@@ -895,7 +904,23 @@ export const MainApi = createApi({
         method: "GET",
         params: {type},
       }),
+    }),
+    getRandomAd:builder.query<any,any>({
+      query: ({on_page}) => ({
+        url: "getRandomAd",
+        method: "GET",
+        params: {on_page},
+      }),
+    }),
+      getUserAdvertisements:builder.query<any,any>({
+      query: ({user_id}) => ({
+        url: "getUserAdvertisements",
+        method: "GET",
+        params: {user_id},
+      }),
+      providesTags: ["advertisementMedia"],
     })
+
   }),
 });
 
@@ -1009,4 +1034,8 @@ export const {
   useGetAdvatizementPriceQuery,
   useLazyGetAdvatizementPriceQuery,
   usePromoteProfileMutation,
+  useGetUserAdvertisementsQuery,
+  useUpdateAdvertisementMediaMutation,
+  useGetRandomAdQuery,
+  useLazyGetRandomAdQuery,
 } = MainApi;

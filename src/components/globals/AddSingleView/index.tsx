@@ -1,5 +1,6 @@
 import {
   useGetSinglePostQuery,
+  useLazyGetRandomAdQuery,
   useSendVisistRequestMutation,
   useShareDetailPostApiMutation
 } from "@/store/api/user/MainApi";
@@ -36,9 +37,11 @@ import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
+  Easing,
   Image,
   Modal,
   StyleSheet,
@@ -68,7 +71,11 @@ export default function AddSingleView({id,type,setshowModel}: {id:number,type:st
   };
 
   const [imageNo, setImageNo] = useState(0);
+  const [ getRandomAd, { data: randomAdData, isFetching: randomAdFetching }] = useLazyGetRandomAdQuery();
   const [sendVisistRequies, { isLoading }] = useSendVisistRequestMutation();
+  useEffect(() => {
+    getRandomAd({on_page:type+'_single'})
+  }, [type]);
   const { data, isFetching } = useGetSinglePostQuery({ type, id });
   const [showImages, setShowImages] = useState(false);
   const [showFloor, setShowFloor] = useState(false);
@@ -135,13 +142,70 @@ export default function AddSingleView({id,type,setshowModel}: {id:number,type:st
 
     return Number(monthlyPayment.toFixed(2));
   };
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+const rotateAnim = useRef(new Animated.Value(0)).current;
 
+useEffect(() => {
+  // scale in
+  Animated.timing(scaleAnim, {
+    toValue: 1,
+    duration: 500,
+    easing: Easing.out(Easing.ease),
+    useNativeDriver: true,
+  }).start();
+  Animated.loop(
+    Animated.sequence([
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 3000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(rotateAnim, {
+        toValue: -1,
+        duration: 3000,
+        useNativeDriver: true,
+      }),
+    ])
+  ).start();
+}, []);
+const rotate = rotateAnim.interpolate({
+  inputRange: [-1, 1],
+  outputRange: ["-2deg", "2deg"],
+});
   const [monthlyPayment, setMonthlyPayment] = useState<number | null>(0);
   return (
     <>
       <ScrollView className="flex-1 bg-white">
         <HeaderWithBack  onBackpress={()=>{setshowModel(false)}}
         />
+        {randomAdData?.data?.ad_link&&(
+      <Animated.View
+  style={[
+    styles.adCard,
+    {
+      transform: [
+        { scale: scaleAnim },
+        { rotateZ: rotate },
+      ],
+    },
+  ]}
+><TouchableOpacity onPress={() => {
+  if(randomAdData?.data?.ad_link){
+    const finalUrl = randomAdData.data.ad_link.startsWith("https")
+      ? randomAdData.data.ad_link
+      : `https://${randomAdData.data.ad_link}`;
+    WebBrowser.openBrowserAsync(finalUrl);
+  }
+}}>
+  <Image
+    source={{
+      uri: ImageFormater(randomAdData?.data?.ad_image),
+    }}
+    style={styles.adImage}
+    resizeMode="contain"
+  />
+  </TouchableOpacity>
+</Animated.View>)}
         <View
           className="flex-1"
           style={{ marginHorizontal: hs(10), paddingVertical: vs(20) }}
@@ -1503,6 +1567,20 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     fontFamily: "PopinRegula",
   },
+    adCard: {
+    width: "100%",
+    height: vs(100),
+    marginVertical: vs(10),
+    borderRadius: ms(16),
+    overflow: "hidden",
+    backgroundColor: "transparent",
+    elevation: 0,
+  },
+
+  adImage: {
+    width: "100%",
+    height: "100%",
+  },
   moreText: {
     color: Colors.light.DarkGreen,
     fontWeight: "600",
@@ -1520,6 +1598,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
+
   heading: {
     color: Colors.light.DarkGreen,
     fontSize: ms(15),

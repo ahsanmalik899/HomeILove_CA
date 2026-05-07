@@ -168,7 +168,7 @@ const index = () => {
   useEffect(() => {
     if (!propertyList) return;
 
-    const newProperties = propertyList.data?.properties ?? [];
+    const newProperties = propertyList.data?.list ?? [];
 
     setHasMore(
       propertyList.pagination.current_page < propertyList.pagination.last_page

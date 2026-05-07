@@ -1,5 +1,5 @@
 
-import { useAskvaluationapiMutation, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useShare_profileApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
+import { useAskvaluationapiMutation, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useLazyGetRandomAdQuery, useShare_profileApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import Call from "@assets/Buy/call.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
@@ -15,9 +15,10 @@ import { hs, ms, vs } from '@utils/design/design';
 import { ImageFormater } from '@utils/ImageFormat';
 import * as Clipboard from "expo-clipboard";
 import { router } from 'expo-router';
+import * as WebBrowser from "expo-web-browser";
 import { Formik } from 'formik';
-import { useEffect, useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
 import * as Yup from 'yup';
@@ -38,7 +39,7 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
   const [reviewModal, setReviewModal] = useState(false);
   const [review, setReview] = useState("");
   const [postrating, setpostRating] = useState(0);
-  const [showConnection, setShowConnection] = useState(false);
+
   const [expanded, setExpanded] = useState(false);
   const [showPast, setShowpast] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -96,6 +97,7 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
   const showMap = !isNaN(latitude) && !isNaN(longitude);
   const [showMortgage, setShowMortgage] = useState(false);
   const rating = Number(profile?.rating || 0);
+    const [ getRandomAd, { data: randomAdData, isFetching: randomAdFetching }] = useLazyGetRandomAdQuery();
   const totalReviews = profile?.total_reviews || 0;
   const submitReview = async (values: {
     review: any;
@@ -140,8 +142,47 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
     }
   };
 
+ useEffect(() => {
+ const maintenanceTypes = ['electrician', 'plumber', 'decor', 'painter', 'builder'];
 
+const normalizedType = type?.toLowerCase();
 
+const onPage = maintenanceTypes.includes(normalizedType)
+  ? 'maintenance_single'
+  : `${normalizedType}_single`;
+
+getRandomAd({ on_page: onPage });
+  }, [type]);
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+const rotateAnim = useRef(new Animated.Value(0)).current;
+
+useEffect(() => {
+  // scale in
+  Animated.timing(scaleAnim, {
+    toValue: 1,
+    duration: 500,
+    easing: Easing.out(Easing.ease),
+    useNativeDriver: true,
+  }).start();
+  Animated.loop(
+    Animated.sequence([
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 3000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(rotateAnim, {
+        toValue: -1,
+        duration: 3000,
+        useNativeDriver: true,
+      }),
+    ])
+  ).start();
+}, []);
+const rotate = rotateAnim.interpolate({
+  inputRange: [-1, 1],
+  outputRange: ["-2deg", "2deg"],
+});
 
   return (
     <>
@@ -149,6 +190,34 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
         {/* Cover */}
         <View style={{ position: "relative" }}>
           <HeaderWithBack onBackpress={() => setshowModel(false)} />
+            {randomAdData?.data?.ad_link&&(
+               <Animated.View
+  style={[
+    styles.adCard,
+    {
+      transform: [
+        { scale: scaleAnim },
+        { rotateZ: rotate },
+      ],
+    },
+  ]}
+><TouchableOpacity onPress={() => {
+  if(randomAdData?.data?.ad_link){
+    const finalUrl = randomAdData.data.ad_link.startsWith("https")
+      ? randomAdData.data.ad_link
+      : `https://${randomAdData.data.ad_link}`;
+    WebBrowser.openBrowserAsync(finalUrl);
+  }
+}}>
+  <Image
+    source={{
+      uri: ImageFormater(randomAdData?.data?.ad_image),
+    }}
+    style={styles.adImage}
+    resizeMode="cover"
+  />
+  </TouchableOpacity>
+</Animated.View>)}
           <Image
             source={{
               uri: ImageFormater(profile?.cover),
@@ -883,7 +952,7 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
                       borderColor: "#e5e7eb",
                     }}
                   >
-                    {/* Label */}
+                  
                     <Text
                       style={{
                         fontSize: 13,
@@ -895,7 +964,7 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
                       Shareable Link
                     </Text>
 
-                    {/* Input Row */}
+                 
                     <View
                       style={{
                         flexDirection: "row",
@@ -921,7 +990,7 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
                         ellipsizeMode="middle"
                       />
 
-                      {/* Copy Button */}
+               
                       <TouchableOpacity
                         onPress={async () => {
                           await Clipboard.setStringAsync(values.link);
@@ -975,7 +1044,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
+ adCard: {
+     width: "100%",
+     height: vs(100),
+     marginVertical: vs(10),
+     borderRadius: ms(16),
+     overflow: "hidden",
+     backgroundColor: "transparent",
+     elevation: 0,
+   },
+ 
+   adImage: {
+     width: "100%",
+     height: "100%",
+   },
   modalContainer: {
     width: "90%",
     backgroundColor: "white",
@@ -1092,7 +1174,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "PopinRegula",
   },
-
+   
   description: {
     marginVertical: 10,
     fontFamily: "PopinRegula",

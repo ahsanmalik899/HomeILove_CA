@@ -2,25 +2,29 @@ import { LegendList } from "@legendapp/list";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { router } from "expo-router";
 import { useRef, useState } from "react";
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ImageBackground, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CircleImage from "../CircleImage/CircleImage";
+import ProfileSingleView from "../ProfileSingleView";
 
 const Index = ({ data = [] ,isFetching}: { data?: any[],isFetching:boolean }) => {
  
 
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<any>(null);
+   const [singleView, setSingleView] = useState(false);
+       const[profileData,setProfileData] = useState<any>({}) 
+         const openProfileModal = async(item: any) => {
+      setProfileData({
+      type: item.type,
+      id: item.id,
+      userid:item.users_id,
+      });
+      setSingleView(true);
+    };
 const renderItem = ({ item }: any) => {
   return (
-    <TouchableOpacity style={{ width:hs(330), paddingHorizontal: hs(10),height:vs(280) }} onPress={()=>router.navigate({
-      pathname:"/ProfileSigleView",
-      params:{
-        type:item.type,
-        id:item.id,
-      }
-    })}>
+    <TouchableOpacity style={{ width:hs(330), paddingHorizontal: hs(10),height:vs(280) }} onPress={()=>{openProfileModal(item),console.log(item)}}>
 
       <View style={styles.mainCard}>
 
@@ -111,6 +115,15 @@ const renderItem = ({ item }: any) => {
           />
         ))}
       </View>
+       <Modal
+                  visible={singleView}
+                  animationType="slide"
+                  onRequestClose={() => setSingleView(false)}
+                  transparent={true}
+                  statusBarTranslucent={true}
+                >
+           <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+                </Modal>
     </View>
   );
 };

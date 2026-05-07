@@ -27,6 +27,7 @@ import ThreeDots from "@assets/icons/threedots.svg";
 import Liked from "@assets/icons/ThumbUpRed.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import { LegendList } from "@legendapp/list";
+import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import CommentInput from "@src/components/globals/CommentInput";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -693,7 +694,7 @@ const [showShare,setShowShare]=useState(false);
                 </TouchableOpacity>
               )}
 
-              {/* Overlay Container */}
+             
               <View
                 style={{
                   position: "absolute",
@@ -705,7 +706,7 @@ const [showShare,setShowShare]=useState(false);
                   alignItems: "flex-end",
                 }}
               >
-                {/* LEFT SIDE - Camera Count */}
+                   {item.images.length > 0 && (
                 <View
                   style={{
                     backgroundColor: "rgba(0,0,0,0.6)",
@@ -727,9 +728,9 @@ const [showShare,setShowShare]=useState(false);
                   >
                     {item.images.length}
                   </Text>
-                </View>
+                </View>)}
 
-                {/* RIGHT SIDE - Auto Playing Muted Video */}
+               
                 {item.post_video && (
                   <TouchableOpacity
                    onPress={() => {
@@ -889,6 +890,11 @@ const [showShare,setShowShare]=useState(false);
           )}
         </TouchableOpacity>
       )
+    }
+    else if (item?.type === "Advertisement") {
+      return (
+       <AdCardWithoutAnimation isSqure={true} ad={item}/>
+      );
     }
     else {
       return (
@@ -1196,7 +1202,7 @@ const [showShare,setShowShare]=useState(false);
         }}
         data={data?.filter((item) => !hiddenPosts.includes(item.post_id))}
         renderItem={renderItem}
-        keyExtractor={(item) => item.post_id.toString()}
+        keyExtractor={(item) => item.post_id.toString()+item?.type}
         onEndReached={() => {
           if (!isfetching && data?.length > 9) {
             setPage((prev) => prev + 1);

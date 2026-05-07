@@ -4,6 +4,7 @@ import Mail from "@assets/Buy/email-open.svg";
 import UnSelecteHeart from "@assets/Feedimg/unselected_heart.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { LegendList } from "@legendapp/list";
+import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
@@ -57,29 +58,31 @@ if(isSingleView){
     const facts = item.imp_facts ?? item.facts ?? "";
     return (
       <>
+      {item?.type==="post"?
+      (
         <TouchableOpacity
-          onPress={()=>openProfileModal(item)}
-            onLongPress={()=>openProfileModal(item)}
+          onPress={()=>openProfileModal(item?.data)}
+            onLongPress={()=>openProfileModal(item?.data)}
         >
           <View className="bg-white" style={styles.card}>
             <View
               className="flex-row justify-between items-center"
               style={{
                 backgroundColor:
-                  item.post_type === "Trending"
+                  item?.data?.post_type === "Trending"
                     ? Colors.light.LightGreen
                     : "white",
                 paddingHorizontal: hs(10),
                 paddingVertical: vs(10),
                 borderRadius: ms(10),
-                marginBottom: item.post_type === "Trending" ? vs(10) : vs(0),
+                marginBottom: item?.data?.post_type === "Trending" ? vs(10) : vs(0),
               }}
             >
               <Text
                 style={{
                   color:
-                    item.post_type === "Trending" ||
-                    item.post_type === "Promoted"
+                    item?.data?.post_type === "Trending" ||
+                    item?.data?.post_type === "Promoted"
                       ? Colors.light.DarkGreen
                       : "black",
                   fontWeight: 700,
@@ -87,14 +90,14 @@ if(isSingleView){
                   fontFamily: "PopinRegula",
                 }}
               >
-                $ {item.contact}
-                {item.property_for === "rent" && (
+                $ {item?.data?.contact}
+                {item?.data?.property_for === "rent" && (
                   <Text style={{ color: Colors.light.red, fontSize: ms(18),fontFamily: "PopinRegula", }}>
-                    /{item.rent_type}
+                    /{item?.data?.rent_type}
                   </Text>
                 )}
               </Text>
-              {item.post_type === "Trending" && (
+              {item?.data?.post_type === "Trending" && (
                 <Text
                   style={{ fontWeight: 600, color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}
                 >
@@ -104,26 +107,26 @@ if(isSingleView){
             </View>
             <View className="flex-row justify-between">
               <Text style={{ color: "black", fontWeight: "700",fontFamily: "PopinRegula", }}>
-                {item.business_name.length > 20
-                  ? item.business_name.slice(0, 20) + "..."
-                  : item.business_name}
+                {item?.data?.business_name.length > 20
+                  ? item?.data?.business_name.slice(0, 20) + "..."
+                  : item?.data?.business_name}
               </Text>
               <View className="flex-row items-center gap-2">
-                <StarRating rating={item.rating} size={10} />
+                <StarRating rating={item?.data?.rating} size={10} />
                 <Text style={{ color: Colors.light.textGray, fontWeight: 700,fontFamily: "PopinRegula", }}>
-                  {item.total_reviews} reviews
+                  {item?.data?.total_reviews} reviews
                 </Text>
               </View>
             </View>
             <View className="flex-row justify-between">
               <Text style={{ color: Colors.light.textGray, marginTop: vs(5),fontFamily: "PopinRegula", }}>
-                {item.address.length > 25
-                  ? item.address.slice(0, 25) + "..."
-                  : item.address}
+                {item?.data?.address.length > 25
+                  ? item?.data?.address.slice(0, 25) + "..."
+                  : item?.data?.address}
               </Text>
 
               <Text style={{ color: Colors.light.textGray, marginTop: vs(5) ,fontFamily: "PopinRegula",}}>
-                License# {item.license_no}
+                License# {item?.data?.license_no}
               </Text>
             </View>
             <View
@@ -136,14 +139,14 @@ if(isSingleView){
               }}
             />
             <View>
-              {item.remarks&&(
+              {item?.data?.remarks&&(
               <Text style={styles.description}>
                 {expanded
-                  ? item.remarks
-                  : item.remarks?.slice(0, 70) +
-                    (item.remarks?.length > 70 ? "..." : "")}
+                  ? item?.data?.remarks
+                  : item?.data?.remarks?.slice(0, 70) +
+                    (item?.data?.remarks?.length > 70 ? "..." : "")}
 
-                {item.remarks?.length > 70 && (
+                {item?.data?.remarks?.length > 70 && (
                   <Text
                     style={styles.moreText}
                     onPress={() => setExpanded(expanded ? false : true)}
@@ -160,7 +163,7 @@ if(isSingleView){
               >
                 <Image
                   source={
-                    item.cover ? { uri: ImageFormater(item.cover) } : NoImage
+                    item?.data?.cover ? { uri: ImageFormater(item?.data?.cover) } : NoImage
                   }
                   style={{
                     height: vs(200),
@@ -209,8 +212,8 @@ if(isSingleView){
                   marginTop: vs(10),
                 }}
               >
-             <Text style={{fontWeight:600,fontSize:ms(15),fontFamily: "PopinRegula",}}>{item.sale_posts} Sale ads</Text>
-             <Text style={{fontWeight:600,fontSize:ms(15),fontFamily: "PopinRegula",}}>{item.rent_posts} Rent ads</Text>
+             <Text style={{fontWeight:600,fontSize:ms(15),fontFamily: "PopinRegula",}}>{item?.data?.sale_posts} Sale ads</Text>
+             <Text style={{fontWeight:600,fontSize:ms(15),fontFamily: "PopinRegula",}}>{item?.data?.rent_posts} Rent ads</Text>
               </View>
 
               <View
@@ -232,13 +235,14 @@ if(isSingleView){
                 </TouchableOpacity>
 
                 <CircleImage
-                  source={{ uri: ImageFormater(item.logo) }}
+                  source={{ uri: ImageFormater(item?.data?.logo) }}
                   Size={40}
                 />
               </View>
             </View>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity>):(<AdCardWithoutAnimation ad={item?.data}/>)
+      }
       </>
     );
   };

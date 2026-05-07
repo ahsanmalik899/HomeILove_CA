@@ -124,7 +124,7 @@ useFocusEffect(
       {params.type?.toString().toUpperCase()} Profiles
     </Text>
     <Text style={styles.resultSub}>
-      {city || state || "Nearby"} • {profiles.length} results
+      {city || state || "Nearby"} • {profiles?.data?.length} results
     </Text>
   </View>
   <TouchableOpacity

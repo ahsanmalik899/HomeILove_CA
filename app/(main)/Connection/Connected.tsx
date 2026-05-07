@@ -2,6 +2,7 @@ import { useGetConnectedUsersApiQuery, useUpdateConnectionApiMutation } from "@/
 import { userdata } from "@/store/slices/selector/user";
 import ThreeDots from "@assets/icons/threedots.svg";
 import { LegendList } from "@legendapp/list";
+import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import FollowButton from "@src/components/globals/FollowButton";
 import Loading from "@src/components/globals/Loading";
@@ -26,9 +27,10 @@ const Connected = () => {
     }
   }, [data]);
   const renderItem = ({ item }) => {
-    const profile = item.profile || {};
+    const profile = item?.data?.profile || {};
 
-    return (
+    return (<>
+      {item.type==="post"?(
       <View style={styles.card}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -41,7 +43,7 @@ const Connected = () => {
             </View>
           </View>
           <TouchableOpacity
-            onPress={() => setMenuVisibleId(item.connection_id)}
+            onPress={() => setMenuVisibleId(item?.data?.connection_id)}
           >
             <ThreeDots />
           </TouchableOpacity>
@@ -56,9 +58,9 @@ const Connected = () => {
         </View>
 
         <View style={styles.follow}>
-          <FollowButton id={item.user_id} onPress={async () => {
+          <FollowButton id={item?.data?.user_id} onPress={async () => {
             const formData = new FormData();
-            formData.append("connection_id", String(item.connection_id ?? ""));
+            formData.append("connection_id", String(item?.data?.connection_id ?? ""));
             formData.append("type", "unfollow");
 
             try {
@@ -67,7 +69,7 @@ const Connected = () => {
               if (result?.success) {
                 renderToastSuccess(result.message);
                 setList(prev =>
-                  prev.filter(i => i.connection_id !== item.connection_id)
+                  prev.filter(i => i?.data?.connection_id !== item?.data?.connection_id)
                 );
               }
             } catch (error) {
@@ -75,7 +77,8 @@ const Connected = () => {
             }
           }} status="accepted" />
         </View>
-      </View>
+      </View>):(<AdCardWithoutAnimation isSqure={true} ad={item.data}/>)}
+      </>
     );
   };
 
@@ -85,7 +88,7 @@ const Connected = () => {
         data={list}
         renderItem={renderItem}
         estimatedItemSize={140}
-        keyExtractor={(item) => item.connection_id.toString()}
+        keyExtractor={(item) => item?.data.connection_id.toString()||item?.data?.advance_id?.toString()}
         showsVerticalScrollIndicator={false}
       />
       <Loading isLoading={isLoading} text="Loading..." />
