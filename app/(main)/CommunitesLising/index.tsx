@@ -1,4 +1,5 @@
 import { useGetCommunityListQuery } from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import Threedot from "@assets/Buy/threedotwhite.svg";
 import CommunityFilter from "@src/components/globals/CommunityFilter";
 import ComunityListingDesign from "@src/components/globals/ComunityListingDesign";
@@ -10,10 +11,12 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useCallback, useEffect, useState } from "react";
 import { BackHandler, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
 import * as Yup from "yup";
 
 const index = () => {
   const params = useLocalSearchParams();
+  const user = useSelector(userdata);
   const [page, setpage] = useState(1);
   const [properties, setProperties] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -51,6 +54,7 @@ const index = () => {
     lng,
     name,
     sort,
+    user_id: user?.id,
     radius: params.radius || undefined,
   });
 
@@ -72,6 +76,7 @@ const index = () => {
       page,
       name,
       sort,
+      user_id: user?.id,
     }));
   }, [address, city, state, zip, lat, lng, page, sort]);
 
@@ -98,6 +103,7 @@ const index = () => {
     lng,
     name,
     sort,
+    user_id: user?.id,
     radius: values.radius || undefined,
     development_status: values.development_status.length
       ? values.development_status.join(",")

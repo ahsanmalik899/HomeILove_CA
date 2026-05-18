@@ -45,7 +45,7 @@ const index = () => {
       </View>
       <View style={{ marginTop: vs(5) }}>
         <SideBarButtons
-          text="Get Help"
+          text="Find Expert"
           onPress={() => router.navigate("/GetHelp")}
         />
       </View>
@@ -67,7 +67,7 @@ const index = () => {
           onPress={() => router.navigate("/Account")}
         />
       </View>
-      <View style={{ marginTop: vs(20), width: hs(150) }}>
+      <View style={{ marginTop: vs(20), width: hs(200) }}>
         <LargeButton
           handleSubmit={async()=> {
             try{

@@ -1,9 +1,12 @@
 import {
   useGetSinglePostQuery,
   useLazyGetRandomAdQuery,
+  useSaveItemApiMutation,
   useSendVisistRequestMutation,
-  useShareDetailPostApiMutation
+  useShareDetailPostApiMutation,
+  useUnsaveItemApiMutation
 } from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
 import RedHeart from "@assets/CreateProfile/heart-red.svg";
@@ -30,6 +33,7 @@ import StarRating from "@src/components/globals/StarRating";
 import TimePickerField from "@src/components/globals/TimePickerField";
 import VideoSection from "@src/components/globals/ViedioSection";
 import Colors from "@src/constants/Colors";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
@@ -53,6 +57,8 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Yup from "yup";
+import ProfileSingleView from "../ProfileSingleView";
+import SavedItems from "../SavedItems";
 
 export default function AddSingleView({id,type,setshowModel}: {id:number,type:string,setshowModel:(val:boolean)=>void}) {
 
@@ -69,14 +75,18 @@ export default function AddSingleView({id,type,setshowModel}: {id:number,type:st
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
     });
   };
-
+ const user = useAppSelector(userdata);
   const [imageNo, setImageNo] = useState(0);
   const [ getRandomAd, { data: randomAdData, isFetching: randomAdFetching }] = useLazyGetRandomAdQuery();
   const [sendVisistRequies, { isLoading }] = useSendVisistRequestMutation();
+    const [profileData, setprofileData] = useState(null);
+    const [showSaved, setShowSaved] = useState(false);
+  const [singleView, setSingleView] = useState(false);
+    const [isSaved,setIsSaved]=useState(false);
   useEffect(() => {
     getRandomAd({on_page:type+'_single'})
   }, [type]);
-  const { data, isFetching } = useGetSinglePostQuery({ type, id });
+  const { data, isFetching } = useGetSinglePostQuery({ type, id,user_id:user?.id });
   const [showImages, setShowImages] = useState(false);
   const [showFloor, setShowFloor] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -85,6 +95,8 @@ export default function AddSingleView({id,type,setshowModel}: {id:number,type:st
   const [showShare, setShowShare] = useState(false);
   const showMap = !isNaN(latitude) && !isNaN(longitude);
   const facts = data?.post?.imp_facts ?? data?.post?.facts ?? "";
+     const [saveItemApi] = useSaveItemApiMutation();
+            const [unsaveItemApi] = useUnsaveItemApiMutation();
     const [shareDetailPostApi, { isLoading: sharing }] = useShareDetailPostApiMutation();
   const visitAdSchema = Yup.object().shape({
     visitor_email: Yup.string()
@@ -144,9 +156,30 @@ export default function AddSingleView({id,type,setshowModel}: {id:number,type:st
   };
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
 const rotateAnim = useRef(new Animated.Value(0)).current;
+    const toggleSave = async () => {
+     
+      try {
+        if (isSaved) {
+          await unsaveItemApi({
+            saved_id: id,
+            user_id: user.id,
+            type: type,
+          }).unwrap();
+        } else {
+          await saveItemApi({
+            saved_id: id,
+            user_id: user.id,
+            type: type,
+          }).unwrap();
+        }
+      } catch (error) {
+        console.log("Error saving/unsaving item:", error);
 
+      } finally {
+        setIsSaved((prev) => !prev);
+      }
+    };
 useEffect(() => {
-  // scale in
   Animated.timing(scaleAnim, {
     toValue: 1,
     duration: 500,
@@ -168,6 +201,11 @@ useEffect(() => {
     ])
   ).start();
 }, []);
+ useEffect(() => {
+    if (data?.is_saved !== undefined) {
+      setIsSaved(data?.is_saved);
+    }
+  }, [data?.is_saved]);
 const rotate = rotateAnim.interpolate({
   inputRange: [-1, 1],
   outputRange: ["-2deg", "2deg"],
@@ -176,7 +214,7 @@ const rotate = rotateAnim.interpolate({
   return (
     <>
       <ScrollView className="flex-1 bg-white">
-        <HeaderWithBack  onBackpress={()=>{setshowModel(false)}}
+        <HeaderWithBack  onBackpress={()=>{setshowModel(false)}}  isSavedItem onpressSave={()=>setShowSaved(true)}
         />
         {randomAdData?.data?.ad_link&&(
       <Animated.View
@@ -208,16 +246,14 @@ const rotate = rotateAnim.interpolate({
 </Animated.View>)}
         <View
           className="flex-1"
-          style={{ marginHorizontal: hs(10), paddingVertical: vs(20) }}
+          style={{ marginHorizontal: hs(10), paddingVertical: vs(5) }}
         >
-          {type === "community" ? (
-            <View className="flex-row justify-between">
-              <Text style={{ color: "black", fontWeight: "600", flex: 1,fontFamily: "PopinRegula", }}>
-                {data?.post?.community_title ?? ""}
-              </Text>
-
-              {data?.post?.community_price?.length > 0 && (
-                <Text style={{ color: Colors.light.red, fontWeight: "600",fontFamily: "PopinRegula", }}>
+          <View style={{backgroundColor:Colors.light.LightGreen,paddingHorizontal: hs(5),borderRadius:ms(10),height:vs(50),justifyContent:"center"}}>
+             {type === "community" ? (
+            <>
+             {data?.post?.community_price?.length > 0 && (
+                <Text style={{ color: Colors.light.red,  fontWeight: 700,
+                  fontSize:ms(18),fontFamily: "PopinRegula", }}>
                   From $ {data.post.community_price[0]} To ${" "}
                   {
                     data.post.community_price[
@@ -225,35 +261,21 @@ const rotate = rotateAnim.interpolate({
                     ]
                   }
                 </Text>
-              )}
-            </View>
-          ) : (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-              }}
-            >
-              <Text style={{ color: "black", fontWeight: "600", flex: 1 ,fontFamily: "PopinRegula",}}>
-                {data?.post?.bedrooms ?? 0} bedrooms{" "}
-                {data?.post?.property_sub_type ?? ""} for{" "}
-                {data?.post?.property_for ?? ""}
-              </Text>
-
-              <Text
+                
+              )}</>):( 
+                <Text
                 style={{
                   color: Colors.light.red,
-                  fontWeight: "600",
+                   fontWeight: 700,
+                                    fontSize:ms(18),
                   marginLeft: 8,
                   fontFamily: "PopinRegula",
                 }}
               >
                 $ {data?.post?.asking_price ?? 0}
                 {type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
-              </Text>
-            </View>
-          )}
+              </Text>)}
+</View>
           <TouchableOpacity
             className="mt-4"
             onPress={() => {
@@ -267,7 +289,7 @@ const rotate = rotateAnim.interpolate({
                   : NoImage
               }
               style={{
-                height: vs(200),
+                height: vs(300),
                 width: "100%",
                 borderRadius: ms(10),
                 resizeMode: "cover",
@@ -275,6 +297,7 @@ const rotate = rotateAnim.interpolate({
                 backgroundColor: "gray",
               }}
             />
+            
             {type !== "community" && data?.floor_images.length > 0 && (
               <TouchableOpacity
                 style={{
@@ -345,9 +368,10 @@ const rotate = rotateAnim.interpolate({
               elevation: 5,
               borderRadius: 8,
               paddingRight: hs(20),
-              paddingVertical: vs(5),
+              paddingVertical: vs(10),
               paddingHorizontal: vs(15),
               marginTop: vs(10),
+              marginBottom: vs(10),
             }}
           >
             {type === "community" ? (
@@ -388,7 +412,35 @@ const rotate = rotateAnim.interpolate({
               </>
             )}
           </View>
-          <View className="flex-row items-center justify-between mt-4">
+           {type === "community" ? (
+            <View className="flex-row justify-between mt-3">
+              <Text style={{ color: "black",  fontWeight: 700,
+                  fontSize:ms(18), flex: 1,fontFamily: "PopinRegula", }}>
+                {data?.post?.community_title ?? ""}
+              </Text>
+
+            
+            </View>
+          ) : (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+              className="mt-3"
+            >
+              <Text style={{ color: "black",  fontWeight: 700,
+                                fontSize:ms(18), flex: 1 ,fontFamily: "PopinRegula",}}>
+                {data?.post?.bedrooms ?? 0} bedrooms{" "}
+                {data?.post?.property_sub_type ?? ""} for{" "}
+                {data?.post?.property_for ?? ""}
+              </Text>
+
+             
+            </View>
+          )}
+          <View className="flex-row items-center justify-between mt-1">
             <Text
               className="flex-1 mr-2"
               numberOfLines={2}
@@ -398,10 +450,14 @@ const rotate = rotateAnim.interpolate({
               {data?.post?.address}
             </Text>
 
-            <View className="flex-row gap-2">
-              <TouchableOpacity>
-                <Heart />
-              </TouchableOpacity>
+            <View className="flex-row ">
+                 <TouchableOpacity onPress={()=>toggleSave()} >
+                            { isSaved ? (
+                                                                  <RedHeart />
+                                                                ) : (
+                           <Heart />
+                                                                )}
+                         </TouchableOpacity>
               <TouchableOpacity onPress={() => setShowShare(true)}>
                 <Share />
               </TouchableOpacity>
@@ -409,6 +465,15 @@ const rotate = rotateAnim.interpolate({
           </View>
           {type !== "community" && (
             <>
+            <View
+                style={{
+                  height: vs(1),
+                  marginTop: vs(20),
+                  marginBottom: vs(10),
+                  backgroundColor: Colors.light.textGray,
+                  opacity: 0.2,
+                }}
+              />
               <Text style={styles.heading}>KEY PROPERTY FACTS</Text>
               <View>
                 <View className="flex-row justify-between">
@@ -440,7 +505,7 @@ const rotate = rotateAnim.interpolate({
                   </Text>
                   <Text style={styles.card}>
                     Home age:{" "}
-                    <Text style={styles.textred}>{data?.post?.home_age}</Text>
+                    <Text style={styles.textred}>{data?.post?.home_age} year</Text>
                   </Text>
                 </View>
                 <View className="flex-row justify-between">
@@ -492,6 +557,7 @@ const rotate = rotateAnim.interpolate({
               </View>
             </>
           )}
+          <View className="mt-5">
           {facts
             .split(",")
             .filter(Boolean)
@@ -501,11 +567,12 @@ const rotate = rotateAnim.interpolate({
                 style={[
                   styles.card2,
                   {
+                    
                     padding: ms(8),
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    marginBottom: vs(8),
+                    marginBottom: vs(5),
                   },
                 ]}
               >
@@ -517,6 +584,7 @@ const rotate = rotateAnim.interpolate({
                       fontSize: ms(15),
                       fontWeight: "500",
                       width: hs(250),
+                      paddingVertical: vs(5),
                     }}
                   >
                     {item.trim()}
@@ -524,8 +592,8 @@ const rotate = rotateAnim.interpolate({
                 </View>
               </View>
             ))}
-
-          <Text style={styles.description}>
+  </View>
+          <Text style={[styles.description,{lineHeight:20}]} >
             {expanded
               ? type === "community"
                 ? data?.post?.community_details
@@ -576,7 +644,7 @@ const rotate = rotateAnim.interpolate({
           {data?.post?.property_titles?.map((_, index) => (
             <View key={index} style={styles.card2}>
               <Text
-                style={[styles.heading, { alignSelf: "center" }]}
+                style={[styles.heading, { alignSelf: "center",width: "100%", backgroundColor:Colors.light.lightGray,padding:vs(15),textAlign:"center",fontFamily:"PopinBold",borderRadius:ms(5) }]}
                 className="mb-4"
               >
                 {data?.post?.property_titles[index]}
@@ -1061,7 +1129,8 @@ const rotate = rotateAnim.interpolate({
                       },
                     ]}
                     onPress={() => {
-                      console.log(item.id);
+                      setprofileData({type:"mortgage",id:item.id});setSingleView(true);
+                     
                     }}
                   >
                     <CircleImage
@@ -1244,7 +1313,7 @@ const rotate = rotateAnim.interpolate({
             }}
           />
 
-          <TouchableOpacity style={[styles.card2, { alignItems: "center" }]}>
+          <TouchableOpacity style={[styles.card2, { alignItems: "center" }]} onPress={()=>{setprofileData({type:data?.posted_by_type,id:data?.posted_by?.id});setSingleView(true);}}>
             <CircleImage
               Size={80}
               source={{ uri: ImageFormater(data?.posted_by?.logo) }}
@@ -1273,20 +1342,20 @@ const rotate = rotateAnim.interpolate({
               </View>
             ) : (
               <View className="flex-row mb-4">
-                <View className="items-center" style={{ flex: 1 }}>
+                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"sale",profile_type:data?.posted_by_type}})}} className="items-center" style={{ flex: 1 }}>
                   <Text style={[styles.heading, { color: Colors.light.red }]}>
                     {data?.posted_by?.sale_posts ?? 0}
                   </Text>
                   <Text style={styles.heading}>For Sale</Text>
-                </View>
+                </TouchableOpacity>
 
                 <VerticalLine />
-                <View className="items-center" style={{ flex: 1 }}>
+                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"rent"}})}} className="items-center" style={{ flex: 1 }}>
                   <Text style={[styles.heading, { color: Colors.light.red }]}>
                     {data?.posted_by?.rent_posts ?? 0}
                   </Text>
                   <Text style={styles.heading}>For Rent</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             )}
             <TouchableOpacity
@@ -1538,6 +1607,18 @@ const rotate = rotateAnim.interpolate({
   </View>
   <Loading isLoading={sharing} text="Sharing..."/>
 </Modal>
+  <Modal
+            visible={singleView}
+            animationType="slide"
+            onRequestClose={() => setSingleView(false)}
+            transparent={true}
+            statusBarTranslucent={true}
+          >
+     <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+          </Modal>
+           <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+                        <SavedItems setShowSaved={setShowSaved} />
+                      </Modal>
       <Loading isLoading={isFetching} text="Loading..." />
       <Loading isLoading={isLoading} text="Sending..." />
     </>
@@ -1560,12 +1641,16 @@ const styles = StyleSheet.create({
   },
   textred: {
     color: Colors.light.red,
+    fontWeight:700,
     fontFamily: "PopinRegula",
   },
   description: {
     marginVertical: vs(10),
     fontWeight: 500,
     fontFamily: "PopinRegula",
+    textAlign:"justify",
+    paddingHorizontal:hs(5),
+ 
   },
     adCard: {
     width: "100%",
@@ -1589,20 +1674,21 @@ const styles = StyleSheet.create({
   card2: {
     backgroundColor: "white",
     borderRadius: 12,
-    paddingVertical: vs(15),
+    paddingVertical: vs(10),
     paddingHorizontal: hs(15),
     marginTop: vs(10),
     elevation: 3,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowRadius: 6,
+    boxShadow:'0.2px 0.2px 0.2px 0.2px rgba(0, 0, 0, 0.1)',
   },
 
   heading: {
     color: Colors.light.DarkGreen,
     fontSize: ms(15),
-    fontWeight: 500,
+    fontWeight: 700,
     marginTop: vs(10),
     fontFamily: "PopinRegula",
   },

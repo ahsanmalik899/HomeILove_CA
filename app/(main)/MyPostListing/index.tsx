@@ -24,6 +24,7 @@ const index = () => {
   const isShowpost = useLocalSearchParams().isShowpost;
   const id = useLocalSearchParams().id;
   const post_type = useLocalSearchParams().type;
+    const profile_type = useLocalSearchParams().profile_type;
   const [ProfileType, SetProfilrType] = useState("");
   const type = String(rawType).toLowerCase();
     const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -74,8 +75,8 @@ const filter = []
     type,
     per_page: perPage,
     page,
-    user_id: user.id,
-    profile_type: ProfileType,
+    user_id:id?id: user.id,
+    profile_type: profile_type?profile_type:ProfileType,
   });
   const renderFilterItem = ({ item }) => {
     const isActive = selectedFilter === item.name;
@@ -134,7 +135,7 @@ const filter = []
           refetch={refetch}
           initialLoadDone={initialLoadDone}
           isShowpost={isShowpost=="true"?true:false}
-          id={id?.toString()}
+          id={id?id.toString(): user.id.toString()}
           post_type={post_type?.toString()}
         />
       </View>

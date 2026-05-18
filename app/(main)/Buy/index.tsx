@@ -2,17 +2,15 @@ import FormandLand from "@assets/Buy/formLandForSale.svg";
 import PropertyForSale from "@assets/Buy/propertyforSale.svg";
 import Rebuilt from "@assets/Buy/reBuiltForsale.svg";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import LargeButton from "@src/components/globals/LaregeButton";
 import SideBarCard from "@src/components/globals/SideBarCard";
 import { hs, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 const index = () => {
   return (
-    <View className="bg-white flex-1">
-      <HeaderWithBack title="Buy" buttonTitile="Raise query to Buy" onButtonPress={()=>router.navigate({
-        pathname:"/HomeValue",
-        params:{type:"buy"}
-      })} />
+    <View className="bg-white flex-1 " >
+      <HeaderWithBack title="Buy" />
       <View style={{ marginHorizontal: hs(20), marginTop: vs(30) }}>
         <View className="flex-row justify-between">
           <SideBarCard
@@ -51,6 +49,12 @@ const index = () => {
             type={"Buy"}
           />
         </View>
+      </View>
+      <View style={{justifyContent: 'flex-end',marginTop:'auto',marginHorizontal:hs(20),marginBottom:hs(20)}}>
+        <LargeButton text="Raise query to Buy" handleSubmit={() => {router.navigate({
+        pathname:"/HomeValue",
+        params:{type:"buy"}
+      })} }/>
       </View>
     </View>
   );

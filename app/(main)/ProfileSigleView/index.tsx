@@ -3,13 +3,16 @@ import {
   useGetotherPastWorkQuery,
   useGetProfilesForConectionQuery,
   useGetSingleProfileQuery,
+  useSaveItemApiMutation,
   useShare_profileApiMutation,
+  useUnsaveItemApiMutation,
   useUserAgentPastPostsApiQuery,
   useWriteReviewApiMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
+import RedHeart from "@assets/CreateProfile/heart-red.svg";
 import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
@@ -28,6 +31,7 @@ import StarRating from "@src/components/globals/StarRating";
 import VideoSection from "@src/components/globals/ViedioSection";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
@@ -53,7 +57,7 @@ const Index = () => {
   const params = useLocalSearchParams();
   const type = params.type as string;
   const id = Number(params.id);
-
+const user_id = Number(user?.id);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
   const [review, setReview] = useState("");
@@ -78,11 +82,27 @@ const Index = () => {
   const [perPage] = useState(10);
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const { data, isLoading } = useGetSingleProfileQuery({ type, id });
+console.log("user:", user);
+console.log("user?.id:", user?.id);
+console.log("skip:", !user?.id);
+ 
+const { data, isLoading } = useGetSingleProfileQuery(
+  {
+    type,
+    id,
+    user_id: Number(user?.id),
+  },
+  {
+    skip: !user?.id,
+  }
+);
+
   const [share_profileApi, { isLoading: sharing }] = useShare_profileApiMutation();
   const profile = data?.data;
+     const [saveItemApi] = useSaveItemApiMutation();
+        const [unsaveItemApi] = useUnsaveItemApiMutation();
   const { data: Profiles, isLoading: ProfilesLoading } =
-    useGetProfilesForConectionQuery({ id: user.id });
+    useGetProfilesForConectionQuery({ id: user?.id });
   const {
     data: othePastdata,
     isLoading: otherWorkLoding,
@@ -159,8 +179,31 @@ const Index = () => {
       setReview(false);
     }
   };
+    const [isSaved,setIsSaved]=useState(profile?.is_saved ?? false);
 
+        const toggleSave = async () => {
+     
+      try {
+        if (isSaved) {
+          await unsaveItemApi({
+            saved_id: item?.data?.id,
+            user_id: user.id,
+            type: item?.data?.type,
+          }).unwrap();
+        } else {
+          await saveItemApi({
+            saved_id: item?.data?.id,
+            user_id: user.id,
+            type: item?.data?.type,
+          }).unwrap();
+        }
+      } catch (error) {
+        console.log("Error saving/unsaving item:", error);
 
+      } finally {
+        setIsSaved((prev) => !prev);
+      }
+    };
 
 
   return (
@@ -216,9 +259,13 @@ const Index = () => {
           <View style={styles.divider} />
 
           {/* Actions */}
-          <View style={styles.row}>
-            <TouchableOpacity>
+          <View style={styles.row}    >
+            <TouchableOpacity onPress={()=>toggleSave()} >
+               { isSaved ? (
+                                                     <RedHeart />
+                                                   ) : (
               <Heart />
+                                                   )}
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setShowShare(true)}>
@@ -602,10 +649,7 @@ const Index = () => {
               <Text style={styles.reviewBtnText}>Write a Review</Text>
             </TouchableOpacity>
 
-            <Text style={styles.dealText}>
-              DEALS BY{" "}
-              <Text style={styles.businessName}>{profile?.business_name}</Text>
-            </Text>
+          
           </View>
         </View>
         <Loading isLoading={isLoading} text="Loading.." />

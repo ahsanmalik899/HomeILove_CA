@@ -67,9 +67,9 @@ export const MainApi = createApi({
         body: formatData,
       }),
     }),
-    getSinglePost: builder.query<any, GetMyPostsOnly>({
-      query: ({ type, id }) => ({
-        url: `getSinglePostapi?type=${type}&id=${id}`,
+    getSinglePost: builder.query<any, any>({
+      query: ({ type, id,user_id }) => ({
+        url: `getSinglePostapi?type=${type}&id=${id}&user_id=${user_id}`,
         method: "GET",
       }),
       providesTags: (r: any, e: any, arg: { id: any }) => [
@@ -244,6 +244,13 @@ export const MainApi = createApi({
         ];
       },
     }),
+    deleteAlertApi:builder.mutation<any, any>({
+      query: ({ alert_id,user_id }) => ({
+        url: `/deleteAlertApi?alert_id=${alert_id}&user_id=${user_id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["AlertPref"],
+    }),
     saveAllerts: builder.mutation<any, FormData>({
       query: (formatdata) => ({
         url: `/saveUpdateAlert`,
@@ -251,6 +258,20 @@ export const MainApi = createApi({
         body: formatdata,
       }),
       invalidatesTags: ["AlertPref"],
+    }),
+    getUserAlertsEdit:builder.query<any, GetMyPostsOnly>({
+      query: ({ type, id }) => ({
+        url: `getUserAlertsEdit?alert_id=${id}`,
+        method: "GET",
+      }),
+      providesTags: ["AlertPref"],
+    }),
+    alertCountApi:builder.query<any, any>({
+      query: ({ type, id }) => ({
+        url: `alertCountApi?user_id=${id}`,
+        method: "GET",
+      }),
+     
     }),
     getAlertPref: builder.query<any, GetMyPostsOnly>({
       query: ({ type, id }) => ({
@@ -280,9 +301,9 @@ export const MainApi = createApi({
       }),
       providesTags: ["PropertyPref"],
     }),
-    getSingleProfile: builder.query<any, GetMyPostsOnly>({
-      query: ({ type, id }) => ({
-        url: `getSingleProfile?type=${type}&id=${Number(id)}`,
+    getSingleProfile: builder.query<any, any>({
+      query: ({ type, id, user_id }) => ({
+        url: `getSingleProfile?type=${type}&id=${Number(id)}&user_id=${user_id}`,
         method: "GET",
       }),
       providesTags:["myProfile"]
@@ -335,6 +356,8 @@ export const MainApi = createApi({
         price_type,
         sort,
         furnishing_type,
+        purposeful_property,
+          user_id,
       }) => ({
         url: "getPropertyListing",
         method: "GET",
@@ -359,6 +382,7 @@ export const MainApi = createApi({
           no_of_baths,
           sale_type,
           price_type,
+          purposeful_property,
           tenure,
           furnishing_type,
           tinency_tenure,
@@ -366,6 +390,7 @@ export const MainApi = createApi({
           min_beds,
           max_beds,
           sort,
+           user_id,
         },
       }),
     }),
@@ -423,6 +448,7 @@ export const MainApi = createApi({
         lng,
         radius,
         sort,
+        user_id,
       }) => ({
         url: `GetProfilesListing`,
         method: "GET",
@@ -438,6 +464,7 @@ export const MainApi = createApi({
           lng,
           radius,
           sort,
+          user_id,
         },
       }),
     }),
@@ -771,10 +798,10 @@ export const MainApi = createApi({
       }),
     }),
     updateAccountApi: builder.mutation({
-      query: (body) => ({
+      query: (formatdata:FormData) => ({
         url: "/updateAccount",
         method: "POST",
-        body,
+       body: formatdata,
       }),
     }),
     markAllAsSeen: builder.mutation({
@@ -822,6 +849,20 @@ export const MainApi = createApi({
       }),
 
     }),
+   resetPassword: builder.mutation<any, any>({
+  query: (body) => ({
+    url: "resetPassword",
+    method: "POST",
+    body,
+  }),
+}),
+deleteAccount: builder.mutation<any, any>({
+  query: (body) => ({
+    url: "deleteAccountapi",
+    method: "POST",
+    body,
+  }),
+}),
     deletePastWork: builder.mutation<any, FormData>({
       query: (formatData) => ({
         url: `deletePastWork`,
@@ -919,8 +960,15 @@ export const MainApi = createApi({
         params: {user_id},
       }),
       providesTags: ["advertisementMedia"],
-    })
+    }),
+getSavedAdsApi:builder.query<any,any>({
+  query: ({user_id,page,limit}) => ({
+    url: "getSavedAdsApi",
+    method: "GET",
+    params: {user_id,page,limit},
+  }),
 
+}),
   }),
 });
 
@@ -970,7 +1018,9 @@ export const {
   useDeleteConnectionPreferencesApiMutation,
   useDeleteCommunityPreferencesApiMutation,
   useGetPostCommentsApiQuery,
+  useDeleteAccountMutation,
   usePostCommentApiMutation,
+  useResetPasswordMutation,
   useUpgradeProfileApiMutation,
   useDeleteCommentApiMutation,
   usePostReplyApiMutation,
@@ -1038,4 +1088,8 @@ export const {
   useUpdateAdvertisementMediaMutation,
   useGetRandomAdQuery,
   useLazyGetRandomAdQuery,
+  useGetSavedAdsApiQuery,
+  useGetUserAlertsEditQuery,
+  useDeleteAlertApiMutation,
+  useAlertCountApiQuery,
 } = MainApi;

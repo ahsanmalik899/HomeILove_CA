@@ -2,6 +2,7 @@ import MortgageExpert from "@assets/GetHelp/mortgageexpert.svg";
 import PropertyInvestor from "@assets/GetHelp/propertyInvestor.svg";
 import ReputedAgent from "@assets/GetHelp/reputeAgent.svg";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import LargeButton from "@src/components/globals/LaregeButton";
 import SideBarCard from "@src/components/globals/SideBarCard";
 import { hs, vs } from "@utils/design/design";
 import { router } from "expo-router";
@@ -9,10 +10,7 @@ import { View } from "react-native";
 const index = () => {
   return (
     <View className="flex-1 bg-white ">
-      <HeaderWithBack title="Get Help"buttonTitile="Raise query to Local Experts for free"  onButtonPress={()=>router.navigate({
-        pathname:"/HomeValue",
-        params:{type:"get help"}
-      })}  />
+      <HeaderWithBack title="Find Expert"  />
       <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
         <View className="flex-row justify-between">
           <SideBarCard
@@ -51,6 +49,9 @@ const index = () => {
             type={"Buy"}
           />
         </View>
+      </View>
+           <View style={{justifyContent: 'flex-end',marginTop:'auto',marginHorizontal:hs(20),marginBottom:hs(20)}}>
+        <LargeButton text="Raise query to Local Experts for free" handleSubmit={() => router.navigate({pathname:"/HomeValue",params:{type:"get help"}})} />
       </View>
     </View>
   );

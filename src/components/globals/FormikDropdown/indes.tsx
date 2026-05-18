@@ -196,13 +196,14 @@ export const FormikDropdown = ({
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600" ,fontFamily: "PopinRegula",},
+  title: { fontSize: ms(14), fontWeight: "700" ,fontFamily: "PopinRegula",},
   card: {
     backgroundColor: "#fff",
     borderRadius: ms(10),
     marginVertical: vs(6),
     marginHorizontal: hs(3),
     elevation: 4,
+
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,

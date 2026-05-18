@@ -289,7 +289,7 @@ else if (values.post_video?.uri && !values.post_video?.isExisting) {
               }}
               onPress={() => handleSubmit()}
             >
-              <Text style={{ color: "white", fontWeight: "600",textAlign:'center',fontFamily: "PopinRegula", }}>{edit? "Update":"Post"}</Text>
+              <Text style={{ color: "white", fontWeight: "700",textAlign:'center',fontFamily: "PopinRegula", }}>{edit? "Update":"Post"}</Text>
             </TouchableOpacity>
           </View>
            

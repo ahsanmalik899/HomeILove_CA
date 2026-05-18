@@ -1,3 +1,4 @@
+import { useSaveItemApiMutation, useUnsaveItemApiMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
 import Mail from "@assets/Buy/email-open.svg";
@@ -50,8 +51,11 @@ const YourAdsPostDesign = ({
   const insets = useSafeAreaInsets();
   const[singlePost,setSinglePost]=useState<any>(null);
   const [scrollable, setscrollable] = useState(true);
+    const [saveItemApi] = useSaveItemApiMutation();
+    const [unsaveItemApi] = useUnsaveItemApiMutation();
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
+    
     const openslider = (index: number) => {
       setSelectedImages(item.images || []);
       setShowImages(true);
@@ -64,7 +68,31 @@ const YourAdsPostDesign = ({
         setSinglePost({ type: post_type, id: post_id});
       }
     }, [isSingleView]);
-    
+     const [isSaved,setIsSaved]=useState(item?.data?.is_saved ?? false);
+      const toggleSave = async () => {
+        const itemId = item?.data?.post_property_id || item?.data?.post_community_id;
+     
+      try {
+        if (isSaved) {
+          await unsaveItemApi({
+            saved_id: itemId,
+            user_id: user.id,
+            type:"community",
+          }).unwrap();
+        } else {
+          await saveItemApi({
+            saved_id: itemId,
+            user_id: user.id,
+            type:"community",
+          }).unwrap();
+        }
+      } catch (error) {
+        console.log("Error saving/unsaving item:", error);
+
+      } finally {
+        setIsSaved((prev) => !prev);
+      }
+    };
       const facts = item.imp_facts ?? item.facts ?? "";
     return (
       <>
@@ -81,19 +109,19 @@ const YourAdsPostDesign = ({
               className="flex-row justify-between items-center"
               style={{
                 backgroundColor:
-                  item.post_type === "Trending"
+                  item?.data?.post_type === "Trending"
                     ? Colors.light.LightGreen
-                    : "white",
+                    : Colors.light.lightGray,
                 paddingHorizontal: hs(10),
                 paddingVertical: vs(10),
                 borderRadius: ms(10),
-                marginBottom: item.post_type === "Trending" ? vs(10) : vs(0),
+                marginBottom: item?.data?.post_type === "Trending" ? vs(10) : vs(10),
               }}
             >
               <Text
                 style={{
                   color:
-                    item.post_type === "Trending"
+                    item?.data?.post_type === "Trending"
                       ? Colors.light.DarkGreen
                       : "black",
                   fontWeight: 700,
@@ -102,11 +130,7 @@ const YourAdsPostDesign = ({
                 }}
               >
                From $ {item?.data?.price1}
-                {type === "rent" && (
-                  <Text style={{ color: Colors.light.red , fontSize:ms(18),fontFamily: "PopinRegula",}}>
-                    /{item.data.rent_type}
-                  </Text>
-                )}
+              z
               </Text>
               {item?.data?.post_type === "Trending" && (
                 <Text
@@ -266,9 +290,16 @@ const YourAdsPostDesign = ({
                       {item?.data?.property_condition}
                     </Text>
                   )}
-                  <TouchableOpacity style={{ marginLeft: "auto" }}>
-                    <UnSelecteHeart />
-                  </TouchableOpacity>
+                  <TouchableOpacity
+                                     style={{ marginLeft: "auto" }}
+                                     onPress={toggleSave}
+                                   >
+                                     { isSaved ? (
+                                       <RedHeart />
+                                     ) : (
+                                       <UnSelecteHeart />
+                                     )}
+                                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
               {item?.data?.post_type==="Trending"&&(

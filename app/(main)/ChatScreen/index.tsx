@@ -55,9 +55,7 @@ const unsubscribe = onSnapshot(q,(snapshot)=>{
 
  setMessages(list);
 
- setTimeout(()=>{
-   listRef.current?.scrollToEnd({animated:true});
- },100);
+
 
  setInitialLoading(false);
 
@@ -66,6 +64,9 @@ const unsubscribe = onSnapshot(q,(snapshot)=>{
 return ()=>unsubscribe();
 
 },[user.id,userId]);
+const previousLength = useRef(0);
+
+
 const fetchOlderMessages = async () => {
 
  if(loadingMore || isFetching || !hasMore) return;

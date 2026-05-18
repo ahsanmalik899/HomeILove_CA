@@ -138,7 +138,7 @@ export const FormikInput = ({
                   justifyContent: "space-between",
                 }]}
               >
-                <View className="flex-row gap-3 items-center">
+                <View className="flex-row gap-3 items-center py-4">
                   <Heart />
 
                   <Text
@@ -172,7 +172,7 @@ export const FormikInput = ({
   );
 };
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: 600,fontFamily: "PopinRegula", },
+  title: { fontSize: ms(14), fontWeight: 700,fontFamily: "PopinRegula", },
   inputdes: {
     height: vs(120),
     textAlignVertical: "top",

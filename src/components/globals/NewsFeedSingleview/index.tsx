@@ -194,13 +194,11 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
                {data?.posted_by?.business_name}
              </Text>
              {data?.type!=="general" && (
-             <TouchableOpacity
-               onPress={() =>
-                setSingleView(true)
-               }
-             >
-               <Text style={styles.fullDetailText}>See Full Details</Text>
-             </TouchableOpacity>)}
+    <View style={{ flex: 1, alignItems: "flex-end" }}>
+  <TouchableOpacity onPress={() => setSingleView(true)}>
+    <Text style={styles.fullDetailText}>See Full Details</Text>
+  </TouchableOpacity>
+</View>)}
            </View>
            {data?.type!=="general" && (
              <>
@@ -735,11 +733,13 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
      fontFamily: "PopinRegula",
    },
    fullDetailText: {
-     color: Colors.light.red,
-     fontSize: ms(13),
-     fontWeight: "600",
+     color: Colors.light.DarkGreen,
+     fontSize: ms(14),
+     fontWeight: "700",
+
      marginTop: vs(6),
      fontFamily: "PopinRegula",
+    
    },
    moreText: {
      color: Colors.light.DarkGreen,

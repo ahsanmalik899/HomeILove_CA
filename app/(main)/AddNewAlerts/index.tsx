@@ -1,6 +1,6 @@
 import {
-  useGetAlertPrefQuery,
-  useSaveAllertsMutation,
+  useGetUserAlertsEditQuery,
+  useSaveAllertsMutation
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import { AdressInput } from "@src/components/globals/AddressInput";
@@ -13,17 +13,17 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms } from "@utils/design/design";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
   const user = useAppSelector(userdata);
+  const params = useLocalSearchParams();
+  const editmode = params?.edit;
   const [setAllert, { isLoading }] = useSaveAllertsMutation();
-  const { data, isFetching } = useGetAlertPrefQuery({ id: user.id, type: "" });
-  console.log(data);
-
+  const { data, isFetching } = useGetUserAlertsEditQuery({ id: params?.id, type: "" },{skip:!params?.id||!editmode});
   const AddAlertSchema = Yup.object().shape({
     alert_id: Yup.number().nullable(),
     address: Yup.string().nullable(),
@@ -118,7 +118,10 @@ const index = () => {
                   if (Array.isArray(value)) value = value.join(",");
                   formData.append(key, String(value));
                 });
-
+                formData.append("edit", editmode?"1":"0");
+                if(editmode){
+                  formData.append("alert_id", params?.id.toString() || "");
+                }
                 const result = await setAllert(formData);
 
                 if (result?.data?.success) {

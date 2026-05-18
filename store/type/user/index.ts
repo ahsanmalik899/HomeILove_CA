@@ -98,6 +98,7 @@ type:string,
 id:number,
 page:number,
 limit:number,
+user_id?:number,
 
 }
 export interface FeedResponse {

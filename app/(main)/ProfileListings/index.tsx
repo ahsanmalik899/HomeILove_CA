@@ -1,17 +1,21 @@
 import { useGetProfileListingQuery } from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import Threedot from "@assets/Buy/threedotwhite.svg";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import ProfileFilter from "@src/components/globals/ProfileFilter";
 import ProfileListingDesign from "@src/components/globals/ProfileListingDesign";
+import SavedItems from "@src/components/globals/SavedItems";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useCallback, useEffect, useState } from "react";
-import { BackHandler, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BackHandler, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
 import * as Yup from "yup";
 const index = () => {
   const params = useLocalSearchParams();
+  const user = useSelector(userdata);
   const [page, setpage] = useState(1);
   const [profiles, setProfiles] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -24,7 +28,8 @@ const index = () => {
   const [zip, setZip] = useState(params.zip || "");
   const [showFilter, setShowFilter] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
-
+  
+const [showSaved, setShowSaved] = useState(false);
  
     const FilterSchema = Yup.object().shape({
       radius: Yup.string().nullable(),
@@ -43,8 +48,10 @@ const index = () => {
         lat,
         lng,
         name,
+        user_id: user?.id,
         type:params.type,
         radius: params.radius || undefined,
+        per_page: 10,
       });
  const { data: profileList, isLoading, isFetching } =
   useGetProfileListingQuery(apiFilters);
@@ -58,8 +65,10 @@ const index = () => {
     lat,
     lng,
     name,
+    user_id: user?.id,
     type:params.type,
     radius: values.radius || undefined,
+     per_page: 10,
   });
   useEffect(() => {
   setApiFilters((prev) => ({
@@ -72,6 +81,8 @@ const index = () => {
     lat,
     lng,
     name,
+    user_id: user?.id,
+     per_page: 10,
   }));
 }, [page, address, city, state, zip, lat, lng, name]);
 
@@ -88,7 +99,7 @@ const index = () => {
       page === 1 ? newProfiles : [...prev, ...newProfiles]
     );
       setInitialLoadDone(true);
-  }, [profileList, page]);
+  }, [profileList]);
 useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
@@ -114,17 +125,18 @@ useFocusEffect(
     return () => sub.remove();
   }, [params])
 );
+  
   return (
     <View className=" flex-1" style={{ backgroundColor: "#F4F0F0" }}>
-       <HeaderWithBack onBackpress={()=>{params?.isSingleView=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}} />
+       <HeaderWithBack onBackpress={()=>{params?.isSingleView=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}} isSavedItem onpressSave={()=>setShowSaved(true) }/>
      <View style={styles.filterBar}>
  
   <View style={{ flex: 1 }}>
     <Text style={styles.resultTitle}>
-      {params.type?.toString().toUpperCase()} Profiles
+      {params.type?.toString().toUpperCase()} Businesses
     </Text>
     <Text style={styles.resultSub}>
-      {city || state || "Nearby"} • {profiles?.data?.length} results
+     <Text style={{fontWeight:700}}>{profileList?.pagination?.total}</Text>  results in {city || state || "Nearby"} 
     </Text>
   </View>
   <TouchableOpacity
@@ -194,6 +206,9 @@ useFocusEffect(
                 )}
               </Formik>
             )}
+                 <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+        <SavedItems setShowSaved={setShowSaved} />
+      </Modal>
     </View>
   );
 };

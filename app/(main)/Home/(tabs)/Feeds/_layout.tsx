@@ -15,8 +15,7 @@ const _layout = () => {
       lazy:true,
       lazyPreloadDistance:100,
   tabBarActiveTintColor: Colors.light.red,
-  tabBarInactiveTintColor: 'black',
-  
+  tabBarInactiveTintColor: Colors.light.DarkGreen,
   tabBarIndicatorStyle: {
     backgroundColor: Colors.light.red,
     height: vs(3),
@@ -40,7 +39,7 @@ tabBarLabel: ({ focused, color }) => {
   }
 
   return (
-    <Text style={{ color,fontSize:ms(12), fontWeight: focused ? 'bold' : 'normal',fontFamily: "PopinRegula", }}>
+    <Text style={{ color,fontSize:ms(12), fontWeight:"700",fontFamily: "PopinRegula", }}>
       {label}
     </Text>
   );

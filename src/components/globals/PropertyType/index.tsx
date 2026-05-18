@@ -48,7 +48,7 @@ export default index
 
 const styles = StyleSheet.create({
     activeButton: {
-    backgroundColor: Colors.light.textGray,
+    backgroundColor: "#F4F0F0",
     width: hs(100),
     paddingVertical: vs(5),
     borderRadius:8,

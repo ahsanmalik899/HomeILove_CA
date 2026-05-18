@@ -472,7 +472,7 @@ const index = () => {
                             onPress={() => setFieldValue("sale_type", "Normal")}
                           >
                             <MaterialIcons
-                              size={18}
+                              size={25}
                               color={Colors.light.DarkGreen}
                               name={
                                 values.sale_type === "Normal"
@@ -500,7 +500,7 @@ const index = () => {
                             }
                           >
                             <MaterialIcons
-                              size={18}
+                              size={25}
                               color={Colors.light.DarkGreen}
                               name={
                                 values.sale_type === "Foreclosure"
@@ -544,13 +544,13 @@ const index = () => {
                   />
                   <Text
                     style={{
-                      fontWeight: 600,
+                      fontWeight: 700,
                       marginBottom: vs(10),
                       fontSize: ms(14),
                       fontFamily: "PopinRegula",
                     }}
                   >
-                    Property Type
+                    Property <Text style={{color:Colors.light.red}}>TYPE</Text>
                   </Text>
                   <PropertyType
                     onPress={(value) => {
@@ -644,13 +644,13 @@ const index = () => {
                   />
                   <Text
                     style={{
-                      fontSize: ms(15),
-                      fontWeight: 500,
+                      fontSize: ms(14),
+                      fontWeight: 700,
                       marginBottom: vs(10),
                       fontFamily: "PopinRegula",
                     }}
                   >
-                    Property Details
+                    Property <Text style={{color:Colors.light.red}}>DETAILS</Text>
                   </Text>
                   <View className="flex-row justify-between gap-3">
                     <View className="flex-1">
@@ -932,14 +932,24 @@ const index = () => {
                   )}
 
                   <View>
+                    <View
+                    style={{
+                      height: vs(1),
+                      marginTop: vs(20),
+                      marginBottom: vs(10),
+                      backgroundColor: Colors.light.textGray,
+                      opacity: 0.2,
+                    }}
+                  />
                     <Text
                       style={{
-                        fontWeight: 600,
+                        fontWeight: 700,
                         marginTop: vs(10),
+                        fontSize: ms(14),
                         fontFamily: "PopinRegula",
                       }}
                     >
-                      Add main features
+                      Add main <Text style={{color:Colors.light.red}}>FEATURES</Text>
                     </Text>
                     <Text style={{ fontFamily: "PopinRegula" }}>
                       (Type property feature and hit + sign. To add more
@@ -984,8 +994,17 @@ const index = () => {
                         multiline
                         errorText={errors.fees_conditions}
                       />
+                        <View
+                    style={{
+                      height: vs(1),
+                      marginTop: vs(20),
+                      marginBottom: vs(10),
+                      backgroundColor: Colors.light.textGray,
+                      opacity: 0.2,
+                    }}
+                  />
                       <Text
-                        style={{ fontWeight: 600, fontFamily: "PopinRegula" }}
+                        style={{ fontWeight: 700, fontSize: ms(16),fontFamily: "PopinRegula" }}
                       >
                         When property available for occupancy?
                         <Text
@@ -1007,10 +1026,14 @@ const index = () => {
                                 : "Vacant now"
                             );
                           }}
+                          style={{
+                            alignContent:"center",
+                            justifyContent:"center",
+                          }}
                         >
                           <View className="flex-row mt-4 items-center">
                             <MaterialIcons
-                              size={18}
+                              size={25}
                               color={Colors.light.DarkGreen}
                               name={
                                 values.available_on === "Vacant now"
@@ -1056,8 +1079,9 @@ const index = () => {
                       </View>
                     </>
                   )}
-                  <Text style={{ fontWeight: 600, fontFamily: "PopinRegula" }}>
-                    Property Visit options
+                    
+                  <Text style={{ fontWeight: 700, fontSize: ms(14), fontFamily: "PopinRegula" }}>
+                     Visit <Text style={{color:Colors.light.red}}>OPTION</Text>
                   </Text>
                   <Text style={{ fontFamily: "PopinRegula" }}>
                     Buyer can visit property physically?
@@ -1076,7 +1100,7 @@ const index = () => {
                         }}
                       >
                         <MaterialIcons
-                          size={18}
+                          size={25}
                           color={Colors.light.DarkGreen}
                           name={
                             values.property_visit === "Yes"
@@ -1105,7 +1129,7 @@ const index = () => {
                         }}
                       >
                         <MaterialIcons
-                          size={18}
+                          size={25}
                           color={Colors.light.DarkGreen}
                           name={
                             values.property_visit === "No"
@@ -1294,6 +1318,15 @@ const index = () => {
                   />
                   {user.user_type === "Business" && (
                     <>
+                        <View
+                    style={{
+                      height: vs(1),
+                      marginTop: vs(20),
+                      marginBottom: vs(10),
+                      backgroundColor: Colors.light.textGray,
+                      opacity: 0.2,
+                    }}
+                  />
                       <Text
                         className="font-bold"
                         style={{ fontFamily: "PopinRegula" }}
@@ -1313,7 +1346,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Agent"
@@ -1344,7 +1377,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Builder"
@@ -1375,7 +1408,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Decor"
@@ -1408,7 +1441,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Electrician"
@@ -1439,7 +1472,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Investor"
@@ -1470,7 +1503,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Mortgage"
@@ -1501,7 +1534,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Painter"
@@ -1532,7 +1565,7 @@ const index = () => {
                             >
                               <View className="flex-row mt-4 items-center">
                                 <MaterialIcons
-                                  size={18}
+                                  size={25}
                                   color={Colors.light.DarkGreen}
                                   name={
                                     values.ad_by === "Plumber"
@@ -1657,7 +1690,7 @@ const index = () => {
                                   }}
                                 >
                                   <MaterialIcons
-                                    size={20}
+                                    size={25}
                                     color={Colors.light.DarkGreen}
                                     name={
                                       values.time_period === item.life.toString()

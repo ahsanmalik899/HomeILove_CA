@@ -315,7 +315,7 @@ export const AdressInput = ({
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600", zIndex: 0,fontFamily: "PopinRegula", },
+  title: { fontSize: ms(14), fontWeight: "700", zIndex: 0,fontFamily: "PopinRegula", },
   buttonContainer: {
     flexDirection: "row",
     backgroundColor: "transparent",

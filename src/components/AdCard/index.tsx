@@ -54,7 +54,7 @@ export const AdCard = ({ ad }) => {
   return (
     <Animated.View
       style={{
-        marginHorizontal: hs(10),
+        marginHorizontal: hs(50),
         marginVertical: vs(10),
         borderRadius: ms(16),
         overflow: "hidden",
@@ -85,7 +85,7 @@ export const AdCard = ({ ad }) => {
 
         <View style={{ padding: ms(10) }}>
           <Text style={{ fontSize: ms(11), color: "#888" }}>
-            Sponsored Ad
+            Sponsored 
           </Text>
 
           {ad?.ad_link && (

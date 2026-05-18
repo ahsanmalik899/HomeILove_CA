@@ -275,7 +275,7 @@ const index = () => {
                     <Text
                       style={{
                         width: hs(250),
-                        fontWeight: 500,
+                        fontWeight: 700,
                         marginTop: vs(10),
                         fontFamily: "PopinRegula",
                       }}
@@ -299,7 +299,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.property_for?.includes("Sale")
@@ -327,7 +327,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.property_for?.includes("Rent")
@@ -792,6 +792,8 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
+                          width:hs(120),
+                          alignItems:'center'
                         }}
                         onPress={async () => {
                           const formatdata = new FormData();
@@ -816,7 +818,7 @@ const index = () => {
                         <Text
                           style={{
                             color: Colors.light.DarkGreen,
-                            fontWeight: 500,
+                            fontWeight: 700,
                             fontFamily: "PopinRegula",
                           }}
                         >
@@ -830,9 +832,11 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(20),
                           paddingVertical: vs(10),
+                          width:hs(170),
+                          alignItems:'center'
                         }}
                       >
-                        <Text style={{ color: "white", fontWeight: 500 ,fontFamily: "PopinRegula",}}>
+                        <Text style={{ color: "white",fontSize:ms(16), fontWeight: 700 ,fontFamily: "PopinRegula",}}>
                           Apply
                         </Text>
                       </TouchableOpacity>
@@ -927,7 +931,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ width: hs(250), marginTop: vs(10),fontFamily: "PopinRegula", }}>
+                    <Text style={{ width: hs(250),fontWeight:700, marginTop: vs(10),fontFamily: "PopinRegula", }}>
                       Community type
                     </Text>
                     <View
@@ -947,7 +951,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.community_type?.includes("Residential")
@@ -975,7 +979,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.community_type?.includes("Commercial")
@@ -1003,7 +1007,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.community_type?.includes("Mix")
@@ -1029,7 +1033,7 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ width: hs(250), marginTop: vs(10),fontFamily: "PopinRegula", }}>
+                    <Text style={{ width: hs(250),fontWeight:700, marginTop: vs(10),fontFamily: "PopinRegula", }}>
                       Development Stage
                     </Text>
 
@@ -1050,7 +1054,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.community_status?.includes("Completed")
@@ -1078,7 +1082,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.community_status?.includes("Constructed")
@@ -1106,7 +1110,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.community_status?.includes("Inplanning")
@@ -1231,12 +1235,13 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
+                          width:ms(120)
                         }}
                       >
                         <Text
                           style={{
                             color: Colors.light.DarkGreen,
-                            fontWeight: 500,
+                            fontWeight: 700,
                             fontFamily: "PopinRegula",
                           }}
                           onPress={async () => {
@@ -1272,9 +1277,12 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(20),
                           paddingVertical: vs(10),
+                          width:hs(180),
+                          justifyContent:"center",
+                          alignItems:"center"
                         }}
                       >
-                        <Text style={{ color: "white", fontWeight: 500,fontFamily: "PopinRegula", }}>
+                        <Text style={{ color: "white", fontSize:ms(16), fontWeight: 700,fontFamily: "PopinRegula", }}>
                           Apply
                         </Text>
                       </TouchableOpacity>
@@ -1349,13 +1357,13 @@ const index = () => {
                     <Text
                       style={{
                         width: hs(250),
-                        marginTop: vs(10),
-                        fontWeight: 600,
-                        fontSize: ms(18),
+                        marginTop: vs(20),
+                        fontWeight: 700,
+                        fontSize: ms(14),
                         fontFamily: "PopinRegula",
                       }}
                     >
-                      Property for
+                      Connection Type
                     </Text>
                     <View
                       className=" "
@@ -1364,7 +1372,7 @@ const index = () => {
                       {/*  Electricians */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{  marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1377,7 +1385,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("electrician")
@@ -1395,7 +1403,7 @@ const index = () => {
                       {/* Builder */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1408,7 +1416,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("builder")
@@ -1426,7 +1434,7 @@ const index = () => {
                       {/*  Property agents */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1439,7 +1447,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("agent")
@@ -1456,7 +1464,7 @@ const index = () => {
                       {/*  Plumbers */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1469,7 +1477,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("plumber")
@@ -1486,7 +1494,7 @@ const index = () => {
                       {/*  Mortgage */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1499,7 +1507,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("mortgage")
@@ -1516,7 +1524,7 @@ const index = () => {
                       {/*  Decors */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1529,7 +1537,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("decor")
@@ -1546,7 +1554,7 @@ const index = () => {
                       {/*  Painters */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1559,7 +1567,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("painter")
@@ -1576,7 +1584,7 @@ const index = () => {
                       {/*  Investors */}
                       <View
                         className="flex-row items-center"
-                        style={{ marginLeft: hs(20), marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1589,7 +1597,7 @@ const index = () => {
                           }
                         >
                           <MaterialIcons
-                            size={18}
+                            size={25}
                             color={Colors.light.DarkGreen}
                             name={
                               values.user_type?.includes("investor")
@@ -1620,6 +1628,7 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
+                          width:ms(120)
                         }}
                              onPress={async () => {
                           const formatdata = new FormData();
@@ -1644,7 +1653,7 @@ const index = () => {
                         <Text
                           style={{
                             color: Colors.light.DarkGreen,
-                            fontWeight: 500,
+                            fontWeight: 700,
                             fontFamily: "PopinRegula",
                           }}
                         >
@@ -1661,9 +1670,12 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(20),
                           paddingVertical: vs(10),
+                          width:hs(180),
+                          justifyContent:"center",
+                          alignItems:"center"
                         }}
                       >
-                        <Text style={{ color: "white", fontWeight: 500,fontFamily: "PopinRegula", }}>
+                        <Text style={{ color: "white", fontSize:ms(16), fontWeight: 700,fontFamily: "PopinRegula", }}>
                           Apply
                         </Text>
                       </TouchableOpacity>

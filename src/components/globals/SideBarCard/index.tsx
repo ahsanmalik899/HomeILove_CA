@@ -8,7 +8,7 @@ import { SideBarCardprops } from "./type";
 const index = ({ Svg, text, type, totalPosts,profileType,id, onPress=()=>{},ProfileExist }: SideBarCardprops) => {
   return (
     <TouchableOpacity
-      style={[styles.card, { height: type === "Buy" ? vs(160) : vs(140) }]}
+      style={[styles.card, { height: type === "Buy" ? vs(160) : vs(140) ,backgroundColor:ProfileExist?'#F4F0F0':'white'}]}
       onPress={() => {
         type === "busenessProfile"
           ? router.navigate({

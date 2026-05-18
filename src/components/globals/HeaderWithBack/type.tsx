@@ -6,4 +6,6 @@ buttonTitile?:string;
 onBackpress?:()=>void;
 onButtonPress?:()=>void;
 redButton?:boolean;
+isSavedItem?:boolean;
+onpressSave?:()=>void;
 }

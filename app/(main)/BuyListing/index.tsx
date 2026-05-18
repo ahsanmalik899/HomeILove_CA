@@ -1,19 +1,23 @@
 import { useGetPropertyListQuery } from "@/store/api/user/MainApi";
+import { userdata } from "@/store/slices/selector/user";
 import Threedot from "@assets/Buy/threedotwhite.svg";
 import SortDropdown from "@src/components/globals/DropDownField";
 import Filter from "@src/components/globals/Filter";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import PropertyListingDesign from "@src/components/globals/PropertyListingDesign";
+import SavedItems from "@src/components/globals/SavedItems";
 import Colors from "@src/constants/Colors";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useCallback, useEffect, useState } from "react";
-import { BackHandler, StyleSheet, TouchableOpacity, View } from "react-native";
+import { BackHandler, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import * as Yup from "yup";
 
 const index = () => {
   const params = useLocalSearchParams();
+  const user = useAppSelector(userdata)
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [page, setpage] = useState(1);
   const [properties, setProperties] = useState<any[]>([]);
@@ -26,7 +30,7 @@ const index = () => {
   const [zip, setZip] = useState(params.zip || "");
   const [showFilter, setShowFilter] = useState(false);
   const [sort, setSort] = useState("");
-
+const [showSaved, setShowSaved] = useState(false);
   const sortOptions = [
     { label: "All", value: "" },
     { label: "Recent First", value: "post_property_id_desc" },
@@ -40,6 +44,7 @@ const index = () => {
       ? params.propertysubType.split(",")
       : [],
     propertyCondition: params.condition ? params.condition.split(",") : [],
+    purposeful_property: params.purposeful_property ? params.purposeful_property.split(",") : [],
     tenure: [],
     furnishing_type:[],
     tinency_tenure: [],
@@ -57,6 +62,7 @@ const index = () => {
     maxPrice: "",
     bathrooms: "",
     sort: sort,
+      user_id:user?.id
   });
 
   const [apiFilters, setApiFilters] = useState({
@@ -69,10 +75,12 @@ const index = () => {
     lat,
     lng,
     sort,
+      user_id:user?.id,
     available_on: params.aivilable_on||undefined,
     pet_allowers: params.pet_allowers,
     max_rent_range: params.max_rent_range,
     condition: params.condition || undefined,
+    purposeful_property: params.purposeful_property || undefined,
     price_type: params.saleprice_type || undefined,
     radius: params.radius || undefined,
     property_type: params.propertyType,
@@ -97,6 +105,7 @@ const index = () => {
       lng,
       page,
       sort,
+      user_id:user?.id
     }));
   }, [address, city, state, zip, lat, lng, page, sort]);
 
@@ -107,6 +116,7 @@ const index = () => {
     pet_allowers: Yup.string().nullable(),
     available_on:Yup.string().nullable(),
     propertyCondition: Yup.array().of(Yup.string()),
+    purposeful_property: Yup.array().of(Yup.string()),
     tenure: Yup.array().of(Yup.string()),
     furnishing_type: Yup.array().of(Yup.string()),
     purposeful_type: Yup.array().of(Yup.string()),
@@ -154,6 +164,9 @@ const index = () => {
 
     condition: values.propertyCondition.length
       ? values.propertyCondition.join(",")
+      : undefined,
+      purposeful_property: values.purposeful_property.length
+      ? values.purposeful_property.join(",")
       : undefined,
     price_type: values.saleprice_type || undefined,
     radius: values.radius || undefined,
@@ -206,7 +219,7 @@ useFocusEffect(
 );
   return (
     <View className=" flex-1" style={{ backgroundColor: "#F4F0F0" }}>
-      <HeaderWithBack onBackpress={()=>{params?.isSingleView=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}} />
+      <HeaderWithBack onBackpress={()=>{params?.isSingleView=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}} isSavedItem onpressSave={()=>setShowSaved(true) } />
 
       <View
         className="flex-row justify-between gap-2"
@@ -298,6 +311,9 @@ useFocusEffect(
           )}
         </Formik>
       )}
+      <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+        <SavedItems setShowSaved={setShowSaved} />
+      </Modal>
     </View>
   );
 };

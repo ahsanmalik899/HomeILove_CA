@@ -3,7 +3,7 @@ import { useSaveNotificationTokenMutation } from '@/store/api/user/MainApi';
 import { registerForPushNotificationsAsync } from '@/store/Notification/usePushNotification';
 import { Onboarding } from '@/store/slices/selector/OnBoarding';
 import { userdata } from '@/store/slices/selector/user';
-import Logo from '@assets/splash/logo.svg';
+import Logo from '@assets/logo/logo-black.svg';
 import splashbg from '@assets/splash/splashbackground.png';
 import Colors from '@src/constants/Colors';
 import { useAppSelector } from '@src/hooks/useReduxHooks';

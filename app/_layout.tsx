@@ -1,7 +1,6 @@
-/* eslint-disable import/extensions */
-// Tailwind CSS must be imported first
-import '@/global.css'; // 👈 add this line at the top
-import { Text, TextInput } from "react-native"; // 👈 add this
+
+import '@/global.css';
+import { Text, TextInput } from "react-native";
 const _Text: any = Text;
 const _TextInput: any = TextInput;
 

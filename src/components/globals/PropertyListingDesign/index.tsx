@@ -57,10 +57,6 @@ const YourAdsPostDesign = ({
   const insets = useSafeAreaInsets();
   const [saveItemApi] = useSaveItemApiMutation();
   const [unsaveItemApi] = useUnsaveItemApiMutation();
-  const [savedItems, setSavedItems] = useState<{ [key: number]: boolean }>({});
-  const [savingItems, setSavingItems] = useState<{ [key: number]: boolean }>(
-    {}
-  );
 
   useEffect(() => {
     if (isSingleView) {
@@ -69,47 +65,35 @@ const YourAdsPostDesign = ({
                 id: post_id});
     }
   }, [isSingleView]);
-  const [expanded, setExpanded] = useState(false);
-  useEffect(() => {
-    const initialSaved: { [key: number]: boolean } = {};
-    data.forEach((item) => {
-      const id = item.post_property_id || item.post_community_id;
-      initialSaved[id] = item.is_saved ?? false;
-    });
-    setSavedItems(initialSaved);
-  }, [data]);
 
 
   const [scrollable, setscrollable] = useState(true);
 
   const renderItem = ({ item }) => {
-    const itemId = item.post_property_id || item.post_community_id;
-    const isSaved = savedItems[itemId] ?? false;
-
+    const itemId = item?.data?.post_property_id || item?.data?.post_community_id;
+    const [isSaved,setIsSaved]=useState(item?.data?.is_saved ?? false);
+ const [expanded, setExpanded] = useState(false);
     const toggleSave = async () => {
      
-      setSavedItems((prev) => ({ ...prev, [itemId]: !isSaved }));
-      setSavingItems((prev) => ({ ...prev, [itemId]: true }));
-
       try {
         if (isSaved) {
           await unsaveItemApi({
             saved_id: itemId,
             user_id: user.id,
-            type: item.property_for || "sale",
+            type: item?.data?.property_for || "sale",
           }).unwrap();
         } else {
           await saveItemApi({
             saved_id: itemId,
             user_id: user.id,
-            type: item.property_for || "sale",
+            type: item?.data?.property_for || "sale",
           }).unwrap();
         }
       } catch (error) {
         console.log("Error saving/unsaving item:", error);
-        setSavedItems((prev) => ({ ...prev, [itemId]: isSaved }));
+
       } finally {
-        setSavingItems((prev) => ({ ...prev, [itemId]: false }));
+        setIsSaved((prev) => !prev);
       }
     };
     const openslider = (index: number) => {
@@ -135,7 +119,7 @@ const YourAdsPostDesign = ({
               className="flex-row justify-between items-center"
               style={{
                 backgroundColor:
-                  item.post_type === "Trending"
+                  item?.data?.post_type === "Trending"
                     ? Colors.light.LightGreen
                     : Colors.light.lightGray,
                 paddingHorizontal: hs(10),
@@ -245,7 +229,7 @@ const YourAdsPostDesign = ({
                       </View>
                     ))}
               </View>
-
+        {item?.data?.property_details && (
               <Text style={styles.description}>
                 {expanded
                   ? item?.data?.property_details
@@ -255,12 +239,13 @@ const YourAdsPostDesign = ({
                 {item?.data?.property_details?.length > 70 && (
                   <Text
                     style={styles.moreText}
-                    onPress={() => setExpanded(expanded ? false : true)}
-                  >
+                    onPress={() => {
+                      console.log(expanded,"expanded")
+                      setExpanded(expanded ? false : true)}}>
                     {expanded ? " Show Less" : " Read More"}
                   </Text>
                 )}
-              </Text>
+              </Text>)}
 
               <TouchableOpacity
                 onPress={() => {
@@ -276,7 +261,7 @@ const YourAdsPostDesign = ({
                       : NoImage
                   }
                   style={{
-                    height: vs(200),
+                    height: vs(250),
                     width: hs(350),
                     borderRadius: ms(10),
                     resizeMode: "cover",
@@ -353,9 +338,7 @@ const YourAdsPostDesign = ({
                     style={{ marginLeft: "auto" }}
                     onPress={toggleSave}
                   >
-                    {savingItems[itemId] ? (
-                      <ActivityIndicator size="small" color="white" />
-                    ) : isSaved ? (
+                    { isSaved ? (
                       <RedHeart />
                     ) : (
                       <UnSelecteHeart />

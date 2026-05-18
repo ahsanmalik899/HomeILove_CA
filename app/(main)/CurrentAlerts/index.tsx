@@ -4,9 +4,11 @@ import { userdata } from "@/store/slices/selector/user";
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import Colors from "@src/constants/Colors";
 import { db } from "@src/utils/firebse";
 import { vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { timeAgo } from "@utils/Timeago";
 import { router } from "expo-router";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
@@ -133,9 +135,8 @@ const Index = () => {
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
       onPress={() => handlePress(item)}
-      style={{ marginVertical: vs(2) }}
-      className={`flex-row items-center p-4 border-b border-gray-100 ${item.is_read ? "bg-white" : "bg-blue-50"
-        }`}
+      style={{ marginVertical: vs(2),backgroundColor:item.is_read? "white" : Colors.light.LightGreen }}
+      className={`flex-row items-center p-4 border-b border-gray-100 `}
     >
       <CircleImage source={{
         uri: ImageFormater(item.sender_logo),
@@ -155,16 +156,16 @@ const Index = () => {
           {(() => {
             const timeObj = item.created_at || item.timestamp;
             if (!timeObj) return "";
-            if (typeof timeObj === 'string') return timeObj;
-            if (timeObj.toDate) return timeObj.toDate().toLocaleString();
-            if (timeObj.seconds) return new Date(timeObj.seconds * 1000).toLocaleString();
-            return String(timeObj);
+            if (typeof timeObj === 'string') return timeAgo(timeObj);
+            if (timeObj.toDate) return timeAgo(timeObj.toDate());
+            if (timeObj.seconds) return timeAgo(new Date(timeObj.seconds * 1000));
+            return String(timeAgo(timeObj));
           })()}
         </Text>
       </View>
 
       {!item.is_read && (
-        <View className="w-3 h-3 bg-blue-500 rounded-full" />
+        <View className="w-3 h-3 rounded-full" style={{backgroundColor:Colors.light.red}} />
       )}
     </TouchableOpacity>
   );
@@ -183,7 +184,7 @@ const Index = () => {
   }, [firebaseNotifications, sqlNotifications]);
 
   return (
-    <View className="flex-1 bg-white" style={{ backgroundColor: "#F4F0F0" }}>
+    <View className="flex-1 bg-white" style={{ backgroundColor: "white" }}>
       <HeaderWithBack title="Current Alerts" />
       {initialLoading ? (
         <View className="flex-1 justify-center items-center">

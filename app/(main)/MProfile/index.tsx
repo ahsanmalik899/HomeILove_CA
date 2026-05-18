@@ -8,19 +8,21 @@ import {
   useGetUserWalletQuery,
   usePromoteProfileMutation,
   useSavePastWorkMutation,
+  useShare_profileApiMutation,
   useUpgradeProfileApiMutation,
   useUserAgentPastPostsApiQuery,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
-import Heart from "@assets/icons/heart.svg";
+import Cross from "@assets/CreateProfile/cross.svg";
 import Delete from "@assets/icons/MypostListing/delet.svg";
 import Edit from "@assets/icons/MypostListing/edit.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
+import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
@@ -33,7 +35,9 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import * as Clipboard from "expo-clipboard";
 import { router, useLocalSearchParams } from "expo-router";
+import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -43,9 +47,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Yup from 'yup';
 
 const Index = () => {
   const user = useAppSelector(userdata);
@@ -56,10 +62,12 @@ const Index = () => {
     usePromoteProfileMutation();
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
+    const [showShare, setShowShare] = useState(false);
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const Profiletype = params.profileType as string;
   const type = params.type as string;
+    const [share_profileApi, { isLoading: sharing }] = useShare_profileApiMutation();
   const [timePeriod, setTimeperiod] = useState("");
   const [SelectedAmount, setSelectedAmount] = useState("");
   const id = Number(params.id);
@@ -233,6 +241,11 @@ setShowoption(false)
       <ScrollView className="flex-1 bg-white">
         <View style={{ position: "relative" }}>
           <HeaderWithBack />
+          <TouchableOpacity style={{position:"absolute",backgroundColor:"#bdbdbd71",borderRadius:hs(50),justifyContent:"center",alignItems:"center",width:hs(40),height:hs(40),top:vs(100),right:hs(10),zIndex:9999}}
+          onPress={() => setShowShare(true)}
+          >
+                <Share  />
+              </TouchableOpacity>
           <Image
             source={{
               uri: ImageFormater(profile?.cover),
@@ -275,32 +288,41 @@ setShowoption(false)
 
           <View style={styles.divider} />
           <View className="flex-row justify-between">
-            <View style={styles.row}>
-              <TouchableOpacity>
-                <Heart />
-              </TouchableOpacity>
-
-              <TouchableOpacity>
-                <Share />
-              </TouchableOpacity>
-            </View>
+           
             {profile?.post_type === "Normal" ? (
-              <LargeButton
-                handleSubmit={() => {
+              <TouchableOpacity
+              style={{
+                backgroundColor:Colors.light.DarkGreen,
+                paddingHorizontal:hs(10),
+                paddingVertical:vs(10),
+                borderRadius:hs(10),
+                alignItems:"center",
+                justifyContent:"center"
+              }}
+                onPress={() => {
                   setShowoption(true);
                   setUpgradeId(profile.id);
                 }}
-                text="Upgrade Profile to trending"
-              />
+            
+              >
+                <Text style={[styles.text,{color:"white"}]}>Upgrade Profile to trending</Text></TouchableOpacity>
             ):profile?.post_type === "Trending"? (
-               <LargeButton
-                handleSubmit={() => {
+               <TouchableOpacity
+               style={{
+                backgroundColor:Colors.light.DarkGreen,
+                paddingHorizontal:hs(10),
+                paddingVertical:vs(10),
+                borderRadius:hs(10),
+                alignItems:"center",
+                justifyContent:"center"
+              }}
+                onPress={() => {
                   setShowoption(true);
                   setUpgradeId(profile.id);
                   setIsPromotion(true);
                 }}
-                text="Upgrade Profile to Promoted"
-              />
+                >
+                  <Text style={[styles.text,{color:"white"}]}>Upgrade Profile to Promoted</Text></TouchableOpacity>
             ):(<></>)}
             <View style={styles.row}>
               <TouchableOpacity onPress={handleDelete}>
@@ -329,16 +351,30 @@ setShowoption(false)
           style={{ marginHorizontal: hs(20), marginTop: vs(10) }}
           className="flex-row justify-between"
         >
-          <LargeButton
-            handleSubmit={() => {
+          <TouchableOpacity
+          style={{
+          borderColor:Colors.light.DarkGreen,
+          borderWidth:2,
+          paddingHorizontal:hs(10),
+          paddingVertical:vs(10),
+          borderRadius:hs(10),
+          alignItems:"center",
+          justifyContent:"center"
+          }}
+            onPress={() => {
               setShowpast(!showPast);
             }}
-            text={
-              showPast
+          
+            >
+              <View className="flex-row items-center gap-2">
+              <Ionicons  name="briefcase-outline" size={hs(20)} color={Colors.light.DarkGreen}/>
+              <Text style={{color:Colors.light.DarkGreen,fontSize:hs(16),fontWeight:700,}}>{showPast
                 ? "Hide my past jobs"
                 : "Show my past jobs "
-            }
-          />
+            }</Text>
+              </View>
+             
+          </TouchableOpacity>
           {Profiletype !== "agent" && (
             <TouchableOpacity
               onPress={() => openPastWorkModal()}
@@ -348,8 +384,10 @@ setShowoption(false)
             </TouchableOpacity>
           )}
         </View>
-        {showPast && Profiletype === "agent" && (
-          <View>
+     
+          <Modal visible={showPast} animationType="slide" statusBarTranslucent onRequestClose={() => setShowpast(false)}>
+            <HeaderWithBack title="Past jobs" onBackpress={() => setShowpast(false)} />
+            {Profiletype==="agent"?(
             <PastDealsagent
               data={posts}
               hasmore={hasMore}
@@ -359,11 +397,8 @@ setShowoption(false)
               setpost={setPosts}
               refetch={refetch}
               initialLoadDone={initialLoadDone}
-            />
-          </View>
-        )}
-        {showPast && Profiletype !== "agent" && (
-          <View style={{ marginTop: vs(15) }}>
+            />):(
+               <View style={{ marginTop: vs(15),flex:1 }}>
             <LegendList
               data={othePastdata?.data || []}
               keyExtractor={(item: any) => item.user_past_work_id.toString()}
@@ -425,7 +460,10 @@ setShowoption(false)
               }}
             />
           </View>
-        )}
+            )}
+          </Modal>
+       
+       
         <PostPastWork
           closeModal={closePastWorkModal}
           savePastWork={savePastWork}
@@ -639,6 +677,211 @@ setShowoption(false)
         </ScrollView>
          <Loading isLoading={ugradeLoading||promoteLoading } text="Loading.." />
       </Modal>
+       <Modal visible={showShare} animationType="slide" transparent>
+              <View style={{
+                flex: 1,
+                backgroundColor: "rgba(0,0,0,0.5)",
+                justifyContent: "flex-end",
+              }}>
+      
+                <View style={{
+                  backgroundColor: "#fff",
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  padding: 20,
+                  minHeight: "80%",
+                }}>
+      
+                  <View style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 15
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: "600" }}>
+                      Share Post
+                    </Text>
+      
+                    <TouchableOpacity onPress={() => setShowShare(false)}>
+                      <Cross height={vs(24)} width={vs(24)} />
+                    </TouchableOpacity>
+                  </View>
+      
+                  <Formik
+                    initialValues={{
+                      recepient_email: "",
+                      message: "",
+                      link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${Profiletype}`,
+                      post_id: id,
+                      type: Profiletype,
+                    }}
+                    validationSchema={Yup.object({
+                      recepient_email: Yup
+                        .string()
+                        .email("Invalid email")
+                        .required("Email is required"),
+                      message: Yup
+                        .string()
+                        .required("Message is required")
+                    })}
+                    onSubmit={async (values) => {
+                      try {
+                        const formData = new FormData();
+                        formData.append("email", values.recepient_email);
+                        formData.append("message", values.message);
+                        formData.append("link", values.link);
+                        formData.append("post_id", values.post_id);
+                        formData.append("type", "profile");
+                        formData.append("profile_type", Profiletype);
+                        console.log(formData);
+                        const result = await share_profileApi(formData).unwrap();
+                        if (result?.success) {
+                          renderToastSuccess(result.message);
+                          setShowShare(false);
+                        }
+                      } catch (error) {
+                        renderToastError("Failed to share post");
+                      }
+                    }}
+                  >
+                    {({
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                      values,
+                      touched,
+                      errors
+                    }) => (
+      
+                      <View style={{ flex: 1 }}>
+      
+      
+                        <FormikInput
+                          name="recepient_email"
+                          placeholder="Recipient Email"
+                          value={values.recepient_email}
+                          onChangeText={handleChange("recepient_email")}
+                          onBlur={handleBlur("recepient_email")}
+                          touched={!!touched.recepient_email}
+                          errors={!!errors.recepient_email}
+                          errorText={errors.recepient_email} title={"Email"} required={true} />
+      
+      
+                        <FormikInput
+                          name="message"
+                          placeholder="Write your message..."
+                          value={values.message}
+                          onChangeText={handleChange("message")}
+                          onBlur={handleBlur("message")}
+                          multiline
+                          touched={!!touched.message}
+                          errors={!!errors.message}
+                          errorText={errors.message} title={"Message"} required={true} />
+      
+                        <View style={{
+                          backgroundColor: "#f5f5f5",
+                          padding: 12,
+                          borderRadius: 10,
+                          marginTop: 10,
+                          marginBottom: 20
+                        }}>
+                          <Text style={{ fontWeight: "600" }}>
+                            Sharing this post
+                          </Text>
+                          <Text style={{ color: "#666", fontSize: 12 }}>
+                            Property / Community link will be sent
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            backgroundColor: "#f5f6f8",
+                            borderRadius: 12,
+                            padding: 12,
+                            marginTop: 15,
+                            borderWidth: 1,
+                            borderColor: "#e5e7eb",
+                          }}
+                        >
+      
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              color: "#6b7280",
+                              marginBottom: 6,
+                              fontFamily: "PopinRegula",
+                            }}
+                          >
+                            Shareable Link
+                          </Text>
+      
+      
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              backgroundColor: "#fff",
+                              borderRadius: 10,
+                              paddingHorizontal: 10,
+                              paddingVertical: 8,
+                              borderWidth: 1,
+                              borderColor: "#e5e7eb",
+                            }}
+                          >
+                            <TextInput
+                              editable={false}
+                              value={values.link}
+                              numberOfLines={1}
+                              style={{
+                                flex: 1,
+                                fontSize: 12,
+                                color: "#374151",
+                                fontFamily: "PopinRegula",
+                              }}
+                              ellipsizeMode="middle"
+                            />
+      
+      
+                            <TouchableOpacity
+                              onPress={async () => {
+                                await Clipboard.setStringAsync(values.link);
+                                renderToastSuccess("Link copied");
+                              }}
+                              style={{
+                                backgroundColor: "#0f766e",
+                                paddingHorizontal: 12,
+                                paddingVertical: 6,
+                                borderRadius: 8,
+                                marginLeft: 8,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color: "#fff",
+                                  fontSize: 12,
+                                  fontWeight: "600",
+                                  fontFamily: "PopinRegula",
+                                }}
+                              >
+                                Copy
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+      
+                        <LargeButton
+                          text="Send"
+                          handleSubmit={handleSubmit}
+                        />
+      
+                      </View>
+      
+                    )}
+                  </Formik>
+      
+                </View>
+              </View>
+              <Loading isLoading={sharing} text="Sharing..." />
+            </Modal>
          <PapPalPayment
               amount={SelectedAmount}
               onPress={(order_id, setApproveUrl) => {

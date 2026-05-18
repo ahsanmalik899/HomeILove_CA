@@ -204,10 +204,10 @@ export const DealingAreas = ({
       )}
 
       {/* Nationwide Toggle */}
-      <View className="flex-row ">
+      <View className="flex-row items-center gap-1 ">
         <TouchableOpacity onPress={toggleNationwide}>
           <MaterialIcons
-            size={18}
+            size={25}
             color={Colors.light.DarkGreen}
             name={
               value === "Nationwide" ? "check-box" : "check-box-outline-blank"
@@ -369,7 +369,7 @@ export const DealingAreas = ({
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600",fontFamily: "PopinRegula", },
+  title: { fontSize: ms(14), fontWeight: "700",fontFamily: "PopinRegula", },
   card: {
     backgroundColor: "#fff",
     borderRadius: ms(10),

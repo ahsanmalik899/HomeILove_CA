@@ -39,7 +39,10 @@ const index = ({
     { label: "Moderate", value: "Moderate" },
     { label: "Need Repairs", value: "Need Repairs" },
   ];
-
+ const PorposeForProperty = [
+    { label: "Retirement homes", value: "Retirement homes" },
+    { label: "Student accomodation", value: "Student accomodation" },
+  ];
   const propertyOptions = {
     House: [
       "All",
@@ -296,71 +299,58 @@ const index = ({
                 </TouchableOpacity>
               ))}
             </View>
-            {type === "rent" && (
-              <>
-                <View
+            <View>
+               <Text
+                style={{
+                  fontWeight: 700,
+                  fontFamily: "PopinRegula",
+                  fontSize: ms(15),
+                  marginVertical: vs(10),
+                  
+                }}
+              >
+                Purposeful property
+              </Text>
+            {PorposeForProperty.map((item) => (
+                <TouchableOpacity
+                  key={item.value}
+                  onPress={() =>
+                    toggleValue(
+                      "purposeful_property",
+                      item.value,
+                      values,
+                      setFieldValue
+                    )
+                  }
                   style={{
-                    height: vs(1),
-                    marginTop: vs(20),
-
-                    backgroundColor: Colors.light.textGray,
-                    opacity: 0.2,
-                  }}
-                />
-                <Text
-                  style={{
-                    fontWeight: 700,
-                    fontFamily: "PopinRegula",
-                    fontSize: ms(15),
-                    marginVertical: vs(10),
-                    
+                    padding: 8,
+                    borderRadius: 5,
+                    marginVertical: vs(5),
+                    paddingHorizontal: hs(10),
+                    paddingVertical: vs(10),
+                    backgroundColor: values.purposeful_property?.includes(
+                      item.value
+                    )
+                      ? Colors.light.DarkGreen
+                      : "lightgray",
                   }}
                 >
-                  Purposeful property
-                </Text>
-                <View className="flex-row justify-between">
-                  {["Retirement homes", "Student accomodation"].map(
-                    (option) => (
-                      <TouchableOpacity
-                        key={option}
-                        onPress={() =>
-                          toggleValue(
-                            "purposeful_type",
-                            option,
-                            values,
-                            setFieldValue
-                          )
-                        }
-                        style={{
-                          width: "48%",
-                          padding: 8,
-                          borderRadius: 5,
-                          marginVertical: vs(5),
-                          backgroundColor: values.purposeful_type?.includes(
-                            option
-                          )
-                            ? Colors.light.DarkGreen
-                            : "lightgray",
-
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: values.purposeful_type?.includes(option)
-                              ? "white"
-                              : "black",
-                              fontFamily: "PopinRegula",
-                          }}
-                        >
-                          {option === "Commonhold"
-                            ? "Under Construction"
-                            : option}
-                        </Text>
-                      </TouchableOpacity>
-                    )
-                  )}
-                </View>
+                  <Text
+                    style={{
+                      color: values.purposeful_property?.includes(item.value)
+                        ? "white"
+                        : "black",
+                        fontFamily: "PopinRegula",
+                    }}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              </View>
+            {type === "rent" && (
+              <>
+              
                 <View
                   style={{
                     height: vs(1),
@@ -882,6 +872,7 @@ const index = ({
       propertysubType: [],
       propertyCondition: [],
       tenure: [],
+      purposeful_property: [],
       furnishing_type: [],
       tinency_tenure: [],
       purposeful_type: [],

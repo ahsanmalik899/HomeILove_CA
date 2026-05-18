@@ -7,10 +7,10 @@ import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 const NewsFeedPreference = () => {
   return (
-     <ScrollView>
+     <ScrollView style={{backgroundColor:"#F4F0F0"}}>
     <View className="flex-1 ">
      
-      <View className="mt-2 ml-2 mr-2">
+      <View className="mt-4 ml-2 mr-2 items-center">
       <PrefrenceCard
         BtnText="Continue"
         Heading="For Property"
@@ -21,7 +21,7 @@ const NewsFeedPreference = () => {
         })}
       />
       </View>
-      <View className="mt-2 ml-2 mr-2">
+      <View className="mt-4 ml-2 mr-2 items-center">
       <PrefrenceCard
         BtnText="Continue"
         Heading="For Community"
@@ -33,7 +33,7 @@ const NewsFeedPreference = () => {
       />
       
       </View>
-      <View className="mt-2 ml-2 mr-2">
+      <View className="mt-4 ml-2 mr-2 items-center">
         <PrefrenceCard
         BtnText="Continue"
         Heading="For Connection"

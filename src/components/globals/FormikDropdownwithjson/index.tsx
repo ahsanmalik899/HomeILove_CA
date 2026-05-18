@@ -170,7 +170,7 @@ export const FormikDropdownwithjson = ({
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: ms(14), fontWeight: "600",fontFamily: "PopinRegula", },
+  title: { fontSize: ms(14), fontWeight: "700",fontFamily: "PopinRegula", },
   card: {
     backgroundColor: "#fff",
     borderRadius: ms(10),

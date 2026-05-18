@@ -24,7 +24,6 @@ export const AdCardWithoutAnimation = ({ ad ,isSqure=false}: { ad: any,isSqure?:
         overflow: "hidden",
         backgroundColor: "#fff",
 
-        // keep shadow (optional)
         elevation: 5,
         shadowColor: "#000",
         shadowOpacity: 0.15,
@@ -36,7 +35,7 @@ export const AdCardWithoutAnimation = ({ ad ,isSqure=false}: { ad: any,isSqure?:
         <Image
           source={{ uri: ImageFormater(ad?.ad_image) }}
           style={{
-            height: isSqure? vs(300) : vs(80),
+            height: isSqure? vs(200) : vs(80),
             width: "100%",
           }}
           resizeMode="contain"
@@ -44,7 +43,7 @@ export const AdCardWithoutAnimation = ({ ad ,isSqure=false}: { ad: any,isSqure?:
 
         <View style={{ padding: ms(10) }}>
           <Text style={{ fontSize: ms(11), color: "#888" }}>
-            Sponsored Ad
+            Sponsored 
           </Text>
 
           {ad?.ad_link && (

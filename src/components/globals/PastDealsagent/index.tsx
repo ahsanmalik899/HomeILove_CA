@@ -1,19 +1,24 @@
 import {
+  useDeletePostMutation,
   useSaveItemApiMutation,
   useUnsaveItemApiMutation,
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Camera from "@assets/Feedimg/camera.svg";
+import Delet from "@assets/icons/MypostListing/delet.svg";
+import NoImage from "@assets/SideBar/no_images.png";
 import { LegendList } from "@legendapp/list";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { router } from "expo-router";
+import { timeAgo } from "@utils/Timeago";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
@@ -21,8 +26,10 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
+import Loading from "../Loading";
 import { postDataType } from "./type";
 const PastDealsagent = ({
   data,
@@ -35,18 +42,22 @@ const PastDealsagent = ({
 }: postDataType) => {
   const [showImages, setShowImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-
+  const [deletePost, { isLoading }] = useDeletePostMutation();
   const user = useAppSelector(userdata);
   const listRef = useRef<any>(null);
   const [imageNo, setImageNo] = useState(0);
   const insets = useSafeAreaInsets();
   const [saveItemApi] = useSaveItemApiMutation();
+    const [deleteType, setDeleteType] = useState("");
+   const [selectedPost, setSelectedPost] = useState(null);
+    const [showpostPostData, setShowpostPostData] = useState<any>(null);
+      const [showpost, setShowpost] = useState(false);
   const [unsaveItemApi] = useUnsaveItemApiMutation();
   const [savedItems, setSavedItems] = useState<{ [key: number]: boolean }>({});
   const [savingItems, setSavingItems] = useState<{ [key: number]: boolean }>(
     {}
   );
-  const [expanded, setExpanded] = useState(false);
+
   useEffect(() => {
     const initialSaved: { [key: number]: boolean } = {};
     data.forEach((item) => {
@@ -55,12 +66,24 @@ const PastDealsagent = ({
     });
     setSavedItems(initialSaved);
   }, [data]);
+  const handleDelete = async (post, type, postType) => {
+    try {
+      await deletePost({
+        post_id: post.id,
+        type: postType,
+        delete_type: type,
+      }).unwrap();
 
+  
+    } catch (e) {
+      console.log(e);
+    }
+  };
   const [scrollable, setscrollable] = useState(true);
   const renderItem = ({ item }) => {
     const itemId = item.post_property_id || item.post_community_id;
     const isSaved = savedItems[itemId] ?? false;
-
+  const [expanded, setExpanded] = useState(false);
     const toggleSave = async () => {
       setSavedItems((prev) => ({ ...prev, [itemId]: !isSaved }));
       setSavingItems((prev) => ({ ...prev, [itemId]: true }));
@@ -99,62 +122,73 @@ const PastDealsagent = ({
           className="bg-white"
           style={styles.card}
           onPress={() => {
-            router.navigate({
-              pathname: "/NewsFeedSingelView",
-              params: {
-                id: item.id,
-                type: item.post_type, // FIX
-                post_id: item.id,
-              },
-            });
+            setShowpostPostData(item);
+            setShowpost(true);
+
           }}
         >
           <View className="flex-row items-center justify-between">
             <View className="flex-row">
               <CircleImage
-                source={{ uri: ImageFormater(item.profile_logo) }}
+                source={{ uri: ImageFormater(item.posted_by?.logo) }}
                 Size={40}
               />
-
               <View style={styles.uperSection}>
                 <View className="flex-row">
-                  <Text style={styles.name}>{item.ad_by}</Text>
+                  <Text style={styles.name}>
+                    {item.posted_by?.business_name || item.posted_by?.name}
+                  </Text>
+                  {item.ad_by && (
+                    <Text style={{ fontFamily: "PopinRegula" }}>
+                      {" "}
+                      ({item.ad_by})
+                    </Text>
+                  )}
                 </View>
-
                 <Text style={{ fontFamily: "PopinRegula" }}>
-                  {item.property_for}
+                  {timeAgo(item.post_created_date || item.created_date)}
                 </Text>
               </View>
+             
             </View>
+   <TouchableOpacity
+    onPress={() => {
+      Alert.alert(
+        "Confirm",
+        "Are you sure you want to delete?",
+        [
+          { text: "No" },
+          {
+            text: "Yes",
+            onPress: () => handleDelete(item, "Deleted", item.type==="community"?"community":"property"),
+          },
+        ]
+      );
+    }}
+    style={{
+      padding: 6,
+      borderRadius: 20,
+      
+    }}
+  >
+    <Delet width={20} height={20} />
+  </TouchableOpacity>
           </View>
-
           <View>
             <Text style={styles.description}>
               {expanded
-                ? item.post_type === "property"
-                  ? item.property_details
-                  : item.community_details
-                : (item.post_type === "property"
-                    ? item.property_details?.slice(0, 70)
-                    : item.community_details?.slice(0, 70)) +
-                  ((item.post_type === "property"
-                    ? item.property_details?.length
-                    : item.community_details?.length) > 70
-                    ? "...."
-                    : "")}
-
-              {(item.post_type === "property"
-                ? item.property_details?.length
-                : item.community_details?.length) > 70 && (
+                ? item.details
+                : item.details?.slice(0, 70) +
+                (item.details?.length > 70 ? "...." : " ")}
+              {item.details?.length > 70 && (
                 <Text
                   style={styles.moreText}
-                  onPress={() => setExpanded(!expanded)}
+                  onPress={() => {setExpanded(!expanded)}}
                 >
                   {expanded ? " Show Less" : " Read More"}
                 </Text>
               )}
             </Text>
-
             <TouchableOpacity
               onPress={() => {
                 setSelectedImages(item.images || []);
@@ -165,12 +199,12 @@ const PastDealsagent = ({
             >
               <Image
                 source={
-                  item.images?.length > 0
+                  item.images && item.images.length > 0
                     ? { uri: ImageFormater(item.images[0]) }
-                    : null
+                    : NoImage
                 }
                 style={{
-                  height: vs(200),
+                  height: vs(250),
                   width: hs(350),
                   borderRadius: ms(12),
                   resizeMode: "cover",
@@ -199,9 +233,7 @@ const PastDealsagent = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  {item.post_type === "property"
-                    ? item.property_sub_type
-                    : item.community_title}
+                  {item.title}
                 </Text>
 
                 <Text
@@ -211,12 +243,9 @@ const PastDealsagent = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  {item.post_type === "property"
-                    ? item.asking_price
-                    : item.price1}
+                  ${item.type==="community"?item.property_types?.price1:item.price1}
                 </Text>
               </View>
-
               <View
                 style={{
                   position: "absolute",
@@ -231,7 +260,6 @@ const PastDealsagent = ({
                 }}
               >
                 <Camera />
-
                 <Text
                   style={{
                     color: "white",
@@ -240,11 +268,42 @@ const PastDealsagent = ({
                     fontFamily: "PopinRegular",
                   }}
                 >
-                  {item.images?.length || 0}
+                  {item.images ? item.images.length : 0}
                 </Text>
               </View>
+
+              <View
+                style={{
+                  position: "absolute",
+                  top: vs(8),
+                  right: hs(8),
+                  alignItems: "flex-end",
+                  gap: vs(5),
+                }}
+              >
+                {item.saleprice_type === "Reduced Price" && (
+                  <Text
+                    style={{
+                      backgroundColor: "rgba(241,28,28,0.85)",
+                      paddingHorizontal: hs(8),
+                      paddingVertical: vs(5),
+                      color: "white",
+                      fontWeight: "600",
+                      borderRadius: ms(8),
+                      fontFamily: "PopinRegular",
+                    }}
+                  >
+                    Reduced Price
+                  </Text>
+                )}
+              </View>
             </TouchableOpacity>
+
+          
+         
+          
           </View>
+      
         </TouchableOpacity>
       </>
     );
@@ -298,6 +357,11 @@ const PastDealsagent = ({
           }}
         />
       )}
+            <Modal visible={showpost} animationType="slide" onRequestClose={() => setShowpost(false)} transparent={true}
+              statusBarTranslucent={true}  >           
+                 <AddSingleView id={showpostPostData?.id} type={showpostPostData?.type} setshowModel={setShowpost} />
+            </Modal>
+            <Loading isLoading={isLoading} text="Deleting..."/>
     </View>
   );
 };

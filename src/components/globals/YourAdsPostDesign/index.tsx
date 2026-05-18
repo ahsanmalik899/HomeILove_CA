@@ -56,6 +56,7 @@ const YourAdsPostDesign = ({
   id,
   post_type,
 }: postDataType) => {
+
   const [showImages, setShowImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -370,6 +371,8 @@ const YourAdsPostDesign = ({
                   Size={35}
                 />
               </View>
+              {id===user.id.toString() &&(
+                <>
               {item.post_type === "Normal" && (
                 <LargeButton
                   handleSubmit={() => {
@@ -418,7 +421,11 @@ const YourAdsPostDesign = ({
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      if (item.ad_by === "agent") {
+                      if (item.ad_by === "Agent") {
+                         setSelectedPost(item);
+                        setDeleteModal(true);
+                       
+                      } else {
                         setSelectedPost(item);
                         setDeleteType("Deleted");
 
@@ -435,9 +442,6 @@ const YourAdsPostDesign = ({
                             },
                           ]
                         );
-                      } else {
-                        setSelectedPost(item);
-                        setDeleteModal(true);
                       }
                     }}
                   >
@@ -445,6 +449,8 @@ const YourAdsPostDesign = ({
                   </TouchableOpacity>
                 </View>
               </View>
+              </>)
+  }
             </View>
           </View>
         </TouchableOpacity>

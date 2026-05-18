@@ -294,11 +294,7 @@ const index = () => {
             fontFamily: "PopinRegula",
           }}
         >
-          Quickly search your{" "}
-          <Text style={{ color: Colors.light.red, marginBottom: vs(20),fontFamily: "PopinRegula", }}>
-            dream
-          </Text>{" "}
-          living
+          Quickly <Text style={{ color: Colors.light.red }}>SEARCH</Text> your dream living
         </Text>
       </View>
       <FlatList

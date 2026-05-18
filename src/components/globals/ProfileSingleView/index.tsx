@@ -1,8 +1,9 @@
 
-import { useAskvaluationapiMutation, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useLazyGetRandomAdQuery, useShare_profileApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
+import { useAskvaluationapiMutation, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useLazyGetRandomAdQuery, useSaveItemApiMutation, useShare_profileApiMutation, useUnsaveItemApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import Call from "@assets/Buy/call.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
+import RedHeart from "@assets/CreateProfile/heart-red.svg";
 import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
@@ -30,16 +31,17 @@ import HeaderWithBack from '../HeaderWithBack';
 import LargeButton from '../LaregeButton';
 import Loading from '../Loading';
 import PastDealsagent from '../PastDealsagent';
+import SavedItems from '../SavedItems';
 import SetRating from '../SetRating';
 import StarRating from '../StarRating';
 import VideoSection from '../ViedioSection';
-const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string,setshowModel:(val:boolean)=>void }) => {
-  const user = useAppSelector(userdata);  
+const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: string, setshowModel: (val: boolean) => void }) => {
+  const user = useAppSelector(userdata);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
   const [review, setReview] = useState("");
   const [postrating, setpostRating] = useState(0);
-
+  const [isSaved,setIsSaved]=useState(false);
   const [expanded, setExpanded] = useState(false);
   const [showPast, setShowpast] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -55,11 +57,13 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
 
     imp_facts: Yup.string(),
   });
+       const [saveItemApi] = useSaveItemApiMutation();
+          const [unsaveItemApi] = useUnsaveItemApiMutation();
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const { data, isLoading } = useGetSingleProfileQuery({type:type?.toLocaleLowerCase(), id:id});
+  const { data, isLoading } = useGetSingleProfileQuery({ type: type?.toLocaleLowerCase(), id: id,user_id:user?.id });
   const [share_profileApi, { isLoading: sharing }] = useShare_profileApiMutation();
   const profile = data?.data;
   const { data: Profiles, isLoading: ProfilesLoading } =
@@ -91,13 +95,20 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
     );
     setInitialLoadDone(true);
   }, [pastData]);
+  
+  useEffect(() => {
+    if (data?.is_saved !== undefined) {
+      setIsSaved(data?.is_saved);
+    }
+  }, [data?.is_saved]);
   const [writeReview] = useWriteReviewApiMutation();
   const latitude = Number(profile?.user_lat);
+  const [showSaved, setShowSaved] = useState(false);
   const longitude = Number(profile?.user_lng);
   const showMap = !isNaN(latitude) && !isNaN(longitude);
   const [showMortgage, setShowMortgage] = useState(false);
   const rating = Number(profile?.rating || 0);
-    const [ getRandomAd, { data: randomAdData, isFetching: randomAdFetching }] = useLazyGetRandomAdQuery();
+  const [getRandomAd, { data: randomAdData, isFetching: randomAdFetching }] = useLazyGetRandomAdQuery();
   const totalReviews = profile?.total_reviews || 0;
   const submitReview = async (values: {
     review: any;
@@ -141,89 +152,113 @@ const ProfileSingleView = ({ type, id,setshowModel }: { type: string, id: string
       setReview(false);
     }
   };
+        const toggleSave = async () => {
+     
+      try {
+        if (isSaved) {
+          await unsaveItemApi({
+            saved_id: id,
+            user_id: user.id,
+            type: type,
+          }).unwrap();
+        } else {
+          await saveItemApi({
+            saved_id: id,
+            user_id: user.id,
+            type: type,
+          }).unwrap();
+        }
+      } catch (error) {
+        console.log("Error saving/unsaving item:", error);
 
- useEffect(() => {
- const maintenanceTypes = ['electrician', 'plumber', 'decor', 'painter', 'builder'];
+      } finally {
+        setIsSaved((prev) => !prev);
+      }
+    };
 
-const normalizedType = type?.toLowerCase();
+  useEffect(() => {
+    const maintenanceTypes = ['electrician', 'plumber', 'decor', 'painter', 'builder'];
 
-const onPage = maintenanceTypes.includes(normalizedType)
-  ? 'maintenance_single'
-  : `${normalizedType}_single`;
+    const normalizedType = type?.toLowerCase();
 
-getRandomAd({ on_page: onPage });
+    const onPage = maintenanceTypes.includes(normalizedType)
+      ? 'maintenance_single'
+      : `${normalizedType}_single`;
+
+    getRandomAd({ on_page: onPage });
   }, [type]);
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
-const rotateAnim = useRef(new Animated.Value(0)).current;
+  const rotateAnim = useRef(new Animated.Value(0)).current;
 
-useEffect(() => {
-  // scale in
-  Animated.timing(scaleAnim, {
-    toValue: 1,
-    duration: 500,
-    easing: Easing.out(Easing.ease),
-    useNativeDriver: true,
-  }).start();
-  Animated.loop(
-    Animated.sequence([
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateAnim, {
-        toValue: -1,
-        duration: 3000,
-        useNativeDriver: true,
-      }),
-    ])
-  ).start();
-}, []);
-const rotate = rotateAnim.interpolate({
-  inputRange: [-1, 1],
-  outputRange: ["-2deg", "2deg"],
-});
+  useEffect(() => {
+    // scale in
+    Animated.timing(scaleAnim, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(rotateAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(rotateAnim, {
+          toValue: -1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+  const rotate = rotateAnim.interpolate({
+    inputRange: [-1, 1],
+    outputRange: ["-2deg", "2deg"],
+  });
 
   return (
     <>
       <ScrollView className="flex-1 bg-white">
         {/* Cover */}
         <View style={{ position: "relative" }}>
-          <HeaderWithBack onBackpress={() => setshowModel(false)} />
-            {randomAdData?.data?.ad_link&&(
-               <Animated.View
-  style={[
-    styles.adCard,
-    {
-      transform: [
-        { scale: scaleAnim },
-        { rotateZ: rotate },
-      ],
-    },
-  ]}
-><TouchableOpacity onPress={() => {
-  if(randomAdData?.data?.ad_link){
-    const finalUrl = randomAdData.data.ad_link.startsWith("https")
-      ? randomAdData.data.ad_link
-      : `https://${randomAdData.data.ad_link}`;
-    WebBrowser.openBrowserAsync(finalUrl);
-  }
-}}>
-  <Image
-    source={{
-      uri: ImageFormater(randomAdData?.data?.ad_image),
-    }}
-    style={styles.adImage}
-    resizeMode="cover"
-  />
-  </TouchableOpacity>
-</Animated.View>)}
+          <HeaderWithBack onBackpress={() => setshowModel(false)} isSavedItem onpressSave={()=>setShowSaved(true)} />
+          {randomAdData?.data?.ad_link && (
+            <Animated.View
+              style={[
+                styles.adCard,
+                {
+                  transform: [
+                    { scale: scaleAnim },
+                    { rotateZ: rotate },
+                  ],
+                },
+              ]}
+            ><TouchableOpacity onPress={() => {
+              if (randomAdData?.data?.ad_link) {
+                const finalUrl = randomAdData.data.ad_link.startsWith("https")
+                  ? randomAdData.data.ad_link
+                  : `https://${randomAdData.data.ad_link}`;
+                WebBrowser.openBrowserAsync(finalUrl);
+              }
+            }}>
+                <Image
+                  source={{
+                    uri: ImageFormater(randomAdData?.data?.ad_image),
+                  }}
+                  style={styles.adImage}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+            </Animated.View>)}
           <Image
             source={{
               uri: ImageFormater(profile?.cover),
             }}
             defaultSource={NoImage}
             style={styles.cover}
+          
           />
         </View>
 
@@ -254,22 +289,33 @@ const rotate = rotateAnim.interpolate({
           {/* Contact */}
           <View style={styles.rowBetween}>
             <View style={styles.row}>
-              <Call />
+              <Call height={hs(20)} width={hs(20)} />
               <Text style={styles.text}>{profile?.contact}</Text>
             </View>
 
-            <Text style={styles.text}>{profile?.web}</Text>
-          </View>
 
+          </View>
+          <View  className="mt-2" >
+          <TouchableOpacity style={styles.row} onPress={ ()=>{const finalUrl = profile?.web?.startsWith("https")
+                  ? profile?.web
+                  : `https://${profile?.web}`;
+                WebBrowser.openBrowserAsync(finalUrl);}}>
+            <Ionicons name="globe-outline" size={hs(20)} color={Colors.light.DarkGreen} />
+            <Text style={styles.text}>{profile?.web}</Text>
+            </TouchableOpacity>
+            </View>
           {/* Divider */}
           <View style={styles.divider} />
 
           {/* Actions */}
-          <View style={styles.row}>
-            <TouchableOpacity>
+          <View className='flex-row justify-end gap-3' style={styles.row}>
+         <TouchableOpacity onPress={()=>toggleSave()} >
+               { isSaved ? (
+                                                     <RedHeart />
+                                                   ) : (
               <Heart />
+                                                   )}
             </TouchableOpacity>
-
             <TouchableOpacity onPress={() => setShowShare(true)}>
               <Share />
             </TouchableOpacity>
@@ -280,11 +326,11 @@ const rotate = rotateAnim.interpolate({
         <View style={{ marginHorizontal: hs(10) }}>
           <Text style={styles.aboutTitle}>
             ABOUT{" "}
-            <Text style={{ color: Colors.light.red }}>
-              {profile?.business_name}
-            </Text>
+           
           </Text>
-
+          <Text style={[styles.aboutTitle,{ color: Colors.light.red,marginTop:hs(0) }]}>
+            {profile?.business_name}
+          </Text>
           <Text style={styles.description}>
             {expanded
               ? profile?.remarks
@@ -301,15 +347,18 @@ const rotate = rotateAnim.interpolate({
             )}
           </Text>
           <View style={{ backgroundColor: Colors.light.lightGray, padding: hs(10), borderRadius: hs(10), marginVertical: hs(10), gap: hs(10) }}>
-            <Text style={{ color: Colors.light.textGray, fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>Total post by <Text style={{ color: Colors.light.red }}>{profile?.business_name}</Text></Text>
+            <Text style={{ color: Colors.light.textGray, fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>Ads by</Text>
+             <Text style={{ color: Colors.light.red,fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>{profile?.business_name}</Text>
             <View style={styles.row}>
-              <TouchableOpacity style={{ flex: 1, alignItems: 'center' }}>
-                <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Rent post</Text>
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }} onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"rent",profile_type:type}})}>
+                <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Rent ads</Text>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.rent_posts}</Text>
               </TouchableOpacity>
               <View style={{ width: hs(1), height: hs(50), backgroundColor: Colors.light.textGray }} />
-              <TouchableOpacity style={{ flex: 1, alignItems: 'center' }}>
-                <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Sale post</Text>
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }}
+              
+              onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"sale",profile_type:type}})}>  
+                <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Sale ads</Text>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.sale_posts}</Text>
               </TouchableOpacity>
             </View>
@@ -563,7 +612,7 @@ const rotate = rotateAnim.interpolate({
                   />
 
                 </TouchableOpacity>)}
-              {showPast && type === "agent" && (
+              {showPast && type.toLocaleLowerCase() === "agent" && (
                 <View>
                   <PastDealsagent
                     data={posts}
@@ -577,7 +626,7 @@ const rotate = rotateAnim.interpolate({
                   />
                 </View>
               )}
-              {showPast && type !== "agent" && (
+              {showPast && type.toLocaleLowerCase() !== "agent" && (
                 <View style={{ marginTop: vs(15) }}>
                   <LegendList
                     data={othePastdata?.data || []}
@@ -651,10 +700,7 @@ const rotate = rotateAnim.interpolate({
               <Text style={styles.reviewBtnText}>Write a Review</Text>
             </TouchableOpacity>
 
-            <Text style={styles.dealText}>
-              DEALS BY{" "}
-              <Text style={styles.businessName}>{profile?.business_name}</Text>
-            </Text>
+          
           </View>
         </View>
         <Loading isLoading={isLoading} text="Loading.." />
@@ -680,9 +726,11 @@ const rotate = rotateAnim.interpolate({
               uri: ImageFormater(profile?.logo),
             }}
           />
-          <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
-            Send Message to {profile?.business_name}
-          </Text>
+     <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>Message to{" "}
+  {profile?.business_name?.length > 18
+    ? profile?.business_name.slice(0, 18) + "..."
+    : profile?.business_name}
+</Text>
         </View>
       </TouchableOpacity>
       <Modal visible={reviewModal} transparent animationType="fade">
@@ -952,7 +1000,7 @@ const rotate = rotateAnim.interpolate({
                       borderColor: "#e5e7eb",
                     }}
                   >
-                  
+
                     <Text
                       style={{
                         fontSize: 13,
@@ -964,7 +1012,7 @@ const rotate = rotateAnim.interpolate({
                       Shareable Link
                     </Text>
 
-                 
+
                     <View
                       style={{
                         flexDirection: "row",
@@ -990,7 +1038,7 @@ const rotate = rotateAnim.interpolate({
                         ellipsizeMode="middle"
                       />
 
-               
+
                       <TouchableOpacity
                         onPress={async () => {
                           await Clipboard.setStringAsync(values.link);
@@ -1032,11 +1080,14 @@ const rotate = rotateAnim.interpolate({
         </View>
         <Loading isLoading={sharing} text="Sharing..." />
       </Modal>
+                 <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+              <SavedItems setShowSaved={setShowSaved} />
+            </Modal>
     </>
   );
 };
 
-export default ProfileSingleView ;
+export default ProfileSingleView;
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
@@ -1044,20 +1095,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
- adCard: {
-     width: "100%",
-     height: vs(100),
-     marginVertical: vs(10),
-     borderRadius: ms(16),
-     overflow: "hidden",
-     backgroundColor: "transparent",
-     elevation: 0,
-   },
- 
-   adImage: {
-     width: "100%",
-     height: "100%",
-   },
+  adCard: {
+    width: "100%",
+    height: vs(100),
+    marginVertical: vs(10),
+    borderRadius: ms(16),
+    overflow: "hidden",
+    backgroundColor: "transparent",
+    elevation: 0,
+  },
+
+  adImage: {
+    width: "100%",
+    height: "100%",
+  },
   modalContainer: {
     width: "90%",
     backgroundColor: "white",
@@ -1103,8 +1154,8 @@ const styles = StyleSheet.create({
   cover: {
     height: vs(250),
     width: "100%",
-    borderBottomLeftRadius: ms(20),
-    borderBottomRightRadius: ms(20),
+    borderBottomLeftRadius: ms(0),
+    borderBottomRightRadius: ms(0),
     resizeMode: "cover",
     backgroundColor: "gray",
   },
@@ -1174,7 +1225,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "PopinRegula",
   },
-   
+
   description: {
     marginVertical: 10,
     fontFamily: "PopinRegula",
@@ -1188,7 +1239,8 @@ const styles = StyleSheet.create({
   map: {
     height: vs(250),
     width: "100%",
-    marginVertical: 10,
+    marginTop: vs(10),
+    marginBottom: vs(20),
   },
   profileContainer: {
     width: "90%",
@@ -1248,8 +1300,8 @@ const styles = StyleSheet.create({
 
   reviewBtn: {
     marginTop: 15,
-    backgroundColor: Colors.light.red,
-    paddingVertical: 10,
+    backgroundColor: Colors.light.DarkGreen,
+    paddingVertical: 20,
     borderRadius: 8,
     alignItems: "center",
   },
@@ -1310,7 +1362,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: Colors.light.DarkGreen,
+    marginHorizontal: hs(10),
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    backgroundColor: Colors.light.red,
     paddingVertical: vs(10),
   },
 

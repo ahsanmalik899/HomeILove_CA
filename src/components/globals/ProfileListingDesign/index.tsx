@@ -1,6 +1,8 @@
+import { useSaveItemApiMutation, useUnsaveItemApiMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Call from "@assets/Buy/call.svg";
 import Mail from "@assets/Buy/email-open.svg";
+import RedHeart from "@assets/CreateProfile/heart-red.svg";
 import UnSelecteHeart from "@assets/Feedimg/unselected_heart.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { LegendList } from "@legendapp/list";
@@ -46,8 +48,34 @@ const YourAdsPostDesign = ({
   const [scrollable, setscrollable] = useState(true);
     const [singleView, setSingleView] = useState(false);
     const [profileData, setProfileData] = useState<any>(null);
+      const [saveItemApi] = useSaveItemApiMutation();
+      const [unsaveItemApi] = useUnsaveItemApiMutation();
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
+       const [isSaved,setIsSaved]=useState(item?.data?.is_saved ?? false);
+           const toggleSave = async () => {
+     
+      try {
+        if (isSaved) {
+          await unsaveItemApi({
+            saved_id: item?.data?.id,
+            user_id: user.id,
+            type: item?.data?.type,
+          }).unwrap();
+        } else {
+          await saveItemApi({
+            saved_id: item?.data?.id,
+            user_id: user.id,
+            type: item?.data?.type,
+          }).unwrap();
+        }
+      } catch (error) {
+        console.log("Error saving/unsaving item:", error);
+
+      } finally {
+        setIsSaved((prev) => !prev);
+      }
+    };
    useEffect(()=>{
 if(isSingleView){
   setSingleView(true)
@@ -78,25 +106,37 @@ if(isSingleView){
                 marginBottom: item?.data?.post_type === "Trending" ? vs(10) : vs(0),
               }}
             >
-              <Text
-                style={{
-                  color:
-                    item?.data?.post_type === "Trending" ||
-                    item?.data?.post_type === "Promoted"
-                      ? Colors.light.DarkGreen
-                      : "black",
-                  fontWeight: 700,
-                  fontSize: ms(18),
-                  fontFamily: "PopinRegula",
-                }}
-              >
-                $ {item?.data?.contact}
-                {item?.data?.property_for === "rent" && (
-                  <Text style={{ color: Colors.light.red, fontSize: ms(18),fontFamily: "PopinRegula", }}>
-                    /{item?.data?.rent_type}
-                  </Text>
-                )}
-              </Text>
+           <Text
+  style={{
+    color:
+      item?.data?.post_type === "Trending" ||
+      item?.data?.post_type === "Promoted"
+        ? Colors.light.DarkGreen
+        : "black",
+    fontWeight: 700,
+    fontSize: ms(18),
+    fontFamily: "PopinRegula",
+  }}
+  numberOfLines={1}
+  ellipsizeMode="tail"
+>
+ 
+  {item?.data?.business_name?.length > 20
+    ? item?.data?.business_name.slice(0, 20) + "..."
+    : item?.data?.business_name}
+
+  {item?.data?.property_for === "rent" && (
+    <Text
+      style={{
+        color: Colors.light.red,
+        fontSize: ms(18),
+        fontFamily: "PopinRegula",
+      }}
+    >
+      /{item?.data?.rent_type}
+    </Text>
+  )}
+</Text>
               {item?.data?.post_type === "Trending" && (
                 <Text
                   style={{ fontWeight: 600, color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}
@@ -106,17 +146,8 @@ if(isSingleView){
               )}
             </View>
             <View className="flex-row justify-between">
-              <Text style={{ color: "black", fontWeight: "700",fontFamily: "PopinRegula", }}>
-                {item?.data?.business_name.length > 20
-                  ? item?.data?.business_name.slice(0, 20) + "..."
-                  : item?.data?.business_name}
-              </Text>
-              <View className="flex-row items-center gap-2">
-                <StarRating rating={item?.data?.rating} size={10} />
-                <Text style={{ color: Colors.light.textGray, fontWeight: 700,fontFamily: "PopinRegula", }}>
-                  {item?.data?.total_reviews} reviews
-                </Text>
-              </View>
+           
+             
             </View>
             <View className="flex-row justify-between">
               <Text style={{ color: Colors.light.textGray, marginTop: vs(5),fontFamily: "PopinRegula", }}>
@@ -129,6 +160,13 @@ if(isSingleView){
                 License# {item?.data?.license_no}
               </Text>
             </View>
+            <Text style={{ color: Colors.light.textGray, marginTop: vs(5),fontFamily: "PopinRegula", }} >{item?.data?.contact}</Text>
+             <View className="flex-row items-center " >
+                <StarRating rating={item?.data?.rating} size={10} />
+                <Text style={{ color: Colors.light.textGray, fontWeight: 700,fontFamily: "PopinRegula",marginLeft:ms(5) }}>
+                  {item?.data?.total_reviews} reviews
+                </Text>
+              </View>
             <View
               style={{
                 height: vs(1),
@@ -166,7 +204,7 @@ if(isSingleView){
                     item?.data?.cover ? { uri: ImageFormater(item?.data?.cover) } : NoImage
                   }
                   style={{
-                    height: vs(200),
+                    height: vs(250),
                     width: hs(350),
                     borderRadius: ms(10),
                     resizeMode: "cover",
@@ -195,9 +233,16 @@ if(isSingleView){
                   }}
                   className="flex-row justify-between"
                 >
-                  <TouchableOpacity style={{ marginLeft: "auto" }}>
-                    <UnSelecteHeart />
-                  </TouchableOpacity>
+                  <TouchableOpacity
+                                     style={{ marginLeft: "auto" }}
+                                     onPress={toggleSave}
+                                   >
+                                     { isSaved ? (
+                                       <RedHeart />
+                                     ) : (
+                                       <UnSelecteHeart />
+                                     )}
+                                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
 
