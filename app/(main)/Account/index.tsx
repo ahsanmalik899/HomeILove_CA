@@ -188,6 +188,7 @@ const index = () => {
                   required
                   onChangeText={handleChange("email")}
                   title="Email"
+                  editable={false}
                   touched={!!touched.email}
                   value={values.email}
                   placeholder="Email"
@@ -196,7 +197,7 @@ const index = () => {
                 <Text
                   style={{
                     marginTop: vs(10),
-                    fontWeight: 600,
+                    fontWeight: 700,
                     fontFamily: "PopinRegula",
                   }}
                 >
@@ -240,6 +241,7 @@ const index = () => {
               </>
             )}
           </Formik>
+          <View className="my-5 w-full h-0 border border-gray-200 "/>
           <Formik
             initialValues={{
               oldPassword: "",
@@ -274,9 +276,11 @@ const index = () => {
                 <Text
                   style={{
                     marginTop: vs(10),
-                    fontWeight: 600,
+                    fontWeight: 700,
                     fontFamily: "PopinRegula",
+                    fontSize:ms(16)
                   }}
+                  className="w-[100%] text-center"
                 >
                   Change Password
                 </Text>

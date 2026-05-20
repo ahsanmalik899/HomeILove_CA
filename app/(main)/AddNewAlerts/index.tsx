@@ -45,14 +45,14 @@ const index = () => {
 
     // Conditional property_type
     property_type: Yup.string().when(["alert_for"], ([alert_for], schema) =>
-      alert_for === "buy" || alert_for === "rent"
+      alert_for === "sale" || alert_for === "rent"
         ? schema.required("Property type is required")
         : schema.nullable()
     ),
 
     // Conditional property_subtype
     property_subtype: Yup.string().when(["alert_for"], ([alert_for], schema) =>
-      alert_for === "buy" || alert_for === "rent"
+      alert_for === "sale" || alert_for === "rent"
         ? schema.required("Property sub-type is required")
         : schema.nullable()
     ),
@@ -207,7 +207,7 @@ const index = () => {
                   required
                   errorText={errors.alert_for}
                   options={[
-                    { label: "Buy", value: "buy" },
+                    { label: "Buy", value: "sale" },
                     { label: "Rent", value: "rent" },
                     { label: "Community", value: "community" },
                   ]}
