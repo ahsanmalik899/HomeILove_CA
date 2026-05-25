@@ -922,12 +922,18 @@ const index = () => {
                             className="mb-4"
                             style={styles.paypalMainButton}
                             onPress={async () => {
-                              if (!SelectedAmount) {
-                                renderToastError("Please select bundle first");
-                                return;
-                              }
-                              setvisible(true);
-                            }}
+    if (!SelectedAmount) {
+      renderToastError("Please select bundle first");
+      return;
+    }
+
+    if (Object.keys(errors).length > 0) {
+      renderToastError("Please fill all the fields");
+      return;
+    }
+
+    setvisible(true);
+  }}
                           >
                             <View style={styles.paypalContent}>
                               <Paypal />

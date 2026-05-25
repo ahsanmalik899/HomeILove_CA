@@ -2,18 +2,19 @@
 import { useGetProfileNamesQuery } from "@/store/api/user/MainApi";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
-import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import ProfileSingleView from "../ProfileSingleView";
 
 interface Props {
   title?: string;
@@ -38,9 +39,17 @@ export const SearchProfile = ({
 }: Props) => {
   const [search, setSearch] = useState(value || "");
   const [focused, setFocused] = useState(false);
-
+    const [profileData, setProfileData] = useState<any>(null);
+          const [singleView, setSingleView] = useState(false);
   const { data, isFetching } = useGetProfileNamesQuery({type});
-
+      const openProfileModal = async(item: any) => {
+    setProfileData({
+    type: type,
+    id: item.id,
+    userid:item.users_id,
+    });
+    setSingleView(true);
+  };
   const filteredData = data?.data?.filter((item: any) =>
     item.business_name.toLowerCase().includes(search.toLowerCase())
   );
@@ -86,10 +95,10 @@ export const SearchProfile = ({
                   setSearch(item.business_name);
                   onSelect?.(item);
                   setFocused(false);
-                  router.navigate({pathname:"/ProfileSigleView",
-                    params:{type,id:item.id}
-                  })
+                  openProfileModal(item)
+                 
                 }}
+               
                 style={styles.item}
               >
                 <Text style={{fontFamily: "PopinRegula",}}>{item.business_name}</Text>
@@ -105,7 +114,15 @@ export const SearchProfile = ({
         </Text>
       )}
     </View>
-
+      <Modal
+                          visible={singleView}
+                          animationType="slide"
+                          onRequestClose={() => setSingleView(false)}
+                          transparent={true}
+                          statusBarTranslucent={true}
+                        >
+                   <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+                        </Modal>
     </KeyboardAvoidingView>
   );
 };

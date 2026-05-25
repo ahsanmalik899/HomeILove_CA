@@ -24,7 +24,9 @@ export const MainApi = createApi({
     "otherPastData",
     "myPost",
     "myProfile",
-    "advertisementMedia"
+    "advertisementMedia",
+    "getPostById",
+    "Advatizemets"
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -168,6 +170,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags:["Advatizemets"]
     }),
     getYorSalePosts: builder.query<any, any>({
       query: ({ page, per_page, type, user_id, profile_type }) => ({
@@ -517,6 +520,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
+       invalidatesTags:["myProfile"]
     }),
   unfollowApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -524,6 +528,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
+        invalidatesTags:["myProfile"]
     }),
       UpdateConnectionApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -531,6 +536,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
+        invalidatesTags:["myProfile"]
     }),
   cancelRequestApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -538,6 +544,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
+       invalidatesTags:["myProfile"]
     }),
   acceptRequestApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -545,6 +552,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
+       invalidatesTags:["myProfile"]
     }),
     deletePropertyPreferencesApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -625,7 +633,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["NewsFeeds"],
+      invalidatesTags: ["NewsFeeds","getPostById"],
     }),
     unlikePost: builder.mutation<any, any>({
       query: (data) => ({
@@ -633,7 +641,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["NewsFeeds"],
+      invalidatesTags: ["NewsFeeds","getPostById"],
     }),
     getConnectedUsersApi: builder.query<any, any>({
       query: ({ id }) => ({
@@ -927,10 +935,11 @@ deleteAccount: builder.mutation<any, any>({
       invalidatesTags:["myProfile"]
     }),
     getPostById: builder.query<any, any>({
-      query: ({ post_id }) => ({
-        url: `getPostById?post_id=${post_id}`,
+      query: ({ post_id,userid }) => ({
+        url: `getPostById?post_id=${post_id}&userid=${userid}`,
         method: "GET",
       }),
+      providesTags:["getPostById"]
     }),
     getPrice:builder.query<any,any>({
       query: ({price_type,profile_type}) => ({
@@ -945,6 +954,7 @@ deleteAccount: builder.mutation<any, any>({
         method: "GET",
         params: {type},
       }),
+      providesTags:["Advatizemets"]
     }),
     getRandomAd:builder.query<any,any>({
       query: ({on_page}) => ({

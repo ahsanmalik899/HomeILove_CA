@@ -1,13 +1,14 @@
-import { useDeleteCommentApiMutation, useGetHomeFeedsQuery, useGetPostByIdQuery, useGetPostCommentsApiQuery, usePostReplyApiMutation, useShare_postApiMutation } from '@/store/api/user/MainApi';
+import { useDeleteCommentApiMutation, useGetHomeFeedsQuery, useGetPostByIdQuery, useGetPostCommentsApiQuery, useLikePostMutation, usePostReplyApiMutation, useShare_postApiMutation, useUnlikePostMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
 import Camera from "@assets/Feedimg/camera.svg";
-import Heart from "@assets/icons/heart.svg";
+import Like from "@assets/icons/Like.svg";
 import Area from "@assets/icons/MypostListing/area.svg";
 import Bed from "@assets/icons/MypostListing/bed.svg";
 import Shower from "@assets/icons/MypostListing/shower.svg";
 import Share from "@assets/icons/share.svg";
+import Liked from "@assets/icons/ThumbUpRed.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
@@ -16,6 +17,7 @@ import Colors from '@src/constants/Colors';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import { ImageFormater } from '@utils/ImageFormat';
+import { timeAgo } from '@utils/Timeago';
 import { ViedioUrlFormat } from '@utils/ViedioUrlFormater';
 import { Video } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
@@ -26,21 +28,88 @@ import { useSelector } from 'react-redux';
 import * as yup from "yup";
 import AddSingleView from '../AddSingleView';
 import CircleImage from '../CircleImage/CircleImage';
+import CommentInput from '../CommentInput';
 import { FormikInput } from '../FormictInput';
 import HeaderWithBack from '../HeaderWithBack';
 import ImageSlider from '../ImageSlider';
 import LargeButton from '../LaregeButton';
 import Loading from '../Loading';
-export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: number,setshowModel:(val:boolean)=>void }) {
+export default function NewsFeedSingleview({ post_id,setshowModel,setAlreadyLiked,setData }: { post_id: number,setshowModel:(val:boolean)=>void, setData:(data:[])=>void,setAlreadyLiked:(val:boolean)=>void }) {
     const user = useSelector(userdata);
+      const { data, isFetching, refetch } = useGetPostByIdQuery({ post_id:post_id,userid:user?.id });
     const [showShare, setShowShare] = useState(false);
     const formatPdfUrl = (file: string) => {
         return ImageFormater(file);
     };
+     
+      const [likePost, { isLoading: liking }] = useLikePostMutation();
+      const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
    const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
+       
   const [loading,setLoading]=useState(false);
   const [singleView, setSingleView] = useState(false);
      const [singlePost, setSinglePost] = useState<any>(null);
+      
+  
+      
+      const handleLikeToggle = async () => {
+     
+           try {
+             if (data?.post?.is_liked) {
+               const res = await unlikePost({
+                 post_id: data?.post_id,
+                 user_id: user.id,
+               }).unwrap();
+               if (res.success) {
+                 renderToastSuccess(res.message)
+    setData((prevData) =>
+  prevData.map((post) =>
+    Number(post.post_id) === Number(data?.post_id)
+      ? {
+          ...post,
+          is_liked: false,
+          likes: Math.max((data?.post?.likes || 1) - 1, 0),
+        }
+      : post
+  )
+);    
+               } else {
+                 renderToastError(res.message)
+               }
+     
+             } else {
+               const res = await likePost({
+               post_id: data?.post_id,
+                 user_id: user.id,
+                 creater_id: data?.posted_by?.id,
+               }).unwrap();
+               if (res.success) {
+                 renderToastSuccess(res.message)
+setData((prevData) =>
+  prevData.map((post) => {
+
+
+    if (Number(post.post_id) === Number(data?.post_id)) {
+
+
+      return {
+        ...post,
+        is_liked: true,
+        likes: (data?.post?.likes || 0) + 1,
+      };
+    }
+
+    return post;
+  })
+);
+               } else {
+                 renderToastError(res.message)
+               }
+             }
+           } catch (error) {
+             renderToastError("Something went wrong");
+           }
+         };
    const CommentItem = ({ item, refetch }) => {
      const user = useSelector(userdata);
  
@@ -117,7 +186,7 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
                <Text style={styles.actionText}>Reply</Text>
              </TouchableOpacity>
  
-             <Text style={styles.time}>{item.created_date}</Text>
+             <Text style={styles.time}>{timeAgo(item.created_date)}</Text>
            </View>
  
            {showReplyInput && (
@@ -171,7 +240,7 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
    };
  
    const [imageNo, setImageNo] = useState(0);
-   const { data, isFetching, refetch } = useGetPostByIdQuery({ post_id:post_id });
+ 
    const { data: comments, isFetching: commentFetching } =
      useGetPostCommentsApiQuery({ post_id: post_id });
    const [showImages, setShowImages] = useState(false);
@@ -179,7 +248,7 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
    const [expanded, setExpanded] = useState(false);
         return (
      <>
-       <ScrollView className="flex-1 bg-white">
+       <ScrollView className="flex-1 bg-white mb-6">
          <HeaderWithBack onBackpress={()=>{setshowModel(false)}}/>
          <View
            className="flex-1"
@@ -190,9 +259,15 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
                Size={40}
                source={{ uri: ImageFormater(data?.posted_by?.logo) }}
              />
-             <Text style={[styles.heading, { color: Colors.light.red }]}>
-               {data?.posted_by?.business_name}
-             </Text>
+            <Text
+  style={[styles.heading, { color: Colors.light.red }]}
+  numberOfLines={1}
+  ellipsizeMode="tail"
+>
+  {data?.posted_by?.business_name?.length > 20
+    ? data?.posted_by?.business_name?.slice(0, 20) + "..."
+    : data?.posted_by?.business_name}
+</Text>
              {data?.type!=="general" && (
     <View style={{ flex: 1, alignItems: "flex-end" }}>
   <TouchableOpacity onPress={() => setSingleView(true)}>
@@ -423,9 +498,33 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
              </Text>
  
              <View className="flex-row gap-2">
-               <TouchableOpacity>
-                 <Heart />
-               </TouchableOpacity>
+                   <View className="flex-row items-center ">
+                  <TouchableOpacity
+                    disabled={liking || unliking}
+                    onPress={() => handleLikeToggle()}
+                  >
+                    {data?.post?.is_liked ?
+                      <Liked
+                        width={22}
+                        height={22}
+                      />
+                      :
+                      <Like
+                        width={22}
+                        height={22}
+
+                      />}
+                  </TouchableOpacity>
+                  <Text
+                    style={{
+                      color: Colors.light.DarkGreen,
+                      paddingLeft: hs(2),
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    {data?.post?.likes}
+                  </Text>
+                </View>
               <TouchableOpacity onPress={()=>{setShowShare(true)}}>
                  <Share />
                </TouchableOpacity>
@@ -483,8 +582,28 @@ export default function NewsFeedSingleview({ post_id,setshowModel }: { post_id: 
                <CommentItem item={item} refetch={refetch} />
              )}
            />
+  
          </View>
        </ScrollView>
+                  <View
+    style={{
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: "#fff",
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderTopWidth: 1,
+      borderColor: "#eee",
+    }}
+  >
+    <CommentInput
+      creatorId={data?.post?.user_id||data?.posted_by?.id}
+      postId={post_id}
+      setData={setData}
+    />
+  </View>
        {showImages && (
          <ImageSlider
            imageNo={imageNo}

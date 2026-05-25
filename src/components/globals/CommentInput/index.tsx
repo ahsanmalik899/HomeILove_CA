@@ -5,7 +5,7 @@ import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import CircleImage from "../CircleImage/CircleImage";
@@ -14,7 +14,9 @@ const Index = ({
   postId,
   creatorId,
   refetch,
+  setData,
 }: {
+  setData:(val:number)=>void,
   postId: number;
   creatorId: number;
   refetch?: () => void;
@@ -41,6 +43,17 @@ const Index = ({
       });
 
       setComment("");
+     
+setData((prevData) =>
+  prevData.map((post) => {
+    return Number(post.post_id) === Number(postId)
+      ? {
+          ...post,
+          comment_count: (post.comment_count || 0) + 1,
+        }
+      : post;
+  })
+);
       refetch?.(); // refresh comments list
     } catch (error) {
       console.log("Comment Error:", error);
@@ -72,12 +85,16 @@ const Index = ({
         />
 
         {/* ✅ SEND BUTTON */}
-        <TouchableOpacity
-          onPress={handleSendComment}
-          disabled={isLoading}
-        >
-          <Send />
-        </TouchableOpacity>
+      {isLoading ? (
+  <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
+) : (
+  <TouchableOpacity
+    onPress={handleSendComment}
+    disabled={isLoading}
+  >
+    <Send />
+  </TouchableOpacity>
+)}
 
       </View>
     </View>

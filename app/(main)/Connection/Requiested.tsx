@@ -18,10 +18,14 @@ const RequestsScreen = () => {
   const user = useAppSelector(userdata);
   const [value, setValue] = useState("Recieved");
 
-  const { data: sentData,isFetching:sentFetching } = useGetSentRequestsApiQuery({ id: user.id });
-  const { data: recivedData,isFetching:recivedFetching } = useGetReceivedRequestsApiQuery({ id: user.id });
+  const { data: sentData,isFetching:sentFetching,refetch:refetchrequested } = useGetSentRequestsApiQuery({ id: user.id });
+  const { data: recivedData,isFetching:recivedFetching,refetch:refetchsended } = useGetReceivedRequestsApiQuery({ id: user.id });
   const [sentlist,setsentList] = useState([]);
   const [recivedlist,setrecivedList] = useState([]);
+  useEffect(()=>{
+    refetchrequested()
+    refetchsended()
+  },[]);
   useEffect(() => {
     if (sentData?.data) {
       setsentList(sentData.data);
@@ -58,7 +62,13 @@ const RequestsScreen = () => {
               const formData = new FormData();
               formData.append("connection_id", String(item.connection_id ?? ""));
               formData.append("type", "accept");
-
+    formData.append("sender_id", String(user?.id ?? ""));
+        formData.append("receiver_id", String(item.user_id ?? ""));
+         formData.append("rcr_logo", String(item?.profile?.logo ?? ""));
+          formData.append("rcr_name", String(item?.profile?.business_name ?? ""));
+      
+        formData.append("sndr_logo", String(user?.logo ?? ""));
+        formData.append("sndr_name", String(user?.name ?? ""));
               try {
                 const result = await updateConnectionApi(formData).unwrap();
 

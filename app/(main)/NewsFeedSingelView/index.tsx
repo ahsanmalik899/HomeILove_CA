@@ -26,6 +26,7 @@ import ImageSlider from "@src/components/globals/ImageSlider";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
 import Colors from "@src/constants/Colors";
+import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
@@ -49,6 +50,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import * as yup from "yup";
 const index = () => {
+  const user=useAppSelector(userdata);
   const params = useLocalSearchParams();
   const type = params.type as string;
   const id = Number(params.id);
@@ -189,7 +191,7 @@ const index = () => {
   };
 
   const [imageNo, setImageNo] = useState(0);
-  const { data, isFetching, refetch } = useGetPostByIdQuery({ post_id:post_id });
+  const { data, isFetching, refetch } = useGetPostByIdQuery({ post_id:post_id,userid:user?.id  });
   const { data: comments, isFetching: commentFetching } =
     useGetPostCommentsApiQuery({ post_id: post_id });
   const [showImages, setShowImages] = useState(false);

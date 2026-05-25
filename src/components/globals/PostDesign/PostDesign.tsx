@@ -314,6 +314,7 @@ const PostDesign = ({
     sender_ProfileId,
     reciverProfile,
     statusi,
+    sender_data,
   }) => {
     try {
       let status = statusi;
@@ -324,10 +325,14 @@ const PostDesign = ({
         formData.append("sender_profile_id", String(sender_ProfileId ?? ""));
         formData.append("sender_profile_type", String(sender_type ?? ""));
         formData.append("receiver_profile_id", String(reciverProfile?.id ?? ""));
+         formData.append("rcr_logo", String(reciverProfile?.logo ?? ""));
+          formData.append("rcr_name", String(reciverProfile?.business_name ?? ""));
         formData.append(
           "receiver_profile_type",
           String(reciverProfile?.connection_type ?? "")
         );
+        formData.append("sndr_logo", String(sender_data?.logo ?? ""));
+        formData.append("sndr_name", String(sender_data?.business_name ?? ""));
       }
       else {
         formData.append("sender_id", String(reciverProfile?.sender_id ?? ""));
@@ -399,20 +404,28 @@ const PostDesign = ({
   }, [showpostPostData]);
   const renderItem = ({ item }) => {
     const [expanded, setExpanded] = useState(false);
-
-    const [alreadyLiked, setAlreadyLiked] = useState(item.is_liked);
-    const [likeCount, setLikeCount] = useState(item.likes);
     const handleLikeToggle = async (item) => {
       try {
-        if (alreadyLiked) {
+        if (item.is_liked) {
           const res = await unlikePost({
             post_id: item.post_id,
             user_id: user.id,
           }).unwrap();
           if (res.success) {
             renderToastSuccess(res.message)
-            setAlreadyLiked(false)
-            setLikeCount(likeCount - 1)
+           
+           
+        setData((prevData) =>
+          prevData.map((post) =>
+            Number(post.post_id) === Number(item.post_id)
+              ? {
+                  ...post,
+                  is_liked: false,
+                  likes: Math.max((post.likes || 1) - 1, 0),
+                }
+              : post
+          )
+        );
           } else {
             renderToastError(res.message)
           }
@@ -425,8 +438,18 @@ const PostDesign = ({
           }).unwrap();
           if (res.success) {
             renderToastSuccess(res.message)
-            setAlreadyLiked(true)
-            setLikeCount(likeCount + 1)
+           
+               setData((prevData) =>
+          prevData.map((post) =>
+           Number(post.post_id) === Number(item.post_id)
+              ? {
+                  ...post,
+                  is_liked: true,
+                  likes: (post.likes || 0) + 1,
+                }
+              : post
+          )
+        );
           } else {
             renderToastError(res.message)
           }
@@ -518,6 +541,7 @@ const PostDesign = ({
           />
           {item.user_id !== user.id && (
             <View style={{ alignItems: "flex-end", marginTop: vs(10) }}>
+              {item.users_id!==user.id&&(
               <FollowButton
                 id={item.receiver_id}
                 status={item.connection_status}
@@ -556,6 +580,7 @@ const PostDesign = ({
 
                 }
               />
+              )}
             </View>)}
           {menuVisible && (
             <TouchableOpacity
@@ -771,7 +796,7 @@ const PostDesign = ({
                     disabled={liking || unliking}
                     onPress={() => handleLikeToggle(item)}
                   >
-                    {alreadyLiked ?
+                    {item.is_liked ?
                       <Liked
                         width={22}
                         height={22}
@@ -790,7 +815,7 @@ const PostDesign = ({
                       fontFamily: "PopinRegula",
                     }}
                   >
-                    {likeCount}
+                    {item.likes}
                   </Text>
                 </View>
                 <View
@@ -821,7 +846,7 @@ const PostDesign = ({
             <CommentInput
               creatorId={item.users_id}
               postId={item.post_id}
-
+              setData={setData}
             />
           </View>
           {menuVisible && (
@@ -1073,7 +1098,7 @@ const PostDesign = ({
                     disabled={liking || unliking}
                     onPress={() => handleLikeToggle(item)}
                   >
-                    {alreadyLiked ?
+                    {item.is_liked ?
                       <Liked
                         width={22}
                         height={22}
@@ -1092,7 +1117,7 @@ const PostDesign = ({
                       fontFamily: "PopinRegula",
                     }}
                   >
-                    {likeCount}
+                    {item.likes}
                   </Text>
                 </View>
                 <View
@@ -1259,6 +1284,7 @@ const PostDesign = ({
                       sender_ProfileId: item.profile_id,
                       sender_type: item.profile_type,
                       statusi: statuse,
+                      sender_data:item,
                     });
 
                     setShowConnection(false);
@@ -1617,9 +1643,9 @@ const PostDesign = ({
         statusBarTranslucent={true}  >
 
         {showpostPostData?.type === "Shared Connection" ? (
-          <ProfileSingleView id={showpostPostData?.id} type={showpostPostData?.connection_type} setshowModel={setShowpost} />
+          <ProfileSingleView id={showpostPostData?.id} type={showpostPostData?.connection_type} setshowModel={setShowpost} setData={setData} />
         ) : (
-          <NewsFeedSingleview post_id={showpostPostData?.post_id} setshowModel={setShowpost} />
+          <NewsFeedSingleview post_id={showpostPostData?.post_id} setshowModel={setShowpost} setData={setData} />
         )}
 
 

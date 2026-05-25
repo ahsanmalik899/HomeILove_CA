@@ -24,21 +24,26 @@ useEffect(()=>{
   handlePay();
 },[])
   
-  const handlePay = async () => {
-    try {
-      const response = await createOrder({ amount: selectedAmount }).unwrap();
-      const url = response.links.find((l: any) => l.rel === "approve")?.href;
+const handlePay = async () => {
+  try {
+    const response = await createOrder({
+      amount: selectedAmount,
+    }).unwrap();
 
-      if (url) {
-        setApproveUrl(url); 
-      } else {
-        Alert.alert("Error", "Could not get PayPal approval URL");
-      }
-    } catch (err) {
-      console.log("Payment creation error:", err);
-      Alert.alert("Error", "Payment failed");
+    console.log("PAYPAL RESPONSE =", response);
+
+    const url = response.approve_link;
+
+    if (url) {
+      setApproveUrl(url);
+    } else {
+      Alert.alert("Error", "Could not get PayPal approval URL");
     }
-  };
+  } catch (err) {
+    console.log("Payment creation error:", err);
+    Alert.alert("Error", "Payment failed");
+  }
+};
 
  
 const handleNavigationChange = async (navState: any) => {

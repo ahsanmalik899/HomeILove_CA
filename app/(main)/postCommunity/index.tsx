@@ -1787,8 +1787,10 @@ const index = () => {
                       try {
                         setFieldValue("payment_method", "Paypal");
                         setFieldValue("order_id", order_id);
+                        setvisible(false);
                         handleSubmit();
                         setApproveUrl(null);
+                              
                       } catch {
                         renderToastError("Some thing went rong");
                       }

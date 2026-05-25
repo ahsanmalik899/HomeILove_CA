@@ -18,7 +18,7 @@ interface PayPalProps {
 
 const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => {
   
-  // ✅ Reset every time modal opens
+
   const captureCalled = useRef(false);
 
   const [createOrder, { isLoading: isCreating }] = usePaybyPaypalMutation();
@@ -30,7 +30,7 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
   useEffect(() => {
     if (!visible) return;
 
-    // ✅ Reset state on every open
+   
     captureCalled.current = false;
     setApproveUrl(null);
     setOrderId(null);
@@ -41,7 +41,7 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
     }
 
     handlePay();
-  }, [visible]); // only trigger on visibility change
+  }, [visible]); 
 
   const handlePay = async () => {
     try {
@@ -67,18 +67,18 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
   const handleNavigationChange = async (navState: any) => {
     const url = navState.url;
 
-    // ✅ Fix 2: match your exact return_url domain, not just "success"
+    
     const isSuccess = url.startsWith("https://example.com/success");
     const isCancel  = url.startsWith("https://example.com/cancel");
 
     if (isSuccess && !captureCalled.current) {
-      captureCalled.current = true; // ✅ prevent double-capture
-
+      captureCalled.current = true; 
+ setVisible(false);
       if (!orderId) {
         renderToastError("Order ID missing");
         return;
       }
-
+     
       onPress(orderId, setApproveUrl);
     }
 

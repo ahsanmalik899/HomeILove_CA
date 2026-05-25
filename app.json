@@ -5,7 +5,7 @@
     "slug": "home-i-love",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icons/app-icon-mobile.png",
+    "icon": "./assets/icons/app-icon 1024x1024.png",
     "newArchEnabled": true,
     "deepLinking": true,
     "userInterfaceStyle": "automatic",
@@ -41,7 +41,7 @@
         "QUERY_ALL_PACKAGES"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo/logo.png",
+        "foregroundImage": "./assets/icons/app-icon 1024x1024.png",
         "backgroundColor": "#ffffff"
       },
        "config": {

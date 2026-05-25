@@ -1,5 +1,5 @@
 
-import { useAskvaluationapiMutation, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useLazyGetRandomAdQuery, useSaveItemApiMutation, useShare_profileApiMutation, useUnsaveItemApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
+import { useAcceptRequestApiMutation, useAskvaluationapiMutation, useCancelRequestApiMutation, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useLazyGetRandomAdQuery, useSaveItemApiMutation, useSendRequestMutation, useShare_profileApiMutation, useUnfollowApiMutation, useUnsaveItemApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import Call from "@assets/Buy/call.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
@@ -25,6 +25,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Yup from 'yup';
 import { AdressInput } from '../AddressInput';
 import CircleImage from '../CircleImage/CircleImage';
+import FollowButton from '../FollowButton';
 import { FormikInput } from '../FormictInput';
 import { FormikDropdownwithjson } from '../FormikDropdownwithjson';
 import HeaderWithBack from '../HeaderWithBack';
@@ -35,7 +36,7 @@ import SavedItems from '../SavedItems';
 import SetRating from '../SetRating';
 import StarRating from '../StarRating';
 import VideoSection from '../ViedioSection';
-const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: string, setshowModel: (val: boolean) => void }) => {
+const ProfileSingleView = ({ type, id, setshowModel,setData }: { type: string, id: string,  setData?: React.Dispatch<React.SetStateAction<any[]>>,setshowModel: (val: boolean) => void }) => {
   const user = useAppSelector(userdata);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
@@ -43,7 +44,12 @@ const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: strin
   const [postrating, setpostRating] = useState(0);
   const [isSaved,setIsSaved]=useState(false);
   const [expanded, setExpanded] = useState(false);
+    const [statuse, setStatus] = useState("");
+      const [showConnection, setShowConnection] = useState(false);
   const [showPast, setShowpast] = useState(false);
+    const [unfollowApi, { isLoading: unfollowing }] = useUnfollowApiMutation();
+    const [cancelRequestApi, { isLoading: canceling }] = useCancelRequestApiMutation();
+    const [acceptRequestApi, { isLoading: accepting }] = useAcceptRequestApiMutation();
   const [showShare, setShowShare] = useState(false);
   const [askEvaluation, { isLoading: askEvaluationLoading }] = useAskvaluationapiMutation();
   const ReviewSchema = Yup.object().shape({
@@ -61,9 +67,10 @@ const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: strin
           const [unsaveItemApi] = useUnsaveItemApiMutation();
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
+   const [sendRequest] = useSendRequestMutation();
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const { data, isLoading } = useGetSingleProfileQuery({ type: type?.toLocaleLowerCase(), id: id,user_id:user?.id });
+  const { data, isLoading,refetch:refetchProfile } = useGetSingleProfileQuery({ type: type?.toLocaleLowerCase(), id: id,user_id:user?.id });
   const [share_profileApi, { isLoading: sharing }] = useShare_profileApiMutation();
   const profile = data?.data;
   const { data: Profiles, isLoading: ProfilesLoading } =
@@ -110,6 +117,172 @@ const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: strin
   const rating = Number(profile?.rating || 0);
   const [getRandomAd, { data: randomAdData, isFetching: randomAdFetching }] = useLazyGetRandomAdQuery();
   const totalReviews = profile?.total_reviews || 0;
+    const [selectedReceiver, setSelectedReceiver] = useState<any>(null);
+const requestSend = async ({
+  sender_type,
+  sender_ProfileId,
+  reciverProfile,
+  statusi,
+}: {
+  sender_type: string;
+  sender_ProfileId: string;
+  reciverProfile: any;
+  statusi: string;
+}) => {
+  try {
+    const formData = new FormData();
+
+    // Connect / Cancel Request
+    if (statusi === "Connect" || statusi === "Cancel Request") {
+      formData.append("sender_id", String(user?.id ?? ""));
+      formData.append("receiver_id", String(reciverProfile?.users_id ?? ""));
+      formData.append(
+        "sender_profile_id",
+        String(sender_ProfileId ?? "")
+      );
+      formData.append(
+        "sender_profile_type",
+        String(sender_type ?? "")
+      );
+      formData.append(
+        "receiver_profile_id",
+        String(reciverProfile?.id ?? "")
+      );
+      formData.append(
+        "receiver_profile_type",
+        String(reciverProfile?.type ?? "")
+      );
+    }
+
+    // Accept / Unfollow
+    else {
+      formData.append(
+        "sender_id",
+        String(reciverProfile?.sender_id ?? "")
+      );
+      formData.append(
+        "receiver_id",
+        String(reciverProfile?.users_id ?? "")
+      );
+      formData.append(
+        "sender_profile_id",
+        String(reciverProfile?.sender_profile_id ?? "")
+      );
+      formData.append(
+        "sender_profile_type",
+        String(reciverProfile?.sender_profile_type ?? "")
+      );
+      formData.append(
+        "receiver_profile_id",
+        String(reciverProfile?.id ?? "")
+      );
+      formData.append(
+        "receiver_profile_type",
+        String(reciverProfile?.type ?? "")
+      );
+    }
+  formData._parts?.forEach((p) => console.log(p[0], p[1]));
+    let result: any;
+
+    switch (statusi) {
+      case "Connect":
+        result = await sendRequest(formData).unwrap();
+        break;
+
+      case "Accept Request":
+        result = await acceptRequestApi(formData).unwrap();
+        break;
+
+      case "Cancel Request":
+        result = await cancelRequestApi(formData).unwrap();
+        break;
+
+      case "Unfollow":
+        result = await unfollowApi(formData).unwrap();
+        break;
+    }
+
+    if (result?.success) {
+      refetchProfile();
+      if(setData){
+    setData((prevData) => {
+  console.log("All Posts:", prevData);
+
+  return prevData.map((post) => {
+    console.log("post", post);
+    console.log("reciverProfile", reciverProfile);
+
+    if (
+      post.users_id === reciverProfile?.users_id &&
+    post.connection_type?.toLowerCase() ===reciverProfile?.type?.toLowerCase()
+    ) {
+
+
+      let newStatus = post.connection_status;
+
+      if (statusi === "Connect") {
+        newStatus = "pending";
+       
+      } else if (statusi === "Accept Request") {
+        newStatus = "accepted";
+       
+      } else if (
+        statusi === "Unfollow" ||
+        statusi === "Cancel Request"
+      ) {
+        newStatus = "";
+        
+      }
+
+      return {
+        ...post,
+        connection_status: newStatus,
+      };
+    }
+
+    return post;
+  });
+});}
+  
+
+      renderToastSuccess(result?.message);
+
+      // Update local connection status
+      let updatedStatus = "";
+
+      switch (statusi) {
+        case "Connect":
+          updatedStatus = "pending";
+          break;
+
+        case "Accept Request":
+          updatedStatus = "accepted";
+          break;
+
+        case "Cancel Request":
+        case "Unfollow":
+          updatedStatus = "";
+          break;
+      }
+
+      // update profile object locally
+      data.data.connection_status = updatedStatus;
+
+      setStatus(updatedStatus);
+      setShowConnection(false);
+    } else {
+      renderToastError(result?.message || "Something went wrong");
+    }
+  } catch (error: any) {
+    console.log("REQUEST ERROR", error);
+
+    renderToastError(
+      error?.data?.message ||
+        error?.message ||
+        "Something went wrong"
+    );
+  }
+};
   const submitReview = async (values: {
     review: any;
     imp_facts: any;
@@ -307,7 +480,7 @@ const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: strin
           {/* Divider */}
           <View style={styles.divider} />
 
-          {/* Actions */}
+    <View className='flex-row justify-between'>
           <View className='flex-row justify-end gap-3' style={styles.row}>
          <TouchableOpacity onPress={()=>toggleSave()} >
                { isSaved ? (
@@ -319,6 +492,46 @@ const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: strin
             <TouchableOpacity onPress={() => setShowShare(true)}>
               <Share />
             </TouchableOpacity>
+          </View>
+          {profile?.users_id!==user.id&&(
+           <FollowButton
+                          id={profile?.receiver_id}
+                          status={profile?.connection_status}
+                          onPress={(status) => {
+          
+                            setStatus(status)
+          
+                            if (user.user_type === "Business") {
+                              setSelectedReceiver(profile);
+          
+          
+                              if (status === "Connect") {
+                                setShowConnection(true);
+                              }
+                              else {
+                                requestSend({
+                                  reciverProfile: profile,
+                                  sender_ProfileId: "",
+                                  sender_type: "Business",
+                                  statusi: status,
+                                });
+                              }
+                            } else {
+                              setStatus(status)
+                              requestSend({
+                                reciverProfile: profile,
+                                sender_ProfileId: "",
+                                sender_type: "Private",
+                                statusi: status,
+                              });
+          
+                            }
+                          }
+          
+          
+          
+                          }c
+                        />)}
           </View>
         </View>
 
@@ -1083,6 +1296,65 @@ const ProfileSingleView = ({ type, id, setshowModel }: { type: string, id: strin
                  <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
               <SavedItems setShowSaved={setShowSaved} />
             </Modal>
+                 <Modal
+                    visible={showConnection}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowConnection(false)}
+                  >
+                    <TouchableOpacity
+                      style={styles.overlay}
+                      activeOpacity={1}
+                      onPressOut={() => setShowConnection(false)}
+                    >
+                      <View
+                        style={[
+                          styles.profileContainer,
+                         styles.fullModal,
+                        ]}
+                      >
+                        <Text style={styles.title}>Connect As</Text>
+            
+                        <ScrollView
+                          showsVerticalScrollIndicator={false}
+                          contentContainerStyle={{ flexGrow: 1 }}
+                        >
+                          {Profiles?.profiles?.map((item, index) => (
+                            <TouchableOpacity
+                              key={index}
+                              style={styles.profileCard}
+                              onPress={() => {
+                                console.log(item)
+                                requestSend({
+                                  reciverProfile: selectedReceiver,
+                                  sender_ProfileId: item.profile_id,
+                                  sender_type: item.profile_type,
+                                  statusi: statuse,
+                                });
+            
+                                setShowConnection(false);
+                              }}
+                            >
+                              <CircleImage
+                                Size={50}
+                                source={{ uri: ImageFormater(item.logo) }}
+                              />
+            
+                              <View style={{ marginLeft: 12 }}>
+                                <Text style={styles.businessName}>
+                                  {item.business_name}
+                                </Text>
+            
+                                <Text style={styles.profileType}>
+                                  {item.profile_type}
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    </TouchableOpacity>
+                  </Modal>
     </>
   );
 };
@@ -1343,7 +1615,14 @@ const styles = StyleSheet.create({
     color: Colors.light.red,
     marginBottom: 15,
   },
+ centerModal: {
+    maxHeight: "50%",
+  },
 
+
+  fullModal: {
+    height: "80%",
+  },
   mortgageBtn: {
     backgroundColor: Colors.light.DarkGreen,
     paddingVertical: 12,
