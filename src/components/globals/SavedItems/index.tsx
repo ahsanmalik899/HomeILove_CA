@@ -98,13 +98,13 @@ const index = ({setShowSaved}:{setShowSaved:(value:boolean)=>void}) => {
           await unsaveItemApi({
             saved_id: item?.data?.id,
             user_id: user.id,
-            type: item?.data?.type,
+            type: item?.type==="property"?item?.data?.property_for:item?.data?.type,
           }).unwrap();
         } else {
           await saveItemApi({
             saved_id: item?.data?.id,
             user_id: user.id,
-            type: item?.data?.type,
+          type: item?.type==="property"?item?.data?.property_for:item?.data?.type,
           }).unwrap();
         }
       } catch (error) {

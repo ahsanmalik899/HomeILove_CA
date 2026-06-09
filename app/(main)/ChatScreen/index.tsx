@@ -11,7 +11,7 @@ import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { db } from "@src/utils/firebse";
-import { vs } from "@utils/design/design";
+import { hs, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { useLocalSearchParams } from "expo-router";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
@@ -20,14 +20,15 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const ChatScreen = () => {
-  const { userId, name } = useLocalSearchParams();
+  const { userId, name,logo } = useLocalSearchParams();
   const user = useAppSelector(userdata);
 
   const [markAsRead] = useMarkAsReadApiMutation();
@@ -157,7 +158,7 @@ const renderItem = useCallback(({ item }: any) => {
 
         {!isMe && (
           <CircleImage
-            source={{ uri: ImageFormater(item?.profile_image) }}
+            source={{ uri: ImageFormater(logo.toString()) }}
             Size={32}
           />
         )}
@@ -185,10 +186,22 @@ const renderItem = useCallback(({ item }: any) => {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <HeaderWithBack />
+<View className="bg-white"> 
+   <View style={styles.headerContainer}>
+      <CircleImage
+        source={{ uri: ImageFormater(logo?.toString()) }}
+        Size={40}
+      />
 
+      <Text style={styles.headerTitle} numberOfLines={1}>
+        {name}
+      </Text>
+    </View>
+</View>
       {initialLoading ? (
         <View
           className="flex-1 justify-center items-center"
+
           style={{ backgroundColor: "#F4F0F0" }}
         >
           <ActivityIndicator size="large" color={Colors.light.DarkGreen} />
@@ -255,5 +268,19 @@ const renderItem = useCallback(({ item }: any) => {
     </KeyboardAvoidingView>
   );
 };
-
+ const styles= StyleSheet.create({
+    headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal:hs(20),
+    paddingVertical:vs(10)
+  },
+  headerTitle: {
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+    maxWidth: 200,
+  },
+ })
 export default ChatScreen;

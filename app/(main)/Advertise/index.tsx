@@ -1,5 +1,19 @@
-import { useGetUserAdvertisementsQuery, useGetUserWalletQuery, useLazyGetAdvatizementPriceQuery, usePostAdvatizementMutation, useUpdateAdvertisementMediaMutation } from "@/store/api/user/MainApi";
+import {
+  useGetUserAdvertisementsQuery,
+  useGetUserWalletQuery,
+  useLazyGetAdvatizementPriceQuery,
+  usePostAdvatizementMutation,
+  useUpdateAdvertisementMediaMutation,
+} from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
+import communitySingleView from "@assets/AdsShowFolder/community singleview.jpg";
+import communityListing from "@assets/AdsShowFolder/communityListing.jpg";
+import connections from "@assets/AdsShowFolder/connections.jpg";
+import Newsfeeed from "@assets/AdsShowFolder/newsfeed.jpg";
+import profileListing from "@assets/AdsShowFolder/profilelisting.jpg";
+import profileSingleview from "@assets/AdsShowFolder/profilesingleview.jpg";
+import propertyListing from "@assets/AdsShowFolder/propertyListing.jpg";
+import propertySingleView from "@assets/AdsShowFolder/propertySingleView.jpg";
 import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import AdvatiseBaner from "@assets/SideBar/advertisementpic.svg";
 import Connection from "@assets/SideBar/connection.svg";
@@ -10,6 +24,7 @@ import Paypal from "@assets/SideBar/paypal-icon.svg";
 import TimeLine from "@assets/SideBar/timeline.svg";
 import { Feather } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
+import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
@@ -24,9 +39,21 @@ import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { Formik } from "formik";
-import { useState } from "react";
-import { ActivityIndicator, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Image,
+  ImageBackground,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
@@ -35,16 +62,27 @@ const index = () => {
   const [showAdvatizeFrom, setShowAdvatizeForm] = useState(false);
   const [advatizeinfoType, setAdvatizeinfoType] = useState("Homefeed");
   const [listingInfo, setListingInfo] = useState("ListingDetail");
-  const [EditAdData,setEditAdData]=useState(null)
+  const [EditAdData, setEditAdData] = useState(null);
   const [timePeriod, setTimeperiod] = useState("");
   const [EditAd, setEditAd] = useState(false);
-  const [getprice, { data: promotionPrices, isFetching: pricesFetching }] = useLazyGetAdvatizementPriceQuery()
+  const [getprice, { data: promotionPrices, isFetching: pricesFetching }] =
+    useLazyGetAdvatizementPriceQuery();
   const [PostAdvatizement, { isLoading }] = usePostAdvatizementMutation();
-  const{data:Myadvatizemants,isFetching:myad_fetching}=  useGetUserAdvertisementsQuery({user_id:user.id})
+  const { data: Myadvatizemants, isFetching: myad_fetching } =
+    useGetUserAdvertisementsQuery({ user_id: user.id });
   const [visible, setvisible] = useState(false);
-  const [page,setpage]=useState("");
-  const [updateAdvertisementMedia,{isLoading:updateadloading}]= useUpdateAdvertisementMediaMutation()
+  const [page, setpage] = useState("");
+  const [updateAdvertisementMedia, { isLoading: updateadloading }] =
+    useUpdateAdvertisementMediaMutation();
+    const [subPage,setSubpage]=useState("");
+      const rotateAnim = useRef(new Animated.Value(0)).current;
   const [showAdPreview, setShowAdPreview] = useState(false);
+    const scaleAnim = useRef(new Animated.Value(0.9)).current;
+    const rotate = rotateAnim.interpolate({
+  inputRange: [-1, 1],
+  outputRange: ["-2deg", "2deg"],
+});
+
   const AdvatizeSchema = Yup.object().shape({
     start_date: Yup.string().required("Start date is required"),
 
@@ -54,14 +92,19 @@ const index = () => {
       .url("Please enter a valid URL")
       .required("Ad link is required"),
     business_cover: Yup.mixed().required("Image is required"),
-    on_page: Yup.string().required("Page selection is required"),
+    on_page: Yup.string()
+      .required("Page selection is required")
+      .test(
+        "valid-page",
+        "Please select a sub page",
+        (value) => value !== "listing" && value !== "listing_details"
+      ),
   });
-    const EditAdvatizeSchema = Yup.object().shape({
+  const EditAdvatizeSchema = Yup.object().shape({
     ad_link: Yup.string()
       .url("Please enter a valid URL")
       .required("Ad link is required"),
     business_cover: Yup.mixed().required("Image is required"),
-   
   });
   const {
     data: amount,
@@ -73,7 +116,28 @@ const index = () => {
   const [SelectedAmount, setSelectedAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [orderid, setOrderid] = useState("");
- 
+useEffect(() => {
+  Animated.timing(scaleAnim, {
+    toValue: 1,
+    duration: 500,
+    easing: Easing.out(Easing.ease),
+    useNativeDriver: true,
+  }).start();
+  Animated.loop(
+    Animated.sequence([
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 3000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(rotateAnim, {
+        toValue: -1,
+        duration: 3000,
+        useNativeDriver: true,
+      }),
+    ])
+  ).start();
+}, []);
   const Listingcomponenet1 = (
     <View style={{ marginTop: vs(10) }}>
       <Listipage1 height={vs(300)} width={hs(350)} />
@@ -87,9 +151,17 @@ const index = () => {
       >
         When user view his love home then he will view your ad
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600", fontFamily: "PopinRegula", }}>$ 15 / Day</Text>
-      <View className="justify-between " style={{ marginTop: vs(10), }}>
-        <Text style={{ fontFamily: "PopinRegula", }}>
+      <Text
+        style={{
+          fontSize: ms(20),
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        $ 15 / Day
+      </Text>
+      <View className="justify-between " style={{ marginTop: vs(10) }}>
+        <Text style={{ fontFamily: "PopinRegula" }}>
           • Another busiest segment where users search their homing needs and
           that where we will present your ad at top most prominent place.
           {"\n\n"}• Target your audience as per your ad requirements e.g. if
@@ -117,9 +189,17 @@ const index = () => {
       >
         Present your brand / business at core segment of portal
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600", fontFamily: "PopinRegula", }}>$ 10 / Day</Text>
+      <Text
+        style={{
+          fontSize: ms(20),
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        $ 10 / Day
+      </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text style={{ fontFamily: "PopinRegula", }}>
+        <Text style={{ fontFamily: "PopinRegula" }}>
           •You have 7 best choices to present your ad at Property for sale &
           rent , New communities, businesses profiles listing pages.
           {"\n\n"}•Target your audience as per your ad requirements e.g. if
@@ -147,9 +227,17 @@ const index = () => {
       >
         Present your brand / business at most visited segment for
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600", fontFamily: "PopinRegula", }}>$ 5/ Day</Text>
+      <Text
+        style={{
+          fontSize: ms(20),
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        $ 5/ Day
+      </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text style={{ fontFamily: "PopinRegula", }}>
+        <Text style={{ fontFamily: "PopinRegula" }}>
           • Most busiest section where every user see all the activities of
           connections and preferred properties & communities.
           {"\n\n"}• No chance to miss your advertisement as your ad will be
@@ -176,9 +264,17 @@ const index = () => {
       >
         Market your brand to user's own timeline page for
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600", fontFamily: "PopinRegula", }}>$ 25 / Day</Text>
+      <Text
+        style={{
+          fontSize: ms(20),
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        $ 25 / Day
+      </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text style={{ fontFamily: "PopinRegula", }}>
+        <Text style={{ fontFamily: "PopinRegula" }}>
           • Every user view its own activities and thats where your ad will be
           placed.{"\n\n"}• Prominent place for your advertisement at our another
           busiest segement.{"\n\n"}• You can promote your business as per your
@@ -204,9 +300,17 @@ const index = () => {
       >
         Most economical yet results producing place for your ad at
       </Text>
-      <Text style={{ fontSize: ms(20), fontWeight: "600", fontFamily: "PopinRegula", }}>$ 20 / Day</Text>
+      <Text
+        style={{
+          fontSize: ms(20),
+          fontWeight: "600",
+          fontFamily: "PopinRegula",
+        }}
+      >
+        $ 20 / Day
+      </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
-        <Text style={{ fontFamily: "PopinRegula", }}>
+        <Text style={{ fontFamily: "PopinRegula" }}>
           • Your ad will be placed at user's list of connections at very
           economical rates.
           {"\n\n"}• Prominent place for your advertisement at another decent
@@ -224,13 +328,23 @@ const index = () => {
     return (
       <ScrollView>
         <View className="flex-1 bg-white">
-          <HeaderWithBack onBackpress={()=>{setShowInfopage(false)}} />
+          <HeaderWithBack
+            onBackpress={() => {
+              setShowInfopage(false);
+            }}
+          />
           <View style={{ marginHorizontal: hs(20), marginTop: vs(30) }}>
-            <Text className="font-bold" style={{ fontFamily: "PopinRegula", }}>
+            <Text className="font-bold" style={{ fontFamily: "PopinRegula" }}>
               Market your Brand or Business on Nation's smartest real-estate
               platform Tranparent - Targeted- Economical
             </Text>
-            <Text style={{ marginTop: vs(30), marginBottom: vs(10), fontFamily: "PopinRegula", }}>
+            <Text
+              style={{
+                marginTop: vs(30),
+                marginBottom: vs(10),
+                fontFamily: "PopinRegula",
+              }}
+            >
               Advertisement options at different segments to give you targeted
               audiences right for your marketing needs.We have five major
               segements where you can market your business
@@ -330,12 +444,37 @@ const index = () => {
       </ScrollView>
     );
   }
+ 
+ const pageImages = {
+  newsfeed: Newsfeeed,
+  connections: connections,
+
+  sale: propertyListing,
+  sale_single: propertySingleView,
+
+  rent: propertyListing,
+  rent_single: propertySingleView,
+
+  community: communityListing,
+  community_single: communitySingleView,
+
+  agent: profileListing,
+  agent_single: profileSingleview,
+
+  developer: profileListing,
+  developer_single: profileSingleview,
+
+  mortgage: profileListing,
+  mortgage_single: profileSingleview,
+
+  maintenance: profileListing,
+  maintenance_single: profileSingleview,
+};
   const pageTypeMap: Record<string, string> = {
     newsfeed: "Newsfeed",
     connections: "Connection",
     listing: "Listing",
     listing_details: "Single View",
-  
   };
 
   if (showAdvatizeFrom) {
@@ -343,11 +482,26 @@ const index = () => {
       <>
         <ScrollView>
           <View className="flex-1 bg-white">
-            <HeaderWithBack onBackpress={()=>{setShowAdvatizeForm(false);}}/>
+            <HeaderWithBack
+              onBackpress={() => {
+                setShowAdvatizeForm(false);
+              }}
+            />
             <View style={{ marginHorizontal: hs(20), marginVertical: vs(20) }}>
-              <Text style={{ fontSize: ms(20), fontWeight: "500", fontFamily: "PopinRegula", }}>
+              <Text
+                style={{
+                  fontSize: ms(20),
+                  fontWeight: "500",
+                  fontFamily: "PopinRegula",
+                }}
+              >
                 Making your brand more
-                <Text style={{ color: Colors.light.red, fontFamily: "PopinRegula", }}>SHINING</Text> with us !
+                <Text
+                  style={{ color: Colors.light.red, fontFamily: "PopinRegula" }}
+                >
+                  SHINING
+                </Text>
+                with us !
               </Text>
               <Formik
                 initialValues={{
@@ -361,17 +515,15 @@ const index = () => {
                   paymentMethod: "",
                   order_id: "",
                   ad_life: "",
-                 
                 }}
                 validationSchema={AdvatizeSchema}
                 onSubmit={async (values) => {
                   try {
                     const formData = new FormData();
 
-
                     Object.keys(values).forEach((key) => {
                       if (
-                        key !== 'business_cover' &&
+                        key !== "business_cover" &&
                         values[key] !== undefined &&
                         values[key] !== null
                       ) {
@@ -388,33 +540,30 @@ const index = () => {
                       } as any);
                     }
 
-                   
-                 
                     const response = await PostAdvatizement(formData).unwrap();
 
                     // ✅ SUCCESS TOAST
                     renderToastSuccess(
-                      response?.message || 'Advertisement submitted successfully'
+                      response?.message ||
+                        "Advertisement submitted successfully"
                     );
                     router.back();
                   } catch (error: any) {
-                    console.log('Submit error:', error);
-
+                    console.log("Submit error:", error);
 
                     if (error?.data?.errors) {
-                      const firstError = Object.values(error.data.errors)[0] as string[];
+                      const firstError = Object.values(
+                        error.data.errors
+                      )[0] as string[];
                       renderToastError(firstError[0]);
                       return;
                     }
 
-
                     renderToastError(
-                      error?.data?.message || 'Something went wrong. Try again.'
+                      error?.data?.message || "Something went wrong. Try again."
                     );
                   }
                 }}
-
-
               >
                 {({
                   handleChange,
@@ -437,7 +586,6 @@ const index = () => {
                           { flex: 1 },
                         ]}
                         onPress={() => {
-
                           setFieldValue("on_page", "newsfeed");
 
                           getprice({ type: pageTypeMap["newsfeed"] });
@@ -457,7 +605,8 @@ const index = () => {
                       <TouchableOpacity
                         style={[
                           styles.btn,
-                          values.on_page === "connections" && styles.btnselected,
+                          values.on_page === "connections" &&
+                            styles.btnselected,
                           { flex: 1 },
                         ]}
                         onPress={() => {
@@ -493,6 +642,7 @@ const index = () => {
                           setFieldValue("on_page", "listing");
                           getprice({ type: pageTypeMap["listing"] });
                           setpage("listing");
+                          
                         }}
                       >
                         <Text
@@ -510,12 +660,12 @@ const index = () => {
                         style={[
                           styles.btn,
                           values.on_page === "listing_details" &&
-                          styles.btnselected,
+                            styles.btnselected,
                           { flex: 1 },
                         ]}
                         onPress={() => {
                           setFieldValue("on_page", "listing_details");
-                          setpage("listing_details")
+                          setpage("listing_details");
                           getprice({ type: pageTypeMap["listing_details"] });
                         }}
                       >
@@ -550,29 +700,44 @@ const index = () => {
                               borderRadius: ms(5),
                             }}
                           />
-                          <Text style={{ fontSize: ms(15), fontWeight: "600", fontFamily: "PopinRegula", }}>
-                            Listing Pages
+                          <Text
+                            style={{
+                              fontSize: ms(15),
+                              fontWeight: "600",
+                              fontFamily: "PopinRegula",
+                            }}
+                          >
+                               { page==="listing"? "Listing Pages":"Detail Pages"}
                           </Text>
                           <View
                             className="flex-row justify-between"
                             style={{ marginTop: vs(10), gap: hs(5) }}
                           >
                             <TouchableOpacity
-                            style={[
-  styles.btn,
-  (values.on_page === "sale" || values.on_page === "sale_single") && styles.btnselected,
-  { flex: 1 },
-]}
+                              style={[
+                                styles.btn,
+                                (values.on_page === "sale" ||
+                                  values.on_page === "sale_single") &&
+                                  styles.btnselected,
+                                { flex: 1 },
+                              ]}
                               onPress={() => {
-                                {values.on_page==="listing_details"?setFieldValue("on_page", "sale"):setFieldValue("on_page", "sale_single")}
-                                
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "sale")
+                                    : setFieldValue("on_page", "sale_single");
+                                }
+
                                 getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "sale" ||values.on_page === "sale_single"  ? "white" : "black",
+                                    values.on_page === "sale" ||
+                                    values.on_page === "sale_single"
+                                      ? "white"
+                                      : "black",
                                   fontWeight: 600,
                                   fontFamily: "PopinRegula",
                                 }}
@@ -584,18 +749,27 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                               ( values.on_page === "rent"||values.on_page === "rent_single" ) && styles.btnselected,
+                                (values.on_page === "rent" ||
+                                  values.on_page === "rent_single") &&
+                                  styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                              {values.on_page==="listing_details"?setFieldValue("on_page", "rent"):setFieldValue("on_page", "rent_single")}
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "rent")
+                                    : setFieldValue("on_page", "rent_single");
+                                }
                                 getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "rent"||values.on_page === "rent_single" ? "white" : "black",
+                                    values.on_page === "rent" ||
+                                    values.on_page === "rent_single"
+                                      ? "white"
+                                      : "black",
                                   fontWeight: 600,
                                   fontFamily: "PopinRegula",
                                 }}
@@ -611,20 +785,28 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                               (values.on_page === "community"||  values.on_page === "community_single") &&
-                                styles.btnselected,
+                                (values.on_page === "community" ||
+                                  values.on_page === "community_single") &&
+                                  styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                            {values.on_page==="listing_details"?setFieldValue("on_page", "community"):setFieldValue("on_page", "community_single")}
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "community")
+                                    : setFieldValue(
+                                        "on_page",
+                                        "community_single"
+                                      );
+                                }
                                 getprice({ type: pageTypeMap[page] });
-
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "community"||  values.on_page === "community_single"
+                                    values.on_page === "community" ||
+                                    values.on_page === "community_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -637,18 +819,25 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                                  (values.on_page === "agent"||values.on_page === "agent_single") && styles.btnselected,
+                                (values.on_page === "agent" ||
+                                  values.on_page === "agent_single") &&
+                                  styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                               {values.on_page==="listing_details"?setFieldValue("on_page", "agent"):setFieldValue("on_page", "agent_single")}
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "agent")
+                                    : setFieldValue("on_page", "agent_single");
+                                }
                                 getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "agent"||values.on_page === "agent_single"
+                                    values.on_page === "agent" ||
+                                    values.on_page === "agent_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -666,19 +855,28 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                               ( values.on_page === "developer"||values.on_page === "developer_single") &&
-                                styles.btnselected,
+                                (values.on_page === "developer" ||
+                                  values.on_page === "developer_single") &&
+                                  styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                                {values.on_page==="listing_details"?setFieldValue("on_page", "developer"):setFieldValue("on_page", "developer_single")}
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "developer")
+                                    : setFieldValue(
+                                        "on_page",
+                                        "developer_single"
+                                      );
+                                }
                                 getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "developer"||values.on_page === "developer_single"
+                                    values.on_page === "developer" ||
+                                    values.on_page === "developer_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -691,19 +889,28 @@ const index = () => {
                             <TouchableOpacity
                               style={[
                                 styles.btn,
-                                (values.on_page === "mortgage"|| values.on_page === "mortgage_single") &&
-                                styles.btnselected,
+                                (values.on_page === "mortgage" ||
+                                  values.on_page === "mortgage_single") &&
+                                  styles.btnselected,
                                 { flex: 1 },
                               ]}
                               onPress={() => {
-                              {values.on_page==="listing_details"?setFieldValue("on_page", "mortgage"):setFieldValue("on_page", "mortgage_single")}
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "mortgage")
+                                    : setFieldValue(
+                                        "on_page",
+                                        "mortgage_single"
+                                      );
+                                }
                                 getprice({ type: pageTypeMap[page] });
                               }}
                             >
                               <Text
                                 style={{
                                   color:
-                                    values.on_page === "mortgage"|| values.on_page === "mortgage_single"
+                                    values.on_page === "mortgage" ||
+                                    values.on_page === "mortgage_single"
                                       ? "white"
                                       : "black",
                                   fontWeight: 600,
@@ -718,19 +925,28 @@ const index = () => {
                           <TouchableOpacity
                             style={[
                               styles.btn,
-                              (values.on_page === "maintenance"||values.on_page === "maintenance_single") &&
-                              styles.btnselected,
+                              (values.on_page === "maintenance" ||
+                                values.on_page === "maintenance_single") &&
+                                styles.btnselected,
                               { width: hs(200), marginTop: vs(10) },
                             ]}
                             onPress={() => {
-                             {values.on_page==="listing_details"?setFieldValue("on_page", "maintenance"):setFieldValue("on_page", "maintenance_single")}
+                              {
+                                page === "listing"
+                                  ? setFieldValue("on_page", "maintenance")
+                                  : setFieldValue(
+                                      "on_page",
+                                      "maintenance_single"
+                                    );
+                              }
                               getprice({ type: pageTypeMap[page] });
                             }}
                           >
                             <Text
                               style={{
                                 color:
-                                  values.on_page === "maintenance"||values.on_page === "maintenance_single"
+                                  values.on_page === "maintenance" ||
+                                  values.on_page === "maintenance_single"
                                     ? "white"
                                     : "black",
                                 fontWeight: 600,
@@ -740,7 +956,6 @@ const index = () => {
                               Home maintenance
                             </Text>
                           </TouchableOpacity>
-
                         </>
                       )}
                     {touched && errors && (
@@ -776,7 +991,6 @@ const index = () => {
                       errors={!!errors.ad_link}
                       required
                       errorText={errors.ad_link}
-
                     />
                     <View
                       style={{
@@ -803,28 +1017,124 @@ const index = () => {
                       value={values.business_cover}
                     />
                     {errors.business_cover && (
-                      <Text style={{ color: "red" }}>{errors.business_cover}</Text>
+                      <Text style={{ color: "red" }}>
+                        {errors.business_cover}
+                      </Text>
                     )}
                     <LargeButton
                       handleSubmit={() => {
                         setShowAdPreview(!showAdPreview);
+                        console.log(values.on_page)
                       }}
                       text={showAdPreview ? "Hide your Ad" : "View your Ad"}
                     />
-                    {showAdPreview && values.business_cover && (
-                      <View style={styles.adContainer}>
-                        <Image
-                          source={{
-                            uri:
-                              typeof values.business_cover === "string"
-                                ? values.business_cover
-                                : values.business_cover?.uri,
-                          }}
-                          style={styles.adImage}
-                          resizeMode="stretch"
-                        />
+                    <Modal
+                      visible={showAdPreview && !!values.business_cover}
+                      transparent={true}
+                      animationType="fade"
+                      onRequestClose={() => setShowAdPreview(false)}
+                    >
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          backgroundColor: "rgba(0,0,0,0.5)",
+                        }}
+                      >
+                        <ImageBackground
+                          source={pageImages[values.on_page.toString()]}
+                          style={styles.adContainer}
+                          resizeMode="cover"
+                          
+                        >
+                            <View
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0,0,0,0.4)",
+    }}
+  />
+                         {values.on_page==="newsfeed"?(
+                          <View style={{marginTop:vs(260)}}>
+                          <AdCardWithoutAnimation isSqure={true} ad={values} />
+                          </View>
+                         ):values.on_page==="connections"?(
+                          <View style={{marginTop:vs(418)}}>
+                          <AdCardWithoutAnimation isSqure={false} ad={values} />
+                          </View>
+                         ):values.on_page==="sale"||values.on_page==="rent"?(
+                            <View style={{marginTop:vs(440)}}>
+                          <AdCardWithoutAnimation isSqure={false} ad={values} />
+                          </View>
+                         ):values.on_page==="community"?(
+                          
+                           <View style={{marginTop:vs(380)}}>
+                          <AdCardWithoutAnimation isSqure={false} ad={values} />
+                          </View>
+                         )
+                        :values.on_page==="agent"||values.on_page==="developer"||values.on_page==="mortgage"||values.on_page==="maintenance"?(
+                          
+                           <View style={{marginTop:vs(385)}}>
+                          <AdCardWithoutAnimation isSqure={false} ad={values} />
+                          </View>
+                         ):(
+                           <View style={{marginTop:vs(50)}}>
+                             <Animated.View
+                            style={[
+                              styles.adCard,
+                              {
+                                transform: [
+                                  { scale: scaleAnim },
+                                  { rotateZ: rotate },
+                                ],
+                              },
+                            ]}
+                          ><TouchableOpacity
+                          style={{backgroundColor:"black"}}
+                           onPress={() => {
+                            if(values.ad_link){
+                            const finalUrl = values.ad_link.startsWith("https")
+                                ? values.ad_link
+                                : `https://${values.ad_link}`;
+                              WebBrowser.openBrowserAsync(finalUrl);
+                            }
+                          }}>
+                            <Image
+                              source={{
+                              uri: values.business_cover?.uri,
+                              }}
+                              style={styles.adImage}
+                              resizeMode="contain"
+                            />
+                            </TouchableOpacity>
+                          </Animated.View>
+                          </View>
+                         )}
+                           
+
+                          <TouchableOpacity
+                            onPress={() => setShowAdPreview(false)}
+                            style={{
+                              position: "absolute",
+                              top: 10,
+                              right: 10,
+                               backgroundColor: "rgba(0,0,0,0.3)", 
+                              padding:10,
+                              borderRadius:50,
+                            }}
+                          >
+                            <Text style={{ color: "#fff", fontSize: 18, }}>
+                              ✕
+                            </Text>
+                          </TouchableOpacity>
+                        </ImageBackground>
                       </View>
-                    )}
+                    </Modal>
+
                     <View
                       style={{
                         borderLeftWidth: 1,
@@ -848,12 +1158,27 @@ const index = () => {
                           backgroundColor: "white",
                           borderRadius: ms(10),
                           padding: hs(5),
-
                         }}
                       >
-
-                        <PromotionPricingCard promotionPrices={promotionPrices} setSelectedtimeprd={setTimeperiod} setprice={setSelectedAmount} setfieldvalue={setFieldValue} />
-                        {touched.start_date && touched.end_date && (errors.start_date || errors.end_date) && <Text style={{ color: Colors.light.red, marginTop: vs(5), fontFamily: "PopinRegula", }}>{errors.start_date || errors.end_date}</Text>}
+                        <PromotionPricingCard
+                          promotionPrices={promotionPrices}
+                          setSelectedtimeprd={setTimeperiod}
+                          setprice={setSelectedAmount}
+                          setfieldvalue={setFieldValue}
+                        />
+                        {touched.start_date &&
+                          touched.end_date &&
+                          (errors.start_date || errors.end_date) && (
+                            <Text
+                              style={{
+                                color: Colors.light.red,
+                                marginTop: vs(5),
+                                fontFamily: "PopinRegula",
+                              }}
+                            >
+                              {errors.start_date || errors.end_date}
+                            </Text>
+                          )}
 
                         <View
                           style={{
@@ -885,7 +1210,10 @@ const index = () => {
                             Your Homeilove account balance
                           </Text>
                           {AmountLoading || isFetching ? (
-                            <ActivityIndicator size="small" color={Colors.light.red} />
+                            <ActivityIndicator
+                              size="small"
+                              color={Colors.light.red}
+                            />
                           ) : (
                             <Text
                               style={{
@@ -906,8 +1234,9 @@ const index = () => {
                               fontFamily: "PopinRegula",
                             }}
                           >
-                            Have more ads to post then buy bundle and get extra discount.
-                            You’ can use credit any time means no expiry!
+                            Have more ads to post then buy bundle and get extra
+                            discount. You’ can use credit any time means no
+                            expiry!
                           </Text>
                           <LargeButton
                             text="Add Credits"
@@ -916,24 +1245,26 @@ const index = () => {
                         </View>
 
                         <View style={styles.card2}>
-                          <Text style={styles.title}>Pay and Ad post Atomaticlly</Text>
+                          <Text style={styles.title}>
+                            Pay and Ad post Atomaticlly
+                          </Text>
 
                           <TouchableOpacity
                             className="mb-4"
                             style={styles.paypalMainButton}
                             onPress={async () => {
-    if (!SelectedAmount) {
-      renderToastError("Please select bundle first");
-      return;
-    }
+                              if (!SelectedAmount) {
+                                renderToastError("Please select bundle first");
+                                return;
+                              }
 
-    if (Object.keys(errors).length > 0) {
-      renderToastError("Please fill all the fields");
-      return;
-    }
+                              if (Object.keys(errors).length > 0) {
+                                renderToastError("Please fill all the fields");
+                                return;
+                              }
 
-    setvisible(true);
-  }}
+                              setvisible(true);
+                            }}
                           >
                             <View style={styles.paypalContent}>
                               <Paypal />
@@ -946,13 +1277,14 @@ const index = () => {
                           <LargeButton
                             handleSubmit={() => {
                               if (!SelectedAmount) {
-                                renderToastError("Please select date from and to");
+                                renderToastError(
+                                  "Please select date from and to"
+                                );
                                 return;
                               }
                               if (amount?.amount >= Number(SelectedAmount)) {
                                 setFieldValue("paymentMethod", "Wallet");
                                 handleSubmit();
-
                               } else {
                                 renderToastError(
                                   "You don't have enough amount in wallet, please recharge"
@@ -968,8 +1300,8 @@ const index = () => {
                       amount={SelectedAmount}
                       onPress={(order_id, setApproveUrl) => {
                         try {
-                          setFieldValue("paymentMethod","paypal");
-                         setFieldValue("order_id",order_id);
+                          setFieldValue("paymentMethod", "paypal");
+                          setFieldValue("order_id", order_id);
                           handleSubmit();
                           setvisible(false);
                           setApproveUrl(null);
@@ -985,7 +1317,6 @@ const index = () => {
               </Formik>
             </View>
           </View>
-
         </ScrollView>
         <Loading isLoading={isLoading} text="Posting Ad..." />
       </>
@@ -994,286 +1325,451 @@ const index = () => {
   return (
     <ScrollView scrollEnabled>
       <View className="flex-1 bg-white">
-        <HeaderWithBack title="Advertisements" onBackpress={()=>router.back()}/>
-              {myad_fetching ?(<ActivityIndicator size="small" color={Colors.light.red} />):(
-                <>
-        {Myadvatizemants?.data?.length>0?(<View>
-              
-<View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: hs(16), marginTop: vs(10) }}>
-  
-  <Text style={{ flex: 1, fontSize: ms(14), color: "#333" }}>
-    Want to promote your ad?
-  </Text>
+        <HeaderWithBack
+          title="Advertisements"
+          onBackpress={() => router.back()}
+        />
+        {myad_fetching ? (
+          <ActivityIndicator size="small" color={Colors.light.red} />
+        ) : (
+          <>
+            {Myadvatizemants?.data?.length > 0 ? (
+              <View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: hs(16),
+                    marginTop: vs(10),
+                  }}
+                >
+                  <Text style={{ flex: 1, fontSize: ms(14), color: "#333" }}>
+                    Want to promote your ad?
+                  </Text>
 
-  <View style={{ width: hs(140) }}>
-    <LargeButton text="Advertise new" handleSubmit={() => setShowInfopage(true)} />
-  </View>
+                  <View style={{ width: hs(140) }}>
+                    <LargeButton
+                      text="Advertise new"
+                      handleSubmit={() => setShowInfopage(true)}
+                    />
+                  </View>
+                </View>
 
-</View>
+                <LegendList
+                  data={Myadvatizemants?.data}
+                  renderItem={({ item }) => (
+                    <View
+                      style={{
+                        backgroundColor: "#fff",
+                        borderRadius: ms(14),
+                        marginHorizontal: hs(16),
+                        marginVertical: vs(8),
+                        overflow: "hidden",
+                        borderWidth: 0.5,
+                        borderColor: "#E0E0E0",
+                      }}
+                    >
+                      <View style={{ position: "relative" }}>
+                        <Image
+                          source={{ uri: ImageFormater(item.ad_image) }}
+                          style={{
+                            height: vs(180),
+                            width: "100%",
+                            resizeMode: "cover",
+                            backgroundColor: "#C8C8C8",
+                          }}
+                        />
 
-          <LegendList
-          data={Myadvatizemants?.data}
+                        <View
+                          style={{
+                            position: "absolute",
+                            top: vs(10),
+                            left: hs(10),
+                            backgroundColor: Colors.light.LightGreen,
+                            borderRadius: ms(20),
+                            paddingHorizontal: hs(10),
+                            paddingVertical: vs(3),
+                            borderWidth: 0.5,
+                            borderColor: Colors.light.DarkGreen,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: "PopinRegula",
+                              fontSize: ms(11),
+                              color: "white",
+                            }}
+                          >
+                            on: {item.on_page}
+                          </Text>
+                        </View>
+                      </View>
 
-  renderItem={({ item }) => (
-  <View style={{
-    backgroundColor: "#fff",
-    borderRadius: ms(14),
-    marginHorizontal: hs(16),
-    marginVertical: vs(8),
-    overflow: "hidden",
-    borderWidth: 0.5,
-    borderColor: "#E0E0E0",
-  }}>
-  
-    <View style={{ position: "relative" }}>
-      <Image
-        source={{ uri: ImageFormater(item.ad_image) }}
-        style={{ height: vs(180), width: "100%", resizeMode: "cover", backgroundColor: "#C8C8C8" }}
-      />
+                      <View style={{ padding: ms(14) }}>
+                        {/* ID + Status */}
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: vs(12),
+                          }}
+                        >
+                          <View>
+                            <Text
+                              style={{
+                                fontFamily: "PopinRegula",
+                                fontSize: ms(11),
+                                color: "#888",
+                              }}
+                            >
+                              Ad ID
+                            </Text>
+                            <Text
+                              style={{
+                                fontFamily: "PopinRegula",
+                                fontSize: ms(15),
+                                fontWeight: "500",
+                                color: "#1A1A1A",
+                              }}
+                            >
+                              #{item.advertisement_id}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              backgroundColor:
+                                item.status === "Active"
+                                  ? Colors.light.LightGreen
+                                  : Colors.light.lightGray,
+                              borderRadius: ms(20),
+                              paddingHorizontal: hs(12),
+                              paddingVertical: vs(4),
+                              borderWidth: 0.5,
+                              borderColor:
+                                item.status === "Active"
+                                  ? Colors.light.DarkGreen
+                                  : Colors.light.red,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontFamily: "PopinRegula",
+                                fontSize: ms(11),
+                                fontWeight: "500",
+                                color:
+                                  item.status === "Active"
+                                    ? Colors.light.DarkGreen
+                                    : Colors.light.red,
+                              }}
+                            >
+                              {item.status}
+                            </Text>
+                          </View>
+                        </View>
 
-   
-      <View style={{
-        position: "absolute", top: vs(10), left: hs(10),
-        backgroundColor: Colors.light.LightGreen, borderRadius: ms(20),
-        paddingHorizontal: hs(10), paddingVertical: vs(3),
-        borderWidth: 0.5, borderColor: Colors.light.DarkGreen,
-      }}>
-        <Text style={{ fontFamily: "PopinRegula", fontSize: ms(11), color: "white" }}>
-          on: {item.on_page}
-        </Text>
+                        {/* Stats Grid */}
+                        <View
+                          style={{
+                            borderTopWidth: 0.5,
+                            borderTopColor: "#E0E0E0",
+                            paddingTop: vs(12),
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            gap: ms(10),
+                          }}
+                        >
+                          {[
+                            {
+                              label: "Amount",
+                              value: `$ ${item.amount_received}`,
+                            },
+                            { label: "Payment", value: item.payment_status },
+                            { label: "Ad life", value: `${item.ad_life} days` },
+                            {
+                              label: "Posted",
+                              value: item.date_posted?.slice(0, 10),
+                            },
+                            { label: "Expires on", value: item.expiry_date },
+                          ].map(({ label, value }) => (
+                            <View key={label} style={{ width: "47%" }}>
+                              <Text
+                                style={{
+                                  fontFamily: "PopinRegula",
+                                  fontSize: ms(11),
+                                  color: "#888",
+                                }}
+                              >
+                                {label}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontFamily: "PopinRegula",
+                                  fontSize: ms(13),
+                                  fontWeight: "500",
+                                  color: "#1A1A1A",
+                                }}
+                              >
+                                {value}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+
+                        {/* Ad Link */}
+                        {item.ad_link ? (
+                          <View
+                            style={{
+                              borderTopWidth: 0.5,
+                              borderTopColor: Colors.light.DarkGreen,
+                              paddingVertical: vs(10),
+                              paddingHorizontal: hs(10),
+                              backgroundColor: Colors.light.DarkGreen,
+                              borderBottomRightRadius: ms(10),
+                              borderBottomLeftRadius: ms(10),
+                              marginTop: vs(12),
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: hs(6),
+                            }}
+                          >
+                            <Feather name="link" size={ms(13)} color="white" />
+                            <Text
+                              style={{
+                                fontFamily: "PopinRegula",
+                                fontSize: ms(12),
+                                color: "white",
+                                flex: 1,
+                              }}
+                              numberOfLines={1}
+                            >
+                              {item.ad_link}
+                            </Text>
+                          </View>
+                        ) : null}
+
+                        {/* Bottom Action Buttons */}
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            gap: hs(8),
+                            marginTop: vs(14),
+                          }}
+                        >
+                          <TouchableOpacity
+                            onPress={() => {
+                              setEditAdData(item);
+                              setEditAd(true);
+                            }}
+                            style={{
+                              flex: 1,
+                              paddingVertical: vs(9),
+                              borderRadius: ms(8),
+                              borderWidth: 0.5,
+                              borderColor: "#E0E0E0",
+                              backgroundColor: Colors.light.red,
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: hs(6),
+                            }}
+                          >
+                            <Feather
+                              name="edit-2"
+                              size={ms(13)}
+                              color="white"
+                            />
+                            <Text
+                              style={{
+                                fontFamily: "PopinRegula",
+                                fontSize: ms(13),
+                                fontWeight: "500",
+                                color: "white",
+                              }}
+                            >
+                              Edit Ad
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  )}
+                  keyExtractor={(item) => item.advertisement_id.toString()}
+                />
+              </View>
+            ) : (
+              <>
+                <View
+                  className="items-center"
+                  style={{ marginHorizontal: hs(20), marginTop: vs(20) }}
+                >
+                  <AdvatiseBaner />
+                  <Text
+                    style={{
+                      fontWeight: 600,
+                      marginTop: vs(30),
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    You have no advertisement.
+                  </Text>
+                  <Text
+                    style={{ marginTop: vs(20), fontFamily: "PopinRegula" }}
+                  >
+                    Why not advertise your business or brand at our website and
+                    expand in no time and cost effectively
+                  </Text>
+                </View>
+                <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
+                  <LargeButton
+                    text="Advertise now"
+                    handleSubmit={() => {
+                      setShowInfopage(true);
+                    }}
+                  />
+                </View>
+              </>
+            )}
+          </>
+        )}
       </View>
-    </View>
-
-    <View style={{ padding: ms(14) }}>
-      {/* ID + Status */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: vs(12) }}>
-        <View>
-          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(11), color: "#888" }}>Ad ID</Text>
-          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(15), fontWeight: "500", color: "#1A1A1A" }}>
-            #{item.advertisement_id}
-          </Text>
-        </View>
-        <View style={{
-          backgroundColor: item.status === "Active" ? Colors.light.LightGreen :Colors.light.lightGray,
-          borderRadius: ms(20), paddingHorizontal: hs(12), paddingVertical: vs(4),
-          borderWidth: 0.5, borderColor: item.status === "Active" ? Colors.light.DarkGreen : Colors.light.red,
-        }}>
-          <Text style={{
-            fontFamily: "PopinRegula", fontSize: ms(11), fontWeight: "500",
-            color: item.status === "Active" ? Colors.light.DarkGreen : Colors.light.red,
-          }}>
-            {item.status}
-          </Text>
-        </View>
-      </View>
-
-      {/* Stats Grid */}
-      <View style={{ borderTopWidth: 0.5, borderTopColor: "#E0E0E0", paddingTop: vs(12), flexDirection: "row", flexWrap: "wrap", gap: ms(10) }}>
-        {[
-          { label: "Amount", value: `$ ${item.amount_received}` },
-          { label: "Payment", value: item.payment_status },
-          { label: "Ad life", value: `${item.ad_life} days` },
-          { label: "Posted", value: item.date_posted?.slice(0, 10) },
-            { label: "Expires on", value: item.expiry_date },
-        ].map(({ label, value }) => (
-          <View key={label} style={{ width: "47%" }}>
-            <Text style={{ fontFamily: "PopinRegula", fontSize: ms(11), color: "#888" }}>{label}</Text>
-            <Text style={{ fontFamily: "PopinRegula", fontSize: ms(13), fontWeight: "500", color: "#1A1A1A" }}>{value}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Ad Link */}
-      {item.ad_link ? (
-        <View style={{ borderTopWidth: 0.5, borderTopColor: Colors.light.DarkGreen, paddingVertical: vs(10),paddingHorizontal:hs(10),backgroundColor:Colors.light.DarkGreen,borderBottomRightRadius:ms(10),borderBottomLeftRadius:ms(10), marginTop: vs(12), flexDirection: "row", alignItems: "center", gap: hs(6) }}>
-          <Feather name="link" size={ms(13)} color="white" />
-          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(12), color: "white", flex: 1 }} numberOfLines={1}>
-            {item.ad_link}
-          </Text>
-        </View>
-      ) : null}
-
-      {/* Bottom Action Buttons */}
-      <View style={{ flexDirection: "row", gap: hs(8), marginTop: vs(14) }}>
-        <TouchableOpacity
-          onPress={() => { setEditAdData(item) ;setEditAd(true)}}
+      <Modal
+        visible={EditAd}
+        onRequestClose={() => setEditAd(false)}
+        animationType="slide"
+      >
+        <ScrollView
           style={{
-            flex: 1, paddingVertical: vs(9), borderRadius: ms(8),
-            borderWidth: 0.5, borderColor: "#E0E0E0",
-            backgroundColor: Colors.light.red,
-            flexDirection: "row", alignItems: "center", justifyContent: "center", gap: hs(6),
+            flex: 1,
+            backgroundColor: "white",
+            paddingHorizontal: hs(20),
           }}
         >
-          <Feather name="edit-2" size={ms(13)} color="white" />
-          <Text style={{ fontFamily: "PopinRegula", fontSize: ms(13), fontWeight: "500", color: "white" }}>
-            Edit Ad
-          </Text>
-        </TouchableOpacity>
-
-     
-      </View>
-    </View>
-  </View>
-)}
-              keyExtractor={item => item.advertisement_id.toString()}
-
+          <HeaderWithBack
+            title="Edit Ad"
+            onBackpress={() => setEditAd(false)}
           />
-            
-       
- 
-        </View>):(
-          <>
-        <View
-          className="items-center"
-          style={{ marginHorizontal: hs(20), marginTop: vs(20) }}
-        >
-          
-          <AdvatiseBaner />
-          <Text style={{ fontWeight: 600, marginTop: vs(30), fontFamily: "PopinRegula", }}>
-            You have no advertisement.
-          </Text>
-          <Text style={{ marginTop: vs(20), fontFamily: "PopinRegula", }}>
-            Why not advertise your business or brand at our website and expand
-            in no time and cost effectively
-          </Text>
-        </View>
-        <View style={{ marginHorizontal: hs(20), marginTop: vs(20) }}>
-          <LargeButton
-            text="Advertise now"
-            handleSubmit={() => {
-              setShowInfopage(true);
+          <Formik
+            initialValues={{
+              ad_link: EditAdData?.ad_link,
+              business_cover: EditAdData?.ad_image,
+              advertisement_id: EditAdData?.advertisement_id,
+              user_id: user.id,
             }}
-          />
-        </View>
-        </>)}</> )}
-      </View>
-      <Modal visible={EditAd} onRequestClose={()=>setEditAd(false)} animationType="slide">
-        <ScrollView style={{flex:1,backgroundColor:"white",paddingHorizontal:hs(20)}}>
-          <HeaderWithBack title="Edit Ad" onBackpress={()=>setEditAd(false)}/>
-               <Formik
-                initialValues={{
-                  ad_link: EditAdData?.ad_link,
-                  business_cover: EditAdData?.ad_image,
-                  advertisement_id:EditAdData?.advertisement_id,
-                  user_id: user.id,
-                }}
-                validationSchema={EditAdvatizeSchema}
+            validationSchema={EditAdvatizeSchema}
             onSubmit={async (values) => {
-  try {
-    const formData = new FormData();
+              try {
+                const formData = new FormData();
 
-    
+                formData.append(
+                  "advertisement_id",
+                  String(values.advertisement_id)
+                );
+                formData.append("ad_link", values.ad_link);
 
-    formData.append("advertisement_id", String(values.advertisement_id));
-    formData.append("ad_link", values.ad_link);
+                if (
+                  values.business_cover &&
+                  typeof values.business_cover === "object" &&
+                  values.business_cover.uri
+                ) {
+                  formData.append("business_cover", {
+                    uri: values.business_cover.uri,
+                    name: values.business_cover.name ?? "advertisement.jpg",
+                    type: values.business_cover.type ?? "image/jpeg",
+                  });
+                }
 
-   
-    if (
-      values.business_cover &&
-      typeof values.business_cover === "object" &&
-      values.business_cover.uri
-    ) {
-      formData.append("business_cover", {
-        uri: values.business_cover.uri,
-        name: values.business_cover.name ?? "advertisement.jpg",
-        type: values.business_cover.type ?? "image/jpeg",
-      });
-    }
+                const response = await updateAdvertisementMedia(
+                  formData
+                ).unwrap();
 
-    const response = await updateAdvertisementMedia(formData).unwrap();
+                renderToastSuccess(response?.message);
+                router.back();
+              } catch (error) {
+                console.log("ERROR FULL:", error?.data || error);
 
-    renderToastSuccess(response?.message);
-    router.back();
+                if (error?.data?.errors) {
+                  const firstError = Object.values(error.data.errors)[0];
+                  renderToastError(firstError[0]);
+                  return;
+                }
 
-  } catch (error) {
-    console.log("ERROR FULL:", error?.data || error);
-
-    if (error?.data?.errors) {
-      const firstError = Object.values(error.data.errors)[0];
-      renderToastError(firstError[0]);
-      return;
-    }
-
-    renderToastError("Something went wrong");
-  }
-}}
-
-
-              >
-                {({
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  setFieldValue,
-                  values,
-                  errors,
-                  touched,
-                }) => (
-                  <>
-                   
-                  
-
-                  
-                
-                  
-                    <FormikInput
-                      title="Link of ad"
-                      placeholder="www.abc.com"
-                      onChangeText={handleChange("ad_link")}
-                      onBlur={handleBlur("ad_link")}
-                      value={values.ad_link}
-                      touched={!!touched.ad_link}
-                      errors={!!errors.ad_link}
-                      required
-                      errorText={errors.ad_link}
-
-                    />
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderBottomWidth: 1,
-                        borderRightWidth: 1,
-                        marginVertical: vs(20),
-                        borderColor: Colors.light.textGray,
-                        borderRadius: ms(5),
-                        opacity: 0.15,
-                      }}
-                    />
-                    <UploadPic
-                      Logo={Profilelogo}
-                      text1="Upload "
-                      text2="Ad"
-                      additionalText={
-                        "Recomended size 1based on selection\n above plz discuss"
-                      }
-                      border
-                      limt={1}
-                      name="business_cover"
-                      setValue={setFieldValue}
-                      value={values.business_cover}
-                    />
-                    {errors.business_cover && (
-                      <Text style={{ color: "red" }}>{errors.business_cover}</Text>
-                    )}
-                  
-                 
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderBottomWidth: 1,
-                        borderRightWidth: 1,
-                        marginVertical: vs(20),
-                        opacity: 0.15,
-                        borderColor: Colors.light.textGray,
-                        borderRadius: ms(5),
-                      }}
-                    />
-                   
-               <LargeButton handleSubmit={()=>{handleSubmit(); console.log(values, "values")  }} text="Update Ad"/>
-                <Loading isLoading={updateadloading} text="Updating Ad..." />
-                  </>
+                renderToastError("Something went wrong");
+              }
+            }}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              touched,
+            }) => (
+              <>
+                <FormikInput
+                  title="Link of ad"
+                  placeholder="www.abc.com"
+                  onChangeText={handleChange("ad_link")}
+                  onBlur={handleBlur("ad_link")}
+                  value={values.ad_link}
+                  touched={!!touched.ad_link}
+                  errors={!!errors.ad_link}
+                  required
+                  errorText={errors.ad_link}
+                />
+                <View
+                  style={{
+                    borderLeftWidth: 1,
+                    borderBottomWidth: 1,
+                    borderRightWidth: 1,
+                    marginVertical: vs(20),
+                    borderColor: Colors.light.textGray,
+                    borderRadius: ms(5),
+                    opacity: 0.15,
+                  }}
+                />
+                <UploadPic
+                  Logo={Profilelogo}
+                  text1="Upload "
+                  text2="Ad"
+                  additionalText={
+                    "Recomended size 1based on selection\n above plz discuss"
+                  }
+                  border
+                  limt={1}
+                  name="business_cover"
+                  setValue={setFieldValue}
+                  value={values.business_cover}
+                />
+                {errors.business_cover && (
+                  <Text style={{ color: "red" }}>{errors.business_cover}</Text>
                 )}
-              </Formik>
+
+                <View
+                  style={{
+                    borderLeftWidth: 1,
+                    borderBottomWidth: 1,
+                    borderRightWidth: 1,
+                    marginVertical: vs(20),
+                    opacity: 0.15,
+                    borderColor: Colors.light.textGray,
+                    borderRadius: ms(5),
+                  }}
+                />
+
+                <LargeButton
+                  handleSubmit={() => {
+                    handleSubmit();
+                    console.log(values, "values");
+                  }}
+                  text="Update Ad"
+                />
+                <Loading isLoading={updateadloading} text="Updating Ad..." />
+              </>
+            )}
+          </Formik>
         </ScrollView>
       </Modal>
     </ScrollView>
@@ -1283,15 +1779,21 @@ const index = () => {
 export default index;
 
 const styles = StyleSheet.create({
-    card: {
-      marginHorizontal: hs(10),
-      marginVertical: vs(10),
-      paddingHorizontal: hs(10),
-      paddingVertical: vs(10),
-      borderRadius: ms(20),
-      elevation: 5,
-    },
-    stickyButton: {
+  card: {
+    marginHorizontal: hs(10),
+    marginVertical: vs(10),
+    padding: ms(12),
+
+    backgroundColor: "#FFFFFF",
+    borderRadius: ms(16),
+
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  stickyButton: {
     backgroundColor: "#fff",
     padding: 10,
     zIndex: 10,
@@ -1314,15 +1816,16 @@ const styles = StyleSheet.create({
   },
   adContainer: {
     width: "100%",
-    height: 180,
+    height: "100%",
     marginTop: 15,
     borderRadius: 12,
     overflow: "hidden",
     backgroundColor: "#eee",
+    
   },
   adImage: {
     width: "100%",
-    height: "100%",
+    height: vs(180),
   },
   title: {
     fontSize: 18,
@@ -1336,6 +1839,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+      adCard: {
+      width: "100%",
+      height: vs(100),
+      marginVertical: vs(10),
+      borderRadius: ms(16),
+      overflow: "hidden",
+      backgroundColor: "transparent",
+      elevation: 0,
+    },
+  
   paypalText: {
     marginLeft: hs(10),
     fontSize: ms(14),
@@ -1348,7 +1861,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: ms(8),
     elevation: 5,
-
 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,

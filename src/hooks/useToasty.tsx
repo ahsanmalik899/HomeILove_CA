@@ -1,10 +1,13 @@
 import * as Burnt from 'burnt';
+import { Platform, ToastAndroid } from 'react-native';
 import ToastNew from 'react-native-toast-message';
-
 export const renderToastSuccess = (title: string) => {
-  // make first letter uppercase
+  if (Platform.OS === 'android') {
+    ToastAndroid.show(title, ToastAndroid.SHORT);
+    return;
+  }
 
-  return ToastNew.show({
+  ToastNew.show({
     type: 'success',
     position: 'bottom',
     swipeable: true,
@@ -14,6 +17,10 @@ export const renderToastSuccess = (title: string) => {
 };
 
 export const renderToastError = (title: string) => {
+    if (Platform.OS === 'android') {
+    ToastAndroid.show(title, ToastAndroid.SHORT);
+    return;
+  }
   return ToastNew.show({
     type: 'error',
     position: 'bottom',

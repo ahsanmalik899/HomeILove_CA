@@ -26,7 +26,9 @@ export const MainApi = createApi({
     "myProfile",
     "advertisementMedia",
     "getPostById",
-    "Advatizemets"
+    "Advatizemets",
+    "savedAds",
+    "checkReview",
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -514,6 +516,13 @@ export const MainApi = createApi({
         method: "GET",
       }),
     }),
+    checkReviewApi: builder.query<any, any>({
+      query: ({ sender_id,receiver_profile_id,profile_type }) => ({
+        url: `checkReviewApi?sender_id=${sender_id}&receiver_profile_id=${receiver_profile_id}&profile_type=${profile_type}`,
+        method: "GET",
+      }),
+      providesTags:["checkReview"]
+    }),
     sendRequest: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
         url: "sendRequestApi",
@@ -619,6 +628,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags:["savedAds"]
     }),
     unsaveItemApi: builder.mutation<any, any>({
       query: (data) => ({
@@ -626,6 +636,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags:["savedAds"]
     }),
     likePost: builder.mutation<any, any>({
       query: (data) => ({
@@ -797,6 +808,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags:["checkReview"]
     }),
     updateReviewApi: builder.mutation({
       query: ({ body }) => ({
@@ -977,7 +989,7 @@ getSavedAdsApi:builder.query<any,any>({
     method: "GET",
     params: {user_id,page,limit},
   }),
-
+providesTags:["savedAds"],
 }),
   }),
 });
@@ -1102,4 +1114,5 @@ export const {
   useGetUserAlertsEditQuery,
   useDeleteAlertApiMutation,
   useAlertCountApiQuery,
+  useCheckReviewApiQuery,
 } = MainApi;

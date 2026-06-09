@@ -77,7 +77,7 @@ const Connected = () => {
             }
           }} status="accepted" />
         </View>
-      </View>):(<AdCardWithoutAnimation isSqure={true} ad={item.data}/>)}
+      </View>):(<AdCardWithoutAnimation isSqure={false} ad={item.data}/>)}
       </>
     );
   };
@@ -88,7 +88,11 @@ const Connected = () => {
         data={list}
         renderItem={renderItem}
         estimatedItemSize={140}
-        keyExtractor={(item) => item?.data.connection_id.toString()||item?.data?.advance_id?.toString()}
+       keyExtractor={(item, index) =>
+  item?.type === "post"
+    ? `post-${item?.data?.connection_id}`
+    : `ad-${item?.data?.advertisement_id}`
+}
         showsVerticalScrollIndicator={false}
       />
       <Loading isLoading={isLoading} text="Loading..." />

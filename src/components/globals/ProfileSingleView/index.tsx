@@ -1,5 +1,5 @@
 
-import { useAcceptRequestApiMutation, useAskvaluationapiMutation, useCancelRequestApiMutation, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useLazyGetRandomAdQuery, useSaveItemApiMutation, useSendRequestMutation, useShare_profileApiMutation, useUnfollowApiMutation, useUnsaveItemApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
+import { useAcceptRequestApiMutation, useAskvaluationapiMutation, useCancelRequestApiMutation, useCheckReviewApiQuery, useGetotherPastWorkQuery, useGetProfilesForConectionQuery, useGetSingleProfileQuery, useLazyGetRandomAdQuery, useSaveItemApiMutation, useSendRequestMutation, useShare_profileApiMutation, useUnfollowApiMutation, useUnsaveItemApiMutation, useUserAgentPastPostsApiQuery, useWriteReviewApiMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import Call from "@assets/Buy/call.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
@@ -38,10 +38,14 @@ import StarRating from '../StarRating';
 import VideoSection from '../ViedioSection';
 const ProfileSingleView = ({ type, id, setshowModel,setData }: { type: string, id: string,  setData?: React.Dispatch<React.SetStateAction<any[]>>,setshowModel: (val: boolean) => void }) => {
   const user = useAppSelector(userdata);
+   const {data:reviewData,isfetching}=useCheckReviewApiQuery({receiver_profile_id:id,sender_id:user?.id,profile_type:type})
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
   const [review, setReview] = useState("");
   const [postrating, setpostRating] = useState(0);
+  useEffect(()=>{
+setpostRating(Number(reviewData?.data?.rating)||0)
+  },[reviewData])
   const [isSaved,setIsSaved]=useState(false);
   const [expanded, setExpanded] = useState(false);
     const [statuse, setStatus] = useState("");
@@ -52,6 +56,7 @@ const ProfileSingleView = ({ type, id, setshowModel,setData }: { type: string, i
     const [acceptRequestApi, { isLoading: accepting }] = useAcceptRequestApiMutation();
   const [showShare, setShowShare] = useState(false);
   const [askEvaluation, { isLoading: askEvaluationLoading }] = useAskvaluationapiMutation();
+ 
   const ReviewSchema = Yup.object().shape({
     review: Yup.string()
       .required("Review is required")
@@ -108,7 +113,7 @@ const ProfileSingleView = ({ type, id, setshowModel,setData }: { type: string, i
       setIsSaved(data?.is_saved);
     }
   }, [data?.is_saved]);
-  const [writeReview] = useWriteReviewApiMutation();
+  const [writeReview,{isLoading:sendingReview}] = useWriteReviewApiMutation();
   const latitude = Number(profile?.user_lat);
   const [showSaved, setShowSaved] = useState(false);
   const longitude = Number(profile?.user_lng);
@@ -309,6 +314,7 @@ const requestSend = async ({
       // API returned success
       if (res.success) {
         renderToastSuccess(res.message);
+        setReviewModal(false)
       } else {
         // This shouldn't happen with unwrap(), but just in case
         renderToastError(res.message || "Review submission failed");
@@ -950,13 +956,17 @@ const requestSend = async ({
         <ScrollView>
           <Formik
             initialValues={{
-              review: "",
-              imp_facts: "",
-              sender_profile_type: "",
+              review: reviewData?.data?.review||"",
+              imp_facts:reviewData?.data?.imp_facts|| "",
+              sender_profile_type: reviewData?.data?.sender_profile_type||"",
               sender_profile_id: "",
             }}
             validationSchema={ReviewSchema}
-            onSubmit={(values) => submitReview(values)}
+           onSubmit={async (values) => { submitReview(values);
+
+ 
+
+}}
           >
             {({
               handleChange,
@@ -1072,14 +1082,14 @@ const requestSend = async ({
                       }}
                       style={styles.cancelBtn}
                     >
-                      <Text>Cancel</Text>
+                      <Text style={{fontWeight:"700"}}>Cancel</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={handleSubmit}
                       style={styles.submitBtn}
                     >
-                      <Text style={{ color: "white" }}>Submit</Text>
+                      <Text style={{ color: "white",fontWeight:"700" }}>Submit</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -1087,6 +1097,7 @@ const requestSend = async ({
             )}
           </Formik>
         </ScrollView>
+          <Loading isLoading={sendingReview} text='Loading...'/>
       </Modal>
       <Modal visible={showShare} animationType="slide" transparent>
         <View style={{
@@ -1355,6 +1366,7 @@ const requestSend = async ({
                       </View>
                     </TouchableOpacity>
                   </Modal>
+                
     </>
   );
 };

@@ -23,7 +23,7 @@ import {
 } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import {
@@ -876,6 +876,7 @@ formData.append("inv_loan_amount", step1Data.inv_loan_amount || "");
                     const result = await postInqiery(formData).unwrap();
 
                     renderToastSuccess("Inquiry sent successfully!");
+                    router.back()
                   } catch (err) {
                     console.log("Error:", err);
                     renderToastError("Failed to send inquiry");

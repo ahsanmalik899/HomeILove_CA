@@ -33,7 +33,13 @@ export const AdCardWithoutAnimation = ({ ad ,isSqure=false}: { ad: any,isSqure?:
     >
       <TouchableOpacity activeOpacity={0.9} onPress={openLink}>
         <Image
-          source={{ uri: ImageFormater(ad?.ad_image) }}
+      source={{
+    uri:
+      ad?.business_cover?.uri ||
+      (typeof ad?.ad_image === "string"
+        ? ImageFormater(ad.ad_image)
+        : ad?.ad_image?.uri),
+  }}
           style={{
             height: isSqure? vs(200) : vs(80),
             width: "100%",

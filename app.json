@@ -1,7 +1,7 @@
 {
   "expo": {
     "scheme": "homeilove",
-    "name": "Home-I-Love",
+    "name": "Home I Love",
     "slug": "home-i-love",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -37,9 +37,7 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
-      "permissions": [
-        "QUERY_ALL_PACKAGES"
-      ],
+    
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app-icon 1024x1024.png",
         "backgroundColor": "#ffffff"

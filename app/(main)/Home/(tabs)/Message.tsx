@@ -62,6 +62,7 @@ console.log("chatList",chatList);
       params: {
         userId: item.chat_user_id,
         name: item.chat_user_name,
+        logo:item.profile_image,
       },
     });
   };
