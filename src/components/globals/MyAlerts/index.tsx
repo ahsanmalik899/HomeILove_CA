@@ -6,6 +6,7 @@ import { LegendList } from '@legendapp/list';
 import Colors from '@src/constants/Colors';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
+import { vs } from '@utils/design/design';
 import { router } from 'expo-router';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HeaderWithBack from '../HeaderWithBack';
@@ -50,9 +51,9 @@ const MyAlerts = ({ setVisible }: { setVisible: (value: boolean) => void }) => {
       </Text>
 
 
-      {item.beds && (
+      {item.alert_for!=="community" && (
         <Text style={styles.info}>
-          Beds: {item.beds}+
+          Beds: {item.beds}
         </Text>
       )}
 
@@ -115,6 +116,70 @@ const MyAlerts = ({ setVisible }: { setVisible: (value: boolean) => void }) => {
           <Delete width={20} height={20} />
         </TouchableOpacity>
       </View>
+  <TouchableOpacity
+  style={{
+    backgroundColor: Colors.light.DarkGreen,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3, // Android shadow
+    shadowColor: "#000", // iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    marginTop:vs(10),
+  }}
+  activeOpacity={0.8}
+  onPress={()=>{
+  
+item.alert_for==="community"?
+  router.push({pathname:"/CommunitesLising",
+    params:{
+     
+min_price:item?.min_price,
+max_price:item?.max_price,
+beds:item?.beds,
+address:item.address,
+lat:item.latitude,
+lng:item.longitude,
+stateCode:item.state,
+city:item.city,
+zip:item.zip,
+radius:item.radius,
+community_type:item?.community_type, 
+    }
+  }):
+    router.push({pathname:"/BuyListing",
+      params:{
+property_for:item?.alert_for,
+propertyType:item?.property_type,
+propertysubType:item?.property_subtype,
+min_price:item?.min_price,
+max_price:item?.max_price,
+beds:item?.beds,
+address:item.address,
+lat:item.latitude,
+lng:item.longitude,
+stateCode:item.state,
+city:item.city,
+zip:item.zip,
+radius:item.radius,
+      }
+    })
+  }}
+>
+  <Text
+    style={{
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "600",
+    }}
+  >
+    View Result
+  </Text>
+</TouchableOpacity>
     </View>
   );
     }

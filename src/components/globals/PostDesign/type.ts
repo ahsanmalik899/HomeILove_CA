@@ -7,4 +7,5 @@ export type postDataType= {
       setData:(data:[])=>void;
       isPostSingle?:boolean;
       post_id:string;
+      
 }

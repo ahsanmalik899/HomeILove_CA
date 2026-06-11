@@ -51,18 +51,20 @@ const [showSaved, setShowSaved] = useState(false);
     purposeful_type: [],
     radius: params.radius || "",
     property_for: params.property_for || "sale",
-    propertyType: params.propertyType || "House",
+    propertyType: params.propertyType || "",
     price_type: params.saleprice_type || "",
     max_rent_range: params.max_rent_range,
     pet_allowers: params.pet_allowers,
     available_on: params.aivilable_on,
     minBed: "",
     maxBed: "",
-    minPrice: "",
-    maxPrice: "",
+    minPrice: params.min_price||"",
+    maxPrice: params.max_price||"",
     bathrooms: "",
     sort: sort,
-      user_id:user?.id
+      user_id:user?.id,
+      min_beds:params.beds||"",
+      max_beds:params.beds||""
   });
 
   const [apiFilters, setApiFilters] = useState({
@@ -79,6 +81,8 @@ const [showSaved, setShowSaved] = useState(false);
     available_on: params.aivilable_on||undefined,
     pet_allowers: params.pet_allowers,
     max_rent_range: params.max_rent_range,
+       minPrice: params.min_price||undefined,
+    maxPrice: params.max_price||undefined,
     condition: params.condition || undefined,
     purposeful_property: params.purposeful_property || undefined,
     price_type: params.saleprice_type || undefined,
@@ -86,6 +90,8 @@ const [showSaved, setShowSaved] = useState(false);
     property_type: params.propertyType,
     property_sub_type:
       params.propertysubType !== "All" ? params.propertysubType : undefined,
+         min_beds:params.beds||undefined,
+      max_beds:params.beds||undefined,
   });
 
   const {
@@ -258,6 +264,7 @@ useFocusEffect(
         data={properties}
         isfetching={isFetching}
         setPage={setpage}
+        refetch={refetch}
         type="sale"
         hasmore={hasMore}
         initialLoadDone={initialLoadDone}

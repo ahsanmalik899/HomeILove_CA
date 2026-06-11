@@ -3,7 +3,6 @@ import {
   useAskvaluationapiMutation,
   useCancelRequestApiMutation,
   useDeleteCommentApiMutation,
-  useGetHomeFeedsQuery,
   useGetProfilesForConectionQuery,
   useHidePostMutation,
   useLazyGetotherPastWorkQuery,
@@ -74,6 +73,7 @@ const PostDesign = ({
   post_id,
   isPostSingle,
   setData,
+  refetch,
 }: postDataType) => {
 
   const user = useAppSelector(userdata);
@@ -163,18 +163,7 @@ const PostDesign = ({
     const [postReply] = usePostReplyApiMutation();
     const [deleteComment] = useDeleteCommentApiMutation();
 
-    const {
-      data,
-      isFetching,
-      refetch: refechfeeds,
-      isError,
-      error,
-    } = useGetHomeFeedsQuery({
-      id: user.id,
-      type: "All",
-      page: 1,
-      limit: 10,
-    });
+
 
     const handleReply = async () => {
       if (!replyText.trim()) return;
@@ -211,7 +200,7 @@ const PostDesign = ({
                       .unwrap()
                       .then(() => {
                         getComments({ post_id: showpostPostData?.post_id });
-                        refechfeeds();
+                       
                       })
                   }
                 >
@@ -1246,6 +1235,7 @@ const PostDesign = ({
             refreshing={isfetching}
             onRefresh={() => {
               setPage(1);
+              refetch();
             }}
           />
         }

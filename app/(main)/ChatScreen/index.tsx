@@ -193,9 +193,12 @@ const renderItem = useCallback(({ item }: any) => {
         Size={40}
       />
 
-      <Text style={styles.headerTitle} numberOfLines={1}>
-        {name}
-      </Text>
+    <Text style={styles.headerTitle} numberOfLines={1}>
+  Chat with{" "}
+  <Text style={{color:Colors.light.red}}>
+  {name?.length > 15 ? `${name.slice(0, 15)}...` : name}
+  </Text>
+</Text>
     </View>
 </View>
       {initialLoading ? (

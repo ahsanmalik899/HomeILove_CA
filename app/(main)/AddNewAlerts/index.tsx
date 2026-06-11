@@ -309,7 +309,7 @@ const index = () => {
                 <View className="flex-row justify-between items-start gap-3">
                   <View className="flex-1">
                     <FormikDropdownwithjson
-                      title="Minimun rent"
+                      title={values.alert_for==="rent"?"Minimun rent":"Minimum price"}
                       placeholder="No Selection"
                       value={values.min_price}
                       touched={!!touched.min_price}
@@ -348,7 +348,7 @@ const index = () => {
 
                   <View className="flex-1">
                     <FormikDropdownwithjson
-                      title="Maximun rent"
+                      title={values.alert_for==="rent"?"Maximun rent":"Maximun price"}
                       placeholder="No Selction"
                       value={values.max_price}
                       touched={!!touched.max_price}
@@ -383,7 +383,7 @@ const index = () => {
                     />
                   </View>
                 </View>
-
+{values.alert_for!=="community"&&(
                 <FormikDropdown
                   onSelect={() => {}}
                   options={[
@@ -410,14 +410,14 @@ const index = () => {
                   errors={!!errors.beds}
                   required={false}
                   errorText={errors.beds}
-                />
+                />)}
                 <View className="my-4 flex-bottom">
                   <LargeButton
                     handleSubmit={() => {
                       handleSubmit();
                       console.log(errors);
                     }}
-                    text="View your Ad"
+                    text="Create alert"
                   />
                 </View>
               </>

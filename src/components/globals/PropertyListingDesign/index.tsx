@@ -42,6 +42,7 @@ const YourAdsPostDesign = ({
   setposts,
   type,
   hasmore,
+  refetch,
   initialLoadDone,
   isSingleView,
   post_id,
@@ -468,7 +469,10 @@ const YourAdsPostDesign = ({
           refreshControl={
             <RefreshControl
               refreshing={isfetching}
-              onRefresh={() => setPage(1)}
+              onRefresh={() => {setPage(1)
+              refetch()
+              }}
+
             />
           }
         />

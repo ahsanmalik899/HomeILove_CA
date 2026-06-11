@@ -40,6 +40,7 @@ const YourAdsPostDesign = ({
   initialLoadDone,
   isSingleView,
   post_id,
+  refetch,
   post_type,
 }: postDataType) => {
   const [showImages, setShowImages] = useState(false);
@@ -413,7 +414,9 @@ const YourAdsPostDesign = ({
             refreshControl={
               <RefreshControl
                 refreshing={isfetching}
-                onRefresh={() => setPage(1)}
+                onRefresh={() =>{ setPage(1)
+                  refetch()
+                }}
               />
             }
           />

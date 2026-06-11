@@ -916,7 +916,9 @@ const requestSend = async ({
               style={styles.reviewBtn}
               onPress={() => setReviewModal(true)}
             >
-              <Text style={styles.reviewBtnText}>Write a Review</Text>
+              <Text style={styles.reviewBtnText}>
+  {reviewData?.review_exists ? "Amend Review" : "Write a Review"}
+</Text>
             </TouchableOpacity>
 
           

@@ -150,12 +150,25 @@ const YourAdsPostDesign = ({
           }}
         >
           <View className="bg-white" style={styles.card}>
-            <View className="flex-row justify-between items-center">
-              {type === "community" ? (
+             <View
+                          className="flex-row justify-between items-center"
+                          style={{
+                            backgroundColor:
+                              item?.post_type === "Trending"
+                                ? Colors.light.LightGreen
+                                : Colors.light.lightGray,
+                            paddingHorizontal: hs(10),
+                            paddingVertical: vs(10),
+                            borderRadius: ms(10),
+                            marginBottom: vs(10),
+                          }}
+                        >
+                           {type === "community" ? (
                 <Text
                   style={{
                     color: Colors.light.DarkGreen,
-                    fontWeight: 600,
+                      fontWeight: 700,
+                  fontSize: ms(20),
                     fontFamily: "PopinRegula",
                   }}
                 >
@@ -165,7 +178,8 @@ const YourAdsPostDesign = ({
                 <Text
                   style={{
                     color: Colors.light.DarkGreen,
-                    fontWeight: 600,
+                       fontWeight: 700,
+                  fontSize: ms(20),
                     fontFamily: "PopinRegula",
                   }}
                 >
@@ -175,6 +189,8 @@ const YourAdsPostDesign = ({
                       style={{
                         color: Colors.light.red,
                         fontFamily: "PopinRegula",
+                            fontWeight: 700,
+                                          fontSize: ms(20),
                       }}
                     >
                       /{item.rent_type}
@@ -182,6 +198,21 @@ const YourAdsPostDesign = ({
                   )}
                 </Text>
               )}
+                          {item?.post_type === "Trending" && (
+                            <Text
+                              style={{
+                                    fontWeight: 700,
+                  fontSize: ms(20),
+                                color: Colors.light.DarkGreen,
+                                fontFamily: "PopinRegular",
+                              }}
+                            >
+                              Trending
+                            </Text>
+                          )}
+                        </View>
+            <View className="flex-row justify-between items-center">
+       
               <View
                 className="items-center"
                 style={{ height: vs(40), width: hs(80) }}
@@ -219,6 +250,8 @@ const YourAdsPostDesign = ({
                 style={{
                   color: Colors.light.textGray,
                   fontFamily: "PopinRegula",
+                    fontWeight: 700,
+                                  fontSize: ms(15),
                 }}
               >
                 {item.bedrooms} bedrooms {item.property_sub_type} for{" "}

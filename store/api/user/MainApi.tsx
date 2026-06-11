@@ -808,7 +808,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags:["checkReview"]
+      invalidatesTags:["checkReview","myProfile"]
     }),
     updateReviewApi: builder.mutation({
       query: ({ body }) => ({

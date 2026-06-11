@@ -44,6 +44,7 @@ const index = () => {
     development_status: [],
   });
 
+
   const [apiFilters, setApiFilters] = useState({
     page,
     address,
@@ -56,6 +57,9 @@ const index = () => {
     sort,
     user_id: user?.id,
     radius: params.radius || undefined,
+    estate_type:params.community_type,
+     min_range: params.min_price,
+      max_range: params.max_price
   });
 
   const {
@@ -192,6 +196,7 @@ useFocusEffect(
         data={properties}
         isfetching={isFetching}
         setPage={setpage}
+        refetch={refetch}
         type="community"
         hasmore={hasMore}
         initialLoadDone={initialLoadDone}

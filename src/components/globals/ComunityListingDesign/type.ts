@@ -8,4 +8,5 @@ export type postDataType= {
     isSingleView:boolean;
     post_id:string;
     post_type:string;
+ refetch: () => void;
 }
