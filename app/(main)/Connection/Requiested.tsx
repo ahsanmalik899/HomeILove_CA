@@ -66,7 +66,25 @@ const RequestsScreen = () => {
         formData.append("receiver_id", String(item.user_id ?? ""));
          formData.append("rcr_logo", String(item?.profile?.logo ?? ""));
           formData.append("rcr_name", String(item?.profile?.business_name ?? ""));
-      
+      formData.append(
+  "sender_profile_id",
+  String(item?.sender_profile_id ?? "")
+);
+
+formData.append(
+  "receiver_profile_id",
+  String(item?.receiver_profile_id ?? "")
+);
+
+formData.append(
+  "sender_profile_type",
+  String(item?.sender_profile_type ?? "")
+);
+
+formData.append(
+  "receiver_profile_type",
+  String(item?.receiver_profile_type ?? "")
+);
         formData.append("sndr_logo", String(user?.logo ?? ""));
         formData.append("sndr_name", String(user?.name ?? ""));
               try {
@@ -100,7 +118,9 @@ const RequestsScreen = () => {
                 console.log(error);
               }
             }
-          }} status={item.status} />
+          }} status={item.status}
+         
+          />
         </View>
       </View>
     );
@@ -141,6 +161,7 @@ const RequestsScreen = () => {
         Componet2={sentComponent}
       />
       <Loading isLoading={recivedFetching||sentFetching} text="Loading..."/>
+      <Loading isLoading={unfollowing} text="Loading..."/>
     </View>
   );
 };

@@ -387,7 +387,8 @@ setShowoption(false)
      
           <Modal visible={showPast} animationType="slide" statusBarTranslucent onRequestClose={() => setShowpast(false)}>
             <HeaderWithBack title="Past jobs" onBackpress={() => setShowpast(false)} />
-            {Profiletype==="agent"?(
+            {Profiletype==="agent"?(<>
+              {posts.length>0?
             <PastDealsagent
               data={posts}
               hasmore={hasMore}
@@ -397,8 +398,21 @@ setShowoption(false)
               setpost={setPosts}
               refetch={refetch}
               initialLoadDone={initialLoadDone}
-            />):(
+              
+            />:
+             <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text>No past deals</Text>
+    </View>
+            }</>
+          ):(
                <View style={{ marginTop: vs(15),flex:1 }}>
+                  {othePastdata?.data?.length > 0 ? (
             <LegendList
               data={othePastdata?.data || []}
               keyExtractor={(item: any) => item.user_past_work_id.toString()}
@@ -458,7 +472,17 @@ setShowoption(false)
                   </View>
                 );
               }}
-            />
+            />): (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text>No past deals</Text>
+    </View>
+  )}
           </View>
             )}
           </Modal>

@@ -32,6 +32,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
+import { formatPrice } from "@utils/PriceFormater";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
@@ -1633,7 +1634,7 @@ const index = () => {
                                 </View>
 
                                 <Text style={{ fontFamily: "PopinRegula" }}>
-                                  ${item?.price?.toString()}
+                                  ${formatPrice(item?.price?.toString())}
                                 </Text>
                               </View>
                             )}

@@ -2,6 +2,7 @@ import { useLogoutApiMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import { resetUserData } from "@/store/slices/user";
 import SidebarLogo from "@assets/SideBar/sideBarLogo.svg";
+import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
@@ -55,12 +56,31 @@ const index = () => {
           onPress={() => router.navigate("/HomeRomance")}
         />
       </View>
+    
+        <View
+                                 style={{
+                                   height: vs(1),
+                                   marginTop: vs(20),
+                                   marginBottom: vs(10),
+                                   backgroundColor: Colors.light.textGray,
+                                   opacity: 0.2,
+                                 }}
+                               />
       <View style={{ marginTop: vs(5) }}>
         <SideBarButtons
-          text="Sell Property"
+          text="Post Ad"
           onPress={() => router.navigate("/(main)/SellProperty")}
         />
       </View>
+          <View
+                                 style={{
+                                   height: vs(1),
+                                   marginTop: vs(20),
+                                   marginBottom: vs(10),
+                                   backgroundColor: Colors.light.textGray,
+                                   opacity: 0.2,
+                                 }}
+                               />
       <View style={{ marginTop: vs(5) }}>
         <SideBarButtons
           text="Account"

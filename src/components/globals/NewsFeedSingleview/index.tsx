@@ -17,6 +17,7 @@ import Colors from '@src/constants/Colors';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import { ImageFormater } from '@utils/ImageFormat';
+import { formatPrice } from '@utils/PriceFormater';
 import { timeAgo } from '@utils/Timeago';
 import { ViedioUrlFormat } from '@utils/ViedioUrlFormater';
 import { Video } from 'expo-av';
@@ -34,7 +35,7 @@ import HeaderWithBack from '../HeaderWithBack';
 import ImageSlider from '../ImageSlider';
 import LargeButton from '../LaregeButton';
 import Loading from '../Loading';
-export default function NewsFeedSingleview({ post_id,setshowModel,setAlreadyLiked,setData }: { post_id: number,setshowModel:(val:boolean)=>void, setData:(data:[])=>void,setAlreadyLiked:(val:boolean)=>void }) {
+export default function NewsFeedSingleview({ post_id,setshowModel,setAlreadyLiked,setData }: { post_id: number,setshowModel:(val:boolean)=>void, setData:(data:[])=>void,setAlreadyLiked?:(val:boolean)=>void }) {
     const user = useSelector(userdata);
       const { data, isFetching, refetch } = useGetPostByIdQuery({ post_id:post_id,userid:user?.id });
     const [showShare, setShowShare] = useState(false);
@@ -276,7 +277,16 @@ setData((prevData) =>
 </View>)}
            </View>
            {data?.type!=="general" && (
-             <>
+             <View
+                   className="flex-row justify-between items-center"
+                              style={{
+                                backgroundColor:
+                                 Colors.light.lightGray,
+                                paddingHorizontal: hs(10),
+                                paddingVertical: vs(10),
+                                borderRadius: ms(10),
+                                marginBottom:  vs(10),
+                              }}>
            {data?.type === "community" ? (
              <View className="flex-row justify-between">
                <Text style={{ color: "black", fontWeight: "600", flex: 1 }}>
@@ -285,11 +295,11 @@ setData((prevData) =>
  
                {data?.post?.community_price?.length > 0 && (
                  <Text style={{ color: Colors.light.red, fontWeight: "600" }}>
-                   From $ {data?.post?.community_price[0]} To ${" "}
-                   {
+                   From $ {formatPrice(data?.post?.community_price[0])} To ${" "}
+                   {formatPrice(
                      data?.post?.community_price[
                        data?.post?.community_price?.length - 1
-                     ]
+                     ])
                    }
                  </Text>
                )}
@@ -315,12 +325,12 @@ setData((prevData) =>
                    marginLeft: 8,
                  }}
                >
-                 $ {data?.post?.asking_price ?? 0}
+                 $ {formatPrice(data?.post?.asking_price ?? 0)}
                  {data?.type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
                </Text>
              </View>
            )}
-           </>)}
+           </View>)}
            
            {data?.type==="general" ?(
              <Text style={styles.description}>

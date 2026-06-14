@@ -75,7 +75,9 @@ const Connected = () => {
             } catch (error) {
               console.log(error);
             }
-          }} status="accepted" />
+          }} status="accepted"
+          
+          />
         </View>
       </View>):(<AdCardWithoutAnimation isSqure={false} ad={item.data}/>)}
       </>
@@ -96,6 +98,7 @@ const Connected = () => {
         showsVerticalScrollIndicator={false}
       />
       <Loading isLoading={isLoading} text="Loading..." />
+      <Loading isLoading={unfollowing} text="Loading..."/>
     </View>
   );
 };

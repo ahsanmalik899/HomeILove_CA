@@ -72,7 +72,7 @@ setpostRating(Number(reviewData?.data?.rating)||0)
           const [unsaveItemApi] = useUnsaveItemApiMutation();
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
-   const [sendRequest] = useSendRequestMutation();
+   const [sendRequest,{isLoading:senddingRequest}] = useSendRequestMutation();
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const { data, isLoading,refetch:refetchProfile } = useGetSingleProfileQuery({ type: type?.toLocaleLowerCase(), id: id,user_id:user?.id });
@@ -128,67 +128,47 @@ const requestSend = async ({
   sender_ProfileId,
   reciverProfile,
   statusi,
+  sender_data,
 }: {
   sender_type: string;
   sender_ProfileId: string;
   reciverProfile: any;
   statusi: string;
+  sender_data:any;
 }) => {
   try {
     const formData = new FormData();
 
     // Connect / Cancel Request
-    if (statusi === "Connect" || statusi === "Cancel Request") {
-      formData.append("sender_id", String(user?.id ?? ""));
-      formData.append("receiver_id", String(reciverProfile?.users_id ?? ""));
-      formData.append(
-        "sender_profile_id",
-        String(sender_ProfileId ?? "")
-      );
-      formData.append(
-        "sender_profile_type",
-        String(sender_type ?? "")
-      );
-      formData.append(
-        "receiver_profile_id",
-        String(reciverProfile?.id ?? "")
-      );
-      formData.append(
-        "receiver_profile_type",
-        String(reciverProfile?.type ?? "")
-      );
-    }
-
-    // Accept / Unfollow
-    else {
-      formData.append(
-        "sender_id",
-        String(reciverProfile?.sender_id ?? "")
-      );
-      formData.append(
-        "receiver_id",
-        String(reciverProfile?.users_id ?? "")
-      );
-      formData.append(
-        "sender_profile_id",
-        String(reciverProfile?.sender_profile_id ?? "")
-      );
-      formData.append(
-        "sender_profile_type",
-        String(reciverProfile?.sender_profile_type ?? "")
-      );
-      formData.append(
-        "receiver_profile_id",
-        String(reciverProfile?.id ?? "")
-      );
-      formData.append(
-        "receiver_profile_type",
-        String(reciverProfile?.type ?? "")
-      );
-    }
+     if (statusi === "Connect" || statusi === "Cancel Request") {
+        formData.append("sender_id", String(user?.id ?? ""));
+        formData.append("receiver_id", String(reciverProfile?.users_id ?? ""));
+        formData.append("sender_profile_id", String(sender_ProfileId ?? ""));
+        formData.append("sender_profile_type", String(sender_type ?? ""));
+        formData.append("receiver_profile_id", String(reciverProfile?.id ?? ""));
+         formData.append("rcr_logo", String(reciverProfile?.logo ?? ""));
+          formData.append("rcr_name", String(reciverProfile?.business_name ?? ""));
+        formData.append(
+          "receiver_profile_type",
+          String(reciverProfile?.connection_type ?? "")
+        );
+        formData.append("sndr_logo", String(sender_data?.logo ?? ""));
+        formData.append("sndr_name", String(sender_data?.business_name ?? ""));
+      }
+      else {
+        formData.append("sender_id", String(reciverProfile?.sender_id ?? ""));
+        formData.append("receiver_id", String(reciverProfile?.receiver_id ?? ""));
+        formData.append("sender_profile_id", String(reciverProfile?.sender_profile_id ?? ""));
+        formData.append("sender_profile_type", String(reciverProfile?.sender_profile_type ?? ""));
+        formData.append("receiver_profile_id", String(reciverProfile?.receiver_profile_id ?? ""));
+        formData.append(
+          "receiver_profile_type",
+          String(reciverProfile?.receiver_profile_type ?? "")
+        );
+      }
   formData._parts?.forEach((p) => console.log(p[0], p[1]));
     let result: any;
-
+ console.log(formData)
     switch (statusi) {
       case "Connect":
         result = await sendRequest(formData).unwrap();
@@ -503,6 +483,7 @@ const requestSend = async ({
            <FollowButton
                           id={profile?.receiver_id}
                           status={profile?.connection_status}
+                          isLoading={senddingRequest||accepting||canceling||unfollowing}
                           onPress={(status) => {
           
                             setStatus(status)
@@ -520,6 +501,7 @@ const requestSend = async ({
                                   sender_ProfileId: "",
                                   sender_type: "Business",
                                   statusi: status,
+                                  sender_data:user,
                                 });
                               }
                             } else {
@@ -529,6 +511,7 @@ const requestSend = async ({
                                 sender_ProfileId: "",
                                 sender_type: "Private",
                                 statusi: status,
+                                sender_data:user,
                               });
           
                             }
@@ -536,7 +519,7 @@ const requestSend = async ({
           
           
           
-                          }c
+                          }
                         />)}
           </View>
         </View>
@@ -955,7 +938,7 @@ const requestSend = async ({
         </View>
       </TouchableOpacity>
       <Modal visible={reviewModal} transparent animationType="fade">
-        <ScrollView>
+        <ScrollView style={{width:"100%"}}>
           <Formik
             initialValues={{
               review: reviewData?.data?.review||"",
@@ -1024,7 +1007,7 @@ const requestSend = async ({
 
                     {Profiles?.profiles?.map((item, index) => {
                       const selected =
-                        values.sender_profile_type === item.profile_type;
+                        values.sender_profile_type === item.profile_type.toLowerCase();
 
                       return (
                         <TouchableOpacity
@@ -1032,14 +1015,14 @@ const requestSend = async ({
                           style={[
                             styles.profileCard,
                             selected && {
-                              borderColor: "#0F9D58",
+                              borderColor: Colors.light.DarkGreen,
                               borderWidth: 2,
                             },
                           ]}
                           onPress={() => {
                             setFieldValue(
                               "sender_profile_type",
-                              item.profile_type
+                              item.profile_type.toLowerCase()
                             );
                             setFieldValue("sender_profile_id", item.profile_id);
                           }}
@@ -1343,6 +1326,7 @@ const requestSend = async ({
                                   sender_ProfileId: item.profile_id,
                                   sender_type: item.profile_type,
                                   statusi: statuse,
+                                  sender_data:item,
                                 });
             
                                 setShowConnection(false);
@@ -1396,7 +1380,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   modalContainer: {
-    width: "90%",
+    width: "100%",
     backgroundColor: "white",
     borderRadius: 15,
     padding: 20,

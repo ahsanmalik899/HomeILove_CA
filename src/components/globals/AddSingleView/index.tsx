@@ -37,6 +37,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
@@ -254,11 +255,12 @@ const rotate = rotateAnim.interpolate({
              {data?.post?.community_price?.length > 0 && (
                 <Text style={{ color: Colors.light.red,  fontWeight: 700,
                   fontSize:ms(18),fontFamily: "PopinRegula", }}>
-                  From $ {data.post.community_price[0]} To ${" "}
+                  From $ {formatPrice(data.post.community_price[0])} To ${" "}
                   {
+                    formatPrice(
                     data.post.community_price[
                       data.post.community_price.length - 1
-                    ]
+                    ])
                   }
                 </Text>
                 
@@ -272,7 +274,7 @@ const rotate = rotateAnim.interpolate({
                   fontFamily: "PopinRegula",
                 }}
               >
-                $ {data?.post?.asking_price ?? 0}
+                $ {formatPrice(data?.post?.asking_price ?? 0)}
                 {type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
               </Text>)}
 </View>

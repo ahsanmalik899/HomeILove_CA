@@ -30,6 +30,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
 import * as Clipboard from 'expo-clipboard';
@@ -239,11 +240,11 @@ const index = () => {
 
               {data?.post?.community_price?.length > 0 && (
                 <Text style={{ color: Colors.light.red, fontWeight: "600" }}>
-                  From $ {data?.post?.community_price[0]} To ${" "}
-                  {
+                  From $ {formatPrice(data?.post?.community_price[0])} To ${" "}
+                  {formatPrice(
                     data?.post?.community_price[
                       data?.post?.community_price?.length - 1
-                    ]
+                    ])
                   }
                 </Text>
               )}
@@ -269,7 +270,7 @@ const index = () => {
                   marginLeft: 8,
                 }}
               >
-                $ {data?.post?.asking_price ?? 0}
+                $ {formatPrice(data?.post?.asking_price ?? 0)}
                 {data?.type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
               </Text>
             </View>

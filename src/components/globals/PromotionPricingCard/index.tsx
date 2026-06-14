@@ -1,6 +1,7 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Colors from "@src/constants/Colors";
 import { ms, vs } from "@utils/design/design";
+import { formatPrice } from "@utils/PriceFormater";
 import { useEffect, useState } from "react";
 import {
   Platform,
@@ -166,13 +167,13 @@ setfieldvalue?.('ad_life',days);
         <View style={styles.summaryDividerV} />
         <View style={styles.summaryItem}>
           <Text style={styles.summaryLabel}>Rate</Text>
-          <Text style={styles.summaryValue}>${pricePerDay}/day</Text>
+          <Text style={styles.summaryValue}>${formatPrice(pricePerDay)}/day</Text>
         </View>
         <View style={styles.summaryDividerV} />
         <View style={styles.summaryItem}>
           <Text style={styles.summaryLabel}>Total</Text>
           <Text style={[styles.summaryValue, styles.totalPrice]}>
-            ${totalPrice}
+            ${formatPrice(totalPrice)}
           </Text>
         </View>
       </View>

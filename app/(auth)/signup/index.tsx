@@ -4,12 +4,13 @@
 /* eslint-disable react/function-component-definition */
 import { useSignupMutation } from "@/store/api/user/Authapi";
 import { setemail } from "@/store/slices/user";
+import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import Logo from "@assets/logo/logo-black.svg";
 import backgroundimage from "@assets/signupbg/bg.png";
-import Uploadlogo from "@assets/signupbg/solar_upload-bold-duotone.svg";
 import { Ionicons } from "@expo/vector-icons";
 import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
+import UploadPic from "@src/components/globals/UploadPic";
 import Colors from "@src/constants/Colors";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
@@ -264,7 +265,7 @@ export default function SignUpScreen() {
                         const selectedValue = val();
                         setFieldValue("user_type", selectedValue);
                       }}
-                      placeholder="Select Business Type"
+                      placeholder="Select user Type"
                       style={{
                         marginBottom:
                           touched.user_type && errors.user_type ? 0 : 15,
@@ -274,23 +275,19 @@ export default function SignUpScreen() {
                       <Text style={styles.error}>{errors.user_type}</Text>
                     )}
 
-                    <View style={styles.input}>
-                      <Text style={styles.textview}>
-                        {imagename || "Upload logo (image)"}
-                      </Text>
-                      <TouchableOpacity
-                        className="absolute right-0"
-                        onPress={() => pickImage(setFieldValue)}
-                      >
-                        <View className="flex-row" style={styles.uploadbutton}>
-                          <Uploadlogo />
-                          <Text style={styles.buttonText}>Upload</Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                    {touched.business_logo && errors.business_logo && (
-                      <Text style={styles.error}>{errors.business_logo}</Text>
-                    )}
+                    <UploadPic
+                                      key="logo"
+                                      Logo={Profilelogo}
+                                      text1="Upload IMAGES"
+                                      text2=""
+                                      additionalText={`Upload logo`}
+                                      value={values.business_logo}
+                                      limt={1}
+                                      name="business_logo"
+                                      border
+                                      setValue={setFieldValue}
+                                    />
+                 
 
                     <View style={styles.loginTextContainer}>
                       <Text style={styles.loginTextBlack}>

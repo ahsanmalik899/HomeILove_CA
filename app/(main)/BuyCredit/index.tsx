@@ -9,6 +9,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
+import { formatPrice } from "@utils/PriceFormater";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -153,7 +154,7 @@ const index = () => {
                       </Text>
                     </View>
                     <Text style={{ fontFamily: "PopinRegula" }}>
-                      {item.price}
+                      {formatPrice(item.price)}
                     </Text>
                     <Text style={{ fontFamily: "PopinRegula" }}>
                       {item.amount}
@@ -167,7 +168,6 @@ const index = () => {
           <View style={styles.card}>
             <Text style={styles.title}>Your Homeilove Account Balance</Text>
 
-            <Text style={styles.amountLabel}>Amount</Text>
             <View style={styles.amountValue}>
               {isLoading || isFetching ? (
                 <ActivityIndicator
@@ -179,6 +179,8 @@ const index = () => {
                   style={{
                     color: Colors.light.DarkGreen,
                     fontFamily: "PopinRegula",
+                    fontWeight:"700",
+                    fontSize:ms(15),
                   }}
                 >
                   ${data?.amount ?? 0}
@@ -248,9 +250,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: ms(14),
     textAlign: "center",
-    fontWeight: "500",
+    fontWeight: "700",
     marginBottom: vs(15),
     fontFamily: "PopinRegula",
+  
   },
 
   amountLabel: {
@@ -269,6 +272,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(20),
     color: Colors.light.DarkGreen,
     fontFamily: "PopinRegula",
+    alignItems:"center",
   },
   paymentOptions: {
     marginTop: vs(30),

@@ -3,6 +3,7 @@ import { userdata } from "@/store/slices/selector/user";
 import PostDesign from "@src/components/globals/PostDesign/PostDesign";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { vs } from "@utils/design/design";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -115,10 +116,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: Colors.light.lightGray,
     marginRight: 8,
+    marginVertical:vs(5),
   },
 
   filterChipActive: {
     backgroundColor: Colors.light.red,
+      marginVertical:vs(5),
   },
   filterText: {
     fontSize: 13,

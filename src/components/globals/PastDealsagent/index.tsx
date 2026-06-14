@@ -12,6 +12,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import { timeAgo } from "@utils/Timeago";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -243,7 +244,7 @@ const PastDealsagent = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  ${item.type==="community"?item.property_types?.price1:item.price1}
+                  ${item.type==="community"?formatPrice(item.property_types?.price1):formatPrice(item.price1)}
                 </Text>
               </View>
               <View

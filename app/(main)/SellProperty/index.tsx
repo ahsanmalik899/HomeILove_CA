@@ -15,14 +15,14 @@ const index = () => {
    const {data,isLoading} =  useGetProfilesQuery({ id: user.id });
   return (
     <View className="flex-1 bg-white ">
-      <HeaderWithBack title="Sell Property" />
+      <HeaderWithBack title="Post Ad" />
       <View
         style={{ marginHorizontal: hs(20),marginTop:vs(20) }}
         className="flex-row justify-between"
       >
         <SideBarCard
           Svg={PropertyForSale}
-          text="Post Property"
+          text="Property"
           onPress={() => {
             if(user.user_type==="Business"&&data.total_profiles<1){
               renderToastError("Go to dashboard and atleast create one Profile")
@@ -35,7 +35,7 @@ const index = () => {
         />
         <SideBarCard
           Svg={Commercial}
-          text="Post Community"
+          text="Community"
           onPress={() => {
               if(user.user_type==="Business"&&data.total_profiles<1){
               renderToastError("Go to dashboard and atleast create one Profile")

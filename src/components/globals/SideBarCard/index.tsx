@@ -30,7 +30,10 @@ const index = ({ Svg, text, type, totalPosts,profileType,id, onPress=()=>{},Prof
       )}
 
       <View className="items-center self-center ">
-        <Svg />
+         <Svg
+    width={hs(60)}
+    height={vs(60)}
+  />
         <Text
           style={{
             marginTop: vs(10),

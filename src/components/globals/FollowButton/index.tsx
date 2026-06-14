@@ -2,15 +2,16 @@ import { userdata } from '@/store/slices/selector/user';
 import Colors from '@src/constants/Colors';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { hs, vs } from '@utils/design/design';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 interface ButtonProps {
   id: number;
   status?: 'accepted' | 'pending' | 'none'; // 👈 added
   onPress: (status:string) => void;
+  isLoading?:boolean;
 }
 
-const FollowButton = ({ id, status = 'none', onPress }: ButtonProps) => {
+const FollowButton = ({ id, status = 'none', onPress,isLoading }: ButtonProps) => {
  const user = useAppSelector(userdata);
   const getButtonText = () => {
    
@@ -32,12 +33,16 @@ const FollowButton = ({ id, status = 'none', onPress }: ButtonProps) => {
     <TouchableOpacity
       style={[styles.button, getButtonStyle()]}
       onPress={()=>onPress(getButtonText().toString())}
-    
+      disabled={isLoading}
       activeOpacity={0.7}
-    >
-      <Text style={styles.buttonText}>
-        {getButtonText()}
-      </Text>
+    >  {isLoading ? (
+    <ActivityIndicator size="small" color="#fff" />
+  ) : (
+    <Text style={styles.buttonText}>
+      {getButtonText()}
+    </Text>
+  )}
+    
     </TouchableOpacity>
   );
 };

@@ -6,6 +6,7 @@ import image from "@assets/test/test.jpeg";
 import { LegendList } from '@legendapp/list';
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from '@utils/design/design';
+import { formatPrice } from "@utils/PriceFormater";
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -54,7 +55,7 @@ const index = ({ data, isfetching }: postDataType) => {
                         )}
                     </Text>
 
-                    <LableImage price={item.price} title={item.title} source={image} />
+                    <LableImage price={formatPrice(item.price)} title={item.title} source={image} />
                     <View
                         className="flex-row justify-between"
                         style={{ marginTop: vs(20), marginBottom: vs(10) }}

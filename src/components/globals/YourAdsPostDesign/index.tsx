@@ -22,6 +22,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -172,7 +173,7 @@ const YourAdsPostDesign = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  From $ {item.price1}
+                  From $ {formatPrice(item.price1)}
                 </Text>
               ) : (
                 <Text
@@ -183,7 +184,7 @@ const YourAdsPostDesign = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  $ {item.asking_price}{" "}
+                  $ {formatPrice(item.asking_price)}{" "}
                   {type === "rent" && (
                     <Text
                       style={{

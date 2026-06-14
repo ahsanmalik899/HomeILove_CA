@@ -10,7 +10,7 @@
     "deepLinking": true,
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/logo/logo.png",
+      "image": "./assets/logo//logo/logo-black.svg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

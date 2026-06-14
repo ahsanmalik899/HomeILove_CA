@@ -1,9 +1,10 @@
 import { useGetPostCountQuery } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
-import Community from "@assets/SideBar/community.svg";
+import Commercial from "@assets/Rent/commercial.svg";
 import Rent from "@assets/SideBar/rent.svg";
 import Sale from "@assets/SideBar/sale.svg";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
+import LargeButton from "@src/components/globals/LaregeButton";
 import Loading from "@src/components/globals/Loading";
 import SideBarCard from "@src/components/globals/SideBarCard";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -48,7 +49,7 @@ const index = () => {
         </View>
         <SideBarCard
           text="Community"
-          Svg={Community}
+          Svg={Commercial}
           type="yourAds"
           totalPosts={data?.data?.community_posts}
           onPress={() => {
@@ -59,6 +60,12 @@ const index = () => {
           }}
         />
       </View>
+       <View style={{justifyContent: 'flex-end',marginTop:'auto',marginHorizontal:hs(20),marginBottom:hs(20)}}>
+                    <LargeButton text="Post new Add" handleSubmit={() =>router.navigate({
+              pathname:"/SellProperty",
+             
+            })} />
+                  </View>
       <Loading isLoading={isFetching} text="Loading..." />
     </View>
   );

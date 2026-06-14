@@ -14,6 +14,7 @@ import VerificationIllustration from '@assets/Resetscreen/feed 14.png';
 import backgroundimage from '@assets/signinicon/Background.png';
 import LargeButton from '@src/components/globals/LaregeButton';
 import Loading from '@src/components/globals/Loading';
+import Colors from '@src/constants/Colors';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
@@ -174,8 +175,8 @@ const styles = StyleSheet.create({
         fontFamily: "PopinRegula",
   },
   emailText: {
-    color: 'black',
-    fontWeight: '500',
+    color: Colors.light.DarkGreen,
+    fontWeight: '700',
         fontFamily: "PopinRegula",
   },
   illustrationContainer: {

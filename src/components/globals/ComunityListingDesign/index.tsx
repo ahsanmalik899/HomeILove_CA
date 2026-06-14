@@ -14,6 +14,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -130,7 +131,7 @@ const YourAdsPostDesign = ({
                   fontFamily: "PopinRegula",
                 }}
               >
-               From $ {item?.data?.price1}
+               From $ {formatPrice(item?.data?.price1)}
               z
               </Text>
               {item?.data?.post_type === "Trending" && (

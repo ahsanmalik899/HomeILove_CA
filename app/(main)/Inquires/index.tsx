@@ -22,6 +22,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -320,7 +321,7 @@ const index = () => {
             {item.min_price && item.max_price && (
               <View style={styles.tag}>
                 <Text style={styles.tagText}>
-                  ${item.min_price} - ${item.max_price}
+                  ${formatPrice(item.min_price)} - ${formatPrice(item.max_price)}
                 </Text>
               </View>
             )}
@@ -923,7 +924,7 @@ const index = () => {
                         {selectedChatItem.min_price && selectedChatItem.max_price && (
                           <View style={styles.tag}>
                             <Text style={styles.tagText}>
-                              ${selectedChatItem.min_price} - ${selectedChatItem.max_price}
+                              ${formatPrice(selectedChatItem.min_price)} - ${formatPrice(selectedChatItem.max_price)}
                             </Text>
                           </View>
                         )}

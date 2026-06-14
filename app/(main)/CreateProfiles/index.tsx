@@ -29,6 +29,7 @@ import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 
 import { LegendList } from "@legendapp/list";
+import { formatPrice } from "@utils/PriceFormater";
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -1087,7 +1088,7 @@ const Index = () => {
                                     onPress={() => {
                                       setFieldValue("time_period", item.life);
 
-                                      setSelectedAmount(item.price);
+                                      setSelectedAmount(formatPrice(item.price));
                                     }}
                                   >
                                     <MaterialIcons
@@ -1112,7 +1113,7 @@ const Index = () => {
                                 </View>
 
                                 <Text style={{ fontFamily: "PopinRegula" }}>
-                                  ${item.price}
+                                  ${formatPrice(item.price)}
                                 </Text>
                               </View>
                             )}

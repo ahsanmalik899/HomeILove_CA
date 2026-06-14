@@ -34,6 +34,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { formatPrice } from "@utils/PriceFormater";
 import { timeAgo } from "@utils/Timeago";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
@@ -1011,7 +1012,21 @@ const PostDesign = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  {item.title}
+                
+              {
+  (item.type === "Shared Community"
+    ? item.title
+    : item.property_sub_type
+  )?.substring(0, 20) +
+  (
+    (item.type === "Shared Community"
+      ? item.title
+      : item.property_sub_type
+    )?.length > 20
+      ? "..."
+      : ""
+  )
+}
                 </Text>
 
                 <Text
@@ -1021,7 +1036,7 @@ const PostDesign = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  {item.price}
+                { item.type === "Shared Community"&&  "starting"} ${formatPrice(item.price)}
                 </Text>
               </View>
               <View
