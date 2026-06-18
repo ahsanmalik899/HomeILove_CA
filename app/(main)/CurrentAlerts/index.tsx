@@ -95,6 +95,9 @@ const Index = () => {
     else if(item.app_url === "/CommunitesLising"){
       router.push({ pathname: "/CommunitesLising", params: { id: item.post_id,isSingleView:"true",type:item.receiver_type} });
     }
+    else if(item.app_url==="/ChatScreen"){
+       router.push({ pathname: "/Home/Message"});
+    }
     else {
       router.push({ pathname: item.app_url, params: { post_id: item.post_id, userId: item.sender_id, name: item.sender_name } });
     }

@@ -919,6 +919,9 @@ const requestSend = async ({
             params: {
               userId: profile?.users_id,
               name: profile?.business_name,
+              title:profile?.business_name,
+              receiver_post_id:profile?.id,
+                      type:profile.type.toLowerCase()
             },
           });
         }}

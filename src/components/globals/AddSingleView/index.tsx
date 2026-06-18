@@ -1375,6 +1375,15 @@ const rotate = rotateAnim.interpolate({
                   params:{
                     userId:data?.post?.user_id,
                    name:data?.posted_by?.business_name,
+                     title: type === "community"
+          ? data?.post?.community_title
+          : `${data?.post?.bedrooms ?? 0} bedrooms ${
+              data?.post?.property_sub_type ?? ""
+            } for ${data?.post?.property_for ?? ""}`,
+      receiver_post_id:  type === "community"
+                    ? data?.post?.post_community_id
+                    : data?.post?.post_property_id,
+                    type:type==="community"?"community":"property"
                   }
                 })
               }}

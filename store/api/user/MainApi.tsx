@@ -29,6 +29,9 @@ export const MainApi = createApi({
     "Advatizemets",
     "savedAds",
     "checkReview",
+    "RecivedRequest",
+    "ConnectedUses",
+    "SendedRequest"
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -521,7 +524,7 @@ export const MainApi = createApi({
         url: `checkReviewApi?sender_id=${sender_id}&receiver_profile_id=${receiver_profile_id}&profile_type=${profile_type}`,
         method: "GET",
       }),
-      providesTags:["checkReview"]
+      providesTags:["checkReview"] 
     }),
     sendRequest: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -529,7 +532,9 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
-       invalidatesTags:["myProfile"]
+       invalidatesTags:["myProfile","RecivedRequest",
+    "ConnectedUses",
+    "SendedRequest"]
     }),
   unfollowApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -537,7 +542,9 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
-        invalidatesTags:["myProfile"]
+        invalidatesTags:["myProfile","RecivedRequest",
+    "ConnectedUses",
+    "SendedRequest"]
     }),
       UpdateConnectionApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -545,7 +552,9 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
-        invalidatesTags:["myProfile"]
+        invalidatesTags:["myProfile","RecivedRequest",
+    "ConnectedUses",
+    "SendedRequest"]
     }),
   cancelRequestApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -553,7 +562,9 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
-       invalidatesTags:["myProfile"]
+       invalidatesTags:["myProfile","RecivedRequest",
+    "ConnectedUses",
+    "SendedRequest"]
     }),
   acceptRequestApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -561,7 +572,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
-       invalidatesTags:["myProfile"]
+       invalidatesTags:["myProfile","RecivedRequest","ConnectedUses","SendedRequest"]  
     }),
     deletePropertyPreferencesApi: builder.mutation<any, any>({
       query: (formatdata: FormData) => ({
@@ -659,18 +670,21 @@ export const MainApi = createApi({
         url: `getConnectedUsersApi?user_id=${id}`,
         method: "GET",
       }),
+      providesTags:["ConnectedUses"]
     }),
     getReceivedRequestsApi: builder.query<any, any>({
       query: ({ id }) => ({
         url: `getReceivedRequestsApi?user_id=${id}`,
         method: "GET",
       }),
+      providesTags:["RecivedRequest"]
     }),
     getSentRequestsApi: builder.query<any, any>({
       query: ({ id }) => ({
         url: `getSentRequestsApi?sender_id=${id}`,
         method: "GET",
       }),
+      providesTags:["SendedRequest"]
     }),
     getNotifications: builder.query({
       query: ({ user_id, page = 1 }) =>
@@ -838,6 +852,14 @@ export const MainApi = createApi({
         body: data,
       }),
       invalidatesTags: ["MypostCount"],
+    }),
+    deleteChats:builder.mutation({
+      query: (data) => ({
+        url: "deleteChats",
+        method: "POST",
+        body: data,
+      }),
+     
     }),
     deleteProfile: builder.mutation({
       query: (body) => ({
@@ -1115,4 +1137,5 @@ export const {
   useDeleteAlertApiMutation,
   useAlertCountApiQuery,
   useCheckReviewApiQuery,
+  useDeleteChatsMutation,
 } = MainApi;

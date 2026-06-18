@@ -3,14 +3,14 @@
     "scheme": "homeilove",
     "name": "Home I Love",
     "slug": "home-i-love",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon 1024x1024.png",
     "newArchEnabled": true,
     "deepLinking": true,
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/logo//logo/logo-black.svg",
+      "image": "./assets/logo/logo-black.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -37,7 +37,7 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
-      "versionCode": 3,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app-icon 1024x1024.png",
         "backgroundColor": "#ffffff"
