@@ -132,7 +132,7 @@ const YourAdsPostDesign = ({
                 }}
               >
                From $ {formatPrice(item?.data?.price1)}
-              z
+              
               </Text>
               {item?.data?.post_type === "Trending" && (
                 <Text

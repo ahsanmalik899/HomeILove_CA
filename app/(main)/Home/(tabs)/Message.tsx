@@ -1,4 +1,4 @@
-import { useDeleteChatsMutation } from "@/store/api/user/MainApi";
+import { useDeleteChatsMutation, useGetConversationListQuery } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,15 +7,13 @@ import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import Loading from "@src/components/globals/Loading";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
-import { db } from "@src/utils/firebse";
+import { socket } from "@src/socket";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
-import { collection, documentId, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Text,
+  ActivityIndicator, AppState, Text,
   TouchableOpacity,
   View
 } from "react-native";
@@ -24,9 +22,13 @@ const Index = () => {
 
   const user = useAppSelector(userdata);
   const [chats,setChats] = useState([]);
+  const {data:conversationList,isLoading,refetch}=useGetConversationListQuery({userid:user.id})
   const [deleteChat,{isLoading:Deleting}]=useDeleteChatsMutation()
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  useEffect(()=>{
+   refetch()
+  },[])
   const handleDelete = async () => {
   try {
     if (selectedIds.length === 0) return;
@@ -53,43 +55,23 @@ const toggleSelection = (id: string) => {
   });
 };
 useEffect(()=>{
-  setLoading(true);
- const q = query(
+setChats(conversationList?.messages)
+},[conversationList])
+useEffect(() => {
+  const subscription = AppState.addEventListener("change", state => {
+    console.log("AppState:", state);
 
-   collection(db,"userChats"),
+    if (state === "active") {
+      if (!socket.connected) {
+        socket.connect();
+      } else {
+        socket.emit("join", user.id);
+      }
+    }
+  });
 
-   where(documentId(),">=",user.id+"-"),
-
-   where(documentId(),"<=",user.id+"-\uf8ff"),
-
-
-
- );
-
- const unsubscribe = onSnapshot(q,(snapshot)=>{
-
-   let chatList=[];
-
-   snapshot.forEach(doc=>{
-
-     chatList.push({
-
-       id:doc.id,
-       ...doc.data()
-
-     });
-
-   });
-
-   setChats(chatList);
-    setLoading(false);
-console.log("chatList",chatList);
- });
-
- return ()=>unsubscribe();
-
-},[user.id]);
-
+  return () => subscription.remove();
+}, [user.id]);
 
   const openChat = (item: any) => {
     router.push({
@@ -104,7 +86,42 @@ console.log("chatList",chatList);
       },
     });
   };
+useEffect(() => {
+  socket.emit("join", user.id);
 
+  socket.on("conversationAdded", (conversation) => {
+    console.log("conversationAdded", conversation);
+
+    setChats((prev: any[]) => [conversation, ...prev]);
+  });
+
+  socket.on("conversationUpdated", (conversation) => {
+    console.log("conversationUpdated", conversation);
+
+    setChats((prev: any[]) => {
+      const filtered = prev.filter(
+        item =>
+          !(
+            item.chat_user_id == conversation.chat_user_id &&
+            item.receiver_post_id == conversation.receiver_post_id &&
+            item.type == conversation.type
+          )
+      );
+
+      return [
+        {
+          ...conversation,
+        },
+        ...filtered,
+      ];
+    });
+  });
+
+  return () => {
+    socket.off("conversationAdded");
+    socket.off("conversationUpdated");
+  };
+}, []);
   const renderItem = ({ item }: any) => (
     
     <TouchableOpacity
@@ -136,7 +153,7 @@ console.log("chatList",chatList);
           className="text-gray-500 mt-1"
           style={{fontFamily: "PopinRegula",}}
         >
-          {item.last_message}
+          {item.content}
         </Text>
       </View>
 
@@ -167,7 +184,7 @@ console.log("chatList",chatList);
 </TouchableOpacity>
     </TouchableOpacity>
   );
-  if(loading){
+  if(isLoading){
 return(
      <View
       className="flex-1 justify-center items-center"
@@ -182,7 +199,7 @@ return(
     </View>
 )
   }
-else if (chats.length === 0) {
+else if (chats?.length === 0) {
   return (
     <View
       className="flex-1 justify-center items-center"

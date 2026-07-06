@@ -636,6 +636,7 @@ const rotate = rotateAnim.interpolate({
                     backgroundColor: Colors.light.red,
                     color: "white",
                     textAlign: "center",
+                    fontFamily: "PopinRegula",
                   },
                 ]}
               >
@@ -646,17 +647,17 @@ const rotate = rotateAnim.interpolate({
           {data?.post?.property_titles?.map((_, index) => (
             <View key={index} style={styles.card2}>
               <Text
-                style={[styles.heading, { alignSelf: "center",width: "100%", backgroundColor:Colors.light.lightGray,padding:vs(15),textAlign:"center",fontFamily:"PopinBold",borderRadius:ms(5) }]}
+                style={[styles.heading, {fontFamily: "PopinRegula", alignSelf: "center",width: "100%", backgroundColor:Colors.light.lightGray,padding:vs(15),textAlign:"center",fontFamily:"PopinBold",borderRadius:ms(5) }]}
                 className="mb-4"
               >
                 {data?.post?.property_titles[index]}
               </Text>
 
               <View className="flex-row justify-between">
-                <Text style={{ color: Colors.light.textGray }}>
+                <Text style={{ fontFamily: "PopinRegula",color: Colors.light.textGray }}>
                   Property type
                 </Text>
-                <Text style={{ fontWeight: 600 }}>
+                <Text style={{ fontFamily: "PopinRegula",fontWeight: 600 }}>
                   {data?.post?.property_types[index]}
                 </Text>
               </View>
@@ -672,10 +673,10 @@ const rotate = rotateAnim.interpolate({
               />
 
               <View className="flex-row justify-between">
-                <Text style={{ color: Colors.light.textGray }}>
+                <Text style={{ fontFamily: "PopinRegula",color: Colors.light.textGray }}>
                   Property sub-type
                 </Text>
-                <Text style={{ fontWeight: 600 }}>
+                <Text style={{ fontFamily: "PopinRegula",fontWeight: 600 }}>
                   {data?.post?.property_sub_types[index]}
                 </Text>
               </View>
@@ -691,8 +692,8 @@ const rotate = rotateAnim.interpolate({
               />
 
               <View className="flex-row justify-between">
-                <Text style={{ color: Colors.light.textGray }}>Tenure</Text>
-                <Text style={{ fontWeight: 600 }}>
+                <Text style={{ fontFamily: "PopinRegula",color: Colors.light.textGray }}>Tenure</Text>
+                <Text style={{fontFamily: "PopinRegula", fontWeight: 600 }}>
                   {data?.post?.tenures[index]}
                 </Text>
               </View>
@@ -708,8 +709,8 @@ const rotate = rotateAnim.interpolate({
               />
 
               <View className="flex-row justify-between">
-                <Text style={{ color: Colors.light.textGray }}>Area</Text>
-                <Text style={{ fontWeight: 600 }}>
+                <Text style={{fontFamily: "PopinRegula", color: Colors.light.textGray }}>Area</Text>
+                <Text style={{ fontFamily: "PopinRegula",fontWeight: 600 }}>
                   {data?.post?.land_areas[index]}
                 </Text>
               </View>
@@ -725,8 +726,8 @@ const rotate = rotateAnim.interpolate({
               />
 
               <View className="flex-row justify-between">
-                <Text style={{ color: Colors.light.textGray }}>Bed</Text>
-                <Text style={{ fontWeight: 600 }}>
+                <Text style={{ color: Colors.light.textGray,fontFamily: "PopinRegula" }}>Bed</Text>
+                <Text style={{ fontWeight: 600,fontFamily: "PopinRegula" }}>
                   {data?.post?.bedrooms[index]}
                 </Text>
               </View>
@@ -742,9 +743,24 @@ const rotate = rotateAnim.interpolate({
               />
 
               <View className="flex-row justify-between">
-                <Text style={{ color: Colors.light.textGray }}>Bath</Text>
-                <Text style={{ fontWeight: 600 }}>
+                <Text style={{ color: Colors.light.textGray,fontFamily: "PopinRegula" }}>Bath</Text>
+                <Text style={{ fontWeight: 600,fontFamily: "PopinRegula" }}>
                   {data?.post?.bathrooms?.[index]}
+                </Text>
+              </View>
+                 <View
+                style={{
+                  height: vs(1),
+                  marginTop: vs(20),
+                  marginBottom:vs(5),
+                  backgroundColor: Colors.light.textGray,
+                  opacity: 0.2,
+                }}
+              />
+                 <View className="flex-row justify-between" style={{backgroundColor:"#F4F0F0",padding:vs(10),borderRadius:ms(10)}}>
+                <Text style={{ color: Colors.light.textGray,fontWeight:"700",fontFamily: "PopinRegula" }}>Price</Text>
+                <Text style={{ fontWeight: 700 ,fontFamily: "PopinRegula"}}>
+                  {formatPrice(data?.post?.community_price?.[index])}
                 </Text>
               </View>
             </View>
@@ -1336,12 +1352,12 @@ const rotate = rotateAnim.interpolate({
               <StarRating size={20} rating={data?.posted_by?.rating} />
             </View>
             {type === "community" ? (
-              <View className="self-center items-center mb-4">
+             <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"community",profile_type:data?.posted_by_type}})}} className="items-center" style={{ flex: 1 }}>
                 <Text style={[styles.heading, { color: Colors.light.red }]}>
                   {data?.posted_by?.total_posts}
                 </Text>
                 <Text style={styles.heading}>Communities</Text>
-              </View>
+ </TouchableOpacity>
             ) : (
               <View className="flex-row mb-4">
                 <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"sale",profile_type:data?.posted_by_type}})}} className="items-center" style={{ flex: 1 }}>

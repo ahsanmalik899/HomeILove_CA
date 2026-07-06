@@ -743,7 +743,7 @@ const Index = () => {
 
                 <FormikInput
                   title="Web Address"
-                  placeholder="Enter Location"
+                  placeholder="web Address"
                   onChangeText={handleChange("web")}
                   onBlur={handleBlur("web")}
                   value={values.web}

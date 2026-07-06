@@ -1,17 +1,16 @@
-import { useLazyGetNotificationsQuery, useMarkAllAsSeenMutation, useMarkReadMutation } from "@/store/api/user/MainApi";
+import { useGetNotificationsQuery, useMarkAllAsSeenMutation, useMarkReadMutation } from "@/store/api/user/MainApi";
 import { setNotificationCount } from "@/store/slices/Notification";
 import { userdata } from "@/store/slices/selector/user";
 import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Colors from "@src/constants/Colors";
-import { db } from "@src/utils/firebse";
+import { socket } from "@src/socket";
 import { vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { timeAgo } from "@utils/Timeago";
 import { router } from "expo-router";
-import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Text,
@@ -25,7 +24,7 @@ const Index = () => {
   const user = useSelector(userdata);
   const [markAllAsSeen] = useMarkAllAsSeenMutation();
   const dispatch = useDispatch();
-  const [triggerGetNotifications] = useLazyGetNotificationsQuery();
+
 
   useEffect(() => {
     dispatch(setNotificationCount(0));
@@ -38,43 +37,10 @@ const Index = () => {
 
     markSeen();
   }, []);
-  const [firebaseNotifications, setFirebaseNotifications] = useState<any[]>([]);
+
   const [sqlNotifications, setSqlNotifications] = useState<any[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
-  useEffect(() => {
 
-    if (!user?.id) return;
-
-    const messagesRef = collection(
-      db,
-      "Notification",
-      String(user.id),
-      "notifications"
-    );
-
-    const q = query(messagesRef, orderBy("created_at", "desc"), limit(20));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-
-      let list: any[] = [];
-
-      snapshot.forEach(doc => {
-        list.push({
-          id: doc.id,
-          ...doc.data()
-        });
-      });
-
-      console.log("list", list);
-
-      setFirebaseNotifications(list);
-      setInitialLoading(false);
-
-    });
-
-    return () => unsubscribe();
-
-  }, [user?.id]);
   const [markRead] = useMarkReadMutation();
 
   const handlePress = async (item: any) => {
@@ -103,43 +69,60 @@ const Index = () => {
     }
 
   };
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(2);
+
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const fetchOlderNotifications = async () => {
-
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-
-    try {
-
-      const res = await triggerGetNotifications({
+    const {data:notificationsdata,isLoading:notificationLiading}=  useGetNotificationsQuery({
         user_id: user.id,
         page: page
-      }).unwrap();
+      });
+useEffect(() => {
+  if (!notificationsdata) return;
 
-      console.log("res", res);
-      if (res.success || res.data) {
-        const newMessages = res?.data?.data ? [...res.data.data] : res?.data ? [...res.data] : [];
-        console.log("newMessages", newMessages);
-        if (!newMessages || newMessages.length === 0) {
-          setHasMore(false);
-        } else {
-          setSqlNotifications(prev => [
-            ...prev,
-            ...newMessages
-          ]);
-          setPage(prev => prev + 1);
-        }
-      }
+  if (notificationsdata.current_page === 1) {
+    setSqlNotifications(notificationsdata.data.data);
+  } else {
+    setSqlNotifications(prev => [
+      ...prev,
+      ...notificationsdata.data.data,
+    ]);
+  }
 
-    } catch (err) {
-      console.error("SQL fetch error:", err);
-    } finally {
-      setLoadingMore(false);
-    }
+  setHasMore(notificationsdata.has_more);
+  setInitialLoading(false);
+}, [notificationsdata]);
+useEffect(() => {
+    if (!user?.id) return;
 
-  };
+    socket.emit("join", String(user.id));
+
+    const onNotification = (notification: any) => {
+
+        if (notification.receiver_id != user.id) return;
+
+        setSqlNotifications(prev => {
+
+            if (prev.some(x => x.id == notification.id)) {
+                return prev;
+            }
+
+            return [notification, ...prev];
+        });
+
+        dispatch(setNotificationCount(prev => prev + 1));
+
+    };
+
+    socket.on("newNotification", onNotification);
+
+    return () => {
+        socket.off("newNotification", onNotification);
+    };
+
+}, [user?.id]);
+useEffect(() => {
+  console.log("notificationsdata", notificationsdata);
+}, [notificationsdata]);
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
       onPress={() => handlePress(item)}
@@ -178,34 +161,24 @@ const Index = () => {
     </TouchableOpacity>
   );
 
-  const notifications = useMemo(() => {
-    const combined = [...firebaseNotifications, ...sqlNotifications];
-    const unique = [];
-    const map = new Set();
-    for (const item of combined) {
-      if (!map.has(item.id)) {
-        map.add(item.id);
-        unique.push(item);
-      }
-    }
-    return unique;
-  }, [firebaseNotifications, sqlNotifications]);
 
   return (
     <View className="flex-1 bg-white" style={{ backgroundColor: "white" }}>
-      <HeaderWithBack title="Current Alerts" />
-      {initialLoading ? (
+      <HeaderWithBack title="Current Notifications" />
+      {(initialLoading ||notificationLiading)? (
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" />
         </View>) : (
         <View className="mt-4 flex-1">
           <LegendList
-            data={notifications}
+            data={sqlNotifications}
             renderItem={renderItem}
             estimatedItemSize={80}
             refreshing={false}
-            keyExtractor={(item) => item.id}
-            onEndReached={() => fetchOlderNotifications()}
+            keyExtractor={(item) => item.id.toString()}
+           onEndReached={() => {
+  setPage(prev=>prev+1)
+}}
           />
         </View>)}
     </View>

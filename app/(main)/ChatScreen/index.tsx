@@ -1,22 +1,20 @@
 import {
-  useLazyGetMessagesApiQuery,
+  useGetMessagesApiQuery,
   useMarkAsReadApiMutation,
   useSendMessageApiMutation
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import Send from "@assets/icons/send.svg";
-import { LegendList } from "@legendapp/list";
 import AddSingleView from "@src/components/globals/AddSingleView";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import ProfileSingleView from "@src/components/globals/ProfileSingleView";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
-import { db } from "@src/utils/firebse";
+import { socket } from "@src/socket";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router, useLocalSearchParams } from "expo-router";
-import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -29,6 +27,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 
 
 
@@ -38,151 +37,129 @@ const ChatScreen = () => {
  console.log(title,receiver_post_id);
   const [markAsRead] = useMarkAsReadApiMutation();
   const [sendMessage,{isLoading:sending}] = useSendMessageApiMutation();
-  const [getMessages, { isFetching }] = useLazyGetMessagesApiQuery();
-
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(2);
+  const [page, setPage] = useState(1);
 
   const listRef = useRef<any>(null);
-  const knownIds = useRef<Set<string>>(new Set());
   const isAtBottom = useRef(true);
  const [Showpost,setShowpost]=useState(false)
   const [Showprofile,setShowprofile]=useState(false)
-  const chatId =
-    Number(user.id) < Number(userId)
-      ? `${user.id}-${userId}-${receiver_post_id}-${type}`
-      : `${userId}-${user.id}-${receiver_post_id}-${type}`;
-
-  useEffect(() => {
-    markAsRead({ user_id: user.id, chat_user_id: userId,  receiver_post_id,
-      type });
-  }, []);
-  useEffect(() => {
-    const messagesRef = collection(db, "chats", chatId, "messages");
-    const q = query(messagesRef, orderBy("timestamp", "desc"), limit(20));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const incoming: any[] = [];
-    snapshot.forEach((doc) => {
-  const data = doc.data();
-  if (
-    data.receiver_id == user.id &&
-    data.receiver_deleted === true
-  ) {
-    return;
-  }
-
-  if (
-    data.sender_id == user.id &&
-    data.sender_deleted === true
-  ) {
-    return;
-  }
-
-  if (!knownIds.current.has(doc.id)) {
-    knownIds.current.add(doc.id);
-    incoming.push({
-      id: doc.id,
-      ...data,
-    });
-  }
-});
-
-      if (incoming.length === 0) {
-        setInitialLoading(false);
-        return;
-      }
-      incoming.sort((a, b) => a.timestamp - b.timestamp);
-
-      setMessages((prev) => {
-        const next = [...prev, ...incoming];
-        if (isAtBottom.current) {
-          requestAnimationFrame(() => {
-            listRef.current?.scrollToEnd?.({ animated: prev.length > 0 });
-          });
-        }
-        return next;
-      });
-
-      setInitialLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [chatId]);
-
-  const isFetchingOlder = useRef(false);
-
-const fetchOlderMessages = useCallback(async () => {
-  if (isFetchingOlder.current || !hasMore) return;
-  isFetchingOlder.current = true;
-  setLoadingMore(true);
-
-  try {
-    const res: any = await getMessages({
+  const{data:msg,isLoading} = useGetMessagesApiQuery({
       userId: user.id,
       chatUserId: userId,
       per_page: 20,
       page,
       receiver_post_id,
       type
-    }).unwrap();
+    },{
+        refetchOnMountOrArgChange: true,
+    });
+    useEffect(() => {
+  if (!msg) return;
 
-    if (res.success) {
-      const older: any[] = res?.data ?? [];
+if (page === 1) {
+    setMessages(msg.data);
+} else {
+    setMessages(prev => {
+        const ids = new Set(prev.map(i => i.id));
 
-      if (older.length === 0) {
-        setHasMore(false);
-      } else {
-      const fresh = older.filter((m) => {
-  if (
-    m.receiver_id == user.id &&
-    Number(m.receiver_deleted) === 1
-  ) {
-    return false;
-  }
+        const older = msg.data.filter(i => !ids.has(i.id));
 
-  // Hide deleted messages for sender
-  if (
-    m.sender_id == user.id &&
-    Number(m.sender_deleted) === 1
-  ) {
-    return false;
-  }
+        return [...prev, ...older];
+    });
+}
 
-  if (knownIds.current.has(String(m.id))) {
-    return false;
-  }
+  setHasMore(msg.pagination.has_more);
+  setInitialLoading(false);
+  setLoadingMore(false);
+}, [msg]);
+useEffect(() => {
+  socket.emit("join", user.id);
 
-  knownIds.current.add(String(m.id));
-  return true;
-});
+  const onNewMessage = (newMessage: any) => {
 
-        if (fresh.length > 0) {
-          setMessages((prev) =>
-            [...fresh.slice().reverse(), ...prev].filter(Boolean)
-          );
-          setPage((p) => p + 1);
-        } else {
-          setHasMore(false);
-        }
+    const isCurrentChat =
+      (
+        (newMessage.sender_id == userId &&
+          newMessage.receiver_id == user.id) ||
+        (newMessage.sender_id == user.id &&
+          newMessage.receiver_id == userId)
+      ) &&
+      newMessage.receiver_post_id == receiver_post_id &&
+      newMessage.type == type;
+
+    if (!isCurrentChat) return;
+
+    setMessages(prev => {
+      // Prevent duplicates
+      if (prev.some(m => m.id == newMessage.id)) {
+        return prev;
       }
-    }
-  } catch (err) {
-    console.error("fetchOlderMessages error:", err);
-  } finally {
-    isFetchingOlder.current = false; 
-    setLoadingMore(false);
-  }
-}, [hasMore, page, user.id, userId]);
-  
-  const handleSend = async () => {
-    const content = message.trim();
-    if (!content) return;
-    setMessage(""); 
+
+      return [newMessage, ...prev];
+    });
+
+    // Mark as read immediately if this chat is open
+    markAsRead({
+      user_id: user.id,
+      chat_user_id: userId,
+      receiver_post_id,
+      type,
+    });
+  };
+
+  socket.on("newMessage", onNewMessage);
+
+  return () => {
+    socket.off("newMessage", onNewMessage);
+  };
+}, [user.id, userId, receiver_post_id, type]);
+    useEffect(()=>{
+
+    },[user.id])
+  useEffect(() => {
+    markAsRead({ user_id: user.id, chat_user_id: userId,  receiver_post_id,
+      type });
+  }, []);
+
+
+
+
+const handleSend = async () => {
+  const content = message.trim();
+  if (!content) return;
+
+  const tempId = Date.now();
+
+  const myMessage = {
+    id: tempId,
+    msg_title: title,
+    sender_id: user.id,
+    sender_name: user.name,
+    receiver_id: Number(userId),
+    receiver_name: name,
+    receiver_post_id: Number(receiver_post_id),
+    type,
+    content,
+    is_read: 1,
+    sender_deleted: 0,
+    receiver_deleted: 0,
+    last_activity: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    pending: true, // local only
+  };
+
+  // Show immediately
+  setMessages(prev => [myMessage, ...prev]);
+
+  setMessage("");
+
+  try {
     await sendMessage({
       sender_id: user.id,
       sender_name: user.name,
@@ -193,7 +170,10 @@ const fetchOlderMessages = useCallback(async () => {
       receiver_post_id,
       type,
     });
-  };
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 const renderItem = useCallback(({ item }: any) => {
   if (!item) return null;
@@ -288,7 +268,7 @@ const renderItem = useCallback(({ item }: any) => {
         </View>
       ) : (
         <>
-          {(loadingMore || isFetching) && (
+          {(loadingMore ) && (
             <View
               className="py-2 items-center justify-center"
               style={{ backgroundColor: "#F4F0F0" }}
@@ -297,14 +277,13 @@ const renderItem = useCallback(({ item }: any) => {
             </View>
           )}
 
-        <LegendList
+        <FlatList
   ref={listRef}
   data={messages.filter(Boolean)}
   keyExtractor={(item) => String(item?.id ?? Math.random())}
   renderItem={renderItem}
-  estimatedItemSize={60}
-  style={{ backgroundColor: "#F4F0F0" }}
-  scrollEventThrottle={200}     
+    inverted
+  style={{ backgroundColor: "#F4F0F0" }} 
   onScroll={(e) => {
     const y = e.nativeEvent.contentOffset.y;
     const height = e.nativeEvent.layoutMeasurement.height;
@@ -312,8 +291,8 @@ const renderItem = useCallback(({ item }: any) => {
 
     isAtBottom.current = contentHeight - y - height < 100;
 
-    if (y <= 100 && hasMore && !isFetchingOlder.current) {  // ✅ use ref, not state
-      fetchOlderMessages();
+    if (y <= 100 && hasMore ) {  
+       setPage(prev=> prev+1)
     }
   }}
 />

@@ -68,7 +68,7 @@ export default function ForgotPasswordScreen() {
               onChangeText={setEmail}
             />
           </View>
-          <LargeButton text='signin' handleSubmit={forgotpassword} />
+          <LargeButton text='Send mail' handleSubmit={forgotpassword} />
         </View>
       </View>
       <Loading isLoading={isLoading} text="Sernding Mail...." />

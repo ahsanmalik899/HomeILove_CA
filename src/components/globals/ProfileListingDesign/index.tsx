@@ -97,7 +97,8 @@ if(isSingleView){
               className="flex-row justify-between items-center"
               style={{
                 backgroundColor:
-                  item?.data?.post_type === "Trending"
+                (item?.data?.post_type === "Trending" ||
+      item?.data?.post_type === "Promoted")
                     ? Colors.light.LightGreen
                     : "white",
                 paddingHorizontal: hs(10),
@@ -109,8 +110,8 @@ if(isSingleView){
            <Text
   style={{
     color:
-      item?.data?.post_type === "Trending" ||
-      item?.data?.post_type === "Promoted"
+      (item?.data?.post_type === "Trending" ||
+      item?.data?.post_type === "Promoted")
         ? Colors.light.DarkGreen
         : "black",
     fontWeight: 700,
@@ -137,13 +138,14 @@ if(isSingleView){
     </Text>
   )}
 </Text>
-              {item?.data?.post_type === "Trending" && (
+              {(item?.data?.post_type === "Trending"||item?.data?.post_type ==="Promoted")&& (
                 <Text
                   style={{ fontWeight: 600, color: Colors.light.DarkGreen,fontFamily: "PopinRegula", }}
                 >
                   Trending
                 </Text>
               )}
+                 
             </View>
             <View className="flex-row justify-between">
            

@@ -3,11 +3,17 @@ import { userdata } from "@/store/slices/selector/user";
 import PostDesign from "@src/components/globals/PostDesign/PostDesign";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
+import { db } from "@src/utils/firebse";
 import { vs } from "@utils/design/design";
+import * as Application from 'expo-application';
 import { useLocalSearchParams } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   FlatList,
+  Linking,
+  Modal,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -20,7 +26,40 @@ const NewsFeeds = () => {
   const limit = 10;
   const [Posts, setPosts] = useState<[]>([]);
   const user = useAppSelector(userdata);
+  const [visible,setVisible]=useState(false)
   const [selectedFilter, setSelectedFilter] = useState("All");
+  useEffect(() => {
+  const checkForUpdate = async () => {
+    try {
+      const currentVersion = Application.nativeApplicationVersion;
+  
+      const docRef = doc(db, "AppVersion", "version");
+      const docSnap = await getDoc(docRef);
+  
+      if (!docSnap.exists()) {
+        console.log("No version document found");
+        return;
+      }
+  
+      const latestVersion = docSnap.data()?.version;
+  
+      console.log("Current:", currentVersion);
+      console.log("Latest:", latestVersion);
+  
+      if (currentVersion !== latestVersion) {
+       
+  
+        setTimeout(() => {
+        setVisible(true)
+        }, 500);
+      }
+    } catch (error) {
+      console.log("Version check error:", error);
+    }
+  };
+  
+    checkForUpdate();
+  }, []);
   const filter = [
     { id: 1, name: "All" },
     { id: 2, name: "Community" },
@@ -86,6 +125,55 @@ const NewsFeeds = () => {
       </View>
 
       <PostDesign data={Posts} isfetching={isFetching} setPage={setPage} refetch={refetch} setData={setPosts} isPostSingle={isPostSingle=="true"?true:false} post_id={post_id?.toString()} />
+        <Modal
+  visible={visible}
+  animationType="slide"
+  transparent
+  onRequestClose={() => setVisible(false)}
+>
+  <View style={styles.overlay}>
+    <View style={styles.sheetContainer}>
+
+      <Text style={{ fontSize: 45 }}>⬆️</Text>
+
+      <Text style={styles.title}>Update Available</Text>
+
+      <Text style={styles.desc}>
+        A new version of the app is available. Please update to continue using all features.
+      </Text>
+
+      <View style={styles.btnRow}>
+
+        <TouchableOpacity
+          style={[styles.btn, { backgroundColor: Colors.light.DarkGreen}]}
+          onPress={() => setVisible(false)}
+        >
+          <Text style={{ color: "white", fontWeight: "600" }}>
+            Later
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.btn, { backgroundColor: Colors.light.red }]}
+        onPress={() => {
+    const url =
+      Platform.OS === "ios"
+        ? "https://apps.apple.com/app/idYOUR_APP_ID" 
+        : "https://play.google.com/store/apps/details?id=com.revnosoft.homeilove";
+
+    Linking.openURL(url);
+  }}
+        >
+          <Text style={{ color: "#fff", fontWeight: "600" }}>
+            Update
+          </Text>
+        </TouchableOpacity>
+
+      </View>
+
+    </View>
+  </View>
+</Modal>
     </View>
   );
 };
@@ -135,6 +223,44 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily: "PopinRegula",
   },
+   sheetContainer: {
+  backgroundColor: "#fff",
+  padding: 20,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  alignItems: "center",
+
+
+  maxHeight: "35%",
+},
+overlay: {
+  flex: 1,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  justifyContent: "flex-end",
+},
+title: {
+  fontSize: 18,
+  fontWeight: "700",
+  marginTop: 10,
+},
+
+desc: {
+  textAlign: "center",
+  marginTop: 10,
+  color: "#666",
+},
+
+btnRow: {
+  flexDirection: "row",
+  marginTop: 20,
+  gap: 10,
+},
+
+btn: {
+  paddingVertical: 10,
+  paddingHorizontal: 25,
+  borderRadius: 10,
+},
 });
 
 export default NewsFeeds;

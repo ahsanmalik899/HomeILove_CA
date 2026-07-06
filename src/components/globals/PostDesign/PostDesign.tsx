@@ -1254,6 +1254,28 @@ const PostDesign = ({
             }}
           />
         }
+          ListEmptyComponent={
+    !isfetching ? (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: vs(100),
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "PopinMedium",
+            fontSize: ms(16),
+            color: Colors.light.DarkGreen,
+          }}
+        >
+          No Data Found
+        </Text>
+      </View>
+    ) : null
+  }
       />
 
       <Modal

@@ -31,7 +31,10 @@ export const MainApi = createApi({
     "checkReview",
     "RecivedRequest",
     "ConnectedUses",
-    "SendedRequest"
+    "SendedRequest",
+    "AlerCount",
+    "unreadChats",
+    "conversations"
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -257,7 +260,7 @@ export const MainApi = createApi({
         url: `/deleteAlertApi?alert_id=${alert_id}&user_id=${user_id}`,
         method: "POST",
       }),
-      invalidatesTags: ["AlertPref"],
+      invalidatesTags: ["AlertPref","AlerCount"],
     }),
     saveAllerts: builder.mutation<any, FormData>({
       query: (formatdata) => ({
@@ -265,7 +268,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatdata,
       }),
-      invalidatesTags: ["AlertPref"],
+      invalidatesTags: ["AlertPref","AlerCount"],
     }),
     getUserAlertsEdit:builder.query<any, GetMyPostsOnly>({
       query: ({ type, id }) => ({
@@ -279,6 +282,7 @@ export const MainApi = createApi({
         url: `alertCountApi?user_id=${id}`,
         method: "GET",
       }),
+      providesTags:["AlerCount"]
      
     }),
     getAlertPref: builder.query<any, GetMyPostsOnly>({
@@ -697,6 +701,7 @@ export const MainApi = createApi({
         method: "POST",
         body: { user_id },
       }),
+      invalidatesTags:["unreadChats"]
     }),
     getChatListApi: builder.query<any, any>({
       query: ({ id }) => ({
@@ -765,12 +770,16 @@ export const MainApi = createApi({
       }),
     }),
     getMessagesApi: builder.query({
-      query: ({ userId, chatUserId, page = 1,per_page = 20 }) => ({
+      query: ({ userId, chatUserId, page = 1,per_page = 20, receiver_post_id,
+      type }) => ({
         url: `getMessages`,
         params: {
           user_id: userId,
           chat_user_id: chatUserId,
           page,
+          receiver_post_id,
+          type,
+          per_page
         },
       }),
     }),
@@ -808,6 +817,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+        invalidatesTags:["unreadChats"]
     }),
      InquirymarkAsRead: builder.mutation({
       query: (data) => ({
@@ -859,7 +869,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
-     
+     invalidatesTags:["conversations"]
     }),
     deleteProfile: builder.mutation({
       query: (body) => ({
@@ -975,6 +985,13 @@ deleteAccount: builder.mutation<any, any>({
       }),
       providesTags:["getPostById"]
     }),
+    getConversationList:builder.query<any, any>({
+      query: ({ userid }) => ({
+        url: `getConversationList?user_id=${userid}`,
+        method: "GET",
+      }),
+   providesTags:["conversations"]
+    }),
     getPrice:builder.query<any,any>({
       query: ({price_type,profile_type}) => ({
         url: "getPrice",
@@ -997,6 +1014,15 @@ deleteAccount: builder.mutation<any, any>({
         params: {on_page},
       }),
     }),
+    getUnreadConversationCount:builder.query<any,any>({
+      query: ({user_id}) => ({
+        url: "getUnreadConversationCount",
+        method: "GET",
+        params: {user_id},
+      }),
+      providesTags:["unreadChats"]
+    }),
+
       getUserAdvertisements:builder.query<any,any>({
       query: ({user_id}) => ({
         url: "getUserAdvertisements",
@@ -1076,8 +1102,8 @@ export const {
   useGetConnectedUsersApiQuery,
   useGetReceivedRequestsApiQuery,
   useGetNotificationsQuery,
-  useLazyGetNotificationsQuery,
   useMarkReadMutation,
+  useGetUnreadConversationCountQuery,
   useGetChatListApiQuery,
   useHidePostMutation,
   useSaveNotificationTokenMutation,
@@ -1088,7 +1114,7 @@ export const {
   useCapturePaymentMutation,
   useGetUserWalletQuery,
   useSendMessageApiMutation,
-  useLazyGetMessagesApiQuery,
+  useGetMessagesApiQuery,
   useMarkAsReadApiMutation,
   useWriteReviewApiMutation,
   useUpdateReviewApiMutation,
@@ -1138,4 +1164,5 @@ export const {
   useAlertCountApiQuery,
   useCheckReviewApiQuery,
   useDeleteChatsMutation,
+  useGetConversationListQuery,
 } = MainApi;

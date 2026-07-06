@@ -291,6 +291,7 @@ const index = () => {
   const [visible, setvisible] = useState(false);
   const [UpdateProperty, { isLoading: UpdateLoading }] =
     useUpdatePropertyMutation();
+    console.log(data);
   const [postProperty, { isLoading }] = usePostPropertyMutation();
   return (
     <View className="bg-white flex-1 ">
@@ -1355,7 +1356,7 @@ const index = () => {
                       </Text>
                       {data?.total_profiles !== 0 && (
                         <View>
-                          {data?.profiles_exist?.agent && (
+                          {data?.profiles_exist?.agent?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1386,7 +1387,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.builder && (
+                          {data?.profiles_exist?.builder?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1417,7 +1418,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.decor && (
+                          {data?.profiles_exist?.decor?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1448,7 +1449,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.electrician && (
+                          {data?.profiles_exist?.electrician?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1481,7 +1482,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.investor && (
+                          {data?.profiles_exist?.investor?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1512,7 +1513,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.mortgage && (
+                          {data?.profiles_exist?.mortgage?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1543,7 +1544,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.painter && (
+                          {data?.profiles_exist?.painter?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1574,7 +1575,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.plumber && (
+                          {data?.profiles_exist?.plumber?.exists && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(

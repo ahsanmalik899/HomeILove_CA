@@ -85,8 +85,8 @@ setpostRating(Number(reviewData?.data?.rating)||0)
     isLoading: otherWorkLoding,
     refetch: pastRefetch,
   } = useGetotherPastWorkQuery(
-    { user_id: profile?.users_id, work_section: type },
-    { skip: !profile?.users_id || type === "agent" || profile?.post_type !== "Trending" }
+    { user_id: profile?.users_id, work_section: type.toLocaleLowerCase() },
+    { skip: !profile?.users_id || type.toLocaleLowerCase() === "agent" || profile?.post_type !== "Trending" }
   );
 
   const {
@@ -95,7 +95,7 @@ setpostRating(Number(reviewData?.data?.rating)||0)
     refetch,
   } = useUserAgentPastPostsApiQuery(
     { page, per_page: perPage, user_id: profile?.users_id },
-    { skip: !profile?.users_id || type !== "agent" || profile?.post_type !== "Trending" }
+    { skip: !profile?.users_id || type.toLocaleLowerCase() !== "agent" || profile?.post_type !== "Trending" }
   );
   useEffect(() => {
     if (!pastData?.data) return;
@@ -318,13 +318,13 @@ const requestSend = async ({
           await unsaveItemApi({
             saved_id: id,
             user_id: user.id,
-            type: type,
+            type: type.toLocaleLowerCase(),
           }).unwrap();
         } else {
           await saveItemApi({
             saved_id: id,
             user_id: user.id,
-            type: type,
+            type: type.toLocaleLowerCase(),
           }).unwrap();
         }
       } catch (error) {
@@ -437,7 +437,7 @@ const requestSend = async ({
         {/* Services */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Service for</Text>
-          <Text style={styles.text}>{profile?.services}</Text>
+          <Text style={styles.text}>{profile?.services||profile?.agent_for}</Text>
 
           <Text style={[styles.sectionTitle, { marginTop: 10 }]}>
             Dealing Areas
@@ -581,7 +581,7 @@ const requestSend = async ({
           )}
 
           <VideoSection url={profile?.youtube_link} />
-          {profile?.advisory_service === "Yes" && (
+          {profile?.advisory_service === "Yes"||profile?.valuation_for && (
             <>
               <TouchableOpacity
                 onPress={() => setShowMortgage(!showMortgage)}
@@ -677,8 +677,7 @@ const requestSend = async ({
                         required
                         withmap={false}
                         errorText={errors.address} />
-                      {type === "agent" ||
-                        (type === "mortgage" && (
+                      {(type.toLocaleLowerCase() === "agent" || type.toLocaleLowerCase() === "mortgage")  && (
                           <FormikDropdownwithjson
                             title={"I need advice on?"}
                             key={values.advice_for}
@@ -686,7 +685,7 @@ const requestSend = async ({
                             required
                             placeholder="Select"
                             value={values.advice_for}
-                            options={type === "mortgage"
+                            options={type.toLocaleLowerCase() === "mortgage"
                               ? [
                                 {
                                   label: "Home purchase property",
@@ -699,7 +698,7 @@ const requestSend = async ({
                                 },
                                 { label: "Others", value: "Others" },
                               ]
-                              : type === "agent"
+                              : type.toLocaleLowerCase() === "agent"
                                 ? [
                                   {
                                     label: "Selling property",
@@ -718,7 +717,7 @@ const requestSend = async ({
                                 : []}
                             name="advice_for"
                             onSelect={() => { }} />
-                        ))}
+                        )}
                       <View style={styles.dottedDivider} />
 
                       <FormikInput
@@ -821,7 +820,7 @@ const requestSend = async ({
                     hasmore={hasMore}
                     isfetching={pastLoading}
                     setPage={setPage}
-                    type={type}
+                    type={type.toLocaleLowerCase()}
                     setpost={setPosts}
                     refetch={refetch}
                     initialLoadDone={initialLoadDone}
@@ -1123,7 +1122,7 @@ const requestSend = async ({
                 message: "",
                 link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${type}`,
                 post_id: id,
-                type: type,
+                type: type.toLocaleLowerCase(),
               }}
               validationSchema={Yup.object({
                 recepient_email: Yup
@@ -1142,7 +1141,7 @@ const requestSend = async ({
                   formData.append("link", values.link);
                   formData.append("post_id", values.post_id);
                   formData.append("type", "profile");
-                  formData.append("profile_type", type);
+                  formData.append("profile_type", type.toLocaleLowerCase());
                   console.log(formData);
                   const result = await share_profileApi(formData).unwrap();
                   if (result?.success) {
@@ -1355,6 +1354,7 @@ const requestSend = async ({
                       </View>
                     </TouchableOpacity>
                   </Modal>
+                  <Loading isLoading={askEvaluationLoading} text='Loading..'/>
                 
     </>
   );

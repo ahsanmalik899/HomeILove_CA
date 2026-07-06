@@ -21,6 +21,7 @@ import Animated, {
 
 const Index = () => {
   const router = useRouter();
+
   const user = useAppSelector(userdata);
   const isOnboarding = useAppSelector(Onboarding);
   const translateX1 = useSharedValue(0);
@@ -214,7 +215,7 @@ const Index = () => {
   }, [user?.id]);
   useEffect(() => {
 
-    // ✅ When notification is clicked
+   
     const subscription =
       Notifications.addNotificationResponseReceivedListener(
         (response) => {
@@ -291,7 +292,9 @@ const Index = () => {
         style={[Styles.circle12, animatedStyle12]}
       />
       <Logo />
+
     </ImageBackground>
+    
   );
 };
 const shadowStyle = {
@@ -446,5 +449,34 @@ const Styles = StyleSheet.create({
     zIndex: 8,
     backgroundColor: Colors.light.circleblue,
   },
+  sheetContainer: {
+  flex: 1,
+  alignItems: "center",
+  padding: 20,
+},
+
+title: {
+  fontSize: 18,
+  fontWeight: "700",
+  marginTop: 10,
+},
+
+desc: {
+  textAlign: "center",
+  marginTop: 10,
+  color: "#666",
+},
+
+btnRow: {
+  flexDirection: "row",
+  marginTop: 20,
+  gap: 10,
+},
+
+btn: {
+  paddingVertical: 10,
+  paddingHorizontal: 25,
+  borderRadius: 10,
+},
 });
 export default Index;
