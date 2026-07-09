@@ -14,4 +14,5 @@ export interface AddressInputProps {
   multipleFields?: boolean;
   name?: string;
   setValue?: (field: string, value: string) => void;
+  cityOnly?: boolean;
 }

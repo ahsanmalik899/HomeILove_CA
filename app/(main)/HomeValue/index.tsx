@@ -55,7 +55,19 @@ const Index = () => {
       }
     });
   };
+const homeValuationOptions = [
+  "Selling property",
+  "Letting property",
+  "Remortgaging - Renovation - Purchasing",
+  "Others",
+];
 
+const agentInquiryOptions = [
+  "Buying property",
+  "Selling property",
+  "Letting property",
+  "Others",
+];
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity
@@ -458,12 +470,11 @@ const map = {
                     value={values.inquiryType}
                     setValue={setFieldValue}
                     name="inquiryType"
-                    options={[
-                      "Selling property",
-                      "Letting property",
-                      "Remortgaging - Renovation - Purchasing",
-                      "Others",
-                    ]}
+                      options={
+      type === "home valuation"
+        ? homeValuationOptions
+        : agentInquiryOptions
+    }
                     onSelect={() => {}}
                     touched={!!touched.inquiryType}
                     errors={!!errors}

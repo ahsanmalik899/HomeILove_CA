@@ -12,6 +12,7 @@ import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
+import Loading from "@src/components/globals/Loading";
 import SetRating from "@src/components/globals/SetRating";
 import StarRating from "@src/components/globals/StarRating";
 import TablikeButton from "@src/components/globals/TablikeButton";
@@ -43,6 +44,7 @@ const Index = () => {
   const [postrating, setpostRating] = useState(0);
   const [isRevise, setIsRevise] = useState(false);
   const [updateReviewApi] = useUpdateReviewApiMutation();
+    const [reviseReview,{isLoading}] = useReviseReviewMutation();
   const updateReview = async (values: any) => {
     try {
       await updateReviewApi({
@@ -92,6 +94,7 @@ const Index = () => {
     { id: 7, name: "Plumbers" },
     { id: 8, name: "Painters" },
     { id: 9, name: "Investors" },
+    { id: 10, name: "Business" },
   ];
 
   const renderFilterItem = ({ item }) => {
@@ -117,7 +120,7 @@ const Index = () => {
     const [reviseModalVisible, setReviseModalVisible] = useState(false);
     const [reviseReason, setReviseReason] = useState("");
     const [deletReview] = useDeletReviewMutation();
-    const [reviseReview] = useReviseReviewMutation();
+  
     const [loading, setLoading] = useState(false);
 
     const handleDelete = async () => {
@@ -220,6 +223,10 @@ const Index = () => {
                         review_id: item.id,
                         requested_by: user.id,
                         reason: reviseReason || "No reason provided",
+                       sender_profile_type: item.receiver_profile_type,
+                       sender_profile_id:item.receiver_profile_id,
+                       
+                       
                       }).unwrap();
                       renderToastSuccess("Revision request sent successfully");
                       refetch?.();
@@ -273,10 +280,16 @@ const Index = () => {
               </TouchableOpacity>
             </View>
           ) : (
-            <LargeButton
-              handleSubmit={() => setReviseModalVisible(true)}
-              text="Ask for revision"
-            />
+           <>
+  {item.revision_status === "Pending" ? (
+    <Text style={{color:Colors.light.DarkGreen}}>You asked for a revision</Text>
+  ) : (
+    <LargeButton
+      handleSubmit={() => setReviseModalVisible(true)}
+      text="Ask for revision"
+    />
+  )}
+</>
           )}
         </View>
 
@@ -482,6 +495,7 @@ const Index = () => {
           )}
         </Formik>
       </Modal>
+    <Loading isLoading={isLoading} text="Loading..."/>
     </View>
   );
 };

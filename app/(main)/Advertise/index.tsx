@@ -511,7 +511,7 @@ useEffect(() => {
                   on_page: "",
                   business_cover: null,
                   user_id: user.id,
-                  total_price: 200,
+                  total_price: 0,
                   paymentMethod: "",
                   order_id: "",
                   ad_life: "",
@@ -530,7 +530,7 @@ useEffect(() => {
                         formData.append(key, String(values[key]));
                       }
                     });
-
+                        
                     // Append image
                     if (values.business_cover?.uri) {
                       formData.append("business_cover", {
@@ -539,7 +539,7 @@ useEffect(() => {
                         type: values.business_cover.type ?? "image/jpeg",
                       } as any);
                     }
-
+                      formData.append("total_price",SelectedAmount);
                     const response = await PostAdvatizement(formData).unwrap();
 
                     // ✅ SUCCESS TOAST

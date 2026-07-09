@@ -34,7 +34,8 @@ export const MainApi = createApi({
     "SendedRequest",
     "AlerCount",
     "unreadChats",
-    "conversations"
+    "conversations",
+    "GetReviews",
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -522,6 +523,7 @@ export const MainApi = createApi({
         url: `/get/userReviews?user_id=${id}&profile_type=${profile_type}&type=${type}`,
         method: "GET",
       }),
+      providesTags:["GetReviews"]
     }),
     checkReviewApi: builder.query<any, any>({
       query: ({ sender_id,receiver_profile_id,profile_type }) => ({
@@ -750,6 +752,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags:["GetReviews"]
     }),
     getUnreadNotificationsCount: builder.query({
       query: ({ user_id }) =>

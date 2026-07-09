@@ -14,6 +14,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { makeCall } from "@utils/makeCall";
 import { formatPrice } from "@utils/PriceFormater";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -377,7 +378,9 @@ const YourAdsPostDesign = ({
                 <TouchableOpacity>
                   <Mail />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>{
+                                  makeCall(item?.data?.posted_by.contact||item?.data?.posted_by.mobile)
+                                }}>
                   <Call />
                 </TouchableOpacity>
 

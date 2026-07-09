@@ -14,6 +14,7 @@ import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import { ImageFormater } from '@utils/ImageFormat';
+import { makeCall } from '@utils/makeCall';
 import * as Clipboard from "expo-clipboard";
 import { router } from 'expo-router';
 import * as WebBrowser from "expo-web-browser";
@@ -86,7 +87,7 @@ setpostRating(Number(reviewData?.data?.rating)||0)
     refetch: pastRefetch,
   } = useGetotherPastWorkQuery(
     { user_id: profile?.users_id, work_section: type.toLocaleLowerCase() },
-    { skip: !profile?.users_id || type.toLocaleLowerCase() === "agent" || profile?.post_type !== "Trending" }
+    { skip: !profile?.users_id || type.toLocaleLowerCase() === "agent" || profile?.post_type === "Normal" }
   );
 
   const {
@@ -95,7 +96,7 @@ setpostRating(Number(reviewData?.data?.rating)||0)
     refetch,
   } = useUserAgentPastPostsApiQuery(
     { page, per_page: perPage, user_id: profile?.users_id },
-    { skip: !profile?.users_id || type.toLocaleLowerCase() !== "agent" || profile?.post_type !== "Trending" }
+    { skip: !profile?.users_id || type.toLocaleLowerCase() !== "agent" || profile?.post_type === "Normal" }
   );
   useEffect(() => {
     if (!pastData?.data) return;
@@ -447,10 +448,12 @@ const requestSend = async ({
 
           {/* Contact */}
           <View style={styles.rowBetween}>
-            <View style={styles.row}>
+            <TouchableOpacity style={styles.row} onPress={()=>{
+              makeCall(profile?.contact)
+            }}>
               <Call height={hs(20)} width={hs(20)} />
               <Text style={styles.text}>{profile?.contact}</Text>
-            </View>
+            </TouchableOpacity>
 
 
           </View>
@@ -780,7 +783,7 @@ const requestSend = async ({
               </View>}</>
           )}
 
-          {profile?.post_type && (
+          {(profile?.post_type==="Trending"||profile?.post_type==="Promoted") && (
             <>
               {posts?.length > 0 && (
                 <TouchableOpacity

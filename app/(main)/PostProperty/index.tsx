@@ -852,14 +852,14 @@ const index = () => {
                         onSelect={() => {}}
                         options={[
                           { label: "Newly built", value: "Newly built" },
-                          { label: "5 yrs", value: 5 },
-                          { label: "10 yrs", value: 10 },
-                          { label: "15 yrs", value: 15 },
-                          { label: "20 yrs", value: 20 },
-                          { label: "25 yrs", value: 25 },
-                          { label: "30 yrs", value: 30 },
-                          { label: "40 yrs", value: 40 },
-                          { label: "50 yrs", value: 50 },
+                          { label: "5 yrs", value:"5" },
+                          { label: "10 yrs", value: "10"},
+                          { label: "15 yrs", value: "15" },
+                          { label: "20 yrs", value: "20" },
+                          { label: "25 yrs", value: "25" },
+                          { label: "30 yrs", value: "30" },
+                          { label: "40 yrs", value: "40" },
+                          { label: "50 yrs", value: "50" },
                           { label: "More than 50 yrs", value: "50+" },
                         ]}
                         title="Home age"

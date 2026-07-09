@@ -227,7 +227,7 @@ const index = () => {
       }
     } catch (err) {
       console.error("Send message error:", err);
-      // Remove failed optimistic message
+     
       setMessages((prev) =>
         prev.filter((m) => m.msg_id !== optimisticMsg.msg_id)
       );
@@ -396,13 +396,17 @@ const index = () => {
               item.users_id?.toString() || Math.random().toString()
             }
             renderItem={({ item: profile }) => (
-              <TouchableOpacity style={styles.card} onPress={() => {
+
+              <TouchableOpacity style={styles.card}
+                disabled={profile?.inquiry_closed}
+              onPress={() => {
                 setSelectedChatProfile(profile);
                 setSelectedChatItem({
                   ...item,
                   chat_type: "sent",
                 });
                 setShowchatModal(true);
+                
               }}>
                 <View style={styles.topRow}>
 
@@ -561,6 +565,7 @@ const index = () => {
 
         <TouchableOpacity
           style={styles.replyBtn}
+            disabled={item?.inquiry_closed}
           onPress={() => {
             setSelectedChatProfile({
               business_name: item.sender_name,

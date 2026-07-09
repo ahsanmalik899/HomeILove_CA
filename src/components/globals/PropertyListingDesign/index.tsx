@@ -18,6 +18,7 @@ import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
+import { makeCall } from "@utils/makeCall";
 import { formatPrice } from "@utils/PriceFormater";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -28,7 +29,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AddSingleView from "../AddSingleView";
@@ -103,6 +104,7 @@ const YourAdsPostDesign = ({
       setscrollable(false);
       setImageNo(index);
     };
+
     const facts = item.imp_facts ?? item.facts ?? "";
    
     return (
@@ -427,10 +429,12 @@ const YourAdsPostDesign = ({
                   marginTop: vs(8),
                 }}
               >
-                <TouchableOpacity>
+                <TouchableOpacity >
                   <Mail />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>{
+                  makeCall(item?.data?.posted_by.contact||item?.data?.posted_by.mobile)
+                }}>
                   <Call />
                 </TouchableOpacity>
                 <CircleImage

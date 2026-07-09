@@ -54,7 +54,8 @@ const FormatDate = (date) => {
   const diffMs = endDate.getTime() - startDate.getTime();
   const days = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
   const totalPrice = days * pricePerDay;
-
+const minStartDate = new Date();
+minStartDate.setDate(minStartDate.getDate() + 3);
 
   useEffect(() => {
     setSelectedtimeprd?.(days);
@@ -119,7 +120,7 @@ setfieldvalue?.('ad_life',days);
         <DateTimePicker
           value={startDate}
           mode="date"
-          minimumDate={today}
+          minimumDate={minStartDate}
           display={Platform.OS === "ios" ? "inline" : "default"}
           onChange={(_, date) => {
             setShowStartPicker(false);
