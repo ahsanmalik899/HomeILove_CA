@@ -22,6 +22,18 @@ export const Google = createApi({
         },
       }),
     }),
+       getCityesSuggestions: builder.query<any, { input: string }>({
+      query: ({ input }) => ({
+        url: "place/autocomplete/json",
+        method: "GET",
+        params: {
+          input,
+          types: "(cities)",
+          components: "country:us",
+          key: GOOGLE_API_KEY,
+        },
+      }),
+    }),
     reverseGeocode: builder.query<any, { lat: number; lng: number }>({
       query: ({ lat, lng }) => ({
         url: `https://maps.googleapis.com/maps/api/geocode/json`,
@@ -51,4 +63,5 @@ export const {
   useGetPlaceDetailsQuery,
   useLazyGetPlaceDetailsQuery,
   useLazyReverseGeocodeQuery,
+  useGetCityesSuggestionsQuery,
 } = Google;

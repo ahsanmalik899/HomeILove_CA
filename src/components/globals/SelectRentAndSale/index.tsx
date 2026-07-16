@@ -6,18 +6,19 @@ import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RentAndSaleProps } from "./type";
-const index = ({ onPress, value,errorText }: RentAndSaleProps) => {
+const index = ({ onPress, value,errorText,edit=false }: RentAndSaleProps) => {
   return (
     <>
     <View className="flex-row justify-between">
+      {(edit&&value==="sale")&&(
       <TouchableOpacity className="items-center"
         style={[value === "sale" ? styles.activeButton : styles.Button]}
         onPress={()=>onPress('sale')}
       >
         {value === "sale" ? <ActiveSale /> : <SaleIcon />}
         <Text style={[value === "sale" ? styles.TextActive : styles.Text]}>For Sale</Text>
-      </TouchableOpacity>
-
+      </TouchableOpacity>)}
+{(edit&&value==="rent")&&(
       <TouchableOpacity
       className="items-center"
         style={[value === "rent" ? styles.activeButton : styles.Button]}
@@ -25,7 +26,7 @@ const index = ({ onPress, value,errorText }: RentAndSaleProps) => {
       >
         {value === "rent" ? <ActiveRent /> : <RentIcon />}
         <Text style={[value === "rent" ? styles.TextActive : styles.Text]}>For Rent</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>)}
     </View>
      { errorText && (
                       <Text

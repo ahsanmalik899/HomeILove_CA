@@ -102,7 +102,8 @@ const Index = () => {
     isFetching,
   } = useGetUserWalletQuery({
     id: user.id,
-  });
+  },
+{skip:!id});
   switch (type) {
     case "Builder Profile":
       dataAccordingType = {
@@ -1162,7 +1163,7 @@ const Index = () => {
                                   fontFamily: "PopinRegula",
                                 }}
                               >
-                                {amount.amount}
+                                {amount?.amount}
                               </Text>
                             )}
                             <Text
@@ -1236,7 +1237,7 @@ const Index = () => {
                                     );
                                     return;
                                   }
-                                  if (amount.amount >= Number(selectedAmount)) {
+                                  if (amount?.amount >= Number(selectedAmount)) {
                                     setFieldValue("payment_method", "Wallet");
                                     setFieldValue("amount", selectedAmount);
                                     handleSubmit();

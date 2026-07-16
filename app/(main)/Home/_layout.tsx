@@ -1,5 +1,5 @@
 import { Drawer } from "@/layouts/drawer";
-import { useGetUnreadNotificationsCountQuery } from "@/store/api/user/MainApi";
+import { useGetBlockedProfileMessageQuery, useGetUnreadNotificationsCountQuery, useGetUserStatusQuery, useSendBlockedProfileMessageMutation } from "@/store/api/user/MainApi";
 import { setNotificationCount } from "@/store/slices/Notification";
 import { Notification } from "@/store/slices/selector/Notification";
 import { userdata } from "@/store/slices/selector/user";
@@ -8,6 +8,7 @@ import NotificatioOutline from "@assets/Home/notificationOutline.svg";
 import SidebarIcon from "@assets/Home/sideMenueIcon.svg";
 import Connection from "@assets/icons/bottom-tabs/connectio_icon.svg";
 import { MaterialIcons } from "@expo/vector-icons";
+import BlockedUserModal from "@src/components/globals/BlockedComponenet/BlockedUserModal";
 import SideBarUser from "@src/components/globals/SideBarUser";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -20,11 +21,49 @@ import { useDispatch } from "react-redux";
 const _layout = () => {
   const user = useAppSelector(userdata);
   const dispatch = useDispatch();
-  const notifiation = useAppSelector(Notification);
+  const {
+  data: userStatus,
+  refetch: refetchUserStatus,
+} = useGetUserStatusQuery(
+  {
+    user_id: user?.id,
+  },
+  {
+    skip: !user?.id,
 
+  }
+);
+  const [
+  sendBlockedProfileMessage,
+  { isLoading: sendingMessage },
+] = useSendBlockedProfileMessageMutation();
+  const {
+  data: blockedMessage,
+  refetch:refetchMessage,
+  isLoading:gettingMessage
+} = useGetBlockedProfileMessageQuery(
+  {
+    post_id: user?.id,
+    post_of: "main_account",
+  },
+  {
+    skip: !user?.id,
+        refetchOnFocus: true,
+    refetchOnReconnect: true,
+  }
+);
+  const notifiation = useAppSelector(Notification);
+const isBlocked = userStatus?.user_status === "Blocked";
   const { data: unredCount ,refetch} = useGetUnreadNotificationsCountQuery({
     user_id: user?.id,
-  });
+  },{skip:!user?.id});
+useFocusEffect(
+  useCallback(() => {
+    refetch();
+    refetchMessage();
+    refetchUserStatus();
+  }, [refetch, refetchMessage, refetchUserStatus])
+);
 useFocusEffect(
   useCallback(() => {
     refetch();
@@ -58,6 +97,7 @@ useEffect(() => {
   };
 }, [user?.id]);
   return (
+    <>
     <Drawer
       screenOptions={{
         header: ({ navigation }) => (
@@ -164,6 +204,32 @@ useEffect(() => {
         }}
       />
     </Drawer>
+<BlockedUserModal
+  visible={isBlocked}
+  message="Your account has been blocked by the administrator."
+  initialMessage={blockedMessage?.messageToAdmin ?? ""}
+  loading={sendingMessage||gettingMessage}
+  onSendMessage={async (adminMessage) => {
+    try {
+      const res = await sendBlockedProfileMessage({
+        post_id: user?.id,
+        post_of: "main_account",
+        message: adminMessage,
+      }).unwrap();
+
+      if (res.status) {
+        alert(res.message);
+        refetch();
+      } else {
+        alert(res.message);
+      }
+    } catch (e) {
+      console.log(e);
+      alert("Something went wrong.");
+    }
+  }}
+/>
+    </>
   );
 };
 

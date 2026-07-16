@@ -16,6 +16,7 @@ import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { makeCall } from "@utils/makeCall";
 import { formatPrice } from "@utils/PriceFormater";
+import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -375,7 +376,26 @@ const YourAdsPostDesign = ({
                  
                 }}
               >
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={()=>{
+                    console.log(type)
+                                                router.navigate({
+                                                  pathname:"/ChatScreen",
+                                                  params:{
+                                                    userId:item.data?.user_id,
+                                                   name:item.data?.posted_by?.business_name,
+                                                     title: type === "community"
+                                          ? item.data?.community_title
+                                          : `${item.data?.bedrooms ?? 0} bedrooms ${
+                                              item.data?.property_sub_type ?? ""
+                                            } for ${item.data?.property_for ?? ""}`,
+                                      receiver_post_id:  type === "community"
+                                                    ? item.data?.post_community_id
+                                                    : item.data?.post_property_id,
+                                                    type:type==="community"?"":"property"
+                                                  }
+                                                })
+                                              }}>
                   <Mail />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{

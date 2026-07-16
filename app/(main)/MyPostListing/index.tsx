@@ -29,17 +29,17 @@ const index = () => {
   const type = String(rawType).toLowerCase();
     const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(ProfileType);
-  // const filter = [
-  //   { id: 1, name: "All" },
-  //   { id: 3, name: "Agents" },
-  //   { id: 4, name: "Builders" },
-  //   { id: 5, name: "Mortgages" },
-  //   { id: 6, name: "Electricians" },
-  //   { id: 7, name: "Decor" },
-  //   { id: 8, name: "Plumbers" },
-  //   { id: 9, name: "Painters" },
-  //   { id: 10, name: "Investors" },
-  // ];
+  const filter = [
+    { id: 1, name: "All" },
+    { id: 3, name: "Agent" },
+    { id: 4, name: "Builder" },
+    { id: 5, name: "Mortgage" },
+    { id: 6, name: "Electrician" },
+    { id: 7, name: "Decor" },
+    { id: 8, name: "Plumber" },
+    { id: 9, name: "Painter" },
+    { id: 10, name: "Investor" },
+  ];
 useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
@@ -65,7 +65,7 @@ useFocusEffect(
     return () => sub.remove();
   }, [isShowpost])
 );
-const filter = []
+
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
   const [posts, setPosts] = useState<[]>([]);
@@ -76,7 +76,11 @@ const filter = []
     per_page: perPage,
     page,
     user_id:id?id: user.id,
-    profile_type: profile_type?profile_type:ProfileType,
+    profile_type: profile_type
+  ? profile_type
+  : ProfileType === "All"
+    ? ""
+    : ProfileType
   });
   const renderFilterItem = ({ item }) => {
     const isActive = selectedFilter === item.name;

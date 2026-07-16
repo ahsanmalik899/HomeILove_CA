@@ -136,7 +136,7 @@ const PostDesign = ({
   }, [showpostPostData?.users_id]);
   const [lazyUserAgentPastPostsApi, { data: pastData, isLoading: pastLoading }] = useLazyUserAgentPastPostsApiQuery();
   useEffect(() => {
-
+  if (!showpostPostData?.users_id) return;
     lazyUserAgentPastPostsApi({ user_id: showpostPostData?.users_id, page: pastpage, per_page: 10 });
   }, [pastpage, showpostPostData]);
   useEffect(() => {
@@ -390,6 +390,7 @@ const PostDesign = ({
     }
   };
   useEffect(() => {
+    if(!showpostPostData?.post_id) return
     getComments({ post_id: showpostPostData?.post_id });
   }, [showpostPostData]);
   const renderItem = ({ item }) => {
@@ -489,9 +490,54 @@ const PostDesign = ({
               <Text style={{ fontFamily: "PopinRegula" }} className="font-bold">
                 Dealing areas
               </Text>
-              <Text style={{ fontFamily: "PopinRegula", width: hs(200) }}>
-                {item.dealing_areas}
-              </Text>
+               <View
+    style={{
+      width: hs(220),
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "flex-end",
+    }}
+  >
+    {item.dealing_areas === "Nationwide" ? (
+      <View
+        style={{
+          backgroundColor: "#E8F5E9",
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+          borderRadius: 20,
+          margin: 3,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "PopinRegula",
+            color: "#2E7D32",
+          }}
+        >
+          Nationwide
+        </Text>
+      </View>
+    ) : (
+      item.dealing_city
+        ?.split(",")
+        .map((city: string, index: number) => (
+          <View
+            key={index}
+            style={{
+              backgroundColor: "#F2F2F2",
+              borderRadius: 20,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              margin: 3,
+            }}
+          >
+            <Text style={{ fontFamily: "PopinRegula", fontSize: 12 }}>
+              {city.trim()}
+            </Text>
+          </View>
+        ))
+    )}
+  </View>
             </View>
             <View
               className="flex-row justify-between"
@@ -1650,6 +1696,7 @@ const PostDesign = ({
 
                 const result = await reportPostApi(formData).unwrap();
                 if (result?.success) {
+                   handleHidePost(reportData);
                   renderToastSuccess(result.message);
                   setShowReport(false);
                   setSelectedType("");

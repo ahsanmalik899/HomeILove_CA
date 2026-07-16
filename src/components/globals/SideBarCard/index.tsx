@@ -1,11 +1,13 @@
 import Add from "@assets/SideBar/addGreen.svg";
 import ArrowUp from "@assets/SideBar/arrowup.svg";
+import { MaterialIcons } from "@expo/vector-icons";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SideBarCardprops } from "./type";
-const index = ({ Svg, text, type, totalPosts,profileType,id, onPress=()=>{},ProfileExist }: SideBarCardprops) => {
+const index = ({ Svg, text, type, totalPosts,profileType,id,isBlocked, onPress=()=>{},ProfileExist }: SideBarCardprops) => {
+  console.log("isblocked",isBlocked)
   return (
     <TouchableOpacity
       style={[styles.card, { height: type === "Buy" ? vs(160) : vs(140) ,backgroundColor:ProfileExist?'#F4F0F0':'white'}]}
@@ -18,9 +20,17 @@ const index = ({ Svg, text, type, totalPosts,profileType,id, onPress=()=>{},Prof
           : onPress();
       }}
     >
-      {type === "busenessProfile" ? (
+      {(type === "busenessProfile"||type==="Blocked") ? (
         <View style={{ marginTop: vs(10) }}>
-         {ProfileExist?(<ArrowUp />):( <Add />)}
+    {ProfileExist ? (
+  isBlocked === "Blocked" ? (
+    <MaterialIcons name="block" size={24} color="red" />
+  ) : (
+    <ArrowUp />
+  )
+) : (
+  <Add />
+)}
         </View>
       ) : (
         <View className="flex-row justify-between items-center">

@@ -432,6 +432,8 @@ const YourAdsPostDesign = ({
                   Learn about trending ads
                 </Text>
                 <View className="flex-row ">
+                  {((type === "community" && item.post_status === "Active") ||
+  (type !== "community" && item.status === "Active")) &&(
                   <TouchableOpacity
                     style={{ marginRight: hs(10) }}
                     onPress={() => {
@@ -452,7 +454,7 @@ const YourAdsPostDesign = ({
                     }}
                   >
                     <Edit />
-                  </TouchableOpacity>
+                  </TouchableOpacity>)}
                   <TouchableOpacity
                     onPress={() => {
                       if (item.ad_by === "Agent") {
@@ -471,7 +473,7 @@ const YourAdsPostDesign = ({
                             {
                               text: "Yes",
                               onPress: () => {
-                                handleDelete(selectedPost, "Deleted", type);
+                                handleDelete(item, "Deleted", type);
                               },
                             },
                           ]

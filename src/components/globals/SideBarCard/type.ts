@@ -9,4 +9,5 @@ export type SideBarCardprops = {
     onPress?:()=>void
     id?:number;
     profileType?:string;
+    isBlocked?:string;
 }

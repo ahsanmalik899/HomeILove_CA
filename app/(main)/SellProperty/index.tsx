@@ -24,7 +24,7 @@ const index = () => {
           Svg={PropertyForSale}
           text="Property"
           onPress={() => {
-            if(user.user_type==="Business"&&data.total_profiles<1){
+            if(user.user_type==="Business"&&data.active_profiles<1){
               renderToastError("Go to dashboard and atleast create one Profile")
             }
             else{
@@ -37,7 +37,7 @@ const index = () => {
           Svg={Commercial}
           text="Community"
           onPress={() => {
-              if(user.user_type==="Business"&&data.total_profiles<1){
+              if(user.user_type==="Business"&&data.active_profiles<1){
               renderToastError("Go to dashboard and atleast create one Profile")
             }
             else{

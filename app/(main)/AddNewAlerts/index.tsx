@@ -232,9 +232,9 @@ const index = () => {
                     required
                     errorText={errors.community_type}
                     options={[
-                      { label: "Residential", value: "Residential" },
-                      { label: "Commercial", value: "Commercial" },
-                      { label: "Farms / Lands", value: "Farms/Lands" },
+                      { label: "Residential", value: "House" },
+                      { label: "Commercial", value: "Commercials" },
+                      { label: "Mix", value: "Farms/Lands" },
                     ]}
                     name="community_type"
                     setValue={setFieldValue}

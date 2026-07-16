@@ -63,6 +63,7 @@ const index = () => {
   const [advatizeinfoType, setAdvatizeinfoType] = useState("Homefeed");
   const [listingInfo, setListingInfo] = useState("ListingDetail");
   const [EditAdData, setEditAdData] = useState(null);
+  const [showMaintenanceOptions, setShowMaintenanceOptions] = useState(false);
   const [timePeriod, setTimeperiod] = useState("");
   const [EditAd, setEditAd] = useState(false);
   const [getprice, { data: promotionPrices, isFetching: pricesFetching }] =
@@ -74,14 +75,14 @@ const index = () => {
   const [page, setpage] = useState("");
   const [updateAdvertisementMedia, { isLoading: updateadloading }] =
     useUpdateAdvertisementMediaMutation();
-    const [subPage,setSubpage]=useState("");
-      const rotateAnim = useRef(new Animated.Value(0)).current;
+  const [subPage, setSubpage] = useState("");
+  const rotateAnim = useRef(new Animated.Value(0)).current;
   const [showAdPreview, setShowAdPreview] = useState(false);
-    const scaleAnim = useRef(new Animated.Value(0.9)).current;
-    const rotate = rotateAnim.interpolate({
-  inputRange: [-1, 1],
-  outputRange: ["-2deg", "2deg"],
-});
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const rotate = rotateAnim.interpolate({
+    inputRange: [-1, 1],
+    outputRange: ["-2deg", "2deg"],
+  });
 
   const AdvatizeSchema = Yup.object().shape({
     start_date: Yup.string().required("Start date is required"),
@@ -97,7 +98,11 @@ const index = () => {
       .test(
         "valid-page",
         "Please select a sub page",
-        (value) => value !== "listing" && value !== "listing_details"
+        (value) =>
+          value !== "listing" &&
+          value !== "listing_details" &&
+          value !== "maintenance_single" &&
+          value !== "maintenance"
       ),
   });
   const EditAdvatizeSchema = Yup.object().shape({
@@ -116,28 +121,28 @@ const index = () => {
   const [SelectedAmount, setSelectedAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [orderid, setOrderid] = useState("");
-useEffect(() => {
-  Animated.timing(scaleAnim, {
-    toValue: 1,
-    duration: 500,
-    easing: Easing.out(Easing.ease),
-    useNativeDriver: true,
-  }).start();
-  Animated.loop(
-    Animated.sequence([
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateAnim, {
-        toValue: -1,
-        duration: 3000,
-        useNativeDriver: true,
-      }),
-    ])
-  ).start();
-}, []);
+  useEffect(() => {
+    Animated.timing(scaleAnim, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(rotateAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(rotateAnim, {
+          toValue: -1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
   const Listingcomponenet1 = (
     <View style={{ marginTop: vs(10) }}>
       <Listipage1 height={vs(300)} width={hs(350)} />
@@ -444,32 +449,32 @@ useEffect(() => {
       </ScrollView>
     );
   }
- 
- const pageImages = {
-  newsfeed: Newsfeeed,
-  connections: connections,
 
-  sale: propertyListing,
-  sale_single: propertySingleView,
+  const pageImages = {
+    newsfeed: Newsfeeed,
+    connections: connections,
 
-  rent: propertyListing,
-  rent_single: propertySingleView,
+    sale: propertyListing,
+    sale_single: propertySingleView,
 
-  community: communityListing,
-  community_single: communitySingleView,
+    rent: propertyListing,
+    rent_single: propertySingleView,
 
-  agent: profileListing,
-  agent_single: profileSingleview,
+    community: communityListing,
+    community_single: communitySingleView,
 
-  developer: profileListing,
-  developer_single: profileSingleview,
+    agent: profileListing,
+    agent_single: profileSingleview,
 
-  mortgage: profileListing,
-  mortgage_single: profileSingleview,
+    developer: profileListing,
+    developer_single: profileSingleview,
 
-  maintenance: profileListing,
-  maintenance_single: profileSingleview,
-};
+    mortgage: profileListing,
+    mortgage_single: profileSingleview,
+
+    maintenance: profileListing,
+    maintenance_single: profileSingleview,
+  };
   const pageTypeMap: Record<string, string> = {
     newsfeed: "Newsfeed",
     connections: "Connection",
@@ -530,7 +535,7 @@ useEffect(() => {
                         formData.append(key, String(values[key]));
                       }
                     });
-                        
+
                     // Append image
                     if (values.business_cover?.uri) {
                       formData.append("business_cover", {
@@ -539,7 +544,7 @@ useEffect(() => {
                         type: values.business_cover.type ?? "image/jpeg",
                       } as any);
                     }
-                      formData.append("total_price",SelectedAmount);
+                    formData.append("total_price", SelectedAmount);
                     const response = await PostAdvatizement(formData).unwrap();
 
                     // ✅ SUCCESS TOAST
@@ -642,7 +647,6 @@ useEffect(() => {
                           setFieldValue("on_page", "listing");
                           getprice({ type: pageTypeMap["listing"] });
                           setpage("listing");
-                          
                         }}
                       >
                         <Text
@@ -707,7 +711,9 @@ useEffect(() => {
                               fontFamily: "PopinRegula",
                             }}
                           >
-                               { page==="listing"? "Listing Pages":"Detail Pages"}
+                            {page === "listing"
+                              ? "Listing Pages"
+                              : "Detail Pages"}
                           </Text>
                           <View
                             className="flex-row justify-between"
@@ -922,22 +928,113 @@ useEffect(() => {
                               </Text>
                             </TouchableOpacity>
                           </View>
+                          <View
+                            className="flex-row justify-between"
+                            style={{ marginTop: vs(10), gap: hs(5) }}
+                          >
+                            <TouchableOpacity
+                              style={[
+                                styles.btn,
+                                (values.on_page === "investor" ||
+                                  values.on_page === "investor_single") &&
+                                  styles.btnselected,
+                                { flex: 1 },
+                              ]}
+                              onPress={() => {
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "investor")
+                                    : setFieldValue(
+                                        "on_page",
+                                        "investor_single"
+                                      );
+                                }
+                                getprice({ type: pageTypeMap[page] });
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color:
+                                    values.on_page === "investor" ||
+                                    values.on_page === "investor_single"
+                                      ? "white"
+                                      : "black",
+                                  fontWeight: 600,
+                                  fontFamily: "PopinRegula",
+                                }}
+                              >
+                                Investors
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[
+                                styles.btn,
+                                (values.on_page === "maintenance" ||
+                                  values.on_page === "maintenance_single") &&
+                                  styles.btnselected,
+                                { flex: 1 },
+                              ]}
+                              onPress={() => {
+                                setShowMaintenanceOptions(true);
+                                {
+                                  page === "listing"
+                                    ? setFieldValue("on_page", "maintenance")
+                                    : setFieldValue(
+                                        "on_page",
+                                        "maintenance_single"
+                                      );
+                                }
+                                getprice({ type: pageTypeMap[page] });
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color:
+                                    values.on_page === "maintenance" ||
+                                    values.on_page === "maintenance_single"
+                                      ? "white"
+                                      : "black",
+                                  fontWeight: 600,
+                                  fontFamily: "PopinRegula",
+                                }}
+                              >
+                                Home maintenance
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </>
+                      )}
+                    {values.on_page && showMaintenanceOptions && (
+                      <View>
+                           <View
+                            style={{
+                              borderLeftWidth: 1,
+                              borderBottomWidth: 1,
+                              borderRightWidth: 1,
+                              marginTop: vs(20),
+                              marginBottom: vs(10),
+                              opacity: 0.15,
+                              borderColor: Colors.light.textGray,
+                              borderRadius: ms(5),
+                            }}
+                          />
+                        <View
+                          className="flex-row justify-between"
+                          style={{ marginTop: vs(10), gap: hs(5) }}
+                        >
                           <TouchableOpacity
                             style={[
                               styles.btn,
-                              (values.on_page === "maintenance" ||
-                                values.on_page === "maintenance_single") &&
-                                styles.btnselected,
-                              { width: hs(200), marginTop: vs(10) },
+                              (values.on_page === "decor" ||
+                                values.on_page === "decor_single") &&
+                                  styles.btnselected,
+                              { flex: 1 },
                             ]}
                             onPress={() => {
                               {
                                 page === "listing"
-                                  ? setFieldValue("on_page", "maintenance")
-                                  : setFieldValue(
-                                      "on_page",
-                                      "maintenance_single"
-                                    );
+                                  ? setFieldValue("on_page", "decor")
+                                  : setFieldValue("on_page", "decor_single");
                               }
                               getprice({ type: pageTypeMap[page] });
                             }}
@@ -945,19 +1042,118 @@ useEffect(() => {
                             <Text
                               style={{
                                 color:
-                                  values.on_page === "maintenance" ||
-                                  values.on_page === "maintenance_single"
+                                  values.on_page === "decor" ||
+                                  values.on_page === "decor_single"
                                     ? "white"
                                     : "black",
                                 fontWeight: 600,
                                 fontFamily: "PopinRegula",
                               }}
                             >
-                              Home maintenance
+                              Home decor
                             </Text>
                           </TouchableOpacity>
-                        </>
-                      )}
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              (values.on_page === "electrician" ||
+                                values.on_page === "electrician_single") &&
+                                styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              {
+                                page === "listing"
+                                  ? setFieldValue("on_page", "electrician")
+                                  : setFieldValue("on_page", "electrician_single");
+                              }
+                              getprice({ type: pageTypeMap[page] });
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "electrician" ||
+                                  values.on_page === "electrician_single"
+                                    ? "white"
+                                    : "black",
+                                fontWeight: 600,
+                                fontFamily: "PopinRegula",
+                              }}
+                            >
+                              Electricians
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View
+                          className="flex-row justify-between"
+                          style={{ marginTop: vs(10), gap: hs(5) }}
+                        >
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              (values.on_page === "plumber" ||
+                                values.on_page === "plumber_single") &&
+                                  styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              {
+                                page === "listing"
+                                  ? setFieldValue("on_page", "plumber")
+                                  : setFieldValue("on_page", "plumber_single");
+                              }
+                              getprice({ type: pageTypeMap[page] });
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "plumber" ||
+                                  values.on_page === "plumber_single"
+                                    ? "white"
+                                    : "black",
+                                fontWeight: 600,
+                                fontFamily: "PopinRegula",
+                              }}
+                            >
+                              Plumbers
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[
+                              styles.btn,
+                              (values.on_page === "painter" ||
+                                values.on_page === "painter_single") &&
+                                styles.btnselected,
+                              { flex: 1 },
+                            ]}
+                            onPress={() => {
+                              {
+                                page === "listing"
+                                  ? setFieldValue("on_page", "painter")
+                                  : setFieldValue("on_page", "painter_single");
+                              }
+                              getprice({ type: pageTypeMap[page] });
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color:
+                                  values.on_page === "painter" ||
+                                  values.on_page === "painter_single"
+                                    ? "white"
+                                    : "black",
+                                fontWeight: 600,
+                                fontFamily: "PopinRegula",
+                              }}
+                            >
+                              Painters
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
                     {touched && errors && (
                       <Text
                         style={{
@@ -1024,7 +1220,7 @@ useEffect(() => {
                     <LargeButton
                       handleSubmit={() => {
                         setShowAdPreview(!showAdPreview);
-                        console.log(values.on_page)
+                        console.log(values.on_page);
                       }}
                       text={showAdPreview ? "Hide your Ad" : "View your Ad"}
                     />
@@ -1046,75 +1242,92 @@ useEffect(() => {
                           source={pageImages[values.on_page.toString()]}
                           style={styles.adContainer}
                           resizeMode="cover"
-                          
                         >
-                            <View
-    style={{
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0,0,0,0.4)",
-    }}
-  />
-                         {values.on_page==="newsfeed"?(
-                          <View style={{marginTop:vs(260)}}>
-                          <AdCardWithoutAnimation isSqure={true} ad={values} />
-                          </View>
-                         ):values.on_page==="connections"?(
-                          <View style={{marginTop:vs(418)}}>
-                          <AdCardWithoutAnimation isSqure={false} ad={values} />
-                          </View>
-                         ):values.on_page==="sale"||values.on_page==="rent"?(
-                            <View style={{marginTop:vs(440)}}>
-                          <AdCardWithoutAnimation isSqure={false} ad={values} />
-                          </View>
-                         ):values.on_page==="community"?(
-                          
-                           <View style={{marginTop:vs(380)}}>
-                          <AdCardWithoutAnimation isSqure={false} ad={values} />
-                          </View>
-                         )
-                        :values.on_page==="agent"||values.on_page==="developer"||values.on_page==="mortgage"||values.on_page==="maintenance"?(
-                          
-                           <View style={{marginTop:vs(385)}}>
-                          <AdCardWithoutAnimation isSqure={false} ad={values} />
-                          </View>
-                         ):(
-                           <View style={{marginTop:vs(50)}}>
-                             <Animated.View
-                            style={[
-                              styles.adCard,
-                              {
-                                transform: [
-                                  { scale: scaleAnim },
-                                  { rotateZ: rotate },
-                                ],
-                              },
-                            ]}
-                          ><TouchableOpacity
-                          style={{backgroundColor:"black"}}
-                           onPress={() => {
-                            if(values.ad_link){
-                            const finalUrl = values.ad_link.startsWith("https")
-                                ? values.ad_link
-                                : `https://${values.ad_link}`;
-                              WebBrowser.openBrowserAsync(finalUrl);
-                            }
-                          }}>
-                            <Image
-                              source={{
-                              uri: values.business_cover?.uri,
-                              }}
-                              style={styles.adImage}
-                              resizeMode="contain"
-                            />
-                            </TouchableOpacity>
-                          </Animated.View>
-                          </View>
-                         )}
-                           
+                          <View
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              backgroundColor: "rgba(0,0,0,0.4)",
+                            }}
+                          />
+                          {values.on_page === "newsfeed" ? (
+                            <View style={{ marginTop: vs(260) }}>
+                              <AdCardWithoutAnimation
+                                isSqure={true}
+                                ad={values}
+                              />
+                            </View>
+                          ) : values.on_page === "connections" ? (
+                            <View style={{ marginTop: vs(418) }}>
+                              <AdCardWithoutAnimation
+                                isSqure={false}
+                                ad={values}
+                              />
+                            </View>
+                          ) : values.on_page === "sale" ||
+                            values.on_page === "rent" ? (
+                            <View style={{ marginTop: vs(440) }}>
+                              <AdCardWithoutAnimation
+                                isSqure={false}
+                                ad={values}
+                              />
+                            </View>
+                          ) : values.on_page === "community" ? (
+                            <View style={{ marginTop: vs(380) }}>
+                              <AdCardWithoutAnimation
+                                isSqure={false}
+                                ad={values}
+                              />
+                            </View>
+                          ) : values.on_page === "agent" ||
+                            values.on_page === "developer" ||
+                            values.on_page === "mortgage" ||
+                            values.on_page === "maintenance" ? (
+                            <View style={{ marginTop: vs(385) }}>
+                              <AdCardWithoutAnimation
+                                isSqure={false}
+                                ad={values}
+                              />
+                            </View>
+                          ) : (
+                            <View style={{ marginTop: vs(50) }}>
+                              <Animated.View
+                                style={[
+                                  styles.adCard,
+                                  {
+                                    transform: [
+                                      { scale: scaleAnim },
+                                      { rotateZ: rotate },
+                                    ],
+                                  },
+                                ]}
+                              >
+                                <TouchableOpacity
+                                  style={{ backgroundColor: "black" }}
+                                  onPress={() => {
+                                    if (values.ad_link) {
+                                      const finalUrl =
+                                        values.ad_link.startsWith("https")
+                                          ? values.ad_link
+                                          : `https://${values.ad_link}`;
+                                      WebBrowser.openBrowserAsync(finalUrl);
+                                    }
+                                  }}
+                                >
+                                  <Image
+                                    source={{
+                                      uri: values.business_cover?.uri,
+                                    }}
+                                    style={styles.adImage}
+                                    resizeMode="contain"
+                                  />
+                                </TouchableOpacity>
+                              </Animated.View>
+                            </View>
+                          )}
 
                           <TouchableOpacity
                             onPress={() => setShowAdPreview(false)}
@@ -1122,12 +1335,12 @@ useEffect(() => {
                               position: "absolute",
                               top: 10,
                               right: 10,
-                               backgroundColor: "rgba(0,0,0,0.3)", 
-                              padding:10,
-                              borderRadius:50,
+                              backgroundColor: "rgba(0,0,0,0.3)",
+                              padding: 10,
+                              borderRadius: 50,
                             }}
                           >
-                            <Text style={{ color: "#fff", fontSize: 18, }}>
+                            <Text style={{ color: "#fff", fontSize: 18 }}>
                               ✕
                             </Text>
                           </TouchableOpacity>
@@ -1821,7 +2034,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     backgroundColor: "#eee",
-    
   },
   adImage: {
     width: "100%",
@@ -1839,16 +2051,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-      adCard: {
-      width: "100%",
-      height: vs(100),
-      marginVertical: vs(10),
-      borderRadius: ms(16),
-      overflow: "hidden",
-      backgroundColor: "transparent",
-      elevation: 0,
-    },
-  
+  adCard: {
+    width: "100%",
+    height: vs(100),
+    marginVertical: vs(10),
+    borderRadius: ms(16),
+    overflow: "hidden",
+    backgroundColor: "transparent",
+    elevation: 0,
+  },
+
   paypalText: {
     marginLeft: hs(10),
     fontSize: ms(14),

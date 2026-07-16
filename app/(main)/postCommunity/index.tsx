@@ -1256,7 +1256,7 @@ const index = () => {
                       </Text>
                       {data?.total_profiles !== 0 && (
                         <View>
-                          {data?.profiles_exist?.agent && (
+                          {(data?.profiles_exist?.agent.exists && data?.profiles_exist?.agent.status==="Active") && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1287,7 +1287,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.builder && (
+                          {(data?.profiles_exist?.builder.exists && data?.profiles_exist?.builder.status==="Active" ) && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1318,7 +1318,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.decor && (
+                          {(data?.profiles_exist?.decor.exists && data?.profiles_exist?.decor.status==="Active") && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1349,7 +1349,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.electrician && (
+                          {(data?.profiles_exist?.electrician.exists &&data?.profiles_exist?.electrician.status==="Active" ) && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1382,7 +1382,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.investor && (
+                          {(data?.profiles_exist?.investor.exists && data?.profiles_exist?.investor.status==="Active") && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1413,7 +1413,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.mortgage && (
+                          {(data?.profiles_exist?.mortgage.exists && data?.profiles_exist?.mortgage.status==="Active") && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1444,7 +1444,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.painter && (
+                          {(data?.profiles_exist?.painter.exists && data?.profiles_exist?.painter.status==="Active") && (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(
@@ -1475,7 +1475,7 @@ const index = () => {
                               </View>
                             </TouchableOpacity>
                           )}
-                          {data?.profiles_exist?.plumber && (
+                          {(data?.profiles_exist?.plumber.exists && data?.profiles_exist?.plumber.status==="Active")&& (
                             <TouchableOpacity
                               onPress={() => {
                                 setFieldValue(

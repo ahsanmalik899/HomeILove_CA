@@ -1,5 +1,6 @@
 import {
   useGetAddressSuggestionsQuery,
+  useGetCityesSuggestionsQuery,
   useLazyGetPlaceDetailsQuery,
 } from "@/store/api/user/Google";
 import Cross from "@assets/CreateProfile/cross.svg";
@@ -36,6 +37,7 @@ export const DealingAreas = ({
   placeholder,
   setValue = () => {},
   name = "name",
+  cityOnly=false,
 }: AddressInputProps) => {
   const [currentValue, setCurrentValue] = useState<string>(
     value?.toString() || ""
@@ -93,10 +95,24 @@ export const DealingAreas = ({
   const normalize = (str: string) =>
     str.replace(/,/g, "").replace(/\s+/g, " ").trim();
   const [getPlaceDetails] = useLazyGetPlaceDetailsQuery();
-  const { data: googleData, isFetching } = useGetAddressSuggestionsQuery(
-    { input: currentValue },
-    { skip: currentValue.length < 3 }
-  );
+const cityQuery = useGetCityesSuggestionsQuery(
+  { input: currentValue },
+  {
+    skip: !cityOnly || currentValue.length < 3,
+  }
+);
+
+const addressQuery = useGetAddressSuggestionsQuery(
+  { input: currentValue },
+  {
+    skip: cityOnly || currentValue.length < 3,
+  }
+);
+
+const googleData = cityOnly ? cityQuery.data : addressQuery.data;
+const isFetching = cityOnly
+  ? cityQuery.isFetching
+  : addressQuery.isFetching;
 
   const handleSelectSuggestion = async (address: string, id: string) => {
     setCurrentValue(address.replace(/,/g, ""));

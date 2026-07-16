@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { Platform, Text } from "react-native";
 const _layout = () => {
   const user = useAppSelector(userdata);
- const {data:count,isLoading}=useGetUnreadConversationCountQuery({user_id:user?.id})
+ const {data:count,isLoading}=useGetUnreadConversationCountQuery({user_id:user?.id},{skip:!user?.id})
     const [unreadCount, setUnreadCount] = useState(0);
 useEffect(()=>{
 setUnreadCount(count?.unread_conversations)

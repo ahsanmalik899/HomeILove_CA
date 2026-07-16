@@ -225,7 +225,7 @@ const renderItem = useCallback(({ item }: any) => {
 <View>
     <Text style={styles.headerTitle} numberOfLines={1}>
   Chat with{" "}
- {type==="community"||type==="property"?(
+ {(type==="community"||type==="property")?(
   <Text style={{color:Colors.light.red}}>
   {name?.length > 15 ? `${name.slice(0, 15)}...` : name}
   </Text>):(
@@ -242,7 +242,7 @@ const renderItem = useCallback(({ item }: any) => {
   )}
  
 </Text>
-{type==="community"||type==="property"&&(
+{(type==="community"||type==="property")&&(
 <TouchableOpacity onPress={()=>{
  
  setShowpost(true)

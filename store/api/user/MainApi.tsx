@@ -36,6 +36,7 @@ export const MainApi = createApi({
     "unreadChats",
     "conversations",
     "GetReviews",
+    "YourPosts"
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -44,6 +45,7 @@ export const MainApi = createApi({
         url: `getUserGeneralPosts?user_id=${userid}&page=${page}`,
         method: "GET",
       }),
+      providesTags:["YourPosts"]
     }),
      getSingleGeneralPost: builder.query<FeedResponse, any>({
       query: ({ userid, post_id }) => ({
@@ -120,6 +122,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags:["YourPosts"]
     }),
      deleteGeneralPost: builder.mutation<any, FormData>({
       query: (data) => ({
@@ -316,7 +319,7 @@ export const MainApi = createApi({
     }),
     getSingleProfile: builder.query<any, any>({
       query: ({ type, id, user_id }) => ({
-        url: `getSingleProfile?type=${type}&id=${Number(id)}&user_id=${user_id}`,
+        url: `getSingleProfile?type=${type}&id=${Number(id)}`,
         method: "GET",
       }),
       providesTags:["myProfile"]
@@ -1042,6 +1045,27 @@ getSavedAdsApi:builder.query<any,any>({
   }),
 providesTags:["savedAds"],
 }),
+getBlockedProfileMessage: builder.query({
+    query: (body) => ({
+        url: "/getBlockedProfileMessage",
+        method: "POST",
+        body,
+    }),
+}),
+getUserStatus: builder.query({
+  query: (body) => ({
+    url: "/getUserStatus",
+    method: "POST",
+    body,
+  }),
+}),
+sendBlockedProfileMessage: builder.mutation({
+    query: (body) => ({
+        url: "/sendBlockedProfileMessage",
+        method: "POST",
+        body,
+    }),
+}),
   }),
 });
 
@@ -1053,6 +1077,7 @@ export const {
   useGetSinglePostQuery,
   usePostPropertyMutation,
   useGetProfilesQuery,
+    useGetUserStatusQuery,
   usePostCommunityMutation,
   usePostGeneralPostMutation,
   useSetPropertyPrefrenceMutation,
@@ -1168,4 +1193,6 @@ export const {
   useCheckReviewApiQuery,
   useDeleteChatsMutation,
   useGetConversationListQuery,
+  useGetBlockedProfileMessageQuery,
+  useSendBlockedProfileMessageMutation,
 } = MainApi;

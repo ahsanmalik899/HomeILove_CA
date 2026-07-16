@@ -122,7 +122,7 @@ const {data:promotionPrices}=useGetAdvatizementPriceQuery({type:"Promotion"})
     refetch,
   } = useUserAgentPastPostsApiQuery(
     { page, per_page: perPage, user_id: user.id },
-    { skip: Profiletype !== "agent" }
+    { skip: Profiletype !== "agent"|| !user?.id, }
   );
   const handleDelete = () => {
     Alert.alert(

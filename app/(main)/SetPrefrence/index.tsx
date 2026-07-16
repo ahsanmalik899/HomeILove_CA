@@ -11,7 +11,7 @@ import {
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import { MaterialIcons } from "@expo/vector-icons";
-import { DealingAreas } from "@src/components/globals/DealingAreas";
+import { DealingAreaswithRadius } from "@src/components/globals/DealinAreaswithRadius";
 import { FormikDropdown } from "@src/components/globals/FormikDropdown/indes";
 import { FormikDropdownwithjson } from "@src/components/globals/FormikDropdownwithjson";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
@@ -29,10 +29,10 @@ const index = () => {
   const user = useAppSelector(userdata);
   const [ResetProperty, { isLoading: resetPropertyLoading }] =
     useDeletePropertyPreferencesApiMutation();
-     const [ResetCommunity, { isLoading: resetCommunityLoading }] =
+  const [ResetCommunity, { isLoading: resetCommunityLoading }] =
     useDeleteCommunityPreferencesApiMutation();
-     useDeletePropertyPreferencesApiMutation();
-     const [ResetConnection, { isLoading: resetConnectionLoading }] =
+  useDeletePropertyPreferencesApiMutation();
+  const [ResetConnection, { isLoading: resetConnectionLoading }] =
     useDeleteConnectionPreferencesApiMutation();
   const { type } = useLocalSearchParams();
   const [setPropertyPrefrence, { isLoading: PropertyLoading }] =
@@ -41,7 +41,11 @@ const index = () => {
     useSetCommunityPrefrenceMutation();
   const [setConnectionPrefrence, { isLoading: ConnectionLoading }] =
     useSetConectionPrefrenceMutation();
-  const { data,refetch:refetchConnectionPreference, isFetching: conectioLoading } = useGetConnectionPrefQuery(
+  const {
+    data,
+    refetch: refetchConnectionPreference,
+    isFetching: conectioLoading,
+  } = useGetConnectionPrefQuery(
     {
       id: user.id,
       type: "",
@@ -51,26 +55,32 @@ const index = () => {
     }
   );
 
-  const { data: communityData,refetch:refetchCommunityPreference, isFetching: communityprefLoading } =
-    useGetCommunityPrefQuery(
-      {
-        id: user.id,
-        type: "",
-      },
-      {
-        skip: type !== "Community",
-      }
-    );
-  const { data: propertyData,refetch: refetchPropertyPreference ,isFetching: propertyprefLoading } =
-    useGetPropertyPrefQuery(
-      {
-        id: user.id,
-        type: "",
-      },
-      {
-        skip: type !== "Property",
-      }
-    );
+  const {
+    data: communityData,
+    refetch: refetchCommunityPreference,
+    isFetching: communityprefLoading,
+  } = useGetCommunityPrefQuery(
+    {
+      id: user.id,
+      type: "",
+    },
+    {
+      skip: type !== "Community",
+    }
+  );
+  const {
+    data: propertyData,
+    refetch: refetchPropertyPreference,
+    isFetching: propertyprefLoading,
+  } = useGetPropertyPrefQuery(
+    {
+      id: user.id,
+      type: "",
+    },
+    {
+      skip: type !== "Property",
+    }
+  );
 
   const toggleStatus = (
     currentvalue: string,
@@ -92,7 +102,7 @@ const index = () => {
     location: Yup.string().nullable(),
     user_id: Yup.string().nullable(),
     property_for: Yup.string().nullable(),
-
+     radius: Yup.string().nullable(),
     property_type: Yup.string().nullable(),
     property_condition: Yup.string().nullable(),
     min_price: Yup.number()
@@ -145,7 +155,7 @@ const index = () => {
 
     community_type: Yup.string().nullable(),
     community_status: Yup.string().nullable(),
-
+    radius: Yup.string().nullable(),
     min_price: Yup.number()
       .typeError("Minimum price must be a number")
       .nullable(),
@@ -159,6 +169,7 @@ const index = () => {
     user_id: Yup.string().nullable(),
     location: Yup.string().nullable(),
     user_type: Yup.string().nullable(),
+    radius: Yup.string().nullable(),
   });
 
   switch (type) {
@@ -174,7 +185,10 @@ const index = () => {
                   user_id: user.id,
 
                   location: propertyData?.data?.location || "",
-
+                     zip:propertyData?.data?.zip|| "",
+                  state:propertyData?.data?.state || "",
+                  radius:propertyData?.data?.radius||"",
+                  
                   property_for: propertyData?.data?.property_for || "",
                   property_type: propertyData?.data?.property_type || "",
                   property_condition:
@@ -222,6 +236,7 @@ const index = () => {
                 }}
                 onSubmit={async (values) => {
                   try {
+                    console.log(values)
                     const result = await setPropertyPrefrence(values);
 
                     if (result?.data?.success) {
@@ -249,7 +264,7 @@ const index = () => {
                   resetForm,
                 }) => (
                   <>
-                    <DealingAreas
+                       <DealingAreaswithRadius
                       city="dealing_city"
                       onSelect={() => {}}
                       state="state"
@@ -262,6 +277,8 @@ const index = () => {
                       setValue={setFieldValue}
                       errorText={errors.location}
                       placeholder="Please enter City, State or Zip code"
+                       radius="radius"
+                      radiusValue={values.radius}
                     />
                     <View
                       style={{
@@ -308,7 +325,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5) ,fontFamily: "PopinRegula",}}> Sale</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Sale
+                        </Text>
                       </View>
 
                       {/* Rent */}
@@ -336,11 +361,24 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Rent</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Rent
+                        </Text>
                       </View>
                     </View>
                     {touched.property_for && errors.property_for && (
-                      <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>
+                      <Text
+                        style={{
+                          color: Colors.light.red,
+                          fontFamily: "PopinRegula",
+                        }}
+                      >
                         {errors.property_for}
                       </Text>
                     )}
@@ -414,7 +452,14 @@ const index = () => {
                               opacity: 0.2,
                             }}
                           />
-                          <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Price Range </Text>
+                          <Text
+                            style={{
+                              fontWeight: 500,
+                              fontFamily: "PopinRegula",
+                            }}
+                          >
+                            Price Range{" "}
+                          </Text>
                         </>
                       ))}
 
@@ -591,7 +636,9 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>
+                    <Text
+                      style={{ fontWeight: 500, fontFamily: "PopinRegula" }}
+                    >
                       Property size (sqft)
                     </Text>
                     <View className="flex-row justify-between items-start gap-3">
@@ -662,7 +709,11 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Lot size (acres)</Text>
+                    <Text
+                      style={{ fontWeight: 500, fontFamily: "PopinRegula" }}
+                    >
+                      Lot size (acres)
+                    </Text>
 
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
@@ -723,7 +774,11 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Home age</Text>
+                    <Text
+                      style={{ fontWeight: 500, fontFamily: "PopinRegula" }}
+                    >
+                      Home age
+                    </Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdownwithjson
@@ -792,8 +847,8 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
-                          width:hs(120),
-                          alignItems:'center'
+                          width: hs(120),
+                          alignItems: "center",
                         }}
                         onPress={async () => {
                           const formatdata = new FormData();
@@ -806,7 +861,7 @@ const index = () => {
                             if (result?.success) {
                               renderToastSuccess(result?.message);
                               resetForm();
-  refetchPropertyPreference();
+                              refetchPropertyPreference();
                             } else {
                               renderToastError(result?.message);
                             }
@@ -832,15 +887,21 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(20),
                           paddingVertical: vs(10),
-                          width:hs(170),
-                          alignItems:'center'
+                          width: hs(170),
+                          alignItems: "center",
                         }}
                       >
-                        <Text style={{ color: "white",fontSize:ms(16), fontWeight: 700 ,fontFamily: "PopinRegula",}}>
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: ms(16),
+                            fontWeight: 700,
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           Apply
                         </Text>
                       </TouchableOpacity>
-                      
                     </View>
                   </>
                 )}
@@ -849,7 +910,7 @@ const index = () => {
           </View>
           <Loading text="Prefrence setting" isLoading={PropertyLoading} />
           <Loading text="Loading..." isLoading={propertyprefLoading} />
-                   <Loading isLoading={resetPropertyLoading} text="Loading..." />
+          <Loading isLoading={resetPropertyLoading} text="Loading..." />
         </ScrollView>
       );
       break;
@@ -865,8 +926,9 @@ const index = () => {
                   user_id: user.id,
 
                   location: communityData?.data?.location || "",
-                  zip: "",
-                  state: "",
+                  zip:communityData?.data?.zip|| "",
+                  state:communityData?.data?.state || "",
+                  radius:communityData?.data?.radius||"",
 
                   community_type: communityData?.data?.community_type || "",
                   community_status: communityData?.data?.community_status || "",
@@ -908,7 +970,7 @@ const index = () => {
                   touched,
                 }) => (
                   <>
-                    <DealingAreas
+                               <DealingAreaswithRadius
                       city="dealing_city"
                       onSelect={() => {}}
                       state="state"
@@ -921,6 +983,8 @@ const index = () => {
                       setValue={setFieldValue}
                       errorText={errors.location}
                       placeholder="Please enter City, State or Zip code"
+                       radius="radius"
+                      radiusValue={values.radius}
                     />
                     <View
                       style={{
@@ -931,7 +995,14 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ width: hs(250),fontWeight:700, marginTop: vs(10),fontFamily: "PopinRegula", }}>
+                    <Text
+                      style={{
+                        width: hs(250),
+                        fontWeight: 700,
+                        marginTop: vs(10),
+                        fontFamily: "PopinRegula",
+                      }}
+                    >
                       Community type
                     </Text>
                     <View
@@ -960,7 +1031,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Residential</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Residential
+                        </Text>
                       </View>
 
                       {/* Commercial */}
@@ -988,7 +1067,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Commercial</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Commercial
+                        </Text>
                       </View>
 
                       {/*  Mix */}
@@ -1016,11 +1103,24 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Mix</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Mix
+                        </Text>
                       </View>
                     </View>
                     {touched.community_type && errors.community_type && (
-                      <Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}>
+                      <Text
+                        style={{
+                          color: Colors.light.red,
+                          fontFamily: "PopinRegula",
+                        }}
+                      >
                         {errors.community_type}
                       </Text>
                     )}
@@ -1033,7 +1133,14 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ width: hs(250),fontWeight:700, marginTop: vs(10),fontFamily: "PopinRegula", }}>
+                    <Text
+                      style={{
+                        width: hs(250),
+                        fontWeight: 700,
+                        marginTop: vs(10),
+                        fontFamily: "PopinRegula",
+                      }}
+                    >
                       Development Stage
                     </Text>
 
@@ -1063,7 +1170,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Completed</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Completed
+                        </Text>
                       </View>
 
                       {/* Constructed */}
@@ -1091,7 +1206,15 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Constructed</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Constructed
+                        </Text>
                       </View>
 
                       {/* Inplanning */}
@@ -1119,13 +1242,26 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5),fontFamily: "PopinRegula", }}> Inplanning</Text>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
+                          {" "}
+                          Inplanning
+                        </Text>
                       </View>
                     </View>
 
                     {/* Error */}
                     {touched.community_status && errors.community_status && (
-                      <Text style={{ color: Colors.light.red ,fontFamily: "PopinRegula",}}>
+                      <Text
+                        style={{
+                          color: Colors.light.red,
+                          fontFamily: "PopinRegula",
+                        }}
+                      >
                         {errors.community_status}
                       </Text>
                     )}
@@ -1139,7 +1275,11 @@ const index = () => {
                         opacity: 0.2,
                       }}
                     />
-                    <Text style={{ fontWeight: 500 ,fontFamily: "PopinRegula",}}>Price Range</Text>
+                    <Text
+                      style={{ fontWeight: 500, fontFamily: "PopinRegula" }}
+                    >
+                      Price Range
+                    </Text>
                     <View className="flex-row justify-between items-start gap-3">
                       <View className="flex-1">
                         <FormikDropdownwithjson
@@ -1235,7 +1375,7 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
-                          width:ms(120)
+                          width: ms(120),
                         }}
                       >
                         <Text
@@ -1245,24 +1385,24 @@ const index = () => {
                             fontFamily: "PopinRegula",
                           }}
                           onPress={async () => {
-                          const formatdata = new FormData();
-                          formatdata.append("user_id", user.id.toString());
-                          try {
-                            const result = await ResetCommunity(
-                              formatdata
-                            ).unwrap();
+                            const formatdata = new FormData();
+                            formatdata.append("user_id", user.id.toString());
+                            try {
+                              const result = await ResetCommunity(
+                                formatdata
+                              ).unwrap();
 
-                            if (result?.success) {
-                              renderToastSuccess(result?.message);
-                              resetForm();
-  refetchCommunityPreference();
-                            } else {
-                              renderToastError(result?.message);
+                              if (result?.success) {
+                                renderToastSuccess(result?.message);
+                                resetForm();
+                                refetchCommunityPreference();
+                              } else {
+                                renderToastError(result?.message);
+                              }
+                            } catch (error) {
+                              renderToastError(error?.data?.message);
                             }
-                          } catch (error) {
-                            renderToastError(error?.data?.message);
-                          }
-                        }}
+                          }}
                         >
                           Reset all filters
                         </Text>
@@ -1277,12 +1417,19 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(20),
                           paddingVertical: vs(10),
-                          width:hs(180),
-                          justifyContent:"center",
-                          alignItems:"center"
+                          width: hs(180),
+                          justifyContent: "center",
+                          alignItems: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize:ms(16), fontWeight: 700,fontFamily: "PopinRegula", }}>
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: ms(16),
+                            fontWeight: 700,
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           Apply
                         </Text>
                       </TouchableOpacity>
@@ -1294,7 +1441,7 @@ const index = () => {
           </View>
           <Loading isLoading={CommunityLoading} text="Setting Prefrence" />
           <Loading isLoading={communityprefLoading} text="Loading" />
-            <Loading isLoading={resetCommunityLoading} text="Loading..." />
+          <Loading isLoading={resetCommunityLoading} text="Loading..." />
         </ScrollView>
       );
       break;
@@ -1310,9 +1457,13 @@ const index = () => {
                   location: data?.data?.location ?? "",
                   user_type: data?.data?.user_type ?? "",
                   user_id: user.id,
+                     zip:data?.zip|| "",
+                  state:data?.state || "",
+                  radius:data?.radius||"",
                 }}
                 onSubmit={async (values) => {
                   try {
+                        console.log("Form Values:", values);
                     const result = await setConnectionPrefrence(values);
 
                     if (result?.data?.success) {
@@ -1340,7 +1491,7 @@ const index = () => {
                   resetForm,
                 }) => (
                   <>
-                    <DealingAreas
+                    <DealingAreaswithRadius
                       city="dealing_city"
                       onSelect={() => {}}
                       state="state"
@@ -1353,6 +1504,8 @@ const index = () => {
                       setValue={setFieldValue}
                       errorText={errors.location}
                       placeholder="Please enter City, State or Zip code"
+                      radius="radius"
+                      radiusValue={values.radius}
                     />
                     <Text
                       style={{
@@ -1372,7 +1525,7 @@ const index = () => {
                       {/*  Electricians */}
                       <View
                         className="flex-row items-center"
-                        style={{  marginVertical: vs(5) }}
+                        style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
                           onPress={() =>
@@ -1394,7 +1547,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Electricians
                         </Text>
@@ -1425,7 +1584,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) ,fontFamily: "PopinRegula",}}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Builder
                         </Text>
@@ -1456,7 +1621,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Property agents
                         </Text>
@@ -1486,7 +1657,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Plumbers
                         </Text>
@@ -1516,7 +1693,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) ,fontFamily: "PopinRegula",}}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Mortgage Advisors
                         </Text>
@@ -1546,7 +1729,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Decors
                         </Text>
@@ -1576,7 +1765,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15),fontFamily: "PopinRegula", }}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Painters
                         </Text>
@@ -1606,7 +1801,13 @@ const index = () => {
                             }
                           />
                         </TouchableOpacity>
-                        <Text style={{ marginLeft: hs(5), fontSize: ms(15) ,fontFamily: "PopinRegula",}}>
+                        <Text
+                          style={{
+                            marginLeft: hs(5),
+                            fontSize: ms(15),
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           {" "}
                           Investors
                         </Text>
@@ -1628,9 +1829,9 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(10),
                           paddingVertical: vs(10),
-                          width:ms(120)
+                          width: ms(120),
                         }}
-                             onPress={async () => {
+                        onPress={async () => {
                           const formatdata = new FormData();
                           formatdata.append("user_id", user.id.toString());
                           try {
@@ -1641,7 +1842,7 @@ const index = () => {
                             if (result?.success) {
                               renderToastSuccess(result?.message);
                               resetForm();
-  refetchConnectionPreference();
+                              refetchConnectionPreference();
                             } else {
                               renderToastError(result?.message);
                             }
@@ -1670,12 +1871,19 @@ const index = () => {
                           borderRadius: ms(10),
                           paddingHorizontal: hs(20),
                           paddingVertical: vs(10),
-                          width:hs(180),
-                          justifyContent:"center",
-                          alignItems:"center"
+                          width: hs(180),
+                          justifyContent: "center",
+                          alignItems: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize:ms(16), fontWeight: 700,fontFamily: "PopinRegula", }}>
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: ms(16),
+                            fontWeight: 700,
+                            fontFamily: "PopinRegula",
+                          }}
+                        >
                           Apply
                         </Text>
                       </TouchableOpacity>
@@ -1687,7 +1895,7 @@ const index = () => {
           </View>
           <Loading isLoading={ConnectionLoading} text="Setting Prefrence ..." />
           <Loading isLoading={conectioLoading} text="Loading..." />
-   <Loading isLoading={resetConnectionLoading} text="Loading..." />
+          <Loading isLoading={resetConnectionLoading} text="Loading..." />
         </ScrollView>
       );
       break;

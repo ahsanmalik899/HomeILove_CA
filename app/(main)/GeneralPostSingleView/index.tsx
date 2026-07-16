@@ -166,7 +166,7 @@ const index = () => {
   const [imageNo, setImageNo] = useState(0);
   const { data, isFetching, refetch } = useGetSingleGeneralPostQuery({ userid:user?.id, post_id:id });
   const { data: comments, isFetching: commentFetching } =
-    useGetPostCommentsApiQuery({ post_id: id });
+    useGetPostCommentsApiQuery({ post_id: id },{skip:!post_id});
   const [showImages, setShowImages] = useState(false);
   const [showFloor, setShowFloor] = useState(false);
   const [expanded, setExpanded] = useState(false);

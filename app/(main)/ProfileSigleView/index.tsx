@@ -118,7 +118,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
     refetch,
   } = useUserAgentPastPostsApiQuery(
     { page, per_page: perPage, user_id: profile?.users_id },
-    { skip: !profile?.users_id || type !== "agent" || profile?.post_type !== "Trending"||type===null }
+    { skip: !profile?.users_id || type !== "agent" || profile?.post_type !== "Trending"||type===null|| !user?.id, }
   );
   useEffect(() => {
     if (!pastData?.data) return;

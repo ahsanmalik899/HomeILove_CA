@@ -82,7 +82,7 @@ export default function NewsFeedSingleview({ post_id,setshowModel,setAlreadyLike
                const res = await likePost({
                post_id: data?.post_id,
                  user_id: user.id,
-                 creater_id: data?.posted_by?.id,
+                 creater_id: data?.post?.user_id,
                }).unwrap();
                if (res.success) {
                  renderToastSuccess(res.message)
@@ -243,7 +243,9 @@ setData((prevData) =>
    const [imageNo, setImageNo] = useState(0);
  
    const { data: comments, isFetching: commentFetching } =
-     useGetPostCommentsApiQuery({ post_id: post_id });
+     useGetPostCommentsApiQuery({ post_id: post_id },  {
+    skip: !post_id,
+  });
    const [showImages, setShowImages] = useState(false);
    const [showFloor, setShowFloor] = useState(false);
    const [expanded, setExpanded] = useState(false);

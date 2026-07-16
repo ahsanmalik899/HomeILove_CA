@@ -288,7 +288,9 @@ const index = () => {
             borderColor: ids.includes(Number(item.inquiry_id))
               ? Colors.light.DarkGreen
               : "#eee",
-          },
+          },{
+            
+          }
         ]}
         activeOpacity={0.9}
         onPress={() => handleSelect(item.inquiry_id)}
@@ -508,6 +510,11 @@ const index = () => {
               <Text style={styles.senderInfo}>✉️ {item.sender_email}</Text>
             )}
           </View>
+            {item.status==="Deleted"&&(
+            <Text style={{color:Colors.light.red}}>
+              Inquiery closed
+            </Text>
+            )}
         </View>
         {/* TOP ROW */}
         <View style={styles.header}>
@@ -565,7 +572,7 @@ const index = () => {
 
         <TouchableOpacity
           style={styles.replyBtn}
-            disabled={item?.inquiry_closed}
+              disabled={item?.inquiry_closed || item.status === "Deleted"}
           onPress={() => {
             setSelectedChatProfile({
               business_name: item.sender_name,
