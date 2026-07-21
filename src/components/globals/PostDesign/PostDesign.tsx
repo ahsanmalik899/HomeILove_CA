@@ -1042,7 +1042,7 @@ const PostDesign = ({
                   position: "absolute",
                   bottom: 0,
                   width: hs(350),
-                  backgroundColor: "rgba(0,0,0,0.55)",
+                  backgroundColor:item.type === "Shared Community"?"rgba(233, 108, 108, 0.55)":"rgba(0,0,0,0.55)",
                   paddingHorizontal: hs(10),
                   paddingVertical: vs(8),
                   borderBottomLeftRadius: ms(12),

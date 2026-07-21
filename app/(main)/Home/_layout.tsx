@@ -53,7 +53,7 @@ const _layout = () => {
   }
 );
   const notifiation = useAppSelector(Notification);
-const isBlocked = userStatus?.user_status === "Blocked";
+const isBlocked = userStatus?.user_status === "Block";
   const { data: unredCount ,refetch} = useGetUnreadNotificationsCountQuery({
     user_id: user?.id,
   },{skip:!user?.id});

@@ -20,10 +20,10 @@ const index = ({ Svg, text, type, totalPosts,profileType,id,isBlocked, onPress=(
           : onPress();
       }}
     >
-      {(type === "busenessProfile"||type==="Blocked") ? (
+      {(type === "busenessProfile"||type==="Block") ? (
         <View style={{ marginTop: vs(10) }}>
     {ProfileExist ? (
-  isBlocked === "Blocked" ? (
+  isBlocked === "Block" ? (
     <MaterialIcons name="block" size={24} color="red" />
   ) : (
     <ArrowUp />

@@ -70,8 +70,8 @@ const index = () => {
             text="Mortgage Profile"
             Svg={Mortgagae}
             type={
-              data?.profiles_exist?.mortgage?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.mortgage?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.mortgage?.exists}
@@ -87,8 +87,8 @@ const index = () => {
             text="Builder Profile"
             Svg={Builder}
             type={
-              data?.profiles_exist?.builder?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.builder?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.builder?.exists}
@@ -105,8 +105,8 @@ const index = () => {
             text="Investor Profile"
             Svg={Investor}
             type={
-              data?.profiles_exist?.investor?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.investor?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.investor?.exists}
@@ -121,8 +121,8 @@ const index = () => {
             text="Agent Profile"
             Svg={Agent}
             type={
-              data?.profiles_exist?.agent?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.agent?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.agent?.exists}
@@ -139,8 +139,8 @@ const index = () => {
             text="Plumber Profile"
             Svg={Plumber}
             type={
-              data?.profiles_exist?.plumber?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.plumber?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.plumber?.exists}
@@ -155,8 +155,8 @@ const index = () => {
             text="Painter Profile"
             Svg={Painter}
             type={
-              data?.profiles_exist?.painter?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.painter?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.painter?.exists}
@@ -173,8 +173,8 @@ const index = () => {
             text="Electrician Profile"
             Svg={Electrician}
             type={
-              data?.profiles_exist?.electrician?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.electrician?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.electrician?.exists}
@@ -189,8 +189,8 @@ const index = () => {
             text="Decor Profile"
             Svg={Decore}
             type={
-              data?.profiles_exist?.decor?.status === "Blocked"
-                ? "Blocked"
+              data?.profiles_exist?.decor?.status === "Block"
+                ? "Block"
                 : "busenessProfile"
             }
             ProfileExist={data?.profiles_exist?.decor?.exists}
