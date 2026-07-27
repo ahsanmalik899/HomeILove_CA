@@ -1460,6 +1460,7 @@ const index = () => {
                      zip:data?.zip|| "",
                   state:data?.state || "",
                   radius:data?.radius||"",
+                  dealing_city:data?.dealing_city||"",
                 }}
                 onSubmit={async (values) => {
                   try {
