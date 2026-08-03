@@ -104,7 +104,8 @@ export const FormikDropdown = ({
             setOpen={setOpen}
             maxHeight={400}
             setItems={setItems}
-            listMode="MODAL"
+             listMode="SCROLLVIEW"
+  dropDownDirection="BOTTOM"
             placeholder={placeholder}
             setValue={(callback) => {
               const val = callback(currentValue);

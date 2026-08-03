@@ -20,7 +20,6 @@ import VerticalLine from "@assets/icons/verticalLine.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { Ionicons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import DatePickerField from "@src/components/globals/DatePickerField";
 import { FormikInput } from "@src/components/globals/FormictInput";
@@ -49,19 +48,22 @@ import {
   Easing,
   Image,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+
+import { FlashList } from "@shopify/flash-list";
 import MapView, { Marker } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 import ProfileSingleView from "../ProfileSingleView";
 import SavedItems from "../SavedItems";
 
-export default function AddSingleView({id,type,setshowModel}: {id:number,type:string,setshowModel:(val:boolean)=>void}) {
+export default function AddSingleView({id,type,setshowModel,  onSavedChange,}: {id:number,type:string,setshowModel:(val:boolean)=>void,  onSavedChange?: (isSaved: boolean) => void;}) {
 
 
   const formatPdfUrl = (file: string) => {
@@ -150,36 +152,40 @@ export default function AddSingleView({id,type,setshowModel}: {id:number,type:st
     if (monthlyRate === 0) return Number((principal / months).toFixed(2));
 
     const monthlyPayment =
-      (principal * (monthlyRate * Math.pow(1 + monthlyRate, months))) /
+      (principal * (monthlyRate * Math.pow(1 + monthlyRate, months))) 
       (Math.pow(1 + monthlyRate, months) - 1);
 
     return Number(monthlyPayment.toFixed(2));
   };
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
 const rotateAnim = useRef(new Animated.Value(0)).current;
-    const toggleSave = async () => {
-     
-      try {
-        if (isSaved) {
-          await unsaveItemApi({
-            saved_id: id,
-            user_id: user.id,
-            type: type,
-          }).unwrap();
-        } else {
-          await saveItemApi({
-            saved_id: id,
-            user_id: user.id,
-            type: type,
-          }).unwrap();
-        }
-      } catch (error) {
-        console.log("Error saving/unsaving item:", error);
+const toggleSave = async () => {
+  const nextSavedValue = !isSaved;
 
-      } finally {
-        setIsSaved((prev) => !prev);
-      }
-    };
+  try {
+    if (isSaved) {
+      await unsaveItemApi({
+        saved_id: id,
+        user_id: user.id,
+        type,
+      }).unwrap();
+    } else {
+      await saveItemApi({
+        saved_id: id,
+        user_id: user.id,
+        type,
+      }).unwrap();
+    }
+
+    // Single view update
+    setIsSaved(nextSavedValue);
+
+    // Parent listing cache update
+    onSavedChange?.(nextSavedValue);
+  } catch (error) {
+    console.log("Error saving/unsaving item:", error);
+  }
+};
 useEffect(() => {
   Animated.timing(scaleAnim, {
     toValue: 1,
@@ -329,7 +335,7 @@ const rotate = rotateAnim.interpolate({
                 left: hs(10),
                 alignItems: "center",
               }}
-              className="flex-row"
+              className="flex-row,flex-1"
             >
               <Camera />
               <Text style={{ color: "white", fontWeight: 600,fontFamily: "PopinRegula", }}>
@@ -337,33 +343,33 @@ const rotate = rotateAnim.interpolate({
               </Text>
             </View>
           </TouchableOpacity>
-          <LegendList
-            data={data?.post_images || []}
-            horizontal
-            className="flex-1"
-            keyExtractor={(item, index) => `${item}-${index}`}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                className="mt-4 mr-2"
-                onPress={() => {
-                  setImageNo(index);
-                  setShowImages(true);
-                }}
-              >
-                <Image
-                  source={{ uri: ImageFormater(item) }}
-                  style={{
-                    height: vs(80),
-                    width: vs(80),
-                    borderRadius: ms(10),
-                    resizeMode: "cover",
-                    backgroundColor: "gray",
-                  }}
-                />
-              </TouchableOpacity>
-            )}
-          />
-
+        <FlashList
+  data={data?.post_images || []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(item, index) => `${item}-${index}`}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item, index }) => (
+    <TouchableOpacity
+      className="mt-4 mr-2"
+      onPress={() => {
+        setImageNo(index);
+        setShowImages(true);
+      }}
+    >
+      <Image
+        source={{ uri: ImageFormater(item) }}
+        style={{
+          height: vs(80),
+          width: vs(80),
+          borderRadius: ms(10),
+          resizeMode: "cover",
+          backgroundColor: "gray",
+        }}
+      />
+    </TouchableOpacity>
+  )}
+/>
           <View
             className=" bg-white flex-row  justify-between"
             style={{
@@ -1126,51 +1132,62 @@ const rotate = rotateAnim.interpolate({
               </View>
 
               <Text style={styles.heading}>Mortgage experts</Text>
-              <LegendList
-                data={data?.mortgage_experts ?? []}
-                horizontal
-                className="flex-1"
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[
-                      styles.card2,
-                      {
-                        marginHorizontal: hs(5),
-                        width: hs(110),
-                        marginBottom: vs(10),
-                        paddingHorizontal: hs(2),
-                        alignItems: "center",
-                        height: vs(180),
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                      },
-                    ]}
-                    onPress={() => {
-                      setprofileData({type:"mortgage",id:item.id});setSingleView(true);
-                     
-                    }}
-                  >
-                    <CircleImage
-                      source={{ uri: ImageFormater(item.logo) }}
-                      Size={60}
-                    />
+              <View className="flex-1">
+            <FlashList
+  data={data?.mortgage_experts ?? []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(item) => item.id.toString()}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.card2,
+        {
+          marginHorizontal: hs(5),
+          width: hs(110),
+          marginBottom: vs(10),
+          paddingHorizontal: hs(2),
+          alignItems: "center",
+          height: vs(180),
+          flexDirection: "column",
+          justifyContent: "space-between",
+        },
+      ]}
+      onPress={() => {
+        setprofileData({
+          type: "mortgage",
+          id: item.id,
+        });
+        setSingleView(true);
+      }}
+    >
+      <CircleImage
+        source={{ uri: ImageFormater(item.logo) }}
+        Size={60}
+      />
 
-                    <Text className="font-bold mt-4 text-center">
-                      {item.business_name}
-                    </Text>
-                    <Text
-                      className="text-center"
-                      style={{ fontSize: ms(10), color: Colors.light.textGray }}
-                    >
-                      {item.city} {item.zip}
-                    </Text>
-                    <View style={{ marginTop: vs(5), alignSelf: "center" }}>
-                      <StarRating size={15} rating={item.rating ?? 0} />{" "}
-                    </View>
-                  </TouchableOpacity>
-                )}
-              />
+      <Text className="font-bold mt-4 text-center">
+        {item.business_name}
+      </Text>
+
+      <Text
+        className="text-center"
+        style={{
+          fontSize: ms(10),
+          color: Colors.light.textGray,
+        }}
+      >
+        {item.city} {item.zip}
+      </Text>
+
+      <View style={{ marginTop: vs(5), alignSelf: "center" }}>
+        <StarRating size={15} rating={item.rating ?? 0} />
+      </View>
+    </TouchableOpacity>
+  )}
+/>
+              </View>
             </>
           )}
           <View
@@ -1431,6 +1448,10 @@ const rotate = rotateAnim.interpolate({
         />
       )}
              <Modal visible={showShare} animationType="slide" transparent>
+               <SafeAreaView
+                                                                      style={{ flex: 1 }}
+                                                                      edges={[ "bottom", "left", "right"]}
+                                                                    >
   <View style={{
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -1632,6 +1653,7 @@ const rotate = rotateAnim.interpolate({
 
     </View>
   </View>
+  </SafeAreaView>
   <Loading isLoading={sharing} text="Sharing..."/>
 </Modal>
   <Modal
@@ -1641,10 +1663,20 @@ const rotate = rotateAnim.interpolate({
             transparent={true}
             statusBarTranslucent={true}
           >
+              <SafeAreaView
+                                                                      style={{ flex: 1 }}
+                                                                      edges={[ "bottom", "left", "right"]}
+                                                                    >
      <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+     </SafeAreaView>
           </Modal>
            <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+             <SafeAreaView
+                                                                      style={{ flex: 1 }}
+                                                                      edges={[ "bottom", "left", "right"]}
+                                                                    >
                         <SavedItems setShowSaved={setShowSaved} />
+                        </SafeAreaView>
                       </Modal>
       <Loading isLoading={isFetching} text="Loading..." />
       <Loading isLoading={isLoading} text="Sending..." />

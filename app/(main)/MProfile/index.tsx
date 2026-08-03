@@ -21,7 +21,7 @@ import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import LargeButton from "@src/components/globals/LaregeButton";
@@ -51,30 +51,32 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as Yup from 'yup';
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Yup from "yup";
 
 const Index = () => {
   const user = useAppSelector(userdata);
   const params = useLocalSearchParams();
   const [upgradeProfile, { isLoading: ugradeLoading }] =
     useUpgradeProfileApiMutation();
-       const [promoteProfile, { isLoading: promoteLoading }] =
+  const [promoteProfile, { isLoading: promoteLoading }] =
     usePromoteProfileMutation();
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
-    const [showShare, setShowShare] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [posts, setPosts] = useState<[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const Profiletype = params.profileType as string;
   const type = params.type as string;
-    const [share_profileApi, { isLoading: sharing }] = useShare_profileApiMutation();
+  const [share_profileApi, { isLoading: sharing }] =
+    useShare_profileApiMutation();
   const [timePeriod, setTimeperiod] = useState("");
   const [SelectedAmount, setSelectedAmount] = useState("");
   const id = Number(params.id);
   const [showPastModal, setShowPastModal] = useState(false);
   const [editingPastWork, setEditingPastWork] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState("");
-    const [orderId, setOrderid] = useState("");
+  const [orderId, setOrderid] = useState("");
   const {
     data: amount,
     isLoading: AmountLoading,
@@ -93,8 +95,13 @@ const Index = () => {
     setEditingPastWork(null);
     setShowPastModal(false);
   };
-const {data:advertisePrices}=useGetPriceQuery({price_type:"Profile",profile_type:Profiletype.toLowerCase()})
-const {data:promotionPrices}=useGetAdvatizementPriceQuery({type:"Promotion"})
+  const { data: advertisePrices } = useGetPriceQuery({
+    price_type: "Profile",
+    profile_type: Profiletype.toLowerCase(),
+  });
+  const { data: promotionPrices } = useGetAdvatizementPriceQuery({
+    type: "Promotion",
+  });
   const [showPast, setShowpast] = useState(false);
   const { data, isLoading } = useGetSingleProfileQuery({
     type: Profiletype,
@@ -122,7 +129,7 @@ const {data:promotionPrices}=useGetAdvatizementPriceQuery({type:"Promotion"})
     refetch,
   } = useUserAgentPastPostsApiQuery(
     { page, per_page: perPage, user_id: user.id },
-    { skip: Profiletype !== "agent"|| !user?.id, }
+    { skip: Profiletype !== "agent" || !user?.id }
   );
   const handleDelete = () => {
     Alert.alert(
@@ -155,40 +162,38 @@ const {data:promotionPrices}=useGetAdvatizementPriceQuery({type:"Promotion"})
     );
   };
   const handelSubmit = async (method) => {
-    if(isPromotion){
-     console.log("promotion", timePeriod,SelectedAmount);
- try {
-      const response = await promoteProfile({
-        profile_id: profile?.id,
-      profileType: Profiletype,
-        days: timePeriod,
-     user_id:user.id,
-        paymentMethod:method,
-        amount:SelectedAmount,
-        
-      }).unwrap();
-setShowoption(false)
-   renderToastSuccess(response?.message)
-    } catch (e) {
-      Alert.alert("Error", "Promotion failed");
+    if (isPromotion) {
+      console.log("promotion", timePeriod, SelectedAmount);
+      try {
+        const response = await promoteProfile({
+          profile_id: profile?.id,
+          profileType: Profiletype,
+          days: timePeriod,
+          user_id: user.id,
+          paymentMethod: method,
+          amount: SelectedAmount,
+        }).unwrap();
+        setShowoption(false);
+        renderToastSuccess(response?.message);
+      } catch (e) {
+        Alert.alert("Error", "Promotion failed");
+      }
+    } else {
+      try {
+        const response = await upgradeProfile({
+          profile_id: profile?.id,
+          profileType: Profiletype,
+          days: timePeriod,
+          user_id: user.id,
+          paymentMethod: method,
+          amount: SelectedAmount,
+        }).unwrap();
+        setShowoption(false);
+        renderToastSuccess(response?.message);
+      } catch (e) {
+        Alert.alert("Error", "Upgrade failed");
+      }
     }
-    }else{
-    try {
-      const response = await upgradeProfile({
-        profile_id: profile?.id,
-      profileType: Profiletype,
-        days: timePeriod,
-     user_id:user.id,
-        paymentMethod:method,
-        amount:SelectedAmount,
-        
-      }).unwrap();
-setShowoption(false)
-   renderToastSuccess(response?.message)
-    } catch (e) {
-      Alert.alert("Error", "Upgrade failed");
-    }
-  }
   };
   const profile = data?.data;
   useEffect(() => {
@@ -241,11 +246,23 @@ setShowoption(false)
       <ScrollView className="flex-1 bg-white">
         <View style={{ position: "relative" }}>
           <HeaderWithBack />
-          <TouchableOpacity style={{position:"absolute",backgroundColor:"#bdbdbd71",borderRadius:hs(50),justifyContent:"center",alignItems:"center",width:hs(40),height:hs(40),top:vs(100),right:hs(10),zIndex:9999}}
-          onPress={() => setShowShare(true)}
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              backgroundColor: "#bdbdbd71",
+              borderRadius: hs(50),
+              justifyContent: "center",
+              alignItems: "center",
+              width: hs(40),
+              height: hs(40),
+              top: vs(100),
+              right: hs(10),
+              zIndex: 9999,
+            }}
+            onPress={() => setShowShare(true)}
           >
-                <Share  />
-              </TouchableOpacity>
+            <Share />
+          </TouchableOpacity>
           <Image
             source={{
               uri: ImageFormater(profile?.cover),
@@ -288,42 +305,48 @@ setShowoption(false)
 
           <View style={styles.divider} />
           <View className="flex-row justify-between">
-           
             {profile?.post_type === "Normal" ? (
               <TouchableOpacity
-              style={{
-                backgroundColor:Colors.light.DarkGreen,
-                paddingHorizontal:hs(10),
-                paddingVertical:vs(10),
-                borderRadius:hs(10),
-                alignItems:"center",
-                justifyContent:"center"
-              }}
+                style={{
+                  backgroundColor: Colors.light.DarkGreen,
+                  paddingHorizontal: hs(10),
+                  paddingVertical: vs(10),
+                  borderRadius: hs(10),
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
                 onPress={() => {
                   setShowoption(true);
                   setUpgradeId(profile.id);
                 }}
-            
               >
-                <Text style={[styles.text,{color:"white"}]}>Upgrade Profile to trending</Text></TouchableOpacity>
-            ):profile?.post_type === "Trending"? (
-               <TouchableOpacity
-               style={{
-                backgroundColor:Colors.light.DarkGreen,
-                paddingHorizontal:hs(10),
-                paddingVertical:vs(10),
-                borderRadius:hs(10),
-                alignItems:"center",
-                justifyContent:"center"
-              }}
+                <Text style={[styles.text, { color: "white" }]}>
+                  Upgrade Profile to trending
+                </Text>
+              </TouchableOpacity>
+            ) : profile?.post_type === "Trending" ? (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: Colors.light.DarkGreen,
+                  paddingHorizontal: hs(10),
+                  paddingVertical: vs(10),
+                  borderRadius: hs(10),
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
                 onPress={() => {
                   setShowoption(true);
                   setUpgradeId(profile.id);
                   setIsPromotion(true);
                 }}
-                >
-                  <Text style={[styles.text,{color:"white"}]}>Upgrade Profile to Promoted</Text></TouchableOpacity>
-            ):(<></>)}
+              >
+                <Text style={[styles.text, { color: "white" }]}>
+                  Upgrade Profile to Promoted
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <></>
+            )}
             <View style={styles.row}>
               <TouchableOpacity onPress={handleDelete}>
                 <Delete />
@@ -352,142 +375,177 @@ setShowoption(false)
           className="flex-row justify-between"
         >
           <TouchableOpacity
-          style={{
-          borderColor:Colors.light.DarkGreen,
-          borderWidth:2,
-          paddingHorizontal:hs(10),
-          paddingVertical:vs(10),
-          borderRadius:hs(10),
-          alignItems:"center",
-          justifyContent:"center"
-          }}
+            style={{
+              borderColor: Colors.light.DarkGreen,
+              borderWidth: 2,
+              paddingHorizontal: hs(10),
+              paddingVertical: vs(10),
+              borderRadius: hs(10),
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             onPress={() => {
               setShowpast(!showPast);
             }}
-          
-            >
-              <View className="flex-row items-center gap-2">
-              <Ionicons  name="briefcase-outline" size={hs(20)} color={Colors.light.DarkGreen}/>
-              <Text style={{color:Colors.light.DarkGreen,fontSize:hs(16),fontWeight:700,}}>{showPast
-                ? "Hide my past jobs"
-                : "Show my past jobs "
-            }</Text>
-              </View>
-             
+          >
+            <View className="flex-row items-center gap-2">
+              <Ionicons
+                name="briefcase-outline"
+                size={hs(20)}
+                color={Colors.light.DarkGreen}
+              />
+              <Text
+                style={{
+                  color: Colors.light.DarkGreen,
+                  fontSize: hs(16),
+                  fontWeight: 700,
+                }}
+              >
+                {showPast ? "Hide my past jobs" : "Show my past jobs "}
+              </Text>
+            </View>
           </TouchableOpacity>
           {Profiletype !== "agent" && (
             <TouchableOpacity
               onPress={() => openPastWorkModal()}
-              style={{backgroundColor:Colors.light.DarkGreen,paddingHorizontal:hs(10),paddingVertical:vs(10),borderRadius:hs(10),alignItems:"center",justifyContent:"center"}}
+              style={{
+                backgroundColor: Colors.light.DarkGreen,
+                paddingHorizontal: hs(10),
+                paddingVertical: vs(10),
+                borderRadius: hs(10),
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <Text style={{color:"white",fontSize:16,fontWeight:700}}>Add past jobs</Text>
+              <Text style={{ color: "white", fontSize: 16, fontWeight: 700 }}>
+                Add past jobs
+              </Text>
             </TouchableOpacity>
           )}
         </View>
-     
-          <Modal visible={showPast} animationType="slide" statusBarTranslucent onRequestClose={() => setShowpast(false)}>
-            <HeaderWithBack title="Past jobs" onBackpress={() => setShowpast(false)} />
-            {Profiletype==="agent"?(<>
-              {posts.length>0?
-            <PastDealsagent
-              data={posts}
-              hasmore={hasMore}
-              isfetching={pastLoading}
-              setPage={setPage}
-              type={type}
-              setpost={setPosts}
-              refetch={refetch}
-              initialLoadDone={initialLoadDone}
-              
-            />:
-             <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>No past deals</Text>
-    </View>
-            }</>
-          ):(
-               <View style={{ marginTop: vs(15),flex:1 }}>
-                  {othePastdata?.data?.length > 0 ? (
-            <LegendList
-              data={othePastdata?.data || []}
-              keyExtractor={(item: any) => item.user_past_work_id.toString()}
-              renderItem={({ item }: any) => {
-                const firstImage = item.images?.length
-                  ? ImageFormater(item.images[0])
-                  : null;
 
-                return (
-                  <View style={styles.pastCard}>
-                    <Image
-                      source={firstImage ? { uri: firstImage } : NoImage}
-                      style={styles.fullImage}
-                    />
-
-                    <View style={styles.pastContent}>
-                      <View style={styles.rowBetween}>
-                        <View>
-                          <Text style={styles.pastTitle}>
-                            {item.property_type}
-                          </Text>
-
-                          <Text style={styles.pastText}>
-                            {item.property_sub_type}
-                          </Text>
-                        </View>
-
-                        <View style={styles.row}>
-                          <TouchableOpacity
-                            onPress={() => openPastWorkModal(item)}
-                            style={styles.iconBtn}
-                          >
-                            <Edit />
-                          </TouchableOpacity>
-
-                          <TouchableOpacity
-                            onPress={() =>
-                              handleDeletePastWork(item.user_past_work_id)
-                            }
-                            style={styles.iconBtn}
-                          >
-                            <Delete />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-
-                      <Text style={styles.pastText}>Beds : {item.beds}</Text>
-
-                      <Text style={styles.pastText}>
-                        {item.city} , {item.state}
-                      </Text>
-
-                      <Text style={styles.pastDesc}>
-                        {item.job_description}
-                      </Text>
-                    </View>
+        <Modal
+          visible={showPast}
+          animationType="slide"
+          statusBarTranslucent
+          onRequestClose={() => setShowpast(false)}
+        >
+          <SafeAreaView
+            style={{ flex: 1 }}
+            edges={["bottom", "left", "right"]}
+          >
+            <HeaderWithBack
+              title="Past jobs"
+              onBackpress={() => setShowpast(false)}
+            />
+            {Profiletype === "agent" ? (
+              <>
+                {posts.length > 0 ? (
+                  <PastDealsagent
+                    data={posts}
+                    hasmore={hasMore}
+                    isfetching={pastLoading}
+                    setPage={setPage}
+                    type={type}
+                    setpost={setPosts}
+                    refetch={refetch}
+                    initialLoadDone={initialLoadDone}
+                  />
+                ) : (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text>No past deals</Text>
                   </View>
-                );
-              }}
-            />): (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>No past deals</Text>
-    </View>
-  )}
+                )}
+              </>
+            ) : (
+              <View style={{ marginTop: vs(15), flex: 1 }}>
+                {othePastdata?.data?.length > 0 ? (
+                 <FlashList
+  data={othePastdata?.data || []}
+  keyExtractor={(item: any) =>
+    item.user_past_work_id.toString()
+  }
+  renderItem={({ item }: any) => {
+    const firstImage = item.images?.length
+      ? ImageFormater(item.images[0])
+      : null;
+
+    return (
+      <View style={styles.pastCard}>
+        <Image
+          source={firstImage ? { uri: firstImage } : NoImage}
+          style={styles.fullImage}
+        />
+
+        <View style={styles.pastContent}>
+          <View style={styles.rowBetween}>
+            <View>
+              <Text style={styles.pastTitle}>
+                {item.property_type}
+              </Text>
+
+              <Text style={styles.pastText}>
+                {item.property_sub_type}
+              </Text>
+            </View>
+
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={() => openPastWorkModal(item)}
+                style={styles.iconBtn}
+              >
+                <Edit />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() =>
+                  handleDeletePastWork(item.user_past_work_id)
+                }
+                style={styles.iconBtn}
+              >
+                <Delete />
+              </TouchableOpacity>
+            </View>
           </View>
+
+          <Text style={styles.pastText}>
+            Beds : {item.beds}
+          </Text>
+
+          <Text style={styles.pastText}>
+            {item.city} , {item.state}
+          </Text>
+
+          <Text style={styles.pastDesc}>
+            {item.job_description}
+          </Text>
+        </View>
+      </View>
+    );
+  }}
+/>
+                ) : (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text>No past deals</Text>
+                  </View>
+                )}
+              </View>
             )}
-          </Modal>
-       
-       
+          </SafeAreaView>
+        </Modal>
+
         <PostPastWork
           closeModal={closePastWorkModal}
           savePastWork={savePastWork}
@@ -504,424 +562,445 @@ setShowoption(false)
         text="Loading.."
       />
       <Modal visible={showoption} animationType="fade" transparent={true}>
-        <ScrollView>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(31, 31, 31, 0.5)", // semi-transparent background
-            justifyContent: "center",
-            paddingHorizontal: hs(5),
-          }}
+        <SafeAreaView
+          style={{ flex: 1 }}
+          edges={[ "bottom", "left", "right"]}
         >
-          <View
-            style={{
-              backgroundColor: "white",
-              borderRadius: ms(10),
-              padding: hs(5),
-           
-            }}
-          >
-            <TouchableOpacity
-              style={{
-                position: "absolute",
-                top: hs(10),
-                right: hs(10),
-                zIndex: 10,
-              }}
-              onPress={() => setShowoption(false)}
-            >
-              <Text style={{ fontSize: ms(20), fontWeight: "bold" }}>×</Text>
-            </TouchableOpacity>
-
-         {isPromotion?(
-          <PromotionPricingCard setprice={setSelectedAmount} setSelectedtimeprd={setTimeperiod}  promotionPrices={promotionPrices} />
-         ):(
-            <LegendList
-              data={advertisePrices?.data}
-              keyExtractor={(item) => item.id}
-              estimatedItemSize={50}
-              extraData={timePeriod}
-              ListHeaderComponent={
-                <View
-                  className="flex-row justify-between items-center"
-                  style={{
-                    borderBottomWidth: 1,
-                    borderColor: Colors.light.textGray,
-                    borderRadius: ms(5),
-                    paddingHorizontal: hs(10),
-                    paddingVertical: vs(10),
-                  }}
-                >
-                  <Text style={{ fontFamily: "PopinRegula" }}>
-                    Advertise Time
-                  </Text>
-                  <Text style={{ fontFamily: "PopinRegula" }}>Price</Text>
-                </View>
-              }
-              renderItem={({ item: valueitem }) => (
-                <View
-                  className="flex-row justify-between items-center"
-                  style={{ paddingHorizontal: hs(10), paddingVertical: vs(10) }}
-                >
-                  <View className="flex-row items-center">
-                    <TouchableOpacity
-                      onPress={() => {
-                        setTimeperiod(valueitem.life);
-                        setSelectedAmount(valueitem.price);
-                      }}
-                    >
-                      <MaterialIcons
-                        size={20}
-                        color={Colors.light.DarkGreen}
-                        name={
-                          timePeriod === valueitem.life
-                            ? "radio-button-checked"
-                            : "radio-button-unchecked"
-                        }
-                      />
-                    </TouchableOpacity>
-                    <Text
-                      style={{
-                        marginLeft: hs(10),
-                        fontFamily: "PopinRegula",
-                      }}
-                    >
-                      For {valueitem.life} Days
-                    </Text>
-                  </View>
-                  <Text style={{ fontFamily: "PopinRegula" }}>
-                    ${valueitem.price}
-                  </Text>
-                </View>
-              )}
-            />)}
-        
+          <ScrollView>
             <View
               style={{
-                height: vs(1),
-                marginTop: vs(20),
-                marginBottom: vs(10),
-                backgroundColor: Colors.light.textGray,
-                opacity: 0.2,
-              }}
-            />
-
-            <Text
-              style={{
-                fontSize: ms(15),
-                fontWeight: "600",
-                fontFamily: "PopinRegula",
+                flex: 1,
+                backgroundColor: "rgba(31, 31, 31, 0.5)", // semi-transparent background
+                justifyContent: "center",
+                paddingHorizontal: hs(5),
               }}
             >
-              Select your payment method
-            </Text>
-            <View style={styles.card} className="items-center">
-              <Text
+              <View
                 style={{
-                  fontSize: ms(15),
-                  fontWeight: "600",
-                  fontFamily: "PopinRegula",
+                  backgroundColor: "white",
+                  borderRadius: ms(10),
+                  padding: hs(5),
                 }}
               >
-                Your Homeilove account balance
-              </Text>
-              {AmountLoading || isFetching ? (
-                <ActivityIndicator size="small" color={Colors.light.red} />
-              ) : (
+                <TouchableOpacity
+                  style={{
+                    position: "absolute",
+                    top: hs(10),
+                    right: hs(10),
+                    zIndex: 10,
+                  }}
+                  onPress={() => setShowoption(false)}
+                >
+                  <Text style={{ fontSize: ms(20), fontWeight: "bold" }}>
+                    ×
+                  </Text>
+                </TouchableOpacity>
+
+                {isPromotion ? (
+                  <PromotionPricingCard
+                    setprice={setSelectedAmount}
+                    setSelectedtimeprd={setTimeperiod}
+                    promotionPrices={promotionPrices}
+                  />
+                ) : (
+                  <View className="flex-1">
+                   <FlashList
+  data={advertisePrices?.data ?? []}
+  keyExtractor={(item) => item.id.toString()}
+  extraData={timePeriod}
+  ListHeaderComponent={
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        borderBottomWidth: 1,
+        borderColor: Colors.light.textGray,
+        borderRadius: ms(5),
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Advertise Time
+      </Text>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Price
+      </Text>
+    </View>
+  }
+  renderItem={({ item: valueitem }) => (
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <View className="flex-row items-center">
+        <TouchableOpacity
+          onPress={() => {
+            setTimeperiod(valueitem.life);
+            setSelectedAmount(valueitem.price);
+          }}
+        >
+          <MaterialIcons
+            size={20}
+            color={Colors.light.DarkGreen}
+            name={
+              timePeriod === valueitem.life
+                ? "radio-button-checked"
+                : "radio-button-unchecked"
+            }
+          />
+        </TouchableOpacity>
+
+        <Text
+          style={{
+            marginLeft: hs(10),
+            fontFamily: "PopinRegula",
+          }}
+        >
+          For {valueitem.life} Days
+        </Text>
+      </View>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        ${valueitem.price}
+      </Text>
+    </View>
+  )}
+/>
+                  </View>
+                )}
+
+                <View
+                  style={{
+                    height: vs(1),
+                    marginTop: vs(20),
+                    marginBottom: vs(10),
+                    backgroundColor: Colors.light.textGray,
+                    opacity: 0.2,
+                  }}
+                />
+
                 <Text
                   style={{
-                    marginVertical: vs(10),
-                    color: Colors.light.red,
                     fontSize: ms(15),
                     fontWeight: "600",
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  {amount.amount}
+                  Select your payment method
                 </Text>
-              )}
-              <Text
-                className="text-center mb-5"
-                style={{
-                  color: Colors.light.textGray,
-                  fontFamily: "PopinRegula",
-                }}
-              >
-                Have more ads to post then buy bundle and get extra discount.
-                You’ can use credit any time means no expiry!
-              </Text>
-              <LargeButton
-                text="Add Credits"
-                handleSubmit={() => router.push("/BuyCredit")}
-              />
-            </View>
-
-            <View style={styles.card2}>
-              <Text style={styles.title}>Pay and Ad post Atomaticlly</Text>
-
-              <TouchableOpacity
-                className="mb-4"
-                style={styles.paypalMainButton}
-                onPress={async () => {
-                  if (!SelectedAmount) {
-                    renderToastError("Please select bundle first");
-                    return;
-                  }
-                  setvisible(true);
-                }}
-              >
-                <View style={styles.paypalContent}>
-                  <Paypal />
-                  <Text style={styles.paypalText}>
-                    Pay with PayPal or Debit/Credit Card
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <LargeButton
-                handleSubmit={() => {
-                  if (!SelectedAmount) {
-                    renderToastError("Please select bundle first");
-                    return;
-                  }
-                  if (amount.amount >= Number(SelectedAmount)) {
-                    setPaymentMethod("Wallet");
-                    handelSubmit("Wallet");
-                  } else {
-                    renderToastError(
-                      "You don't have enough amount in wallet, please recharge"
-                    );
-                  }
-                }}
-                text="Pay with wallet"
-              />
-            </View>
-          </View>
-        </View>
-        </ScrollView>
-         <Loading isLoading={ugradeLoading||promoteLoading } text="Loading.." />
-      </Modal>
-       <Modal visible={showShare} animationType="slide" transparent>
-              <View style={{
-                flex: 1,
-                backgroundColor: "rgba(0,0,0,0.5)",
-                justifyContent: "flex-end",
-              }}>
-      
-                <View style={{
-                  backgroundColor: "#fff",
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  padding: 20,
-                  minHeight: "80%",
-                }}>
-      
-                  <View style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 15
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: "600" }}>
-                      Share Post
-                    </Text>
-      
-                    <TouchableOpacity onPress={() => setShowShare(false)}>
-                      <Cross height={vs(24)} width={vs(24)} />
-                    </TouchableOpacity>
-                  </View>
-      
-                  <Formik
-                    initialValues={{
-                      recepient_email: "",
-                      message: "",
-                      link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${Profiletype}`,
-                      post_id: id,
-                      type: Profiletype,
-                    }}
-                    validationSchema={Yup.object({
-                      recepient_email: Yup
-                        .string()
-                        .email("Invalid email")
-                        .required("Email is required"),
-                      message: Yup
-                        .string()
-                        .required("Message is required")
-                    })}
-                    onSubmit={async (values) => {
-                      try {
-                        const formData = new FormData();
-                        formData.append("email", values.recepient_email);
-                        formData.append("message", values.message);
-                        formData.append("link", values.link);
-                        formData.append("post_id", values.post_id);
-                        formData.append("type", "profile");
-                        formData.append("profile_type", Profiletype);
-                        console.log(formData);
-                        const result = await share_profileApi(formData).unwrap();
-                        if (result?.success) {
-                          renderToastSuccess(result.message);
-                          setShowShare(false);
-                        }
-                      } catch (error) {
-                        renderToastError("Failed to share post");
-                      }
+                <View style={styles.card} className="items-center">
+                  <Text
+                    style={{
+                      fontSize: ms(15),
+                      fontWeight: "600",
+                      fontFamily: "PopinRegula",
                     }}
                   >
-                    {({
-                      handleChange,
-                      handleBlur,
-                      handleSubmit,
-                      values,
-                      touched,
-                      errors
-                    }) => (
-      
-                      <View style={{ flex: 1 }}>
-      
-      
-                        <FormikInput
-                          name="recepient_email"
-                          placeholder="Recipient Email"
-                          value={values.recepient_email}
-                          onChangeText={handleChange("recepient_email")}
-                          onBlur={handleBlur("recepient_email")}
-                          touched={!!touched.recepient_email}
-                          errors={!!errors.recepient_email}
-                          errorText={errors.recepient_email} title={"Email"} required={true} />
-      
-      
-                        <FormikInput
-                          name="message"
-                          placeholder="Write your message..."
-                          value={values.message}
-                          onChangeText={handleChange("message")}
-                          onBlur={handleBlur("message")}
-                          multiline
-                          touched={!!touched.message}
-                          errors={!!errors.message}
-                          errorText={errors.message} title={"Message"} required={true} />
-      
-                        <View style={{
-                          backgroundColor: "#f5f5f5",
-                          padding: 12,
+                    Your Homeilove account balance
+                  </Text>
+                  {AmountLoading || isFetching ? (
+                    <ActivityIndicator size="small" color={Colors.light.red} />
+                  ) : (
+                    <Text
+                      style={{
+                        marginVertical: vs(10),
+                        color: Colors.light.red,
+                        fontSize: ms(15),
+                        fontWeight: "600",
+                        fontFamily: "PopinRegula",
+                      }}
+                    >
+                      {amount.amount}
+                    </Text>
+                  )}
+                  <Text
+                    className="text-center mb-5"
+                    style={{
+                      color: Colors.light.textGray,
+                      fontFamily: "PopinRegula",
+                    }}
+                  >
+                    Have more ads to post then buy bundle and get extra
+                    discount. You’ can use credit any time means no expiry!
+                  </Text>
+                  <LargeButton
+                    text="Add Credits"
+                    handleSubmit={() => router.push("/BuyCredit")}
+                  />
+                </View>
+
+                <View style={styles.card2}>
+                  <Text style={styles.title}>Pay and Ad post Atomaticlly</Text>
+
+                  <TouchableOpacity
+                    className="mb-4"
+                    style={styles.paypalMainButton}
+                    onPress={async () => {
+                      if (!SelectedAmount) {
+                        renderToastError("Please select bundle first");
+                        return;
+                      }
+                      setvisible(true);
+                    }}
+                  >
+                    <View style={styles.paypalContent}>
+                      <Paypal />
+                      <Text style={styles.paypalText}>
+                        Pay with PayPal or Debit/Credit Card
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  <LargeButton
+                    handleSubmit={() => {
+                      if (!SelectedAmount) {
+                        renderToastError("Please select bundle first");
+                        return;
+                      }
+                      if (amount.amount >= Number(SelectedAmount)) {
+                        setPaymentMethod("Wallet");
+                        handelSubmit("Wallet");
+                      } else {
+                        renderToastError(
+                          "You don't have enough amount in wallet, please recharge"
+                        );
+                      }
+                    }}
+                    text="Pay with wallet"
+                  />
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+        <Loading isLoading={ugradeLoading || promoteLoading} text="Loading.." />
+      </Modal>
+      <Modal visible={showShare} animationType="slide" transparent>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          edges={[ "bottom", "left", "right"]}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.5)",
+              justifyContent: "flex-end",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "#fff",
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                padding: 20,
+                minHeight: "80%",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 15,
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "600" }}>
+                  Share Post
+                </Text>
+
+                <TouchableOpacity onPress={() => setShowShare(false)}>
+                  <Cross height={vs(24)} width={vs(24)} />
+                </TouchableOpacity>
+              </View>
+
+              <Formik
+                initialValues={{
+                  recepient_email: "",
+                  message: "",
+                  link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${Profiletype}`,
+                  post_id: id,
+                  type: Profiletype,
+                }}
+                validationSchema={Yup.object({
+                  recepient_email: Yup.string()
+                    .email("Invalid email")
+                    .required("Email is required"),
+                  message: Yup.string().required("Message is required"),
+                })}
+                onSubmit={async (values) => {
+                  try {
+                    const formData = new FormData();
+                    formData.append("email", values.recepient_email);
+                    formData.append("message", values.message);
+                    formData.append("link", values.link);
+                    formData.append("post_id", values.post_id);
+                    formData.append("type", "profile");
+                    formData.append("profile_type", Profiletype);
+                    console.log(formData);
+                    const result = await share_profileApi(formData).unwrap();
+                    if (result?.success) {
+                      renderToastSuccess(result.message);
+                      setShowShare(false);
+                    }
+                  } catch (error) {
+                    renderToastError("Failed to share post");
+                  }
+                }}
+              >
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  touched,
+                  errors,
+                }) => (
+                  <View style={{ flex: 1 }}>
+                    <FormikInput
+                      name="recepient_email"
+                      placeholder="Recipient Email"
+                      value={values.recepient_email}
+                      onChangeText={handleChange("recepient_email")}
+                      onBlur={handleBlur("recepient_email")}
+                      touched={!!touched.recepient_email}
+                      errors={!!errors.recepient_email}
+                      errorText={errors.recepient_email}
+                      title={"Email"}
+                      required={true}
+                    />
+
+                    <FormikInput
+                      name="message"
+                      placeholder="Write your message..."
+                      value={values.message}
+                      onChangeText={handleChange("message")}
+                      onBlur={handleBlur("message")}
+                      multiline
+                      touched={!!touched.message}
+                      errors={!!errors.message}
+                      errorText={errors.message}
+                      title={"Message"}
+                      required={true}
+                    />
+
+                    <View
+                      style={{
+                        backgroundColor: "#f5f5f5",
+                        padding: 12,
+                        borderRadius: 10,
+                        marginTop: 10,
+                        marginBottom: 20,
+                      }}
+                    >
+                      <Text style={{ fontWeight: "600" }}>
+                        Sharing this post
+                      </Text>
+                      <Text style={{ color: "#666", fontSize: 12 }}>
+                        Property / Community link will be sent
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        backgroundColor: "#f5f6f8",
+                        borderRadius: 12,
+                        padding: 12,
+                        marginTop: 15,
+                        borderWidth: 1,
+                        borderColor: "#e5e7eb",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          color: "#6b7280",
+                          marginBottom: 6,
+                          fontFamily: "PopinRegula",
+                        }}
+                      >
+                        Shareable Link
+                      </Text>
+
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          backgroundColor: "#fff",
                           borderRadius: 10,
-                          marginTop: 10,
-                          marginBottom: 20
-                        }}>
-                          <Text style={{ fontWeight: "600" }}>
-                            Sharing this post
-                          </Text>
-                          <Text style={{ color: "#666", fontSize: 12 }}>
-                            Property / Community link will be sent
-                          </Text>
-                        </View>
-                        <View
+                          paddingHorizontal: 10,
+                          paddingVertical: 8,
+                          borderWidth: 1,
+                          borderColor: "#e5e7eb",
+                        }}
+                      >
+                        <TextInput
+                          editable={false}
+                          value={values.link}
+                          numberOfLines={1}
                           style={{
-                            backgroundColor: "#f5f6f8",
-                            borderRadius: 12,
-                            padding: 12,
-                            marginTop: 15,
-                            borderWidth: 1,
-                            borderColor: "#e5e7eb",
+                            flex: 1,
+                            fontSize: 12,
+                            color: "#374151",
+                            fontFamily: "PopinRegula",
+                          }}
+                          ellipsizeMode="middle"
+                        />
+
+                        <TouchableOpacity
+                          onPress={async () => {
+                            await Clipboard.setStringAsync(values.link);
+                            renderToastSuccess("Link copied");
+                          }}
+                          style={{
+                            backgroundColor: "#0f766e",
+                            paddingHorizontal: 12,
+                            paddingVertical: 6,
+                            borderRadius: 8,
+                            marginLeft: 8,
                           }}
                         >
-      
                           <Text
                             style={{
-                              fontSize: 13,
-                              color: "#6b7280",
-                              marginBottom: 6,
+                              color: "#fff",
+                              fontSize: 12,
+                              fontWeight: "600",
                               fontFamily: "PopinRegula",
                             }}
                           >
-                            Shareable Link
+                            Copy
                           </Text>
-      
-      
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              backgroundColor: "#fff",
-                              borderRadius: 10,
-                              paddingHorizontal: 10,
-                              paddingVertical: 8,
-                              borderWidth: 1,
-                              borderColor: "#e5e7eb",
-                            }}
-                          >
-                            <TextInput
-                              editable={false}
-                              value={values.link}
-                              numberOfLines={1}
-                              style={{
-                                flex: 1,
-                                fontSize: 12,
-                                color: "#374151",
-                                fontFamily: "PopinRegula",
-                              }}
-                              ellipsizeMode="middle"
-                            />
-      
-      
-                            <TouchableOpacity
-                              onPress={async () => {
-                                await Clipboard.setStringAsync(values.link);
-                                renderToastSuccess("Link copied");
-                              }}
-                              style={{
-                                backgroundColor: "#0f766e",
-                                paddingHorizontal: 12,
-                                paddingVertical: 6,
-                                borderRadius: 8,
-                                marginLeft: 8,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  color: "#fff",
-                                  fontSize: 12,
-                                  fontWeight: "600",
-                                  fontFamily: "PopinRegula",
-                                }}
-                              >
-                                Copy
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-      
-                        <LargeButton
-                          text="Send"
-                          handleSubmit={handleSubmit}
-                        />
-      
+                        </TouchableOpacity>
                       </View>
-      
-                    )}
-                  </Formik>
-      
-                </View>
-              </View>
-              <Loading isLoading={sharing} text="Sharing..." />
-            </Modal>
-         <PapPalPayment
-              amount={SelectedAmount}
-              onPress={(order_id, setApproveUrl) => {
-                try {
-                  setPaymentMethod("Paypal");
-                  setOrderid(order_id);
-                  handelSubmit("Paypal");
-                   setvisible(false);
-                  setApproveUrl(null);
-                } catch {
-                  renderToastError("Some thing went rong");
-                }
-              }}
-              setVisible={setvisible}
-              visible={visible}
-            />
+                    </View>
+
+                    <LargeButton text="Send" handleSubmit={handleSubmit} />
+                  </View>
+                )}
+              </Formik>
+            </View>
+          </View>
+        </SafeAreaView>
+        <Loading isLoading={sharing} text="Sharing..." />
+      </Modal>
+      <PapPalPayment
+        amount={SelectedAmount}
+        onPress={(order_id, setApproveUrl) => {
+          try {
+            setPaymentMethod("Paypal");
+            setOrderid(order_id);
+            handelSubmit("Paypal");
+            setvisible(false);
+            setApproveUrl(null);
+          } catch {
+            renderToastError("Some thing went rong");
+          }
+        }}
+        setVisible={setvisible}
+        visible={visible}
+      />
     </>
   );
 };

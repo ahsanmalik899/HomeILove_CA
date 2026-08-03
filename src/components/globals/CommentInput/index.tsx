@@ -5,8 +5,7 @@ import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { useState } from "react";
-import { ActivityIndicator, TouchableOpacity, View } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import { ActivityIndicator, TextInput, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import CircleImage from "../CircleImage/CircleImage";
 

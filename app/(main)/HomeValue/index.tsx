@@ -4,7 +4,7 @@ import {
 } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import { MaterialIcons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdressInput } from "@src/components/globals/AddressInput";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import { FormikInput } from "@src/components/globals/FormictInput";
@@ -790,25 +790,32 @@ const map = {
                   </Text>
                 </View>
               ) : (
-                <LegendList
-                  className="bg-black"
-                  data={agents ?? []}
-                  extraData={ids}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => item.id?.toString()}
-                  onEndReached={() => {
-                    if (agents?.length > 9) setPage((prev) => prev + 1);
-                  }}
-                  ListFooterComponent={
-                    isFetching ? <ActivityIndicator size="small" /> : null
-                  }
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={isFetching}
-                      onRefresh={() => setPage(1)}
-                    />
-                  }
-                />
+                <View className="flex-1">
+            <FlashList
+  style={{ flex: 1, backgroundColor: "black" }}
+  data={agents ?? []}
+  extraData={ids}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id?.toString()}
+  onEndReachedThreshold={1}
+  onEndReached={() => {
+    if (!isFetching && agents?.length > 9) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isFetching && page > 1 ? (
+      <ActivityIndicator size="small" />
+    ) : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={isFetching && page === 1}
+      onRefresh={() => setPage(1)}
+    />
+  }
+/>
+                </View>
               )}
             </View>
 

@@ -1,7 +1,7 @@
 import { useGetConnectedUsersApiQuery, useUpdateConnectionApiMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import ThreeDots from "@assets/icons/threedots.svg";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import FollowButton from "@src/components/globals/FollowButton";
@@ -86,17 +86,16 @@ const Connected = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <LegendList
-        data={list}
-        renderItem={renderItem}
-        estimatedItemSize={140}
-       keyExtractor={(item, index) =>
-  item?.type === "post"
-    ? `post-${item?.data?.connection_id}`
-    : `ad-${item?.data?.advertisement_id}`
-}
-        showsVerticalScrollIndicator={false}
-      />
+ <FlashList
+  data={list}
+  renderItem={renderItem}
+  keyExtractor={(item, index) =>
+    item?.type === "post"
+      ? `post-${item?.data?.connection_id}`
+      : `ad-${item?.data?.advertisement_id}`
+  }
+  showsVerticalScrollIndicator={false}
+/>
       <Loading isLoading={isLoading} text="Loading..." />
       <Loading isLoading={unfollowing} text="Loading..."/>
     </View>

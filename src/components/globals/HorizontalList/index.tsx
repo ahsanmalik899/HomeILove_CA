@@ -3,7 +3,7 @@ import Like from "@assets/icons/Like.svg";
 import Share from "@assets/icons/share.svg";
 import ThreeDots from "@assets/icons/threedots.svg";
 import image from "@assets/test/test.jpeg";
-import { LegendList } from '@legendapp/list';
+import { FlashList } from "@shopify/flash-list";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from '@utils/design/design';
 import { formatPrice } from "@utils/PriceFormater";
@@ -101,12 +101,13 @@ const index = ({ data, isfetching }: postDataType) => {
 
         <View style={{ paddingBottom: insets.bottom }}>
         {!isfetching ? (
-  <LegendList
-    data={data}
-    renderItem={renderItem}
-    keyExtractor={(item) => item.id.toString()}
-    estimatedItemSize={200}
-  />
+            <View className="flex-1">
+<FlashList
+  data={data}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id.toString()}
+/>
+  </View>
 ) : (
   <Text style={{ textAlign: "center", marginTop: 20 ,fontFamily: "PopinRegula",}}>Loading...</Text>
 )}

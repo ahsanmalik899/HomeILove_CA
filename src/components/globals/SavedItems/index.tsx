@@ -12,13 +12,15 @@ import Bed from "@assets/icons/MypostListing/bed.svg";
 import Shower from "@assets/icons/MypostListing/shower.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from '@legendapp/list';
+import { LegendList } from "@legendapp/list/react-native";
+import { FlashList } from '@shopify/flash-list';
 import Colors from '@src/constants/Colors';
 import { hs, ms, vs } from '@utils/design/design';
 import { ImageFormater } from '@utils/ImageFormat';
 import { formatPrice } from '@utils/PriceFormater';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import AddSingleView from '../AddSingleView';
 import CircleImage from '../CircleImage/CircleImage';
@@ -26,71 +28,40 @@ import HeaderWithBack from '../HeaderWithBack';
 import ProfileSingleView from '../ProfileSingleView';
 import StarRating from '../StarRating';
 
-const index = ({setShowSaved}:{setShowSaved:(value:boolean)=>void}) => {
-    const user = useSelector(userdata);
-    const [page,setPage]=useState(1);
-    const [limit,setLimit]=useState(10);
-      const [showImages, setShowImages] = useState(false);
-      const [selectedImages, setSelectedImages] = useState<string[]>([]);
-        const [scrollable, setscrollable] = useState(true);
-      const[singlePost,setSinglePost]=useState<any>(null);
-      const[singleView,setSingleView]=useState(false);
-      const[postSingleView,setPostSingleView]=useState(false);
-    const [profileData, setProfileData] = useState<any>(null);
-      const [imageNo, setImageNo] = useState(0);
-      const[initialLoad,setInitialLoad]=useState(true);
-    const {data:savedItems,isLoading,isFetching}=useGetSavedAdsApiQuery({user_id:user?.id,page,limit},{skip:!user?.id});
-    const [saveList,setSaveList]=useState([]);
- const [saveItemApi] = useSaveItemApiMutation();
-      const [unsaveItemApi] = useUnsaveItemApiMutation();
-    useEffect(() => {
-      if(page===1){
-        if(isLoading){
-         setInitialLoad(true);
-        }else{
-          setInitialLoad(false);
-        }
-        setSaveList(savedItems?.data?.feed);}
-        else{
-          setSaveList((prev)=>[...prev,...savedItems?.data?.feed]);
-        }
-    }, [savedItems]);
-   
-      const openProfileModal = async(item: any) => {
-    setProfileData({
-    type: item?.data?.type,
-    id: item?.data?.id,
-    userid:item?.data?.users_id,
-    });
-    setSingleView(true);
-  };
-  return (
-    <View className='flex-1'>
-      <HeaderWithBack title="Saved Items" onBackpress={()=>setShowSaved(false)} />
-        {initialLoad?(
-          <ActivityIndicator />
-        ):(
-     <LegendList
-      data={saveList}
-      onEndReached={()=>setPage((prev)=>prev+1)}
-      onEndReachedThreshold={0.8}
-          ListFooterComponent={
-            isFetching?(<ActivityIndicator />):null
-          }
-          ListEmptyComponent={
-            <View className='flex-1 justify-center items-center'>
-              <Text>No Saved Items</Text>
-            </View>
-          }
-          onRefresh={()=>{
-            setPage(1);
-            setSaveList([]);
-          }}
-          refreshing={isFetching}
-   keyExtractor={(item)=>item?.data?.id}
-      renderItem={({ item }: { item: any }) => {
-         const [expanded, setExpanded] = useState(false);
-       const [isSaved,setIsSaved]=useState(item?.is_saved ?? false);
+type SavedItemCardProps = {
+  item: any;
+  user: any;
+  saveItemApi: any;
+  unsaveItemApi: any;
+  openProfileModal: (item: any) => void | Promise<void>;
+  setSelectedImages: (images: string[]) => void;
+  setShowImages: (value: boolean) => void;
+  setscrollable: (value: boolean) => void;
+  setImageNo: (value: number) => void;
+  setPostSingleView: (value: boolean) => void;
+  setSinglePost: (value: any) => void;
+};
+
+const SavedItemCard = ({
+  item,
+  user,
+  saveItemApi,
+  unsaveItemApi,
+  openProfileModal,
+  setSelectedImages,
+  setShowImages,
+  setscrollable,
+  setImageNo,
+  setPostSingleView,
+  setSinglePost,
+}: SavedItemCardProps) => {
+  const [expanded, setExpanded] = useState(false);
+  const [isSaved, setIsSaved] = useState(item?.is_saved ?? false);
+
+  useEffect(() => {
+    setExpanded(false);
+    setIsSaved(item?.is_saved ?? false);
+  }, [item?.type, item?.data?.id, item?.is_saved]);
            const toggleSave = async () => {
      
       try {
@@ -533,7 +504,7 @@ else if(item?.type==="community"){
                 </View>
               </TouchableOpacity>
               {item?.data?.post_type==="Trending"&&(
-                <>
+                <View className='flex-1'>
                  <LegendList
                 data={item?.data?.images || []}
                 horizontal
@@ -560,7 +531,7 @@ else if(item?.type==="community"){
                 )}
               />
             
-            </>
+            </View>
               )}
              
               <View
@@ -863,6 +834,7 @@ else{
                </TouchableOpacity>
                {item?.data?.post_type === "Trending" && (
                  <>
+                 <View className='flex-1'>
                    <LegendList
                      data={item?.data?.images || []}
                      horizontal
@@ -888,6 +860,7 @@ else{
                        </TouchableOpacity>
                      )}
                    />
+                   </View>
                  </>
                )}
  
@@ -962,8 +935,93 @@ else{
    
   )
 }
-      }}
-    />)}
+};
+
+const index = ({setShowSaved}:{setShowSaved:(value:boolean)=>void}) => {
+    const user = useSelector(userdata);
+    const [page,setPage]=useState(1);
+    const [limit,setLimit]=useState(10);
+      const [showImages, setShowImages] = useState(false);
+      const [selectedImages, setSelectedImages] = useState<string[]>([]);
+        const [scrollable, setscrollable] = useState(true);
+      const[singlePost,setSinglePost]=useState<any>(null);
+      const[singleView,setSingleView]=useState(false);
+      const[postSingleView,setPostSingleView]=useState(false);
+    const [profileData, setProfileData] = useState<any>(null);
+      const [imageNo, setImageNo] = useState(0);
+      const[initialLoad,setInitialLoad]=useState(true);
+    const {data:savedItems,isLoading,isFetching}=useGetSavedAdsApiQuery({user_id:user?.id,page,limit},{skip:!user?.id});
+    const [saveList, setSaveList] = useState<any[]>([]);
+ const [saveItemApi] = useSaveItemApiMutation();
+      const [unsaveItemApi] = useUnsaveItemApiMutation();
+    useEffect(() => {
+      if(page===1){
+        if(isLoading){
+         setInitialLoad(true);
+        }else{
+          setInitialLoad(false);
+        }
+        setSaveList(savedItems?.data?.feed ?? []);}
+        else{
+          setSaveList((prev) => [...prev, ...(savedItems?.data?.feed ?? [])]);
+        }
+    }, [savedItems]);
+   
+      const openProfileModal = async(item: any) => {
+    setProfileData({
+    type: item?.data?.type,
+    id: item?.data?.id,
+    userid:item?.data?.users_id,
+    });
+    setSingleView(true);
+  };
+  return (
+    <View className='flex-1' style={{backgroundColor:"#F4F0F0"}}>
+      <HeaderWithBack title="Saved Items" onBackpress={()=>setShowSaved(false)} />
+        {initialLoad?(
+          <ActivityIndicator />
+        ):(
+          <View className='flex-1'>
+            <FlashList
+  data={saveList}
+  onEndReached={() => {
+    if (!isFetching) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  onEndReachedThreshold={0.8}
+  ListFooterComponent={
+    isFetching ? <ActivityIndicator /> : null
+  }
+  ListEmptyComponent={
+    <View className="flex-1 justify-center items-center">
+      <Text>No Saved Items</Text>
+    </View>
+  }
+  onRefresh={() => {
+    setPage(1);
+    setSaveList([]);
+  }}
+  refreshing={isFetching}
+  keyExtractor={(item, index) => `${item?.type}-${item?.data?.id ?? index}`}
+    renderItem={({ item }: { item: any }) => (
+      <SavedItemCard
+        item={item}
+        user={user}
+        saveItemApi={saveItemApi}
+        unsaveItemApi={unsaveItemApi}
+        openProfileModal={openProfileModal}
+        setSelectedImages={setSelectedImages}
+        setShowImages={setShowImages}
+        setscrollable={setscrollable}
+        setImageNo={setImageNo}
+        setPostSingleView={setPostSingleView}
+        setSinglePost={setSinglePost}
+      />
+    )}
+/>
+     </View>)}
+
           <Modal
                 visible={singleView}
                 animationType="slide"
@@ -971,13 +1029,23 @@ else{
                 transparent={true}
                 statusBarTranslucent={true}
               >
+                 <SafeAreaView
+                                                                                           style={{ flex: 1 }}
+                                                                                           edges={[ "bottom", "left", "right"]}
+                                                                                         >
          <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+         </SafeAreaView>
               </Modal>
                   <Modal visible={postSingleView} animationType="slide" onRequestClose={() => {    setPostSingleView(false);
                   setSinglePost(null);
                 }} transparent={true}
                               statusBarTranslucent={true}  >
+                                 <SafeAreaView
+                                                                                           style={{ flex: 1 }}
+                                                                                           edges={[ "bottom", "left", "right"]}
+                                                                                         >
                               <AddSingleView id={singlePost?.id} type={singlePost?.type} setshowModel={setPostSingleView} />
+                              </SafeAreaView>
                             </Modal>
     </View>
   )

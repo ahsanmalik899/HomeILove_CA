@@ -57,21 +57,31 @@ export default function ForgotPasswordScreen() {
        }
   };
 const handleOpenGmail = async () => {
-  if (Platform.OS === 'android') {
-    try {
-      await IntentLauncher.openApplication(packageName);
-        await IntentLauncher.getApplicationIconAsync('com.google.android.gm');
-    } catch (error) {
-      Alert.alert(
-        'Gmail not found',
-        'Gmail app is not installed on this device. Please open your email manually.'
-      );
-    }
-  } else {
-    Alert.alert('Android only', 'This feature is only available on Android.');
+  if (Platform.OS !== "android") {
+    Alert.alert(
+      "Android only",
+      "This feature is only available on Android."
+    );
+    return;
+  }
+
+  try {
+    await IntentLauncher.startActivityAsync(
+      "android.intent.action.MAIN",
+      {
+        packageName: "com.google.android.gm",
+        category: "android.intent.category.LAUNCHER",
+      }
+    );
+  } catch (error) {
+    console.log("GMAIL OPEN ERROR:", error);
+
+    Alert.alert(
+      "Unable to open Gmail",
+      "Gmail could not be opened on this device."
+    );
   }
 };
-
 
 
   return (

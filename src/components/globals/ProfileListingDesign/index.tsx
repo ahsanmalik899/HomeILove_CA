@@ -5,7 +5,7 @@ import Mail from "@assets/Buy/email-open.svg";
 import RedHeart from "@assets/CreateProfile/heart-red.svg";
 import UnSelecteHeart from "@assets/Feedimg/unselected_heart.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -22,77 +22,59 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import CircleImage from "../CircleImage/CircleImage";
 import ProfileSingleView from "../ProfileSingleView";
 import StarRating from "../StarRating";
 import { postDataType } from "./type";
-const YourAdsPostDesign = ({
-  data,
-  setPage,
-  isfetching,
-  setposts,
-  type,
-  hasmore,
-   initialLoadDone,
-   isSingleView,
-   post_id,
-   post_type,
-}: postDataType) => {
- 
+const ProfileListItem = ({
+  item,
+  user,
+  openProfileModal,
+  saveItemApi,
+  unsaveItemApi,
+    isSaved,
+  onSavedChange,
+}: any) => {
+  const [expanded, setExpanded] = useState(false);
 
-  const user = useAppSelector(userdata);
-  const listRef = useRef<any>(null);
-  const [imageNo, setImageNo] = useState(0);
-  const insets = useSafeAreaInsets();
-  const [scrollable, setscrollable] = useState(true);
-    const [singleView, setSingleView] = useState(false);
-    const [profileData, setProfileData] = useState<any>(null);
-      const [saveItemApi] = useSaveItemApiMutation();
-      const [unsaveItemApi] = useUnsaveItemApiMutation();
-  const renderItem = ({ item }) => {
-    const [expanded, setExpanded] = useState(false);
-       const [isSaved,setIsSaved]=useState(item?.data?.is_saved ?? false);
-           const toggleSave = async () => {
-     
-      try {
-        if (isSaved) {
-          await unsaveItemApi({
-            saved_id: item?.data?.id,
-            user_id: user.id,
-            type: item?.data?.type,
-          }).unwrap();
-        } else {
-          await saveItemApi({
-            saved_id: item?.data?.id,
-            user_id: user.id,
-            type: item?.data?.type,
-          }).unwrap();
-        }
-      } catch (error) {
-        console.log("Error saving/unsaving item:", error);
+  const profileId = item?.data?.id;
+  const profileType = item?.data?.type?.toLowerCase();
 
-      } finally {
-        setIsSaved((prev) => !prev);
-      }
-    };
-   useEffect(()=>{
-if(isSingleView){
-  setSingleView(true)
-  setProfileData({id:post_id,type:post_type})
-}
-    
-   },[isSingleView])
-    const facts = item.imp_facts ?? item.facts ?? "";
-    return (
-      <>
-      {item?.type==="post"?
-      (
-        <TouchableOpacity
-          onPress={()=>openProfileModal(item?.data)}
-            onLongPress={()=>openProfileModal(item?.data)}
-        >
-          <View className="bg-white" style={styles.card}>
+const toggleSave = async () => {
+  const nextSavedValue = !isSaved;
+
+  try {
+    if (isSaved) {
+      await unsaveItemApi({
+        saved_id: profileId,
+        user_id: user.id,
+        type: profileType,
+      }).unwrap();
+    } else {
+      await saveItemApi({
+        saved_id: profileId,
+        user_id: user.id,
+        type: profileType,
+      }).unwrap();
+    }
+
+    onSavedChange(nextSavedValue);
+  } catch (error) {
+    console.log("Error saving/unsaving profile:", error);
+  }
+};
+
+  if (item?.type !== "post") {
+    return <AdCardWithoutAnimation ad={item?.data} />;
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={() => openProfileModal(item?.data)}
+      onLongPress={() => openProfileModal(item?.data)}
+    >
+      <View className="bg-white" style={styles.card}>
             <View
               className="flex-row justify-between items-center"
               style={{
@@ -153,8 +135,8 @@ if(isSingleView){
             </View>
             <View className="flex-row justify-between">
               <Text style={{ color: Colors.light.textGray, marginTop: vs(5),fontFamily: "PopinRegula", }}>
-                {item?.data?.address.length > 25
-                  ? item?.data?.address.slice(0, 25) + "..."
+                {item?.data?.address?.length > 25
+                  ? item?.data?.address?.slice(0, 25) + "..."
                   : item?.data?.address}
               </Text>
 
@@ -288,46 +270,120 @@ if(isSingleView){
               </View>
             </View>
           </View>
-        </TouchableOpacity>):(<AdCardWithoutAnimation ad={item?.data}/>)
-      }
-      </>
-    );
-  };
-    const openProfileModal = async(item: any) => {
+    </TouchableOpacity>
+  );
+};
+const YourAdsPostDesign = ({
+  data,
+  setPage,
+  isfetching,
+  setposts,
+  type,
+  hasmore,
+   initialLoadDone,
+   isSingleView,
+   post_id,
+   post_type,
+}: postDataType) => {
+ 
+
+  const user = useAppSelector(userdata);
+  const listRef = useRef<any>(null);
+  const insets = useSafeAreaInsets();
+  const [scrollable, setscrollable] = useState(true);
+    const [singleView, setSingleView] = useState(false);
+    const [profileData, setProfileData] = useState<any>(null);
+      const [saveItemApi] = useSaveItemApiMutation();
+      const [unsaveItemApi] = useUnsaveItemApiMutation();
+       const [savedItems, setSavedItems] = useState<Record<string, boolean>>({});
+useEffect(() => {
+  if (isSingleView && post_id && post_type) {
+    const normalizedType = post_type.toLowerCase();
+
     setProfileData({
-    type: item.type,
-    id: item.id,
-    userid:item.users_id,
+      id: post_id,
+      type: post_type,
+      itemKey: `${normalizedType}-${post_id}`,
     });
+
     setSingleView(true);
-  };
+  }
+}, [isSingleView, post_id, post_type]);
+const openProfileModal = (item: any) => {
+  const normalizedType = item?.type?.toLowerCase();
+  const itemKey = `${normalizedType}-${item?.id}`;
+
+  setProfileData({
+    type: item?.type,
+    id: item?.id,
+    userid: item?.users_id,
+    itemKey,
+  });
+
+  setSingleView(true);
+};
+const renderItem = ({ item, index }: any) => {
+  const profileId = item?.data?.id;
+  const profileType = item?.data?.type?.toLowerCase();
+  const itemKey = `${profileType}-${profileId ?? index}`;
+
+  const isSaved =
+    savedItems[itemKey] ??
+    item?.data?.is_saved ??
+    false;
+
   return (
-      <View style={{ flex: 1, marginBottom: insets.bottom }}>
+    <ProfileListItem
+      item={item}
+      user={user}
+      openProfileModal={openProfileModal}
+      saveItemApi={saveItemApi}
+      unsaveItemApi={unsaveItemApi}
+      isSaved={isSaved}
+      onSavedChange={(nextSavedValue: boolean) => {
+        setSavedItems((prev) => ({
+          ...prev,
+          [itemKey]: nextSavedValue,
+        }));
+      }}
+    />
+  );
+};
+  
+  return (
+      <View style={{ flex: 1}}>
          {!initialLoadDone ? (
             <ActivityIndicator size="large" style={{ marginTop: 20 }} />
           ) : data.length > 0 ? (
-            <LegendList
-              data={data}
-              scrollEnabled={scrollable}
-              ref={listRef}
-              renderItem={renderItem}
-              keyExtractor={(item, index) =>
-                `${item.post_property_id || item.post_community_id}-${index}`
-              }
-              onEndReached={() => {
-                if (!isfetching && hasmore) setPage((prev) => prev + 1);
-              }}
-              onEndReachedThreshold={0.8}
-              ListFooterComponent={
-                isfetching ? <ActivityIndicator size="small" /> : null
-              }
-              refreshControl={
-                <RefreshControl
-                  refreshing={isfetching}
-                  onRefresh={() => setPage(1)}
-                />
-              }
-            />
+            <View className="flex-1">
+           <FlashList
+  data={data}
+  scrollEnabled={scrollable}
+  ref={listRef}
+  renderItem={renderItem}
+    extraData={savedItems}
+keyExtractor={(item, index) =>
+  item?.type === "post"
+    ? `profile-${item?.data?.type}-${item?.data?.id}`
+    : `ad-${item?.data?.advertisement_id ?? index}`
+}
+  onEndReachedThreshold={2}
+  onEndReached={() => {
+    if (!isfetching && hasmore) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isfetching ? <ActivityIndicator size="small" /> : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={isfetching}
+      onRefresh={() => setPage(1)}
+    />
+  }
+/>
+            </View>
           ) : (
             <Text style={{ textAlign: "center", marginTop: 20, fontFamily: 'PopinRegular', }}>
               No Data Found
@@ -340,7 +396,32 @@ if(isSingleView){
             transparent={true}
             statusBarTranslucent={true}
           >
-     <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+             <SafeAreaView
+                                                 style={{ flex: 1 }}
+                                                 edges={[ "bottom", "left", "right"]}
+                                               >
+    <ProfileSingleView
+  id={profileData?.id}
+  type={profileData?.type}
+  setshowModel={setSingleView}
+  onSavedChange={(nextSavedValue) => {
+    const normalizedType = profileData?.type?.toLowerCase();
+
+    const itemKey =
+      profileData?.itemKey ||
+      (normalizedType && profileData?.id
+        ? `${normalizedType}-${profileData.id}`
+        : null);
+
+    if (!itemKey) return;
+
+    setSavedItems((prev) => ({
+      ...prev,
+      [itemKey]: nextSavedValue,
+    }));
+  }}
+/>
+     </SafeAreaView>
           </Modal>
           
         </View>

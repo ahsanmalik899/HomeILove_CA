@@ -17,6 +17,7 @@ import { hs, vs } from "@utils/design/design";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 const _layout = () => {
   const user = useAppSelector(userdata);
@@ -98,6 +99,10 @@ useEffect(() => {
 }, [user?.id]);
   return (
     <>
+     <SafeAreaView
+      style={{ flex: 1 }}
+      edges={["bottom", "left", "right"]}
+    >
     <Drawer
       screenOptions={{
         header: ({ navigation }) => (
@@ -229,6 +234,7 @@ useEffect(() => {
     }
   }}
 />
+</SafeAreaView>
     </>
   );
 };

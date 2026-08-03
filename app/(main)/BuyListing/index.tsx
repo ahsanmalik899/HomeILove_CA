@@ -13,6 +13,7 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useCallback, useEffect, useState } from "react";
 import { BackHandler, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 
 const index = () => {
@@ -180,7 +181,6 @@ const [showSaved, setShowSaved] = useState(false);
     min_price_range: values.minPrice || undefined,
     max_price_range: values.maxPrice || undefined,
     no_of_baths: values.bathrooms || undefined,
-    // no_of_baths: values.bathrooms && values.bathrooms !== "0" ? Number(values.bathrooms) : undefined,
     min_beds: values.minBed !== "" ? Number(values.minBed) : undefined,
     max_beds: values.maxBed !== "" ? Number(values.maxBed) : undefined,
   });
@@ -319,7 +319,12 @@ useFocusEffect(
         </Formik>
       )}
       <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+         <SafeAreaView
+                                                  style={{ flex: 1 }}
+                                                  edges={[ "bottom", "left", "right"]}
+                                                >
         <SavedItems setShowSaved={setShowSaved} />
+        </SafeAreaView>
       </Modal>
     </View>
   );

@@ -8,7 +8,7 @@ import Camera from "@assets/Feedimg/camera.svg";
 import UnSelecteHeart from "@assets/Feedimg/unselected_heart.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -28,86 +28,84 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
 import { postDataType } from "./type";
-const YourAdsPostDesign = ({
-  data,
-  setPage,
-  isfetching,
-  setposts,
+const CommunityListItem = ({
+  item,
   type,
-  hasmore,
-  initialLoadDone,
-  isSingleView,
-  post_id,
-  refetch,
-  post_type,
-}: postDataType) => {
-  const [showImages, setShowImages] = useState(false);
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const[singleView,setSingleView]=useState(false);
-  const user = useAppSelector(userdata);
-  const listRef = useRef<any>(null);
-  const [imageNo, setImageNo] = useState(0);
-  const insets = useSafeAreaInsets();
-  const[singlePost,setSinglePost]=useState<any>(null);
-  const [scrollable, setscrollable] = useState(true);
-    const [saveItemApi] = useSaveItemApiMutation();
-    const [unsaveItemApi] = useUnsaveItemApiMutation();
-  const renderItem = ({ item }) => {
-    const [expanded, setExpanded] = useState(false);
-    
-    const openslider = (index: number) => {
-      setSelectedImages(item.images || []);
-      setShowImages(true);
-      setscrollable(false);
-      setImageNo(index);
-    };
-    useEffect(() => {
-      if(isSingleView){
-        setSingleView(true);
-        setSinglePost({ type: post_type, id: post_id});
-      }
-    }, [isSingleView]);
-     const [isSaved,setIsSaved]=useState(item?.data?.is_saved ?? false);
-      const toggleSave = async () => {
-        const itemId = item?.data?.post_property_id || item?.data?.post_community_id;
-     
-      try {
-        if (isSaved) {
-          await unsaveItemApi({
-            saved_id: itemId,
-            user_id: user.id,
-            type:"community",
-          }).unwrap();
-        } else {
-          await saveItemApi({
-            saved_id: itemId,
-            user_id: user.id,
-            type:"community",
-          }).unwrap();
-        }
-      } catch (error) {
-        console.log("Error saving/unsaving item:", error);
+  user,
+  setSingleView,
+  setSinglePost,
+  setSelectedImages,
+  setShowImages,
+  setscrollable,
+  setImageNo,
+  saveItemApi,
+  unsaveItemApi,
+    isSaved,
+  onSavedChange,
+}: any) => {
+  const [expanded, setExpanded] = useState(false);
 
-      } finally {
-        setIsSaved((prev) => !prev);
-      }
-    };
-      const facts = item.imp_facts ?? item.facts ?? "";
-    return (
-      <>
-      {item.type==="post"?(
-        <TouchableOpacity
-          onPress={() => {
-            setSingleView(true);
-           setSinglePost({ type: type,
-                id: item?.data?.post_community_id});
-          }}
-        >
+  const itemId =
+    item?.data?.post_community_id ||
+    item?.data?.post_property_id ||
+    item?.data?.id;
+
+  const itemKey = `community-${itemId}`;
+  const openslider = (index: number) => {
+    setSelectedImages(item?.data?.images || []);
+    setShowImages(true);
+    setscrollable(false);
+    setImageNo(index);
+  };
+
+ const toggleSave = async () => {
+  const nextSavedValue = !isSaved;
+
+  try {
+    if (isSaved) {
+      await unsaveItemApi({
+        saved_id: itemId,
+        user_id: user.id,
+        type: "community",
+      }).unwrap();
+    } else {
+      await saveItemApi({
+        saved_id: itemId,
+        user_id: user.id,
+        type: "community",
+      }).unwrap();
+    }
+
+    onSavedChange(nextSavedValue);
+  } catch (error) {
+    console.log("Error saving/unsaving community:", error);
+  }
+};
+
+  const facts = item?.imp_facts ?? item?.facts ?? "";
+
+  if (item?.type !== "post") {
+    return <AdCardWithoutAnimation ad={item?.data} />;
+  }
+
+  return (
+  <>
+    <TouchableOpacity
+  onPress={() => {
+  setSinglePost({
+    type,
+    id: itemId,
+    itemKey,
+  });
+
+  setSingleView(true);
+}}
+  >
           <View className="bg-white" style={styles.card}>
             <View
               className="flex-row justify-between items-center"
@@ -307,34 +305,35 @@ const YourAdsPostDesign = ({
                 </View>
               </TouchableOpacity>
               {item?.data?.post_type==="Trending"&&(
-                <>
-                 <LegendList
-                data={item?.data?.images || []}
-                horizontal
-                className="flex-1"
-                keyExtractor={(item, index) => `${item}-${index}`}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity
-                    className="mt-4 mr-2"
-                    onPress={() => {
-                      openslider(index);
-                    }}
-                  >
-                    <Image
-                      source={{ uri: ImageFormater(item) }}
-                      style={{
-                        height: vs(80),
-                        width: vs(80),
-                        borderRadius: ms(10),
-                        resizeMode: "cover",
-                        backgroundColor: "gray",
-                      }}
-                    />
-                  </TouchableOpacity>
-                )}
-              />
+                <View className="flex-1">
+               <FlashList
+  data={item?.data?.images || []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(image, index) => `${image}-${index}`}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item: image, index }) => (
+    <TouchableOpacity
+      className="mt-4 mr-2"
+      onPress={() => {
+        openslider(index);
+      }}
+    >
+      <Image
+        source={{ uri: ImageFormater(image) }}
+        style={{
+          height: vs(80),
+          width: vs(80),
+          borderRadius: ms(10),
+          resizeMode: "cover",
+          backgroundColor: "gray",
+        }}
+      />
+    </TouchableOpacity>
+  )}
+/>
             
-            </>
+            </View>
               )}
              
               <View
@@ -411,39 +410,119 @@ const YourAdsPostDesign = ({
               </View>
             </View>
           </View>
-        </TouchableOpacity>):(<AdCardWithoutAnimation  ad={item?.data}/>)}
+        </TouchableOpacity>
       </>
-    );
-  };
+  );
+};
+const YourAdsPostDesign = ({
+  data,
+  setPage,
+  isfetching,
+  setposts,
+  type,
+  hasmore,
+  initialLoadDone,
+  isSingleView,
+  post_id,
+  refetch,
+  post_type,
+}: postDataType) => {
+  const [showImages, setShowImages] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const[singleView,setSingleView]=useState(false);
+  const user = useAppSelector(userdata);
+  const listRef = useRef<any>(null);
+  const [imageNo, setImageNo] = useState(0);
+  const insets = useSafeAreaInsets();
+  const[singlePost,setSinglePost]=useState<any>(null);
+  const [scrollable, setscrollable] = useState(true);
+    const [saveItemApi] = useSaveItemApiMutation();
+    const [unsaveItemApi] = useUnsaveItemApiMutation();
+    const [savedItems, setSavedItems] = useState<Record<string, boolean>>({});
+useEffect(() => {
+  if (isSingleView && post_id) {
+    setSinglePost({
+      type: post_type,
+      id: post_id,
+      itemKey: `community-${post_id}`,
+    });
+
+    setSingleView(true);
+  }
+}, [isSingleView, post_type, post_id]);
+const renderItem = ({ item, index }: any) => {
+  const itemId =
+    item?.data?.post_community_id ||
+    item?.data?.post_property_id ||
+    item?.data?.id;
+
+  const itemKey = `community-${itemId ?? index}`;
+
+  const isSaved =
+    savedItems[itemKey] ??
+    item?.data?.is_saved ??
+    false;
+
   return (
-    <View style={{ flex: 1, marginBottom: insets.bottom }}>
+    <CommunityListItem
+      item={item}
+      type={type}
+      user={user}
+      setSingleView={setSingleView}
+      setSinglePost={setSinglePost}
+      setSelectedImages={setSelectedImages}
+      setShowImages={setShowImages}
+      setscrollable={setscrollable}
+      setImageNo={setImageNo}
+      saveItemApi={saveItemApi}
+      unsaveItemApi={unsaveItemApi}
+      isSaved={isSaved}
+      onSavedChange={(nextSavedValue: boolean) => {
+        setSavedItems((prev) => ({
+          ...prev,
+          [itemKey]: nextSavedValue,
+        }));
+      }}
+    />
+  );
+};
+  return (
+    <View style={{ flex: 1}}>
         {!initialLoadDone ? (
           <ActivityIndicator size="large" style={{ marginTop: 20 }} />
         ) : data.length > 0 ? (
-          <LegendList
-            data={data}
-            scrollEnabled={scrollable}
-            ref={listRef}
-            renderItem={renderItem}
-            keyExtractor={(item, index) =>
-              `${item.post_property_id || item.post_community_id}-${index}`
-            }
-            onEndReached={() => {
-              if (!isfetching && hasmore) setPage((prev) => prev + 1);
-            }}
-            onEndReachedThreshold={0.8}
-            ListFooterComponent={
-              isfetching ? <ActivityIndicator size="small" /> : null
-            }
-            refreshControl={
-              <RefreshControl
-                refreshing={isfetching}
-                onRefresh={() =>{ setPage(1)
-                  refetch()
-                }}
-              />
-            }
-          />
+          <View className="flex-1">
+         <FlashList
+  data={data}
+  scrollEnabled={scrollable}
+  ref={listRef}
+  renderItem={renderItem}
+    extraData={savedItems}
+keyExtractor={(item, index) =>
+  item?.type === "post"
+    ? `community-${item?.data?.post_community_id ?? index}`
+    : `ad-${item?.data?.advertisement_id ?? index}`
+}
+  onEndReachedThreshold={0.8}
+  onEndReached={() => {
+    if (!isfetching && hasmore) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isfetching ? <ActivityIndicator size="small" /> : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={isfetching}
+      onRefresh={() => {
+        setPage(1);
+        refetch();
+      }}
+    />
+  }
+/>
+          </View>
         ) : (
           <Text
             style={{
@@ -468,7 +547,30 @@ const YourAdsPostDesign = ({
         )}
         <Modal visible={singleView} animationType="slide" onRequestClose={() => setSingleView(false)} transparent={true}
           statusBarTranslucent={true}  >
-          <AddSingleView id={singlePost?.id} type={singlePost?.type} setshowModel={setSingleView} />
+                 <SafeAreaView
+                                                                                  style={{ flex: 1 }}
+                                                                                  edges={[ "bottom", "left", "right"]}
+                                                                                >
+<AddSingleView
+  id={singlePost?.id}
+  type={singlePost?.type}
+  setshowModel={setSingleView}
+  onSavedChange={(nextSavedValue) => {
+    const itemKey =
+      singlePost?.itemKey ||
+      (singlePost?.id
+        ? `community-${singlePost.id}`
+        : null);
+
+    if (!itemKey) return;
+
+    setSavedItems((prev) => ({
+      ...prev,
+      [itemKey]: nextSavedValue,
+    }));
+  }}
+/>
+          </SafeAreaView>
         </Modal>
       </View>
   );

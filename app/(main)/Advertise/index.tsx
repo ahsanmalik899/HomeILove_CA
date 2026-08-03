@@ -23,7 +23,8 @@ import Listipage2 from "@assets/SideBar/listinpage2.svg";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import TimeLine from "@assets/SideBar/timeline.svg";
 import { Feather } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
+
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
@@ -49,12 +50,14 @@ import {
   Image,
   ImageBackground,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import * as Yup from "yup";
 const index = () => {
   const user = useAppSelector(userdata);
@@ -1230,6 +1233,10 @@ const index = () => {
                       animationType="fade"
                       onRequestClose={() => setShowAdPreview(false)}
                     >
+                                    <SafeAreaView
+                          style={{ flex: 1 }}
+                          edges={[ "bottom", "left", "right"]}
+                        >
                       <View
                         style={{
                           flex: 1,
@@ -1346,6 +1353,7 @@ const index = () => {
                           </TouchableOpacity>
                         </ImageBackground>
                       </View>
+                      </SafeAreaView>
                     </Modal>
 
                     <View
@@ -1547,7 +1555,7 @@ const index = () => {
         ) : (
           <>
             {Myadvatizemants?.data?.length > 0 ? (
-              <View>
+              <View className="flex-1">
                 <View
                   style={{
                     flexDirection: "row",
@@ -1568,247 +1576,264 @@ const index = () => {
                   </View>
                 </View>
 
-                <LegendList
-                  data={Myadvatizemants?.data}
-                  renderItem={({ item }) => (
-                    <View
-                      style={{
-                        backgroundColor: "#fff",
-                        borderRadius: ms(14),
-                        marginHorizontal: hs(16),
-                        marginVertical: vs(8),
-                        overflow: "hidden",
-                        borderWidth: 0.5,
-                        borderColor: "#E0E0E0",
-                      }}
-                    >
-                      <View style={{ position: "relative" }}>
-                        <Image
-                          source={{ uri: ImageFormater(item.ad_image) }}
-                          style={{
-                            height: vs(180),
-                            width: "100%",
-                            resizeMode: "cover",
-                            backgroundColor: "#C8C8C8",
-                          }}
-                        />
+              <FlashList
+  data={Myadvatizemants?.data ?? []}
+  renderItem={({ item }) => (
+    <View
+      style={{
+        backgroundColor: "#fff",
+        borderRadius: ms(14),
+        marginHorizontal: hs(16),
+        marginVertical: vs(8),
+        overflow: "hidden",
+        borderWidth: 0.5,
+        borderColor: "#E0E0E0",
+      }}
+    >
+      <View style={{ position: "relative" }}>
+        <Image
+          source={{ uri: ImageFormater(item.ad_image) }}
+          style={{
+            height: vs(180),
+            width: "100%",
+            resizeMode: "cover",
+            backgroundColor: "#C8C8C8",
+          }}
+        />
 
-                        <View
-                          style={{
-                            position: "absolute",
-                            top: vs(10),
-                            left: hs(10),
-                            backgroundColor: Colors.light.LightGreen,
-                            borderRadius: ms(20),
-                            paddingHorizontal: hs(10),
-                            paddingVertical: vs(3),
-                            borderWidth: 0.5,
-                            borderColor: Colors.light.DarkGreen,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontFamily: "PopinRegula",
-                              fontSize: ms(11),
-                              color: "white",
-                            }}
-                          >
-                            on: {item.on_page}
-                          </Text>
-                        </View>
-                      </View>
+        <View
+          style={{
+            position: "absolute",
+            top: vs(10),
+            left: hs(10),
+            backgroundColor: Colors.light.LightGreen,
+            borderRadius: ms(20),
+            paddingHorizontal: hs(10),
+            paddingVertical: vs(3),
+            borderWidth: 0.5,
+            borderColor: Colors.light.DarkGreen,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "PopinRegula",
+              fontSize: ms(11),
+              color: "white",
+            }}
+          >
+            on: {item.on_page}
+          </Text>
+        </View>
+      </View>
 
-                      <View style={{ padding: ms(14) }}>
-                        {/* ID + Status */}
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: vs(12),
-                          }}
-                        >
-                          <View>
-                            <Text
-                              style={{
-                                fontFamily: "PopinRegula",
-                                fontSize: ms(11),
-                                color: "#888",
-                              }}
-                            >
-                              Ad ID
-                            </Text>
-                            <Text
-                              style={{
-                                fontFamily: "PopinRegula",
-                                fontSize: ms(15),
-                                fontWeight: "500",
-                                color: "#1A1A1A",
-                              }}
-                            >
-                              #{item.advertisement_id}
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              backgroundColor:
-                                item.status === "Active"
-                                  ? Colors.light.LightGreen
-                                  : Colors.light.lightGray,
-                              borderRadius: ms(20),
-                              paddingHorizontal: hs(12),
-                              paddingVertical: vs(4),
-                              borderWidth: 0.5,
-                              borderColor:
-                                item.status === "Active"
-                                  ? Colors.light.DarkGreen
-                                  : Colors.light.red,
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontFamily: "PopinRegula",
-                                fontSize: ms(11),
-                                fontWeight: "500",
-                                color:
-                                  item.status === "Active"
-                                    ? Colors.light.DarkGreen
-                                    : Colors.light.red,
-                              }}
-                            >
-                              {item.status}
-                            </Text>
-                          </View>
-                        </View>
+      <View style={{ padding: ms(14) }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: vs(12),
+          }}
+        >
+          <View>
+            <Text
+              style={{
+                fontFamily: "PopinRegula",
+                fontSize: ms(11),
+                color: "#888",
+              }}
+            >
+              Ad ID
+            </Text>
 
-                        {/* Stats Grid */}
-                        <View
-                          style={{
-                            borderTopWidth: 0.5,
-                            borderTopColor: "#E0E0E0",
-                            paddingTop: vs(12),
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            gap: ms(10),
-                          }}
-                        >
-                          {[
-                            {
-                              label: "Amount",
-                              value: `$ ${item.amount_received}`,
-                            },
-                            { label: "Payment", value: item.payment_status },
-                            { label: "Ad life", value: `${item.ad_life} days` },
-                            {
-                              label: "Posted",
-                              value: item.date_posted?.slice(0, 10),
-                            },
-                            { label: "Expires on", value: item.expiry_date },
-                          ].map(({ label, value }) => (
-                            <View key={label} style={{ width: "47%" }}>
-                              <Text
-                                style={{
-                                  fontFamily: "PopinRegula",
-                                  fontSize: ms(11),
-                                  color: "#888",
-                                }}
-                              >
-                                {label}
-                              </Text>
-                              <Text
-                                style={{
-                                  fontFamily: "PopinRegula",
-                                  fontSize: ms(13),
-                                  fontWeight: "500",
-                                  color: "#1A1A1A",
-                                }}
-                              >
-                                {value}
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
+            <Text
+              style={{
+                fontFamily: "PopinRegula",
+                fontSize: ms(15),
+                fontWeight: "500",
+                color: "#1A1A1A",
+              }}
+            >
+              #{item.advertisement_id}
+            </Text>
+          </View>
 
-                        {/* Ad Link */}
-                        {item.ad_link ? (
-                          <View
-                            style={{
-                              borderTopWidth: 0.5,
-                              borderTopColor: Colors.light.DarkGreen,
-                              paddingVertical: vs(10),
-                              paddingHorizontal: hs(10),
-                              backgroundColor: Colors.light.DarkGreen,
-                              borderBottomRightRadius: ms(10),
-                              borderBottomLeftRadius: ms(10),
-                              marginTop: vs(12),
-                              flexDirection: "row",
-                              alignItems: "center",
-                              gap: hs(6),
-                            }}
-                          >
-                            <Feather name="link" size={ms(13)} color="white" />
-                            <Text
-                              style={{
-                                fontFamily: "PopinRegula",
-                                fontSize: ms(12),
-                                color: "white",
-                                flex: 1,
-                              }}
-                              numberOfLines={1}
-                            >
-                              {item.ad_link}
-                            </Text>
-                          </View>
-                        ) : null}
+          <View
+            style={{
+              backgroundColor:
+                item.status === "Active"
+                  ? Colors.light.LightGreen
+                  : Colors.light.lightGray,
+              borderRadius: ms(20),
+              paddingHorizontal: hs(12),
+              paddingVertical: vs(4),
+              borderWidth: 0.5,
+              borderColor:
+                item.status === "Active"
+                  ? Colors.light.DarkGreen
+                  : Colors.light.red,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "PopinRegula",
+                fontSize: ms(11),
+                fontWeight: "500",
+                color:
+                  item.status === "Active"
+                    ? Colors.light.DarkGreen
+                    : Colors.light.red,
+              }}
+            >
+              {item.status}
+            </Text>
+          </View>
+        </View>
 
-                        {/* Bottom Action Buttons */}
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            gap: hs(8),
-                            marginTop: vs(14),
-                          }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => {
-                              setEditAdData(item);
-                              setEditAd(true);
-                            }}
-                            style={{
-                              flex: 1,
-                              paddingVertical: vs(9),
-                              borderRadius: ms(8),
-                              borderWidth: 0.5,
-                              borderColor: "#E0E0E0",
-                              backgroundColor: Colors.light.red,
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              gap: hs(6),
-                            }}
-                          >
-                            <Feather
-                              name="edit-2"
-                              size={ms(13)}
-                              color="white"
-                            />
-                            <Text
-                              style={{
-                                fontFamily: "PopinRegula",
-                                fontSize: ms(13),
-                                fontWeight: "500",
-                                color: "white",
-                              }}
-                            >
-                              Edit Ad
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                  )}
-                  keyExtractor={(item) => item.advertisement_id.toString()}
-                />
+        <View
+          style={{
+            borderTopWidth: 0.5,
+            borderTopColor: "#E0E0E0",
+            paddingTop: vs(12),
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: ms(10),
+          }}
+        >
+          {[
+            {
+              label: "Amount",
+              value: `$ ${item.amount_received}`,
+            },
+            {
+              label: "Payment",
+              value: item.payment_status,
+            },
+            {
+              label: "Ad life",
+              value: `${item.ad_life} days`,
+            },
+            {
+              label: "Posted",
+              value: item.date_posted?.slice(0, 10),
+            },
+            {
+              label: "Expires on",
+              value: item.expiry_date,
+            },
+          ].map(({ label, value }) => (
+            <View key={label} style={{ width: "47%" }}>
+              <Text
+                style={{
+                  fontFamily: "PopinRegula",
+                  fontSize: ms(11),
+                  color: "#888",
+                }}
+              >
+                {label}
+              </Text>
+
+              <Text
+                style={{
+                  fontFamily: "PopinRegula",
+                  fontSize: ms(13),
+                  fontWeight: "500",
+                  color: "#1A1A1A",
+                }}
+              >
+                {value}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {item.ad_link ? (
+          <View
+            style={{
+              borderTopWidth: 0.5,
+              borderTopColor: Colors.light.DarkGreen,
+              paddingVertical: vs(10),
+              paddingHorizontal: hs(10),
+              backgroundColor: Colors.light.DarkGreen,
+              borderBottomRightRadius: ms(10),
+              borderBottomLeftRadius: ms(10),
+              marginTop: vs(12),
+              flexDirection: "row",
+              alignItems: "center",
+              gap: hs(6),
+            }}
+          >
+            <Feather
+              name="link"
+              size={ms(13)}
+              color="white"
+            />
+
+            <Text
+              style={{
+                fontFamily: "PopinRegula",
+                fontSize: ms(12),
+                color: "white",
+                flex: 1,
+              }}
+              numberOfLines={1}
+            >
+              {item.ad_link}
+            </Text>
+          </View>
+        ) : null}
+
+        <View
+          style={{
+            flexDirection: "row",
+            gap: hs(8),
+            marginTop: vs(14),
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              setEditAdData(item);
+              setEditAd(true);
+            }}
+            style={{
+              flex: 1,
+              paddingVertical: vs(9),
+              borderRadius: ms(8),
+              borderWidth: 0.5,
+              borderColor: "#E0E0E0",
+              backgroundColor: Colors.light.red,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: hs(6),
+            }}
+          >
+            <Feather
+              name="edit-2"
+              size={ms(13)}
+              color="white"
+            />
+
+            <Text
+              style={{
+                fontFamily: "PopinRegula",
+                fontSize: ms(13),
+                fontWeight: "500",
+                color: "white",
+              }}
+            >
+              Edit Ad
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  )}
+  keyExtractor={(item) =>
+    item.advertisement_id.toString()
+  }
+  showsVerticalScrollIndicator={false}
+/>
               </View>
             ) : (
               <>
@@ -1851,6 +1876,10 @@ const index = () => {
         onRequestClose={() => setEditAd(false)}
         animationType="slide"
       >
+                         <SafeAreaView
+                          style={{ flex: 1 }}
+                          edges={[ "bottom", "left", "right"]}
+                        >
         <ScrollView
           style={{
             flex: 1,
@@ -1984,6 +2013,7 @@ const index = () => {
             )}
           </Formik>
         </ScrollView>
+        </SafeAreaView>
       </Modal>
     </ScrollView>
   );

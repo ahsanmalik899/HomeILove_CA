@@ -7,6 +7,7 @@ import LargeButton from "@src/components/globals/LaregeButton";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, vs } from "@utils/design/design";
 import { Formik } from "formik";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 import { AdressInput } from "../AddressInput";
 import { FormikInput } from "../FormictInput";
@@ -80,7 +81,10 @@ const PastWorkModal = ({
 
   return (
     <Modal visible={visible} animationType="slide">
-     
+      <SafeAreaView
+                                     style={{ flex: 1 }}
+                                     edges={[ "bottom", "left", "right"]}
+                                   >
       <View style={styles.container}>
         <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",paddingVertical:vs(10)}}>
           <Text style={styles.title}>
@@ -314,6 +318,7 @@ const PastWorkModal = ({
           )}
         </Formik>
       </View>
+      </SafeAreaView>
       <Loading isLoading={isLoading} text="Loading..."/>
     </Modal>
   );

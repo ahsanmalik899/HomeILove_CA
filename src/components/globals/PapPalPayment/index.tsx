@@ -3,11 +3,15 @@ import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import { renderToastError } from "@src/hooks/useToasty";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Modal, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
 
 interface PayPalProps {
   visible: boolean;
-  onPress: (order_id: string, setApproveUrl: (value: string | null) => void) => void;
+  onPress: (
+    order_id: string,
+    setApproveUrl: (value: string | null) => void
+  ) => void;
   amount: string | number;
   type?: string;
   profileType?: string;
@@ -16,9 +20,12 @@ interface PayPalProps {
   setVisible: (value: boolean) => void;
 }
 
-const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => {
-  
-
+const PayPalScreen = ({
+  visible,
+  onPress,
+  amount,
+  setVisible,
+}: PayPalProps) => {
   const captureCalled = useRef(false);
 
   const [createOrder, { isLoading: isCreating }] = usePaybyPaypalMutation();
@@ -30,7 +37,6 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
   useEffect(() => {
     if (!visible) return;
 
-   
     captureCalled.current = false;
     setApproveUrl(null);
     setOrderId(null);
@@ -41,7 +47,7 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
     }
 
     handlePay();
-  }, [visible]); 
+  }, [visible]);
 
   const handlePay = async () => {
     try {
@@ -57,7 +63,6 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
 
       setApproveUrl(approve_link);
       setOrderId(order_id);
-
     } catch (err) {
       console.log("Payment creation error:", err);
       Alert.alert("Error", "Could not initiate payment. Please try again.");
@@ -67,18 +72,17 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
   const handleNavigationChange = async (navState: any) => {
     const url = navState.url;
 
-    
     const isSuccess = url.startsWith("https://example.com/success");
-    const isCancel  = url.startsWith("https://example.com/cancel");
+    const isCancel = url.startsWith("https://example.com/cancel");
 
     if (isSuccess && !captureCalled.current) {
-      captureCalled.current = true; 
- setVisible(false);
+      captureCalled.current = true;
+      setVisible(false);
       if (!orderId) {
         renderToastError("Order ID missing");
         return;
       }
-     
+
       onPress(orderId, setApproveUrl);
     }
 
@@ -97,33 +101,42 @@ const PayPalScreen = ({ visible, onPress, amount, setVisible }: PayPalProps) => 
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      onRequestClose={handleClose}
-    >
-      <HeaderWithBack title="PayPal Payment" onBackpress={handleClose} />
+    <Modal visible={visible} animationType="slide" onRequestClose={handleClose}>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        edges={[ "bottom", "left", "right"]}
+      >
+        <HeaderWithBack title="PayPal Payment" onBackpress={handleClose} />
 
-      {isCreating ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <ActivityIndicator size="large" color="#0070ba" />
-        </View>
-      ) : approveUrl ? (
-        <WebView
-          source={{ uri: approveUrl }}
-          style={{ flex: 1 }}
-          onNavigationStateChange={handleNavigationChange}
-          startInLoadingState
-          javaScriptEnabled
-          domStorageEnabled
-          originWhitelist={["*"]}
-          renderLoading={() => (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <ActivityIndicator size="large" color="#0070ba" />
-            </View>
-          )}
-        />
-      ) : null}
+        {isCreating ? (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <ActivityIndicator size="large" color="#0070ba" />
+          </View>
+        ) : approveUrl ? (
+          <WebView
+            source={{ uri: approveUrl }}
+            style={{ flex: 1 }}
+            onNavigationStateChange={handleNavigationChange}
+            startInLoadingState
+            javaScriptEnabled
+            domStorageEnabled
+            originWhitelist={["*"]}
+            renderLoading={() => (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color="#0070ba" />
+              </View>
+            )}
+          />
+        ) : null}
+      </SafeAreaView>
     </Modal>
   );
 };

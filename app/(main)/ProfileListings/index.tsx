@@ -11,6 +11,7 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import { useCallback, useEffect, useState } from "react";
 import { BackHandler, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import * as Yup from "yup";
 const index = () => {
@@ -28,7 +29,7 @@ const index = () => {
   const [zip, setZip] = useState(params.zip || "");
   const [showFilter, setShowFilter] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
-  
+ 
 const [showSaved, setShowSaved] = useState(false);
  
     const FilterSchema = Yup.object().shape({
@@ -207,7 +208,12 @@ useFocusEffect(
               </Formik>
             )}
                  <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+                   <SafeAreaView
+                                                style={{ flex: 1 }}
+                                                edges={[ "bottom", "left", "right"]}
+                                              >
         <SavedItems setShowSaved={setShowSaved} />
+        </SafeAreaView>
       </Modal>
     </View>
   );

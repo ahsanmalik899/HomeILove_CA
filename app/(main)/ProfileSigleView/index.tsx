@@ -17,7 +17,7 @@ import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { Ionicons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdressInput } from "@src/components/globals/AddressInput";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import { FormikInput } from "@src/components/globals/FormictInput";
@@ -50,6 +50,7 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 
 const Index = () => {
@@ -576,53 +577,53 @@ const { data, isLoading } = useGetSingleProfileQuery(
                 </View>
               )}
               {showPast && type !== "agent" && (
-                <View style={{ marginTop: vs(15) }}>
-                  <LegendList
-                    data={othePastdata?.data || []}
-                    keyExtractor={(item: any) =>
-                      item.user_past_work_id.toString()
-                    }
-                    renderItem={({ item }: any) => {
-                      const firstImage = item.images?.length
-                        ? ImageFormater(item.images[0])
-                        : null;
+                <View style={{ marginTop: vs(15),flex:1 }}>
+                 <FlashList
+  data={othePastdata?.data || []}
+  keyExtractor={(item: any) =>
+    item.user_past_work_id.toString()
+  }
+  renderItem={({ item }: any) => {
+    const firstImage = item.images?.length
+      ? ImageFormater(item.images[0])
+      : null;
 
-                      return (
-                        <View style={styles.pastCard}>
-                          <Image
-                            source={firstImage ? { uri: firstImage } : NoImage}
-                            style={styles.fullImage}
-                          />
+    return (
+      <View style={styles.pastCard}>
+        <Image
+          source={firstImage ? { uri: firstImage } : NoImage}
+          style={styles.fullImage}
+        />
 
-                          <View style={styles.pastContent}>
-                            <View style={styles.rowBetween}>
-                              <View>
-                                <Text style={styles.pastTitle}>
-                                  {item.property_type}
-                                </Text>
+        <View style={styles.pastContent}>
+          <View style={styles.rowBetween}>
+            <View>
+              <Text style={styles.pastTitle}>
+                {item.property_type}
+              </Text>
 
-                                <Text style={styles.pastText}>
-                                  {item.property_sub_type}
-                                </Text>
-                              </View>
-                            </View>
+              <Text style={styles.pastText}>
+                {item.property_sub_type}
+              </Text>
+            </View>
+          </View>
 
-                            <Text style={styles.pastText}>
-                              Beds : {item.beds}
-                            </Text>
+          <Text style={styles.pastText}>
+            Beds : {item.beds}
+          </Text>
 
-                            <Text style={styles.pastText}>
-                              {item.city} , {item.state}
-                            </Text>
+          <Text style={styles.pastText}>
+            {item.city} , {item.state}
+          </Text>
 
-                            <Text style={styles.pastDesc}>
-                              {item.job_description}
-                            </Text>
-                          </View>
-                        </View>
-                      );
-                    }}
-                  />
+          <Text style={styles.pastDesc}>
+            {item.job_description}
+          </Text>
+        </View>
+      </View>
+    );
+  }}
+/>
                 </View>
               )}
             </>
@@ -681,6 +682,10 @@ const { data, isLoading } = useGetSingleProfileQuery(
         </View>
       </TouchableOpacity>
       <Modal visible={reviewModal} transparent animationType="fade">
+        <SafeAreaView
+                                      style={{ flex: 1 }}
+                                      edges={[ "bottom", "left", "right"]}
+                                    >
         <ScrollView>
           <Formik
             initialValues={{
@@ -821,8 +826,13 @@ const { data, isLoading } = useGetSingleProfileQuery(
             )}
           </Formik>
         </ScrollView>
+        </SafeAreaView>
       </Modal>
       <Modal visible={showShare} animationType="slide" transparent>
+        <SafeAreaView
+                                      style={{ flex: 1 }}
+                                      edges={[ "bottom", "left", "right"]}
+                                    >
         <View style={{
           flex: 1,
           backgroundColor: "rgba(0,0,0,0.5)",
@@ -1025,6 +1035,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
 
           </View>
         </View>
+        </SafeAreaView>
         <Loading isLoading={sharing} text="Sharing..." />
       </Modal>
     </>

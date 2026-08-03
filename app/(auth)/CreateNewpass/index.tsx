@@ -8,7 +8,7 @@ import { Formik } from 'formik';
 import { useState } from 'react';
 import {
   ImageBackground,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -25,7 +25,7 @@ import Loading from '@src/components/globals/Loading';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ScrollView } from 'react-native-gesture-handler';
+
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -45,7 +45,7 @@ export default function CreateNewPasswordScreen() {
 
   return (
     <ImageBackground source={backgroundimage} style={styles.background} resizeMode="cover">
-      <SafeAreaView style={styles.safeArea}>
+   
         <ScrollView>
           <View style={styles.container}>
             <View style={styles.logoContainer}>
@@ -147,7 +147,7 @@ export default function CreateNewPasswordScreen() {
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView>
+   
       <Loading text='Changing password' isLoading={isLoading} />
     </ImageBackground>
   );

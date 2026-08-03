@@ -18,6 +18,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -27,7 +28,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
@@ -329,15 +330,24 @@ const renderItem = useCallback(({ item }: any) => {
             onRequestClose={() => setShowprofile(false)}
             transparent={true}
             statusBarTranslucent={true}>
+                 <SafeAreaView
+                                        style={{ flex: 1 }}
+                                        edges={[ "bottom", "left", "right"]}
+                                      >
          <ProfileSingleView id={receiver_post_id.toLocaleString()} type={type.toLocaleString()} setshowModel={setShowprofile}  />
+         </SafeAreaView>
       </Modal>
        <Modal visible={Showpost} 
       
             onRequestClose={() => setShowpost(false)}
             transparent={true}
             statusBarTranslucent={true}>
-  
+   <SafeAreaView
+                                        style={{ flex: 1 }}
+                                        edges={[ "bottom", "left", "right"]}
+                                      >
                     <AddSingleView id={Number(receiver_post_id.toLocaleString())} type={type.toLocaleString()} setshowModel={setShowpost} />
+                    </SafeAreaView>
                   </Modal>
 
     </KeyboardAvoidingView>

@@ -36,7 +36,8 @@ export const MainApi = createApi({
     "unreadChats",
     "conversations",
     "GetReviews",
-    "YourPosts"
+    "YourPosts",
+    "singlePost"
   ],
   baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
   endpoints: (builder) => ({
@@ -48,10 +49,11 @@ export const MainApi = createApi({
       providesTags:["YourPosts"]
     }),
      getSingleGeneralPost: builder.query<FeedResponse, any>({
-      query: ({ userid, post_id }) => ({
+      query: ({ userid, post_id,id }) => ({
         url: `getSingleGeneralPost?user_id=${userid}&post_id=${post_id}`,
         method: "GET",
       }),
+    
     }),
     getHomepost: builder.query<FeedResponse, GetPostType>({
       query: ({ userid, page }) => ({
@@ -84,6 +86,7 @@ export const MainApi = createApi({
       query: ({ type, id,user_id }) => ({
         url: `getSinglePostapi?type=${type}&id=${id}&user_id=${user_id}`,
         method: "GET",
+        
       }),
       providesTags: (r: any, e: any, arg: { id: any }) => [
         { type: "SinglePostData", id: arg.id },
@@ -319,7 +322,7 @@ export const MainApi = createApi({
     }),
     getSingleProfile: builder.query<any, any>({
       query: ({ type, id, user_id }) => ({
-        url: `getSingleProfile?type=${type}&id=${Number(id)}`,
+        url: `getSingleProfile?type=${type}&id=${Number(id)}&user_id=${user_id}`,
         method: "GET",
       }),
       providesTags:["myProfile"]
@@ -648,7 +651,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags:["savedAds"]
+      invalidatesTags:["savedAds","SinglePostData","myProfile"]
     }),
     unsaveItemApi: builder.mutation<any, any>({
       query: (data) => ({
@@ -656,7 +659,7 @@ export const MainApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags:["savedAds"]
+      invalidatesTags:["savedAds","SinglePostData","myProfile"]
     }),
     likePost: builder.mutation<any, any>({
       query: (data) => ({

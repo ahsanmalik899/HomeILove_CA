@@ -12,6 +12,7 @@ import { hs, vs } from '@utils/design/design'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Modal, StyleSheet, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 const index = () => {
    const user = useAppSelector(userdata);
  const {data:AlertCount,isFetching} = useAlertCountApiQuery({id:user?.id})
@@ -36,7 +37,12 @@ const index = () => {
          />
       </View>
       <Modal visible={modalVisible} onRequestClose={()=>{setModalVisible(false)}}   transparent   >
+        <SafeAreaView
+                                                        style={{ flex: 1 }}
+                                                        edges={[ "bottom", "left", "right"]}
+                                                      >
 <MyAlerts setVisible={setModalVisible}/>
+</SafeAreaView>
       </Modal>
       <Loading isLoading={isFetching} text="Loading.."/>
     </View>

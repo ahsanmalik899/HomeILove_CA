@@ -7,7 +7,7 @@ import Like from "@assets/icons/Like.svg";
 import Share from "@assets/icons/share.svg";
 import ThreeDots from "@assets/icons/threedots.svg";
 import Liked from "@assets/icons/ThumbUpRed.svg";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import CommentInput from "@src/components/globals/CommentInput";
 import CreatePost from "@src/components/globals/CreatePost/createPost";
@@ -23,6 +23,7 @@ import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
+import * as Clipboard from "expo-clipboard";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import {
@@ -37,6 +38,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as yup from "yup";
 
 const YourPosts = () => {
@@ -57,47 +59,71 @@ const YourPosts = () => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [scrollable, setscrollable] = useState(true);
   const user = useAppSelector(userdata);
+  const [expandedPost, setExpandedPost] = useState<number | null>(null);
+const [menuPost, setMenuPost] = useState<number | null>(null);
     const [showpost,setShowpost]=useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showShare,setShowShare]=useState(false);
   const renderItem = ({ item }) => {
-    const [expanded, setExpanded] = useState(false);
-    const [menuVisible, setMenuVisible] = useState(false);
-    const [alreadyLiked, setAlreadyLiked] = useState(item.is_liked);
-    const [likeCount, setLikeCount] = useState(item.likes);
-    const handleLikeToggle = async (item) => {
-      try {
-        if (alreadyLiked) {
-          const res = await unlikePost({
-            post_id: item.id,
-            user_id: user.id,
-          }).unwrap();
-          if (res.success) {
-            renderToastSuccess(res.message)
-            setAlreadyLiked(false)
-            setLikeCount(likeCount - 1)
-          } else {
-            renderToastError(res.message)
-          }
+  const expanded = expandedPost === item.id;
+  const menuVisible = menuPost === item.id;
 
-        } else {
-          const res = await likePost({
-            post_id: item.id,
-            user_id: user.id,
-            creater_id: item.post_creater_id,
-          }).unwrap();
-          if (res.success) {
-            renderToastSuccess(res.message)
-            setAlreadyLiked(true)
-            setLikeCount(likeCount + 1)
-          } else {
-            renderToastError(res.message)
-          }
-        }
-      } catch (error) {
-        renderToastError("Something went wrong");
+  const alreadyLiked = item.is_liked;
+  const likeCount = item.likes;
+ const handleLikeToggle = async (item) => {
+  try {
+    if (item.is_liked) {
+      const res = await unlikePost({
+        post_id: item.id,
+        user_id: user.id,
+      }).unwrap();
+
+      if (res.success) {
+        renderToastSuccess(res.message);
+
+        setPosts((prev) =>
+          prev.map((post: any) =>
+            post.id === item.id
+              ? {
+                  ...post,
+                  is_liked: false,
+                  likes: Math.max((post.likes || 1) - 1, 0),
+                }
+              : post
+          )
+        );
+      } else {
+        renderToastError(res.message);
       }
-    };
+    } else {
+      const res = await likePost({
+        post_id: item.id,
+        user_id: user.id,
+        creater_id: item.post_creater_id,
+      }).unwrap();
+
+      if (res.success) {
+        renderToastSuccess(res.message);
+
+        setPosts((prev) =>
+          prev.map((post: any) =>
+            post.id === item.id
+              ? {
+                  ...post,
+                  is_liked: true,
+                  likes: (post.likes || 0) + 1,
+                }
+              : post
+          )
+        );
+      } else {
+        renderToastError(res.message);
+      }
+    }
+  } catch (error) {
+    renderToastError("Something went wrong");
+  }
+};
     const Images = item.post_images
       ? item.post_images.split(',').filter(img => img.trim() !== '')
       : [];
@@ -129,7 +155,7 @@ const YourPosts = () => {
               <Text style={{ fontFamily: "PopinRegula", }}>{item.post_created_date || item.created_date}</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={() => setMenuVisible(true)}>
+         <TouchableOpacity onPress={() => setMenuPost(item.id)}>
             <ThreeDots />
           </TouchableOpacity>
 
@@ -143,7 +169,9 @@ const YourPosts = () => {
             {item.description?.length > 70 && (
               <Text
                 style={styles.moreText}
-                onPress={() => setExpanded(!expanded)}
+              onPress={() =>
+  setExpandedPost(expanded ? null : item.id)
+}
               >
                 {expanded ? " Show Less" : " Read More"}
               </Text>
@@ -297,7 +325,7 @@ const YourPosts = () => {
         {menuVisible && (
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => setMenuVisible(false)}
+            onPress={() => setMenuPost(null)}
             style={{
               position: "absolute",
               top: 0,
@@ -321,12 +349,11 @@ const YourPosts = () => {
               }}
             >
               <TouchableOpacity
-                onPress={() => {
-                  setSelectedPost(item);
-                  setShowEditModal(true);
-                  setMenuVisible(false);
-
-                }}
+               onPress={() => {
+  setSelectedPost(item);
+  setShowEditModal(true);
+  setMenuPost(null);
+}}
                 style={{ paddingVertical: 12, paddingHorizontal: 15 }}
               >
                 <Text style={{ fontSize: 15, fontWeight: "500", fontFamily: "PopinRegula", }}>
@@ -339,7 +366,7 @@ const YourPosts = () => {
               <TouchableOpacity
                 style={{ paddingVertical: 12, paddingHorizontal: 15 }}
                 onPress={() => {
-                  setMenuVisible(false);
+                  setMenuPost(null);
 
                   Alert.alert(
                     "Delete Post",
@@ -388,9 +415,7 @@ const YourPosts = () => {
     userid: user.id,
     page,
   });
-  useEffect(() => {
-    refetch();
-  }, [page]);
+
   useEffect(() => {
     if (!data?.data?.posts) return;
 
@@ -404,34 +429,42 @@ const YourPosts = () => {
   }, [data]);
 
   return (
-    <View>
-      <LegendList
-        className="flex-1 bg-red"
-        contentContainerStyle={{
-          paddingBottom: vs(100),
-        }}
-        data={Posts}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        onEndReached={() => {
-          if (!isFetching && data?.data?.posts?.length > 9) {
-            setPage((prev) => prev + 1);
-          }
-        }}
-        ListFooterComponent={
-          isFetching ? <ActivityIndicator size="small" /> : null
+    <View className="flex-1">
+<FlashList
+  style={{
+    flex: 1,
+    backgroundColor: "#F4F0F0",
+  }}
+  contentContainerStyle={{
+    paddingBottom: vs(100),
+  }}
+  data={Posts}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id.toString()}
+  scrollEnabled={scrollable}
+  onEndReachedThreshold={1}
+  onEndReached={() => {
+    if (!isFetching && data?.data?.posts?.length > 9) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isFetching ? <ActivityIndicator size="small" /> : null
+  }
+  ListHeaderComponent={<CreatePost />}
+  refreshControl={
+    <RefreshControl
+      refreshing={isFetching}
+      onRefresh={() => {
+        if (page === 1) {
+          refetch();
+        } else {
+          setPage(1);
         }
-        style={{ backgroundColor: "#F4F0F0" }}
-        ListHeaderComponent={<CreatePost />}
-        refreshControl={
-          <RefreshControl
-            refreshing={isFetching}
-            onRefresh={() => {
-              setPage(1);
-            }}
-          />
-        }
-      />
+      }}
+    />
+  }
+/>
       {showImages && (
         <ImageSlider
 
@@ -496,11 +529,20 @@ const YourPosts = () => {
         onRequestClose={() => setShowEditModal(false)}
         style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: "100%" }}
       >
+         <SafeAreaView
+                                                  style={{ flex: 1 }}
+                                                  edges={[ "bottom", "left", "right"]}
+                                                >
         <View style={{ height: "100%", width: "100%", backgroundColor: 'rgba(255, 255, 255, 0.6)', alignContent: "center", justifyContent: "center" }}>
           <CreatePost edit={true} item={selectedPost} />
         </View>
+        </SafeAreaView>
       </Modal>
             <Modal visible={showShare} animationType="slide" transparent><>
+              <SafeAreaView
+                                                              style={{ flex: 1 }}
+                                                              edges={[ "bottom", "left", "right"]}
+                                                            >
   <View style={{
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -705,11 +747,17 @@ const YourPosts = () => {
     </View>
   </View>
   <Loading isLoading={sharing} text="Sharing..."/>
+  </SafeAreaView>
   </>
 </Modal>
 <Modal visible={showpost} animationType="slide" onRequestClose={() => setShowpost(false)} transparent={true}
   statusBarTranslucent={true}  >
+            <SafeAreaView
+                                                              style={{ flex: 1 }}
+                                                              edges={[ "bottom", "left", "right"]}
+                                                            >
 <NewsFeedSingleview post_id={showpostPostData?.post_id} setshowModel={setShowpost}/>
+</SafeAreaView>
 </Modal>
     </View>
   );

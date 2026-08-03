@@ -3,8 +3,8 @@ import Connection from "@assets/Home/Conection.svg";
 import Property from "@assets/Home/Property.svg";
 import PrefrenceCard from "@src/components/globals/PrefrenceCard";
 import { router } from "expo-router";
-import { View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, View } from "react-native";
+
 const NewsFeedPreference = () => {
   return (
      <ScrollView style={{backgroundColor:"#F4F0F0"}}>

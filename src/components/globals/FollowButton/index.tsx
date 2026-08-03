@@ -29,22 +29,22 @@ const FollowButton = ({ id, status = 'none', onPress,isLoading }: ButtonProps) =
   
   
 
-  return (
-    <TouchableOpacity
-      style={[styles.button, getButtonStyle()]}
-      onPress={()=>onPress(getButtonText().toString())}
-      disabled={isLoading}
-      activeOpacity={0.7}
-    >  {isLoading ? (
-    <ActivityIndicator size="small" color="#fff" />
-  ) : (
-    <Text style={styles.buttonText}>
-      {getButtonText()}
-    </Text>
-  )}
-    
-    </TouchableOpacity>
-  );
+return (
+  <TouchableOpacity
+    style={[styles.button, getButtonStyle()]}
+    onPress={() => onPress(getButtonText())}
+    disabled={isLoading}
+    activeOpacity={0.7}
+  >
+    {isLoading ? (
+      <ActivityIndicator size="small" color="#fff" />
+    ) : (
+      <Text style={styles.buttonText}>
+        {getButtonText()}
+      </Text>
+    )}
+  </TouchableOpacity>
+);
 };
 
 export default FollowButton;

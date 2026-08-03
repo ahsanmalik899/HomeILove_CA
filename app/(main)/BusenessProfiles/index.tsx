@@ -20,8 +20,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, vs } from "@utils/design/design";
 import { router } from "expo-router";
 import { useState } from "react";
-import { View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 const index = () => {
   const insets = useSafeAreaInsets();

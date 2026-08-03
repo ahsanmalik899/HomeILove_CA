@@ -3,7 +3,7 @@ import { userdata } from "@/store/slices/selector/user";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import PowerdByPayPal from "@assets/SideBar/Powered by PayPal.svg";
 import { MaterialIcons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -14,12 +14,13 @@ import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+
 const index = () => {
   const user = useAppSelector(userdata);
   const bundlesData = [
@@ -91,77 +92,82 @@ const index = () => {
                 borderRightWidth: 1,
                 borderColor: Colors.light.textGray,
                 borderRadius: ms(5),
+                flex:1,
               }}
             >
-              <LegendList
-                data={bundlesData}
-                keyExtractor={(item) => item.id}
-                estimatedItemSize={50}
-                ListHeaderComponent={
-                  <View
-                    className="flex-row justify-between items-center"
-                    style={{
-                      borderTopWidth: 1,
-                      borderBottomWidth: 1,
-                      borderColor: Colors.light.textGray,
-                      borderRadius: ms(5),
-                      paddingHorizontal: hs(10),
-                      paddingVertical: vs(10),
-                    }}
-                  >
-                    <Text style={{ fontFamily: "PopinRegula" }}>Bundles</Text>
-                    <Text style={{ fontFamily: "PopinRegula" }}>
-                      Bundle price
-                    </Text>
-                    <Text style={{ fontFamily: "PopinRegula" }}>
-                      Amount you get
-                    </Text>
-                  </View>
-                }
-                renderItem={({ item }) => (
-                  <View
-                    className="flex-row justify-between items-center"
-                    style={{
-                      paddingHorizontal: hs(10),
-                      paddingVertical: vs(10),
-                    }}
-                  >
-                    <View className="flex-row items-center ">
-                      <TouchableOpacity
-                        onPress={() => {
-                          setAdtype(adType === item.type ? "" : item.type);
-                          setSelectedAmount(item.price);
-                          setUpgradeAmout(item.amount);
-                        }}
-                      >
-                        <MaterialIcons
-                          size={18}
-                          color={Colors.light.DarkGreen}
-                          name={
-                            adType === item.type
-                              ? "check-box"
-                              : "check-box-outline-blank"
-                          }
-                        />
-                      </TouchableOpacity>
-                      <Text
-                        style={{
-                          marginLeft: hs(10),
-                          fontFamily: "PopinRegula",
-                        }}
-                      >
-                        {item.type}
-                      </Text>
-                    </View>
-                    <Text style={{ fontFamily: "PopinRegula" }}>
-                      {formatPrice(item.price)}
-                    </Text>
-                    <Text style={{ fontFamily: "PopinRegula" }}>
-                      {item.amount}
-                    </Text>
-                  </View>
-                )}
-              />
+             <FlashList
+  data={bundlesData}
+  keyExtractor={(item) => item.id}
+  ListHeaderComponent={
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: Colors.light.textGray,
+        borderRadius: ms(5),
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <Text style={{ fontFamily: "PopinRegula" }}>Bundles</Text>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Bundle price
+      </Text>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Amount you get
+      </Text>
+    </View>
+  }
+  renderItem={({ item }) => (
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <View className="flex-row items-center">
+        <TouchableOpacity
+          onPress={() => {
+            setAdtype(adType === item.type ? "" : item.type);
+            setSelectedAmount(item.price);
+            setUpgradeAmout(item.amount);
+          }}
+        >
+          <MaterialIcons
+            size={18}
+            color={Colors.light.DarkGreen}
+            name={
+              adType === item.type
+                ? "check-box"
+                : "check-box-outline-blank"
+            }
+          />
+        </TouchableOpacity>
+
+        <Text
+          style={{
+            marginLeft: hs(10),
+            fontFamily: "PopinRegula",
+          }}
+        >
+          {item.type}
+        </Text>
+      </View>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        {formatPrice(item.price)}
+      </Text>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        {item.amount}
+      </Text>
+    </View>
+  )}
+/>
             </View>
           </View>
 

@@ -6,8 +6,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { router } from "expo-router";
-import { Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, Text, View } from "react-native";
 const Account = () => {
   const user = useAppSelector(userdata);
   return (

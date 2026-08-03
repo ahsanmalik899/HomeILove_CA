@@ -4,13 +4,13 @@ import { hs, vs } from "@utils/design/design";
 import { useEffect, useState } from "react";
 import {
   Modal,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import LargeButton from "../LaregeButton";
 
 type Props = {

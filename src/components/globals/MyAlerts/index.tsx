@@ -2,7 +2,7 @@ import { useDeleteAlertApiMutation, useGetAlertPrefQuery } from '@/store/api/use
 import { userdata } from '@/store/slices/selector/user';
 import Delete from "@assets/icons/MypostListing/delet.svg";
 import Edit from "@assets/icons/MypostListing/edit.svg";
-import { LegendList } from '@legendapp/list';
+import { FlashList } from '@shopify/flash-list';
 import Colors from '@src/constants/Colors';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
@@ -187,12 +187,11 @@ radius:item.radius,
   return (
     <View className='flex-1 bg-white'>
   <HeaderWithBack title='My Alerts'  onBackpress={()=>setVisible(false)}/>
-  <LegendList
-  data={data?.data}
+<FlashList
+  data={data?.data ?? []}
   renderItem={RenderItem}
-   keyExtractor={(item)=>item.alert_id}
-
-  />
+  keyExtractor={(item) => item.alert_id.toString()}
+/>
   <Loading isLoading={deleting} text='deleting...'/>
     </View>
   )

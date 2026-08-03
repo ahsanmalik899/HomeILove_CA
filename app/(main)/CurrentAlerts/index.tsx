@@ -1,7 +1,7 @@
 import { useGetNotificationsQuery, useMarkAllAsSeenMutation, useMarkReadMutation } from "@/store/api/user/MainApi";
 import { setNotificationCount } from "@/store/slices/Notification";
 import { userdata } from "@/store/slices/selector/user";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Colors from "@src/constants/Colors";
@@ -72,7 +72,7 @@ const Index = () => {
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-    const {data:notificationsdata,isLoading:notificationLiading}=  useGetNotificationsQuery({
+    const {data:notificationsdata,isLoading:notificationLiading,isFetching}=  useGetNotificationsQuery({
         user_id: user.id,
         page: page
       });
@@ -170,16 +170,29 @@ useEffect(() => {
           <ActivityIndicator size="large" />
         </View>) : (
         <View className="mt-4 flex-1">
-          <LegendList
-            data={sqlNotifications}
-            renderItem={renderItem}
-            estimatedItemSize={80}
-            refreshing={false}
-            keyExtractor={(item) => item.id.toString()}
-           onEndReached={() => {
-  setPage(prev=>prev+1)
-}}
-          />
+    <FlashList
+  data={sqlNotifications}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id.toString()}
+  refreshing={false}
+  onEndReachedThreshold={2}
+  onEndReached={() => {
+    setPage((prev) => prev + 1);
+  }}
+    ListFooterComponent={
+    isFetching && page > 1 ? (
+      <View
+        style={{
+          height: vs(60),
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="small" />
+      </View>
+    ) : null
+  }
+/>
         </View>)}
     </View>
 

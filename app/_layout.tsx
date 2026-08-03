@@ -60,6 +60,7 @@ const ReduxWrapper = () => {
 
   return (
     <>
+    
       <Slot />
       <StatusBar />
     </>
@@ -77,7 +78,7 @@ const RootLayout = () => {
                 ...DefaultTheme,
                 colors: {
                   ...DefaultTheme.colors,
-                  secondaryContainer: 'transparent',
+                  secondaryContainer: "transparent",
                 },
               }}
             >
@@ -85,6 +86,7 @@ const RootLayout = () => {
             </PaperProvider>
           </PersistGate>
         </Provider>
+
         <Toast config={toastConfig} />
       </GestureHandlerRootView>
     </SafeAreaProvider>

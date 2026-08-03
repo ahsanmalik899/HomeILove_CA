@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon 1024x1024.png",
     "newArchEnabled": true,
-    "deepLinking": true,
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/logo/logo-black.png",
@@ -27,7 +26,6 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.revnosoft.homeilove",
       "associatedDomains": [
-        "applinks:homeilove.app",
         "applinks:homeilove.app"
       ],
       "infoPlist": {
@@ -42,11 +40,11 @@
         "foregroundImage": "./assets/icons/app-icon 1024x1024.png",
         "backgroundColor": "#ffffff"
       },
-       "config": {
-    "googleMaps": {
-      "apiKey": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY"
-    }
-  },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY"
+        }
+      },
       "intentFilters": [
         {
           "action": "VIEW",
@@ -78,7 +76,7 @@
             "DEFAULT"
           ]
         },
-         {
+        {
           "action": "VIEW",
           "autoVerify": true,
           "data": [
@@ -134,14 +132,14 @@
       "expo-router",
       "expo-font",
       "expo-asset",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
-    
       "router": {
         "origin": false
       },
-       "GOOGLE_MAPS_API_KEY": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY",
+      "GOOGLE_MAPS_API_KEY": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY",
       "eas": {
         "projectId": "e370ca21-f752-4295-8201-cdd94e014280"
       }

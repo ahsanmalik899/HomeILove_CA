@@ -8,9 +8,11 @@ import { socket } from "@src/socket";
 import { hs, ms, vs } from "@utils/design/design";
 import { Tabs } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, Text } from "react-native";
+import { Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const _layout = () => {
   const user = useAppSelector(userdata);
+    const insets = useSafeAreaInsets();
  const {data:count,isLoading}=useGetUnreadConversationCountQuery({user_id:user?.id},{skip:!user?.id})
     const [unreadCount, setUnreadCount] = useState(0);
 useEffect(()=>{
@@ -34,24 +36,53 @@ useEffect(() => {
   
   
   return (
-   <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: Colors.light.red,
-        tabBarInactiveTintColor: Colors.light.DarkGreen,
-        tabBarStyle: {
-          position: "absolute",
-          bottom: Platform.OS === "ios" ? vs(15) : vs(10),
-          elevation: 10,
-          backgroundColor: "white",
-          borderRadius: ms(50),
-          height: vs(65),
-          marginHorizontal: hs(10),
-          alignItems: "center",
-          paddingTop: vs(5),
-        },
-      }}
-    >
+ <Tabs
+  screenOptions={{
+    headerShown: false,
+
+    tabBarActiveTintColor: Colors.light.red,
+    tabBarInactiveTintColor: Colors.light.DarkGreen,
+
+    tabBarHideOnKeyboard: true,
+
+    tabBarStyle: {
+      position: "absolute",
+
+      height: vs(60),
+
+      backgroundColor: "#FFFFFF",
+
+      borderRadius: hs(22),
+      elevation: 12,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: -2,
+      },
+      shadowOpacity: 0.08,
+      shadowRadius: 10,
+
+   
+  
+      paddingBottom: vs(6),
+    },
+
+    tabBarItemStyle: {
+      borderRadius: hs(18),
+      paddingVertical: vs(3),
+    },
+
+    tabBarIconStyle: {
+      marginTop: vs(2),
+    },
+
+    tabBarLabelStyle: {
+      fontSize: ms(10),
+      fontWeight: "500",
+
+    },
+  }}
+>
       <Tabs.Screen
       name="Feeds"
         options={{

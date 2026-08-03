@@ -12,7 +12,7 @@ import Liked from "@assets/icons/ThumbUpRed.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from '@legendapp/list';
+import { FlashList } from '@shopify/flash-list';
 import Colors from '@src/constants/Colors';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
 import { hs, ms, vs } from '@utils/design/design';
@@ -23,8 +23,9 @@ import { ViedioUrlFormat } from '@utils/ViedioUrlFormater';
 import { Video } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import { Formik } from 'formik';
-import { useState } from 'react';
-import { ActivityIndicator, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Keyboard, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import * as yup from "yup";
 import AddSingleView from '../AddSingleView';
@@ -42,7 +43,23 @@ export default function NewsFeedSingleview({ post_id,setshowModel,setAlreadyLike
     const formatPdfUrl = (file: string) => {
         return ImageFormater(file);
     };
-     
+    const insets = useSafeAreaInsets();
+     const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+useEffect(() => {
+  const showListener = Keyboard.addListener("keyboardDidShow", (event) => {
+    setKeyboardHeight(event.endCoordinates.height);
+  });
+
+  const hideListener = Keyboard.addListener("keyboardDidHide", () => {
+    setKeyboardHeight(0);
+  });
+
+  return () => {
+    showListener.remove();
+    hideListener.remove();
+  };
+}, []);
       const [likePost, { isLoading: liking }] = useLikePostMutation();
       const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
    const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
@@ -262,21 +279,21 @@ setData((prevData) =>
                Size={40}
                source={{ uri: ImageFormater(data?.posted_by?.logo) }}
              />
-            <Text
-  style={[styles.heading, { color: Colors.light.red }]}
-  numberOfLines={1}
-  ellipsizeMode="tail"
->
-  {data?.posted_by?.business_name?.length > 20
-    ? data?.posted_by?.business_name?.slice(0, 20) + "..."
-    : data?.posted_by?.business_name}
-</Text>
+                    <Text
+                       style={[styles.heading, { color: Colors.light.red }]}
+                    numberOfLines={1}
+                          ellipsizeMode="tail"
+                               >
+                   {data?.posted_by?.business_name?.length > 20
+                      ? data?.posted_by?.business_name?.slice(0, 20) + "..."
+                   : data?.posted_by?.business_name}
+                      </Text>
              {data?.type!=="general" && (
-    <View style={{ flex: 1, alignItems: "flex-end" }}>
-  <TouchableOpacity onPress={() => setSingleView(true)}>
-    <Text style={styles.fullDetailText}>See Full Details</Text>
-  </TouchableOpacity>
-</View>)}
+                        <View style={{ flex: 1, alignItems: "flex-end" }}>
+                          <TouchableOpacity onPress={() => setSingleView(true)}>
+                   <Text style={styles.fullDetailText}>See Full Details</Text>
+                    </TouchableOpacity>
+                </View>)}
            </View>
            {data?.type!=="general" && (
              <View
@@ -421,33 +438,35 @@ setData((prevData) =>
                </Text>
              </View>
            </TouchableOpacity>
-           <LegendList
-             data={data?.post_images || []}
-             horizontal
-             className="flex-1"
-             keyExtractor={(item, index) => `${item}-${index}`}
-             renderItem={({ item, index }) => (
-               <TouchableOpacity
-                 className="mt-4 mr-2"
-                 onPress={() => {
-                   setImageNo(index);
-                   setShowImages(true);
-                 }}
-               >
-                 <Image
-                   source={{ uri: ImageFormater(item) }}
-                   style={{
-                     height: vs(80),
-                     width: vs(80),
-                     borderRadius: ms(10),
-                     resizeMode: "cover",
-                     backgroundColor: "gray",
-                   }}
-                 />
-               </TouchableOpacity>
-             )}
-           />
- 
+           <View className='flex-1'>
+         <FlashList
+  data={data?.post_images || []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(item, index) => `${item}-${index}`}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item, index }) => (
+    <TouchableOpacity
+      className="mt-4 mr-2"
+      onPress={() => {
+        setImageNo(index);
+        setShowImages(true);
+      }}
+    >
+      <Image
+        source={{ uri: ImageFormater(item) }}
+        style={{
+          height: vs(80),
+          width: vs(80),
+          borderRadius: ms(10),
+          resizeMode: "cover",
+          backgroundColor: "gray",
+        }}
+      />
+    </TouchableOpacity>
+  )}
+/>
+ </View>
            <View
              className=" bg-white flex-row  justify-between"
              style={{
@@ -581,41 +600,77 @@ setData((prevData) =>
                                     
                              </View>
                                    )}
-         <View style={{ marginTop: vs(20) }}>
+         <View style={{ marginTop: vs(20),flex:1 }}>
            <Text style={styles.heading}>
              Comments ({comments?.data?.length || 0})
            </Text>
  
-           <LegendList
-             data={comments?.data || []}
-             estimatedItemSize={80}
-             keyExtractor={(item) => item.comment_id.toString()}
-             renderItem={({ item }) => (
-               <CommentItem item={item} refetch={refetch} />
-             )}
-           />
+         <FlashList
+         style={{flex:1}}
+  data={comments?.data || []}
+  keyExtractor={(item) => item.comment_id.toString()}
+  renderItem={({ item }) => (
+    <CommentItem item={item} refetch={refetch} />
+  )}
+   ListFooterComponent={
+    <View style={{ height: vs(100) }} />
+  }
+    ListEmptyComponent={
+    !commentFetching ? (
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: vs(35),
+        }}
+      >
+        <Text
+          style={{
+            fontSize: ms(14),
+            color: Colors.light.textGray,
+            fontFamily: "PopinRegula",
+          }}
+        >
+          No comments yet
+        </Text>
+      </View>
+    ) : null
+  }
+/>
   
          </View>
        </ScrollView>
-                  <View
-    style={{
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: "#fff",
-      paddingHorizontal: 10,
-      paddingVertical: 8,
-      borderTopWidth: 1,
-      borderColor: "#eee",
-    }}
-  >
-    <CommentInput
-      creatorId={data?.post?.user_id||data?.posted_by?.id}
-      postId={post_id}
-      setData={setData}
-    />
-  </View>
+ <View
+  style={{
+    position: "absolute",
+
+    bottom:
+      keyboardHeight > 0
+        ? keyboardHeight+vs(45)
+        :  insets.bottom,
+
+    left: 0,
+    right: 0,
+
+    backgroundColor: "#fff",
+
+    paddingHorizontal: hs(10),
+    paddingTop: vs(8),
+    paddingBottom: keyboardHeight > 0 ? vs(10) : vs(8),
+
+    borderTopWidth: 1,
+    borderColor: "#eee",
+
+    zIndex: 100,
+    elevation: 10,
+  }}
+>
+  <CommentInput
+    creatorId={data?.post?.user_id || data?.posted_by?.id}
+    postId={post_id}
+    setData={setData}
+  />
+</View>
        {showImages && (
          <ImageSlider
            imageNo={imageNo}
@@ -636,6 +691,10 @@ setData((prevData) =>
          />
        )}
                   <Modal visible={showShare} animationType="slide" transparent>
+                          <SafeAreaView
+                                                                                                                        style={{ flex: 1 }}
+                                                                                                                        edges={[ "bottom", "left", "right"]}
+                                                                                                                      >
    <View style={{
      flex: 1,
      backgroundColor: "rgba(0,0,0,0.5)",
@@ -839,13 +898,19 @@ setData((prevData) =>
  
      </View>
    </View>
+   </SafeAreaView>
    <Loading isLoading={sharing} text="Sharing..."/>
  </Modal>
    <Modal visible={singleView} animationType="slide" onRequestClose={() => {    setSingleView(false);
      setSinglePost(null);
    }} transparent={true}
                  statusBarTranslucent={true}  >
+                   <SafeAreaView
+                                                                                                                        style={{ flex: 1 }}
+                                                                                                                        edges={[ "bottom", "left", "right"]}
+                                                                                                                      >
                  <AddSingleView id={ data?.post?.post_property_id||data?.post?.post_community_id} type={data?.type} setshowModel={setSingleView} />
+                 </SafeAreaView>
                </Modal>
        <Loading isLoading={isFetching} text="Loading..." />
      </>

@@ -68,21 +68,32 @@ const index = () => {
     isFetching,
     refetch,
   } = useGetCommunityListQuery(apiFilters);
-  useEffect(() => {
-    setApiFilters((prev) => ({
-      ...prev,
-      address,
-      city,
-      state,
-      zip,
-      lat,
-      lng,
-      page,
-      name,
-      sort,
-      user_id: user?.id,
-    }));
-  }, [address, city, state, zip, lat, lng, page, sort]);
+ useEffect(() => {
+  setApiFilters((prev) => ({
+    ...prev,
+    address,
+    city,
+    state,
+    zip,
+    lat,
+    lng,
+    page,
+    name,
+    sort,
+    user_id: user?.id,
+  }));
+}, [
+  address,
+  city,
+  state,
+  zip,
+  lat,
+  lng,
+  page,
+  name,
+  sort,
+  user?.id,
+]);
 
   const FilterSchema = Yup.object().shape({
     radius: Yup.string().nullable(),
@@ -155,7 +166,7 @@ useFocusEffect(
     );
 
     return () => sub.remove();
-  }, [params])
+  }, [params?.isSingleView])
 );
   return (
     <View className=" flex-1" style={{ backgroundColor: "#F4F0F0" }}>

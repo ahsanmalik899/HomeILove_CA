@@ -10,7 +10,7 @@ import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import ImageSlider from "@src/components/globals/ImageSlider";
@@ -25,13 +25,13 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 
 const index = () => {
@@ -249,33 +249,35 @@ const index = () => {
               </Text>
             </View>
           </TouchableOpacity>
-          <LegendList
-            data={data?.post_images || []}
-            horizontal
-            className="flex-1"
-            keyExtractor={(item, index) => `${item}-${index}`}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                className="mt-4 mr-2"
-                onPress={() => {
-                  setImageNo(index);
-                  setShowImages(true);
-                }}
-              >
-                <Image
-                  source={{ uri: ImageFormater(item) }}
-                  style={{
-                    height: vs(80),
-                    width: vs(80),
-                    borderRadius: ms(10),
-                    resizeMode: "cover",
-                    backgroundColor: "gray",
-                  }}
-                />
-              </TouchableOpacity>
-            )}
-          />
-
+          <View className="flex-1">
+        <FlashList
+  data={data?.post_images || []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(item, index) => `${item}-${index}`}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item, index }) => (
+    <TouchableOpacity
+      className="mt-4 mr-2"
+      onPress={() => {
+        setImageNo(index);
+        setShowImages(true);
+      }}
+    >
+      <Image
+        source={{ uri: ImageFormater(item) }}
+        style={{
+          height: vs(80),
+          width: vs(80),
+          borderRadius: ms(10),
+          resizeMode: "cover",
+          backgroundColor: "gray",
+        }}
+      />
+    </TouchableOpacity>
+  )}
+/>
+</View>
           <View
             className=" bg-white flex-row  justify-between"
             style={{
@@ -348,19 +350,18 @@ const index = () => {
                     </View>
                           )}
                             
-        <View style={{ marginTop: vs(20) }}>
+        <View style={{ marginTop: vs(20),flex:1 }}>
           <Text style={styles.heading}>
             Comments ({comments?.data?.length || 0})
           </Text>
 
-          <LegendList
-            data={comments?.data || []}
-            estimatedItemSize={80}
-            keyExtractor={(item) => item.comment_id.toString()}
-            renderItem={({ item }) => (
-              <CommentItem item={item} refetch={refetch} />
-            )}
-          />
+         <FlashList
+  data={comments?.data || []}
+  keyExtractor={(item) => item.comment_id.toString()}
+  renderItem={({ item }) => (
+    <CommentItem item={item} refetch={refetch} />
+  )}
+/>
         </View>
       </ScrollView>
       {showImages && (

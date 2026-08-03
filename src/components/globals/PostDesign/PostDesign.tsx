@@ -26,7 +26,7 @@ import ThreeDots from "@assets/icons/threedots.svg";
 import Liked from "@assets/icons/ThumbUpRed.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import CommentInput from "@src/components/globals/CommentInput";
 import Colors from "@src/constants/Colors";
@@ -40,23 +40,22 @@ import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
 import * as Clipboard from 'expo-clipboard';
 import { Formik } from "formik";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
   Modal,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import * as yup from "yup";
 import CircleImage from "../CircleImage/CircleImage";
-import CreatePost from "../CreatePost/createPost";
 import FollowButton from "../FollowButton";
 import { FormikInput } from "../FormictInput";
 import ImageSlider from "../ImageSlider";
@@ -74,6 +73,7 @@ const PostDesign = ({
   post_id,
   isPostSingle,
   setData,
+  hasMore,
   refetch,
 }: postDataType) => {
 
@@ -91,12 +91,12 @@ const PostDesign = ({
   const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
   const [showReport, setShowReport] = useState(false);
   const [showFloor, setShowFloor] = useState(false);
-
+const [expandedPost, setExpandedPost] = useState<string | null>(null);
+const [menuPost, setMenuPost] = useState<string | null>(null);
   const [SelectedViedio, setSelectedViedio] = useState('');
   const [loading, setLoading] = useState(false);
   const [shareData, setShareData] = useState('');
   const [showMortgage, setShowMortgage] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
   const { data: Profiles, isLoading: ProfilesLoading } =
     useGetProfilesForConectionQuery({ id: user.id });
@@ -121,9 +121,28 @@ const PostDesign = ({
   const [description, setDescription] = useState("");
   const [showpost, setShowpost] = useState(false);
   const [pastpage, setpastPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+
   const [reviewModal, setReviewModal] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+const feedData = useMemo(() => {
+  return (data ?? []).filter(
+    (item) => !hiddenPosts.includes(item.post_id)
+  );
+}, [data, hiddenPosts]);
+
+const handleRefresh = async () => {
+  try {
+    setRefreshing(true);
+
+    setPage(1);
+    await refetch();
+  } finally {
+    setRefreshing(false);
+  }
+};
+
   const [getotherPastWork, {
     data: othePastdata,
     isLoading: otherWorkLoding,
@@ -142,7 +161,7 @@ const PostDesign = ({
   useEffect(() => {
     if (!pastData?.data) return;
 
-    setHasMore(pastData?.has_more);
+  
 
     setPosts((prev) =>
       pastpage === 1 ? pastData.data : [...prev, ...pastData.data]
@@ -393,8 +412,12 @@ const PostDesign = ({
     if(!showpostPostData?.post_id) return
     getComments({ post_id: showpostPostData?.post_id });
   }, [showpostPostData]);
+  
   const renderItem = ({ item }) => {
-    const [expanded, setExpanded] = useState(false);
+     const itemKey = `${item.post_id}-${item.type}`;
+
+  const expanded = expandedPost === itemKey;
+  const menuVisible = menuPost === itemKey;
     const handleLikeToggle = async (item) => {
       try {
         if (item.is_liked) {
@@ -450,7 +473,7 @@ const PostDesign = ({
       }
     };
 
-    const [menuVisible, setMenuVisible] = useState(false);
+
     if (item.type === "Shared Connection") {
       return (
         <TouchableOpacity className="bg-white" style={styles.card} onPress={() => {
@@ -481,7 +504,7 @@ const PostDesign = ({
                 <Text style={{ fontFamily: "PopinRegula" }}>{item.city}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => setMenuVisible(true)}>
+            <TouchableOpacity onPress={() =>  setMenuPost(itemKey)}>
               <ThreeDots />
             </TouchableOpacity>
           </View>
@@ -621,7 +644,7 @@ const PostDesign = ({
           {menuVisible && (
             <TouchableOpacity
               activeOpacity={1}
-              onPress={() => setMenuVisible(false)}
+              onPress={() => setMenuPost(null)}
               style={{
                 position: "absolute",
                 top: 0,
@@ -646,7 +669,7 @@ const PostDesign = ({
               >
                 <TouchableOpacity
                   onPress={() => {
-                    setMenuVisible(false);
+                    setMenuPost(null);
                     handleHidePost(item);
                   }}
                   style={{ paddingVertical: 12, paddingHorizontal: 15 }}
@@ -666,7 +689,7 @@ const PostDesign = ({
 
                 <TouchableOpacity
                   onPress={async () => {
-                    setMenuVisible(false);
+                    setMenuPost(null);
                     setReportData(item);
                     setShowReport(true);
                   }}
@@ -717,7 +740,7 @@ const PostDesign = ({
                 <Text style={{ fontFamily: "PopinRegula", }}>{timeAgo(item.post_created_date || item.created_date)}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => setMenuVisible(true)}>
+            <TouchableOpacity onPress={() =>  setMenuPost(itemKey)}>
               <ThreeDots />
             </TouchableOpacity>
 
@@ -731,7 +754,7 @@ const PostDesign = ({
               {item.description?.length > 70 && (
                 <Text
                   style={styles.moreText}
-                  onPress={() => setExpanded(!expanded)}
+                  onPress={() =>   setExpandedPost(expanded ? null : itemKey)}
                 >
                   {expanded ? " Show Less" : " Read More"}
                 </Text>
@@ -888,7 +911,7 @@ const PostDesign = ({
           {menuVisible && (
             <TouchableOpacity
               activeOpacity={1}
-              onPress={() => setMenuVisible(false)}
+              onPress={() => setMenuPost(null)}
               style={{
                 position: "absolute",
                 top: 0,
@@ -913,7 +936,7 @@ const PostDesign = ({
               >
                 <TouchableOpacity
                   onPress={() => {
-                    setMenuVisible(false);
+                    setMenuPost(null);
                     handleHidePost(item);
                   }}
                   style={{ paddingVertical: 12, paddingHorizontal: 15 }}
@@ -933,7 +956,7 @@ const PostDesign = ({
 
                 <TouchableOpacity
                   onPress={() => {
-                    setMenuVisible(false);
+                    setMenuPost(null);
                     setReportData(item);
                     setShowReport(true);
                   }}
@@ -995,7 +1018,7 @@ const PostDesign = ({
                 </Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => setMenuVisible(true)}>
+            <TouchableOpacity onPress={() =>  setMenuPost(itemKey)}>
               <ThreeDots />
             </TouchableOpacity>
           </View>
@@ -1008,7 +1031,7 @@ const PostDesign = ({
               {item.description?.length > 70 && (
                 <Text
                   style={styles.moreText}
-                  onPress={() => setExpanded(!expanded)}
+                  onPress={() =>   setExpandedPost(expanded ? null : itemKey)}
                 >
                   {expanded ? " Show Less" : " Read More"}
                 </Text>
@@ -1202,7 +1225,7 @@ const PostDesign = ({
           {menuVisible && (
             <TouchableOpacity
               activeOpacity={1}
-              onPress={() => setMenuVisible(false)}
+              onPress={() => setMenuPost(null)}
               style={{
                 position: "absolute",
                 top: 0,
@@ -1227,7 +1250,7 @@ const PostDesign = ({
               >
                 <TouchableOpacity
                   onPress={() => {
-                    setMenuVisible(false);
+                    setMenuPost(null);
                     handleHidePost(item);
                   }}
                   style={{ paddingVertical: 12, paddingHorizontal: 15 }}
@@ -1247,7 +1270,7 @@ const PostDesign = ({
 
                 <TouchableOpacity
                   onPress={() => {
-                    setMenuVisible(false);
+                    setMenuPost(null);
                     setReportData(item);
                     setShowReport(true);
                   }}
@@ -1273,63 +1296,74 @@ const PostDesign = ({
   };
 
   return (
-    <View style={{ paddingBottom: insets.bottom, flex: 1, backgroundColor: "#F4F0F0" }}>
-      <LegendList
-        className="flex-1 bg-red"
-        contentContainerStyle={{
-          paddingBottom: vs(100),
-        }}
-        data={data?.filter((item) => !hiddenPosts.includes(item.post_id))}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.post_id.toString() + item?.type}
-        onEndReached={() => {
-          if (!isfetching && data?.length > 9) {
-            setPage((prev) => prev + 1);
-          }
-        }}
-        ListHeaderComponent={withCreatePost ? <CreatePost /> : null}
-        ListFooterComponent={
-          isfetching ? <ActivityIndicator size="small" /> : null
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={isfetching}
-            onRefresh={() => {
-              setPage(1);
-              refetch();
-            }}
-          />
-        }
-          ListEmptyComponent={
-    !isfetching ? (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: vs(100),
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "PopinMedium",
-            fontSize: ms(16),
-            color: Colors.light.DarkGreen,
-          }}
-        >
-          No Data Found
-        </Text>
-      </View>
-    ) : null
-  }
-      />
+    <View style={{  flex: 1, backgroundColor: "#F4F0F0" }}>
+<FlashList
+  style={{
+    flex: 1,
+    backgroundColor: "#F4F0F0",
+  }}
 
+  data={feedData}
+
+  renderItem={renderItem}
+
+  keyExtractor={(item) =>
+    `${item.type}-${item.post_id}`
+  }
+
+  getItemType={(item) => item.type}
+
+  extraData={{
+    expandedPost,
+    menuPost,
+    hiddenPosts,
+  }}
+
+  scrollEnabled={scrollable}
+
+  contentContainerStyle={{
+    paddingBottom: vs(90),
+  }}
+
+ onEndReachedThreshold={1.5}
+
+onEndReached={() => {
+  if (!isfetching && hasMore && feedData.length > 0) {
+    setPage((prev) => prev + 1);
+  }
+}}
+
+  ListFooterComponent={
+    <View
+      style={{
+        height: vs(70),
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {isfetching && !refreshing && (
+        <ActivityIndicator size="small" />
+      )}
+    </View>
+  }
+
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    />
+  }
+/>
       <Modal
         visible={showConnection}
         transparent={true}
         animationType="fade"
         onRequestClose={() => setShowConnection(false)}
       >
+           <SafeAreaView
+                              style={{ flex: 1 }}
+                              edges={[ "bottom", "left", "right"]}
+                            >
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
@@ -1382,6 +1416,7 @@ const PostDesign = ({
             </ScrollView>
           </View>
         </TouchableOpacity>
+        </SafeAreaView>
       </Modal>
       <Loading isLoading={isLoading} text="Sending request..." />
       {
@@ -1430,20 +1465,32 @@ const PostDesign = ({
           </View>
         )
       }
-      <Modal visible={showShare} animationType="slide" transparent>
+      <Modal visible={showShare} animationType="slide" transparent >
+            <SafeAreaView
+                                style={{ flex: 1 }}
+                                edges={[ "bottom", "left", "right"]}
+                              >
         <View style={{
           flex: 1,
           backgroundColor: "rgba(0,0,0,0.5)",
           justifyContent: "flex-end",
         }}>
 
-          <View style={{
-            backgroundColor: "#fff",
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            padding: 20,
-            minHeight: "80%",
-          }}>
+        <View
+  style={{
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+
+    paddingTop: 20,
+    paddingHorizontal: 20,
+
+
+    paddingBottom: 20 + insets.bottom,
+
+    minHeight: "80%",
+  }}
+>
 
             <View style={{
               flexDirection: "row",
@@ -1633,9 +1680,14 @@ const PostDesign = ({
 
           </View>
         </View>
+        </SafeAreaView>
         <Loading isLoading={sharing} text="Sharing..." />
       </Modal>
       <Modal visible={showReport} animationType="slide" onRequestClose={() => setShowReport(false)} >
+          <SafeAreaView
+                                style={{ flex: 1 }}
+                                edges={[ "bottom", "left", "right"]}
+                              >
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
           <View style={styles.modalContainer}>
 
@@ -1711,17 +1763,21 @@ const PostDesign = ({
 
           </View>
         </View>
+        </SafeAreaView>
         <Loading isLoading={reporting} text="Reporting..." />
       </Modal>
       <Modal visible={showpost} animationType="slide" onRequestClose={() => setShowpost(false)} transparent={true}
         statusBarTranslucent={true}  >
-
+ <SafeAreaView
+                                style={{ flex: 1 }}
+                                edges={[ "bottom", "left", "right"]}
+                              >
         {showpostPostData?.type === "Shared Connection" ? (
           <ProfileSingleView id={showpostPostData?.id} type={showpostPostData?.connection_type} setshowModel={setShowpost} setData={setData} />
         ) : (
           <NewsFeedSingleview post_id={showpostPostData?.post_id} setshowModel={setShowpost} setData={setData} />
         )}
-
+</SafeAreaView>
 
       </Modal>
       {showImages && (

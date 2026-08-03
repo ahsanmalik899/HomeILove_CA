@@ -7,7 +7,7 @@ import {
 import { userdata } from "@/store/slices/selector/user";
 import Delet from "@assets/icons/MypostListing/delet.svg";
 import Edit from "@assets/icons/MypostListing/edit.svg";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import { FormikInput } from "@src/components/globals/FormictInput";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
@@ -35,6 +35,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 const Index = () => {
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [value, setValue] = useState("Sent");
@@ -160,6 +161,10 @@ const Index = () => {
           animationType="slide"
           onRequestClose={() => setReviseModalVisible(false)}
         >
+            <SafeAreaView
+                                                style={{ flex: 1 }}
+                                                edges={[ "bottom", "left", "right"]}
+                                              >
           <View
             style={{
               flex: 1,
@@ -252,6 +257,7 @@ const Index = () => {
               </View>
             </View>
           </View>
+          </SafeAreaView>
         </Modal>
 
         <View style={styles.row}>
@@ -338,22 +344,34 @@ const Index = () => {
       {sentLoading ? (
         <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
-        <LegendList
-          data={sentData?.reviews}
-          keyExtractor={(item: any) => item.id.toString()}
-          renderItem={({ item }: any) => (
-            <ReviewCard item={item} type="sent" refetch={refetchSentReviews} />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: vs(40) }}
-          ListEmptyComponent={<Text style={styles.empty}>No sent reviews</Text>}
-          refreshControl={
-            <RefreshControl
-              refreshing={sentLoading}
-              onRefresh={() => refetchSentReviews()}
-            />
-          }
-        />
+        <View className="flex-1">
+      <FlashList
+  data={sentData?.reviews ?? []}
+  keyExtractor={(item: any) => item.id.toString()}
+  renderItem={({ item }: any) => (
+    <ReviewCard
+      item={item}
+      type="sent"
+      refetch={refetchSentReviews}
+    />
+  )}
+  showsVerticalScrollIndicator={false}
+  contentContainerStyle={{
+    paddingBottom: vs(40),
+  }}
+  ListEmptyComponent={
+    <Text style={styles.empty}>
+      No sent reviews
+    </Text>
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={sentLoading}
+      onRefresh={() => refetchSentReviews()}
+    />
+  }
+/>
+        </View>
       )}
     </View>
   );
@@ -376,24 +394,30 @@ const Index = () => {
       {reciveLoading ? (
         <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
-        <LegendList
-          data={reciveData?.reviews}
-          keyExtractor={(item: any) => item.id.toString()}
-          renderItem={({ item }: any) => (
-            <ReviewCard item={item} type="received" />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: vs(40) }}
-          ListEmptyComponent={
-            <Text style={styles.empty}>No received reviews</Text>
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={reciveLoading}
-              onRefresh={() => refetchRecived()}
-            />
-          }
-        />
+        <View className="flex-1">
+       <FlashList
+  data={reciveData?.reviews ?? []}
+  keyExtractor={(item: any) => item.id.toString()}
+  renderItem={({ item }: any) => (
+    <ReviewCard item={item} type="received" />
+  )}
+  showsVerticalScrollIndicator={false}
+  contentContainerStyle={{
+    paddingBottom: vs(40),
+  }}
+  ListEmptyComponent={
+    <Text style={styles.empty}>
+      No received reviews
+    </Text>
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={reciveLoading}
+      onRefresh={() => refetchRecived()}
+    />
+  }
+/>
+        </View>
       )}
     </View>
   );
@@ -418,6 +442,10 @@ const Index = () => {
         />
       </View>
       <Modal visible={editModal} transparent animationType="slide">
+        <SafeAreaView
+                                                style={{ flex: 1 }}
+                                                edges={[ "bottom", "left", "right"]}
+                                              >
         <Formik
           enableReinitialize
           initialValues={{
@@ -494,6 +522,7 @@ const Index = () => {
             </View>
           )}
         </Formik>
+        </SafeAreaView>
       </Modal>
     <Loading isLoading={isLoading} text="Loading..."/>
     </View>

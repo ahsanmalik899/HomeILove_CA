@@ -15,8 +15,8 @@ import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms } from "@utils/design/design";
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
-import { StyleSheet, Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+
 import * as Yup from "yup";
 const index = () => {
   const user = useAppSelector(userdata);

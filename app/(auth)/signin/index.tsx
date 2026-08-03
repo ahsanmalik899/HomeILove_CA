@@ -1,10 +1,4 @@
-/* eslint-disable import/order */
-/* eslint-disable react/jsx-no-undef */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
-/* eslint-disable prettier/prettier */
-/* eslint-disable react/function-component-definition */
-// eslint-disable-next-line import/order
+
 import {
   useResendVaerificationMutation,
   useSigninMutation,
@@ -24,13 +18,13 @@ import { Formik } from "formik";
 import { useState } from "react";
 import {
   ImageBackground,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
 
@@ -46,6 +40,7 @@ export default function SignInScreen() {
   const [resend, {isLoading:isLoadingMail }] = useResendVaerificationMutation();
 
   return (
+    
     <ImageBackground
       source={backgroundimage}
       style={styles.backgroundImage}

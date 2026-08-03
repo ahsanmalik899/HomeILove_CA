@@ -12,7 +12,7 @@ import Area from "@assets/icons/MypostListing/area.svg";
 import Bed from "@assets/icons/MypostListing/bed.svg";
 import Shower from "@assets/icons/MypostListing/shower.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
@@ -32,7 +32,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
@@ -71,34 +71,45 @@ const YourAdsPostDesign = ({
 
 
   const [scrollable, setscrollable] = useState(true);
+const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
-  const renderItem = ({ item }) => {
-    const itemId = item?.data?.post_property_id || item?.data?.post_community_id;
-    const [isSaved,setIsSaved]=useState(item?.data?.is_saved ?? false);
- const [expanded, setExpanded] = useState(false);
+const [savedItems, setSavedItems] = useState<Record<string, boolean>>({});
+const renderItem = ({ item, index }) => {
+    const itemId =
+    item?.data?.post_property_id ||
+    item?.data?.post_community_id ||
+    item?.data?.id;
+
+  const itemKey = `${item?.type}-${itemId ?? index}`;
+
+  const expanded = expandedItem === itemKey;
+
+  const isSaved =
+    savedItems[itemKey] ?? item?.data?.is_saved ?? false;
     const toggleSave = async () => {
-     
-      try {
-        if (isSaved) {
-          await unsaveItemApi({
-            saved_id: itemId,
-            user_id: user.id,
-            type: item?.data?.property_for || "sale",
-          }).unwrap();
-        } else {
-          await saveItemApi({
-            saved_id: itemId,
-            user_id: user.id,
-            type: item?.data?.property_for || "sale",
-          }).unwrap();
-        }
-      } catch (error) {
-        console.log("Error saving/unsaving item:", error);
+  try {
+    if (isSaved) {
+      await unsaveItemApi({
+        saved_id: itemId,
+        user_id: user.id,
+        type: item?.data?.property_for || "sale",
+      }).unwrap();
+    } else {
+      await saveItemApi({
+        saved_id: itemId,
+        user_id: user.id,
+        type: item?.data?.property_for || "sale",
+      }).unwrap();
+    }
 
-      } finally {
-        setIsSaved((prev) => !prev);
-      }
-    };
+    setSavedItems((prev) => ({
+      ...prev,
+      [itemKey]: !isSaved,
+    }));
+  } catch (error) {
+    console.log("Error saving/unsaving item:", error);
+  }
+};
     const openslider = (index: number) => {
       setSelectedImages(item.images || []);
       setShowImages(true);
@@ -111,11 +122,15 @@ const YourAdsPostDesign = ({
     return (
       <>
       {item.type==="ad"?(<AdCardWithoutAnimation ad={item.data} />):    (    <TouchableOpacity
-         onPress={() => {
-            setSingleView(true);
-           setSinglePost({     type: item?.data?.property_for,
-                id: item?.data?.post_property_id});
-          }}
+        onPress={() => {
+  setSinglePost({
+    type: item?.data?.property_for,
+    id: item?.data?.post_property_id,
+    itemKey,
+  });
+
+  setSingleView(true);
+}}
         
         >
           <View className="bg-white" style={styles.card}>
@@ -243,9 +258,9 @@ const YourAdsPostDesign = ({
                 {item?.data?.property_details?.length > 70 && (
                   <Text
                     style={styles.moreText}
-                    onPress={() => {
-                      console.log(expanded,"expanded")
-                      setExpanded(expanded ? false : true)}}>
+              onPress={() => {
+  setExpandedItem(expanded ? null : itemKey);
+}}>
                     {expanded ? " Show Less" : " Read More"}
                   </Text>
                 )}
@@ -351,33 +366,34 @@ const YourAdsPostDesign = ({
                 </View>
               </TouchableOpacity>
               {item?.data?.post_type === "Trending" && (
-                <>
-                  <LegendList
-                    data={item?.data?.images || []}
-                    horizontal
-                    className="flex-1"
-                    keyExtractor={(item, index) => `${item}-${index}`}
-                    renderItem={({ item, index }) => (
-                      <TouchableOpacity
-                        className="mt-4 mr-2"
-                        onPress={() => {
-                          openslider(index);
-                        }}
-                      >
-                        <Image
-                          source={{ uri: ImageFormater(item) }}
-                          style={{
-                            height: vs(80),
-                            width: vs(80),
-                            borderRadius: ms(10),
-                            resizeMode: "cover",
-                            backgroundColor: "gray",
-                          }}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  />
-                </>
+                <View className="flex-1">
+                <FlashList
+  data={item?.data?.images || []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(image, index) => `${image}-${index}`}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item: image, index }) => (
+    <TouchableOpacity
+      className="mt-4 mr-2"
+      onPress={() => {
+        openslider(index);
+      }}
+    >
+      <Image
+        source={{ uri: ImageFormater(image) }}
+        style={{
+          height: vs(80),
+          width: vs(80),
+          borderRadius: ms(10),
+          resizeMode: "cover",
+          backgroundColor: "gray",
+        }}
+      />
+    </TouchableOpacity>
+  )}
+/>
+                </View>
               )}
 
               <View
@@ -472,33 +488,44 @@ const YourAdsPostDesign = ({
     );
   };
   return (
-    <View style={{ flex: 1, marginBottom: insets.bottom }}>
+    <View style={{ flex: 1}}>
       {!initialLoadDone ? (
         <ActivityIndicator size="large" style={{ marginTop: 20 }} />
       ) : data.length > 0 ? (
-        <LegendList
-          data={data}
-          scrollEnabled={scrollable}
-          ref={listRef}
-          renderItem={renderItem}
-   keyExtractor={(item, index) => (item.type === "ad" ? `ad-${index}` : `${item.data.post_property_id || item.data.post_community_id}-${index}`) }
-          onEndReached={() => {
-            if (!isfetching && hasmore) setPage((prev) => prev + 1);
-          }}
-          onEndReachedThreshold={0.8}
-          ListFooterComponent={
-            isfetching ? <ActivityIndicator size="small" /> : null
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={isfetching}
-              onRefresh={() => {setPage(1)
-              refetch()
-              }}
-
-            />
-          }
-        />
+        <View className="flex-1">
+       <FlashList
+  data={data}
+  scrollEnabled={scrollable}
+  ref={listRef}
+  renderItem={renderItem}
+  keyExtractor={(item, index) =>
+    item.type === "ad"
+      ? `ad-${index}`
+      : `${
+          item.data.post_property_id ||
+          item.data.post_community_id
+        }-${index}`
+  }
+  onEndReachedThreshold={0.8}
+  onEndReached={() => {
+    if (!isfetching && hasmore) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isfetching ? <ActivityIndicator size="small" /> : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={isfetching}
+      onRefresh={() => {
+        setPage(1);
+        refetch();
+      }}
+    />
+  }
+/>
+        </View>
       ) : (
         <Text
           style={{
@@ -525,7 +552,24 @@ const YourAdsPostDesign = ({
     setSinglePost(null);
   }} transparent={true}
                 statusBarTranslucent={true}  >
-                <AddSingleView id={singlePost?.id} type={singlePost?.type} setshowModel={setSingleView} />
+                     <SafeAreaView
+                                                                           style={{ flex: 1 }}
+                                                                           edges={[ "bottom", "left", "right"]}
+                                                                         >
+              <AddSingleView
+  id={singlePost?.id}
+  type={singlePost?.type}
+  setshowModel={setSingleView}
+  onSavedChange={(nextSavedValue) => {
+    if (!singlePost?.itemKey) return;
+
+    setSavedItems((prev) => ({
+      ...prev,
+      [singlePost.itemKey]: nextSavedValue,
+    }));
+  }}
+/>
+                </SafeAreaView>
               </Modal>
     </View>
   );

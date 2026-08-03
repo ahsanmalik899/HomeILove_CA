@@ -16,7 +16,7 @@ import VerticalLine from "@assets/icons/verticalLine.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { Ionicons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import DatePickerField from "@src/components/globals/DatePickerField";
 import { FormikInput } from "@src/components/globals/FormictInput";
@@ -41,14 +41,16 @@ import {
   Dimensions,
   Image,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+
 import MapView, { Marker } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 
 
@@ -251,32 +253,33 @@ const index = () => {
               </Text>
             </View>
           </TouchableOpacity>
-          <LegendList
-            data={data?.post_images || []}
-            horizontal
-            className="flex-1"
-            keyExtractor={(item, index) => `${item}-${index}`}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                className="mt-4 mr-2"
-                onPress={() => {
-                  setImageNo(index);
-                  setShowImages(true);
-                }}
-              >
-                <Image
-                  source={{ uri: ImageFormater(item) }}
-                  style={{
-                    height: vs(80),
-                    width: vs(80),
-                    borderRadius: ms(10),
-                    resizeMode: "cover",
-                    backgroundColor: "gray",
-                  }}
-                />
-              </TouchableOpacity>
-            )}
-          />
+       <FlashList
+  data={data?.post_images || []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(item, index) => `${item}-${index}`}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item, index }) => (
+    <TouchableOpacity
+      className="mt-4 mr-2"
+      onPress={() => {
+        setImageNo(index);
+        setShowImages(true);
+      }}
+    >
+      <Image
+        source={{ uri: ImageFormater(item) }}
+        style={{
+          height: vs(80),
+          width: vs(80),
+          borderRadius: ms(10),
+          resizeMode: "cover",
+          backgroundColor: "gray",
+        }}
+      />
+    </TouchableOpacity>
+  )}
+/>
 
           <View
             className=" bg-white flex-row  justify-between"
@@ -979,50 +982,56 @@ const index = () => {
               </View>
 
               <Text style={styles.heading}>Mortgage experts</Text>
-              <LegendList
-                data={data?.mortgage_experts ?? []}
-                horizontal
-                className="flex-1"
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[
-                      styles.card2,
-                      {
-                        marginHorizontal: hs(5),
-                        width: hs(110),
-                        marginBottom: vs(10),
-                        paddingHorizontal: hs(2),
-                        alignItems: "center",
-                        height: vs(180),
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                      },
-                    ]}
-                    onPress={() => {
-                      console.log(item.id);
-                    }}
-                  >
-                    <CircleImage
-                      source={{ uri: ImageFormater(item.logo) }}
-                      Size={60}
-                    />
+            <FlashList
+  data={data?.mortgage_experts ?? []}
+  horizontal
+  style={{ flex: 1 }}
+  keyExtractor={(item) => item.id.toString()}
+  showsHorizontalScrollIndicator={false}
+  renderItem={({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.card2,
+        {
+          marginHorizontal: hs(5),
+          width: hs(110),
+          marginBottom: vs(10),
+          paddingHorizontal: hs(2),
+          alignItems: "center",
+          height: vs(180),
+          flexDirection: "column",
+          justifyContent: "space-between",
+        },
+      ]}
+      onPress={() => {
+        console.log(item.id);
+      }}
+    >
+      <CircleImage
+        source={{ uri: ImageFormater(item.logo) }}
+        Size={60}
+      />
 
-                    <Text className="font-bold mt-4 text-center">
-                      {item.business_name}
-                    </Text>
-                    <Text
-                      className="text-center"
-                      style={{ fontSize: ms(10), color: Colors.light.textGray }}
-                    >
-                      {item.city} {item.zip}
-                    </Text>
-                    <View style={{ marginTop: vs(5), alignSelf: "center" }}>
-                      <StarRating size={15} rating={item.rating ?? 0} />{" "}
-                    </View>
-                  </TouchableOpacity>
-                )}
-              />
+      <Text className="font-bold mt-4 text-center">
+        {item.business_name}
+      </Text>
+
+      <Text
+        className="text-center"
+        style={{
+          fontSize: ms(10),
+          color: Colors.light.textGray,
+        }}
+      >
+        {item.city} {item.zip}
+      </Text>
+
+      <View style={{ marginTop: vs(5), alignSelf: "center" }}>
+        <StarRating size={15} rating={item.rating ?? 0} />
+      </View>
+    </TouchableOpacity>
+  )}
+/>
             </>
           )}
           <View
@@ -1274,6 +1283,10 @@ const index = () => {
         />
       )}
              <Modal visible={showShare} animationType="slide" transparent>
+               <SafeAreaView
+    style={{ flex: 1 }}
+    edges={[ "bottom", "left", "right"]}
+  >
   <View style={{
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -1475,6 +1488,7 @@ const index = () => {
 
     </View>
   </View>
+</SafeAreaView>
   <Loading isLoading={sharing} text="Sharing..."/>
 </Modal>
       <Loading isLoading={isFetching} text="Loading..." />

@@ -29,7 +29,7 @@ const index = () => {
           router.navigate({pathname:"/CreateNewpass",params:{token:token}})
           break;
            case "verify":
-          router.navigate({pathname:"/Verifyacc",params:{token:token}})
+          router.navigate({pathname:"/(auth)/Account",params:{token:token}})
           break;
       }
 

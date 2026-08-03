@@ -8,8 +8,7 @@ import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 const index = () => {
   const { type } = useLocalSearchParams();
     const { data: profileList, isLoading, isFetching } =useGetTrendingProfilesQuery({type:type})

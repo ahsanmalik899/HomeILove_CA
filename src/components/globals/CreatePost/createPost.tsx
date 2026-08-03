@@ -13,8 +13,8 @@ import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import { Formik } from "formik";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+
 import * as Yup from "yup";
 import Loading from "../Loading";
 import UploadPic from "../UploadPic";

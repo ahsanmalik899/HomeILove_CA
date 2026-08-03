@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileSingleView from "../ProfileSingleView";
 
 interface Props {
@@ -121,7 +122,12 @@ export const SearchProfile = ({
                           transparent={true}
                           statusBarTranslucent={true}
                         >
+                           <SafeAreaView
+                                                                                                                     style={{ flex: 1 }}
+                                                                                                                     edges={[ "bottom", "left", "right"]}
+                                                                                                                   >
                    <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+                   </SafeAreaView>
                         </Modal>
     </KeyboardAvoidingView>
   );

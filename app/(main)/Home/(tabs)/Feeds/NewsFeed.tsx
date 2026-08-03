@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const NewsFeeds = () => {
   const [page, setPage] = useState(1);
@@ -28,6 +29,7 @@ const NewsFeeds = () => {
   const user = useAppSelector(userdata);
   const [visible,setVisible]=useState(false)
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [hasMore, setHasMore] = useState(true);
   useEffect(() => {
   const checkForUpdate = async () => {
     try {
@@ -78,10 +80,14 @@ const NewsFeeds = () => {
 
     return (
       <TouchableOpacity
-        onPress={() => {
-          setSelectedFilter(item.name);
-          setPage(1);
-        }}
+       onPress={() => {
+  if (selectedFilter === item.name) return;
+
+  setPosts([]);
+  setPage(1);
+    setHasMore(true);
+  setSelectedFilter(item.name);
+}}
         style={[styles.filterChip, isActive && styles.filterChipActive]}
       >
         <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
@@ -97,18 +103,30 @@ const NewsFeeds = () => {
     page,
     limit,
   });
+useEffect(() => {
+  const newPosts = data?.data?.feed;
 
-  useEffect(() => {
-    if (!data?.data?.feed) return;
+  if (!newPosts) return;
 
-    setPosts((prev) => {
-      if (page === 1) {
-        return data?.data?.feed;
-      } else {
-        return [...prev, ...data?.data?.feed];
-      }
-    });
-  }, [data]);
+  setHasMore(newPosts.length > 0);
+
+  setPosts((prev) => {
+    if (page === 1) {
+      return newPosts;
+    }
+
+    const existingKeys = new Set(
+      prev.map((item: any) => `${item.type}-${item.post_id}`)
+    );
+
+    const uniquePosts = newPosts.filter(
+      (item: any) =>
+        !existingKeys.has(`${item.type}-${item.post_id}`)
+    );
+
+    return [...prev, ...uniquePosts];
+  });
+}, [data, page]);
   return (
     <View className="bg-white flex-1">
       <View style={styles.filterContainer}>
@@ -124,13 +142,17 @@ const NewsFeeds = () => {
         />
       </View>
 
-      <PostDesign data={Posts} isfetching={isFetching} setPage={setPage} refetch={refetch} setData={setPosts} isPostSingle={isPostSingle=="true"?true:false} post_id={post_id?.toString()} />
+      <PostDesign data={Posts} hasMore={hasMore} isfetching={isFetching} setPage={setPage} refetch={refetch} setData={setPosts} isPostSingle={isPostSingle=="true"?true:false} post_id={post_id?.toString()} />
         <Modal
   visible={visible}
   animationType="slide"
   transparent
   onRequestClose={() => setVisible(false)}
 >
+   <SafeAreaView
+                                          style={{ flex: 1 }}
+                                          edges={[ "bottom", "left", "right"]}
+                                        >
   <View style={styles.overlay}>
     <View style={styles.sheetContainer}>
 
@@ -173,7 +195,9 @@ const NewsFeeds = () => {
 
     </View>
   </View>
+  </SafeAreaView>
 </Modal>
+
     </View>
   );
 };

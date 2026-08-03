@@ -7,7 +7,7 @@ import { userdata } from "@/store/slices/selector/user";
 import Camera from "@assets/Feedimg/camera.svg";
 import Delet from "@assets/icons/MypostListing/delet.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
@@ -26,7 +26,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
@@ -314,28 +314,30 @@ const PastDealsagent = ({
       {!initialLoadDone ? (
         <ActivityIndicator size="large" style={{ marginTop: 20 }} />
       ) : data.length > 0 ? (
-        <LegendList
-          data={data}
-          scrollEnabled={scrollable}
-          ref={listRef}
-          renderItem={renderItem}
-          keyExtractor={(item, index) =>
-            `${item.post_property_id || item.post_community_id}-${index}`
-          }
-          onEndReached={() => {
-            if (!isfetching && hasmore) setPage((prev) => prev + 1);
-          }}
-          onEndReachedThreshold={0.8}
-          ListFooterComponent={
-            isfetching ? <ActivityIndicator size="small" /> : null
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={isfetching}
-              onRefresh={() => setPage(1)}
-            />
-          }
-        />
+      <FlashList
+  data={data}
+  scrollEnabled={scrollable}
+  ref={listRef}
+  renderItem={renderItem}
+  keyExtractor={(item, index) =>
+    `${item.post_property_id || item.post_community_id}-${index}`
+  }
+  onEndReachedThreshold={0.8}
+  onEndReached={() => {
+    if (!isfetching && hasmore) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isfetching ? <ActivityIndicator size="small" /> : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={isfetching}
+      onRefresh={() => setPage(1)}
+    />
+  }
+/>
       ) : (
         <Text
           style={{
@@ -359,8 +361,13 @@ const PastDealsagent = ({
         />
       )}
             <Modal visible={showpost} animationType="slide" onRequestClose={() => setShowpost(false)} transparent={true}
-              statusBarTranslucent={true}  >           
+              statusBarTranslucent={true}  >      
+                  <SafeAreaView
+                      style={{ flex: 1 }}
+                      edges={[ "bottom", "left", "right"]}
+                    >
                  <AddSingleView id={showpostPostData?.id} type={showpostPostData?.type} setshowModel={setShowpost} />
+                 </SafeAreaView>     
             </Modal>
             <Loading isLoading={isLoading} text="Deleting..."/>
     </View>

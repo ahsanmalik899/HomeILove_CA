@@ -9,7 +9,6 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Modal,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 import Loading from "../Loading";
 
@@ -76,8 +76,13 @@ const BlockedUserModal = ({
         transparent
         animationType="fade"
       >
+
+         <SafeAreaView
+                                                                              style={{ flex: 1 }}
+                                                                              edges={[ "bottom", "left", "right"]}
+                                                                            >
         <View style={styles.overlay}>
-          <SafeAreaView style={styles.card}>
+          <View style={styles.card}>
             <ScrollView
               showsVerticalScrollIndicator={false}
             >
@@ -247,9 +252,9 @@ const BlockedUserModal = ({
                 </Text>
               </View>
             </ScrollView>
-          </SafeAreaView>
+          </View>
         </View>
-
+</SafeAreaView>
         <Loading
           isLoading={loading || isLoading}
           text="Please wait..."

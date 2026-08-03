@@ -28,7 +28,7 @@ import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
 import { hs, ms, vs } from "@utils/design/design";
 
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { formatPrice } from "@utils/PriceFormater";
 import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
@@ -1052,73 +1052,72 @@ const Index = () => {
                       }
                       Componet2={
                         <View>
-                          <LegendList
-                            data={advertisePrices?.data}
-                            keyExtractor={(item) => item.id}
-                            estimatedItemSize={50}
-                            extraData={values.time_period}
-                            ListHeaderComponent={
-                              <View
-                                className="flex-row justify-between items-center"
-                                style={{
-                                  borderBottomWidth: 1,
-                                  borderColor: Colors.light.textGray,
-                                  borderRadius: ms(5),
-                                  paddingHorizontal: hs(10),
-                                  paddingVertical: vs(10),
-                                }}
-                              >
-                                <Text style={{ fontFamily: "PopinRegula" }}>
-                                  Advertise Time
-                                </Text>
-                                <Text style={{ fontFamily: "PopinRegula" }}>
-                                  Price
-                                </Text>
-                              </View>
-                            }
-                            renderItem={({ item }) => (
-                              <View
-                                className="flex-row justify-between items-center"
-                                style={{
-                                  paddingHorizontal: hs(10),
-                                  paddingVertical: vs(10),
-                                }}
-                              >
-                                <View className="flex-row items-center">
-                                  <TouchableOpacity
-                                    onPress={() => {
-                                      setFieldValue("time_period", item.life);
+                         <FlashList
+  data={advertisePrices?.data ?? []}
+  keyExtractor={(item) => item.id.toString()}
+  extraData={values.time_period}
+  ListHeaderComponent={
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        borderBottomWidth: 1,
+        borderColor: Colors.light.textGray,
+        borderRadius: ms(5),
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Advertise Time
+      </Text>
 
-                                      setSelectedAmount(formatPrice(item.price));
-                                    }}
-                                  >
-                                    <MaterialIcons
-                                      size={20}
-                                      color={Colors.light.DarkGreen}
-                                      name={
-                                        values.time_period === item.life
-                                          ? "radio-button-checked"
-                                          : "radio-button-unchecked"
-                                      }
-                                    />
-                                  </TouchableOpacity>
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Price
+      </Text>
+    </View>
+  }
+  renderItem={({ item }) => (
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <View className="flex-row items-center">
+        <TouchableOpacity
+          onPress={() => {
+            setFieldValue("time_period", item.life);
+            setSelectedAmount(formatPrice(item.price));
+          }}
+        >
+          <MaterialIcons
+            size={20}
+            color={Colors.light.DarkGreen}
+            name={
+              values.time_period === item.life
+                ? "radio-button-checked"
+                : "radio-button-unchecked"
+            }
+          />
+        </TouchableOpacity>
 
-                                  <Text
-                                    style={{
-                                      marginLeft: hs(10),
-                                      fontFamily: "PopinRegula",
-                                    }}
-                                  >
-                                    For {item.life} Days
-                                  </Text>
-                                </View>
+        <Text
+          style={{
+            marginLeft: hs(10),
+            fontFamily: "PopinRegula",
+          }}
+        >
+          For {item.life} Days
+        </Text>
+      </View>
 
-                                <Text style={{ fontFamily: "PopinRegula" }}>
-                                  ${formatPrice(item.price)}
-                                </Text>
-                              </View>
-                            )}
-                          />
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        ${formatPrice(item.price)}
+      </Text>
+    </View>
+  )}
+/>
 
                           <View
                             style={{

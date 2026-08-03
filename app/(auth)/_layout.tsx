@@ -1,7 +1,12 @@
 import { Stack } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 // const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const Layout = () => {
   return (
+    <SafeAreaView
+  style={{ flex: 1 }}
+  edges={[ "bottom", "left", "right"]}
+>
     <Stack
       screenOptions={{ headerShown: false }}
       initialRouteName="welcome/index"
@@ -15,6 +20,7 @@ const Layout = () => {
       <Stack.Screen name="PasswordChange/index" />
       <Stack.Screen name="CreateNewpass/index" />
     </Stack>
+    </SafeAreaView>
   );
 };
 

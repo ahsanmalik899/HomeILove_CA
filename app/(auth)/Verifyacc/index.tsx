@@ -25,13 +25,12 @@ import {
   Image,
   ImageBackground,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-
 export default function VerifyAccountScreen() {
 
    const [packageName, setPackageName] = useState('com.google.android.gm');
@@ -56,22 +55,17 @@ const [resend,{isLoading}]= useResendVaerificationMutation();
     }
     };
 
-const handleOpenGmail = async () => {
-     if (Platform.OS === 'android') {
-       try {
-         await IntentLauncher.openApplication(packageName);
-           await IntentLauncher.getApplicationIconAsync('com.google.android.gm');
-       } catch (error) {
-         Alert.alert(
-           'Gmail not found',
-           'Gmail app is not installed on this device. Please open your email manually.'
-         );
-       }
-     } else {
-       Alert.alert('Android only', 'This feature is only available on Android.');
-     }
-
-
+const handleOpenGmail = () => {
+  if (Platform.OS === "android") {
+    try {
+      IntentLauncher.openApplication("com.google.android.gm");
+    } catch (error) {
+      Alert.alert(
+        "Gmail not found",
+        "Gmail app is not installed on this device."
+      );
+    }
+  }
 };
 
   return (

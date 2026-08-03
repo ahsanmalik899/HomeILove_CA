@@ -16,7 +16,7 @@ import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import { MaterialIcons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { renderToastError, renderToastSuccess } from "@src/hooks/useToasty";
@@ -36,7 +36,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import AddSingleView from "../AddSingleView";
 import CircleImage from "../CircleImage/CircleImage";
 import ImageSlider from "../ImageSlider";
@@ -44,113 +44,39 @@ import LargeButton from "../LaregeButton";
 import Loading from "../Loading";
 import PapPalPayment from "../PapPalPayment";
 import { postDataType } from "./type";
-const YourAdsPostDesign = ({
-  data,
-  setPage,
-  isfetching,
+const MyPostItem = ({
+  item,
   type,
-  hasmore,
-  refetch,
-  setpost,
-  initialLoadDone,
-  isShowpost,
-  id,
-  post_type,
-}: postDataType) => {
+  user,
+    id,
+  setSingleView,
+  setSinglePost,
+  setSelectedImages,
+  setShowImages,
+  setscrollable,
+  setShowoption,
+  setUpgradeId,
+  setSelectedPost,
+  setDeleteModal,
+  setDeleteType,
+  handleDelete,
+}: any) => {
+  const [expanded, setExpanded] = useState(false);
 
-  const [showImages, setShowImages] = useState(false);
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [deleteType, setDeleteType] = useState("");
-  const [visible, setvisible] = useState(false);
-  const [orderId, setOrderid] = useState("");
-  const[singlePost,setSinglePost] = useState<any>(null);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const user = useAppSelector(userdata);
-  const [singleView, setSingleView] = useState(false);
-  const [upgradeId, setUpgradeId] = useState(0);
- const{data:advertisePrices}=useGetPriceQuery({price_type:type==="community"?"community":"property"})
-  const listRef = useRef<any>(null);
-  const [deletePost, { isLoading }] = useDeletePostMutation();
-  const insets = useSafeAreaInsets();
-  const [scrollable, setscrollable] = useState(true);
-  const [timePeriod, setTimeperiod] = useState("");
-  const [SelectedAmount, setSelectedAmount] = useState("");
-
-  const [upgradePost, { isLoading: upgradeLoading }] =
-    useUpgradePostApiMutation();
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const {
-    data: amount,
-    isLoading: AmountLoading,
-    isFetching,
-  } = useGetUserWalletQuery({
-    id: user.id,
-  });
-  const [showoption, setShowoption] = useState(false);
-  const handleDelete = async (post, type, postType) => {
-    try {
-      await deletePost({
-        post_id: post.post_property_id || post.post_community_id,
-        type: postType,
-        delete_type: type,
-      });
-
-      refetch();
-      setpost((prev) =>
-        prev.filter(
-          (item) =>
-            (item.post_property_id || item.post_community_id) !==
-            (post.post_property_id || post.post_community_id)
-        )
-      );
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const handelSubmit = async (method) => {
-    try {
-      const response = await upgradePost({
-        post_id: upgradeId,
-        type: type,
-        days: timePeriod,
-        user_id:user.id,
-        paymentMethod:method,
-        amount:SelectedAmount
-      }).unwrap();
-       setShowoption(false)
-      renderToastSuccess(response.message);
-    } catch (e) {
-      Alert.alert("Error", "Upgrade failed");
-    }
-  };
-  useEffect(() => {
-   if(isShowpost){
-    setSingleView(true)
-          setSinglePost({
-            type: post_type,
-            id:id,
-          })
-   }
-  }, [isShowpost]);
-  const renderItem = ({ item }) => {
-    const [expanded, setExpanded] = useState(false);
-
-    return (
-      <>
-        <TouchableOpacity
-          onPress={() => {
-            setSingleView(true)
-            setSinglePost({
-              type: type,
-                id:
-                  type === "community"
-                    ? item.post_community_id
-                    : item.post_property_id,
-            })
-          }}
-        >
-          <View className="bg-white" style={styles.card}>
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        setSingleView(true);
+        setSinglePost({
+          type,
+          id:
+            type === "community"
+              ? item.post_community_id
+              : item.post_property_id,
+        });
+      }}
+    >
+      <View className="bg-white" style={styles.card}>
              <View
                           className="flex-row justify-between items-center"
                           style={{
@@ -489,40 +415,151 @@ const YourAdsPostDesign = ({
   }
             </View>
           </View>
-        </TouchableOpacity>
-      </>
-    );
+    </TouchableOpacity>
+  );
+};
+const YourAdsPostDesign = ({
+  data,
+  setPage,
+  isfetching,
+  type,
+  hasmore,
+  refetch,
+  setpost,
+  initialLoadDone,
+  isShowpost,
+  id,
+  post_type,
+}: postDataType) => {
+
+  const [showImages, setShowImages] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteType, setDeleteType] = useState("");
+  const [visible, setvisible] = useState(false);
+  const [orderId, setOrderid] = useState("");
+  const[singlePost,setSinglePost] = useState<any>(null);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const user = useAppSelector(userdata);
+  const [singleView, setSingleView] = useState(false);
+  const [upgradeId, setUpgradeId] = useState(0);
+ const{data:advertisePrices}=useGetPriceQuery({price_type:type==="community"?"community":"property"})
+  const listRef = useRef<any>(null);
+  const [deletePost, { isLoading }] = useDeletePostMutation();
+  const insets = useSafeAreaInsets();
+  const [scrollable, setscrollable] = useState(true);
+  const [timePeriod, setTimeperiod] = useState("");
+  const [SelectedAmount, setSelectedAmount] = useState("");
+
+  const [upgradePost, { isLoading: upgradeLoading }] =
+    useUpgradePostApiMutation();
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const {
+    data: amount,
+    isLoading: AmountLoading,
+    isFetching,
+  } = useGetUserWalletQuery({
+    id: user.id,
+  });
+  const [showoption, setShowoption] = useState(false);
+  const handleDelete = async (post, type, postType) => {
+    try {
+      await deletePost({
+        post_id: post.post_property_id || post.post_community_id,
+        type: postType,
+        delete_type: type,
+      });
+
+      refetch();
+      setpost((prev) =>
+        prev.filter(
+          (item) =>
+            (item.post_property_id || item.post_community_id) !==
+            (post.post_property_id || post.post_community_id)
+        )
+      );
+    } catch (e) {
+      console.log(e);
+    }
   };
+  const handelSubmit = async (method) => {
+    try {
+      const response = await upgradePost({
+        post_id: upgradeId,
+        type: type,
+        days: timePeriod,
+        user_id:user.id,
+        paymentMethod:method,
+        amount:SelectedAmount
+      }).unwrap();
+       setShowoption(false)
+      renderToastSuccess(response.message);
+    } catch (e) {
+      Alert.alert("Error", "Upgrade failed");
+    }
+  };
+useEffect(() => {
+  if (isShowpost) {
+    setSingleView(true);
+    setSinglePost({
+      type: post_type,
+      id,
+    });
+  }
+}, [isShowpost, post_type, id]);
+const renderItem = ({ item }: any) => (
+  <MyPostItem
+    item={item}
+    type={type}
+    user={user}
+     id={id}
+    setSingleView={setSingleView}
+    setSinglePost={setSinglePost}
+    setSelectedImages={setSelectedImages}
+    setShowImages={setShowImages}
+    setscrollable={setscrollable}
+    setShowoption={setShowoption}
+    setUpgradeId={setUpgradeId}
+    setSelectedPost={setSelectedPost}
+    setDeleteModal={setDeleteModal}
+    setDeleteType={setDeleteType}
+    handleDelete={handleDelete}
+  />
+);
   return (
-    <View style={{ flex: 1, marginBottom: insets.bottom }}>
+    <View style={{ flex: 1, }}>
       {!initialLoadDone ? (
         <ActivityIndicator size="large" style={{ marginTop: 20 }} />
       ) : data.length > 0 ? (
-        <LegendList
-          data={data}
-          scrollEnabled={scrollable}
-          ref={listRef}
-          renderItem={renderItem}
-          keyExtractor={(item, index) =>
-            `${item.post_property_id || item.post_community_id}-${index}`
-          }
-          onEndReached={() => {
-            if (!isfetching && hasmore) setPage((prev) => prev + 1);
-          }}
-          onEndReachedThreshold={0.6}
-          ListFooterComponent={
-            isfetching ? <ActivityIndicator size="small" /> : null
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={isfetching}
-              onRefresh={() => {
-                setPage(1);
-                refetch();
-              }}
-            />
-          }
-        />
+        <View className="flex-1">
+      <FlashList
+  data={data}
+  scrollEnabled={scrollable}
+  ref={listRef}
+  renderItem={renderItem}
+  keyExtractor={(item, index) =>
+    `${item.post_property_id || item.post_community_id}-${index}`
+  }
+  onEndReached={() => {
+    if (!isfetching && hasmore) {
+      setPage((prev) => prev + 1);
+    }
+  }}
+  onEndReachedThreshold={0.6}
+  ListFooterComponent={
+    isfetching ? <ActivityIndicator size="small" /> : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={isfetching}
+      onRefresh={() => {
+        setPage(1);
+        refetch();
+      }}
+    />
+  }
+/>
+        </View>
       ) : (
         <Text
           style={{
@@ -545,6 +582,10 @@ const YourAdsPostDesign = ({
         />
       )}
       <Modal visible={showoption} animationType="fade" transparent={true}>
+        <SafeAreaView
+                                                                                                                     style={{ flex: 1 }}
+                                                                                                                     edges={[ "bottom", "left", "right"]}
+                                                                                                                   >
         <View
           style={{
             flex: 1,
@@ -559,6 +600,7 @@ const YourAdsPostDesign = ({
               borderRadius: ms(10),
               padding: hs(5),
               maxHeight: "90%",
+              flex:1
             }}
           >
             <TouchableOpacity
@@ -572,65 +614,72 @@ const YourAdsPostDesign = ({
             >
               <Text style={{ fontSize: ms(20), fontWeight: "bold" }}>×</Text>
             </TouchableOpacity>
-            <LegendList
-              data={advertisePrices?.data}
-              keyExtractor={(item) => item.id}
-              estimatedItemSize={50}
-              extraData={timePeriod}
-              ListHeaderComponent={
-                <View
-                  className="flex-row justify-between items-center"
-                  style={{
-                    borderBottomWidth: 1,
-                    borderColor: Colors.light.textGray,
-                    borderRadius: ms(5),
-                    paddingHorizontal: hs(10),
-                    paddingVertical: vs(10),
-                  }}
-                >
-                  <Text style={{ fontFamily: "PopinRegula" }}>
-                    Advertise Time
-                  </Text>
-                  <Text style={{ fontFamily: "PopinRegula" }}>Price</Text>
-                </View>
-              }
-              renderItem={({ item: valueitem }) => (
-                <View
-                  className="flex-row justify-between items-center"
-                  style={{ paddingHorizontal: hs(10), paddingVertical: vs(10) }}
-                >
-                  <View className="flex-row items-center">
-                    <TouchableOpacity
-                      onPress={() => {
-                        setTimeperiod(valueitem.life);
-                        setSelectedAmount(valueitem.price);
-                      }}
-                    >
-                      <MaterialIcons
-                        size={20}
-                        color={Colors.light.DarkGreen}
-                        name={
-                          timePeriod === valueitem.life
-                            ? "radio-button-checked"
-                            : "radio-button-unchecked"
-                        }
-                      />
-                    </TouchableOpacity>
-                    <Text
-                      style={{
-                        marginLeft: hs(10),
-                        fontFamily: "PopinRegula",
-                      }}
-                    >
-                      For {valueitem.life} Days
-                    </Text>
-                  </View>
-                  <Text style={{ fontFamily: "PopinRegula" }}>
-                    ${valueitem.price}
-                  </Text>
-                </View>
-              )}
-            />
+            <FlashList
+  data={advertisePrices?.data ?? []}
+  keyExtractor={(item) => item.id.toString()}
+  extraData={timePeriod}
+  ListHeaderComponent={
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        borderBottomWidth: 1,
+        borderColor: Colors.light.textGray,
+        borderRadius: ms(5),
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Advertise Time
+      </Text>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Price
+      </Text>
+    </View>
+  }
+  renderItem={({ item: valueitem }) => (
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <View className="flex-row items-center">
+        <TouchableOpacity
+          onPress={() => {
+            setTimeperiod(valueitem.life);
+            setSelectedAmount(valueitem.price);
+          }}
+        >
+          <MaterialIcons
+            size={20}
+            color={Colors.light.DarkGreen}
+            name={
+              timePeriod === valueitem.life
+                ? "radio-button-checked"
+                : "radio-button-unchecked"
+            }
+          />
+        </TouchableOpacity>
+
+        <Text
+          style={{
+            marginLeft: hs(10),
+            fontFamily: "PopinRegula",
+          }}
+        >
+          For {valueitem.life} Days
+        </Text>
+      </View>
+
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        ${valueitem.price}
+      </Text>
+    </View>
+  )}
+/>
 
             <View
               style={{
@@ -734,9 +783,14 @@ const YourAdsPostDesign = ({
             </View>
           </View>
         </View>
+        </SafeAreaView>
             <Loading isLoading={upgradeLoading} text="Loading.." />
       </Modal>
       <Modal visible={deleteModal} transparent={true} animationType="fade">
+         <SafeAreaView
+                                                                                                                     style={{ flex: 1 }}
+                                                                                                                     edges={[ "bottom", "left", "right"]}
+                                                                                                                   >
         <View
           style={{
             flex: 1,
@@ -808,6 +862,7 @@ const YourAdsPostDesign = ({
             </TouchableOpacity>
           </View>
         </View>
+        </SafeAreaView>
       </Modal>
       <Loading isLoading={isLoading} text="Deleting.." />
    
@@ -829,7 +884,12 @@ const YourAdsPostDesign = ({
       />
         <Modal visible={singleView} animationType="slide" onRequestClose={() => setSingleView(false)} transparent={true}
                       statusBarTranslucent={true}  >
+                         <SafeAreaView
+                                                                                                                     style={{ flex: 1 }}
+                                                                                                                     edges={[ "bottom", "left", "right"]}
+                                                                                                                   >
                       <AddSingleView id={singlePost?.id} type={singlePost?.type} setshowModel={setSingleView} />
+                      </SafeAreaView>
                     </Modal>
     </View>
   );

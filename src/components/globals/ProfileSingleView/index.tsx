@@ -8,7 +8,7 @@ import Heart from "@assets/icons/heart.svg";
 import Share from "@assets/icons/share.svg";
 import NoImage from "@assets/SideBar/no_images.png";
 import { Ionicons } from '@expo/vector-icons';
-import { LegendList } from '@legendapp/list';
+import { FlashList } from '@shopify/flash-list';
 import Colors from '@src/constants/Colors';
 import { useAppSelector } from '@src/hooks/useReduxHooks';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
@@ -21,8 +21,8 @@ import * as WebBrowser from "expo-web-browser";
 import { Formik } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 import { AdressInput } from '../AddressInput';
 import CircleImage from '../CircleImage/CircleImage';
@@ -37,7 +37,7 @@ import SavedItems from '../SavedItems';
 import SetRating from '../SetRating';
 import StarRating from '../StarRating';
 import VideoSection from '../ViedioSection';
-const ProfileSingleView = ({ type, id, setshowModel,setData }: { type: string, id: string,  setData?: React.Dispatch<React.SetStateAction<any[]>>,setshowModel: (val: boolean) => void }) => {
+const ProfileSingleView = ({ type, id, setshowModel,setData ,  onSavedChange}: { type: string,  onSavedChange?: (isSaved: boolean) => void, id: string,  setData?: React.Dispatch<React.SetStateAction<any[]>>,setshowModel: (val: boolean) => void }) => {
   const user = useAppSelector(userdata);
    const {data:reviewData,isfetching}=useCheckReviewApiQuery({receiver_profile_id:id,sender_id:user?.id,profile_type:type})
   const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -79,6 +79,11 @@ setpostRating(Number(reviewData?.data?.rating)||0)
   const { data, isLoading,refetch:refetchProfile } = useGetSingleProfileQuery({ type: type?.toLocaleLowerCase(), id: id,user_id:user?.id });
   const [share_profileApi, { isLoading: sharing }] = useShare_profileApiMutation();
   const profile = data?.data;
+  const [connectionStatus, setConnectionStatus] = useState("");
+
+useEffect(() => {
+  setConnectionStatus(profile?.connection_status ?? "");
+}, [profile?.connection_status]);
   const { data: Profiles, isLoading: ProfilesLoading } =
     useGetProfilesForConectionQuery({ id: user.id });
   const {
@@ -251,11 +256,9 @@ const requestSend = async ({
           break;
       }
 
-      // update profile object locally
-      data.data.connection_status = updatedStatus;
-
-      setStatus(updatedStatus);
-      setShowConnection(false);
+     
+setConnectionStatus(updatedStatus);
+setShowConnection(false);
     } else {
       renderToastError(result?.message || "Something went wrong");
     }
@@ -312,29 +315,33 @@ const requestSend = async ({
       setReview(false);
     }
   };
-        const toggleSave = async () => {
-     
-      try {
-        if (isSaved) {
-          await unsaveItemApi({
-            saved_id: id,
-            user_id: user.id,
-            type: type.toLocaleLowerCase(),
-          }).unwrap();
-        } else {
-          await saveItemApi({
-            saved_id: id,
-            user_id: user.id,
-            type: type.toLocaleLowerCase(),
-          }).unwrap();
-        }
-      } catch (error) {
-        console.log("Error saving/unsaving item:", error);
+ const toggleSave = async () => {
+  const nextSavedValue = !isSaved;
 
-      } finally {
-        setIsSaved((prev) => !prev);
-      }
-    };
+  try {
+    if (isSaved) {
+      await unsaveItemApi({
+        saved_id: id,
+        user_id: user.id,
+        type: type.toLowerCase(),
+      }).unwrap();
+    } else {
+      await saveItemApi({
+        saved_id: id,
+        user_id: user.id,
+        type: type.toLowerCase(),
+      }).unwrap();
+    }
+
+    // Single view ka heart update
+    setIsSaved(nextSavedValue);
+
+    // Profile listing ka local cache update
+    onSavedChange?.(nextSavedValue);
+  } catch (error) {
+    console.log("Error saving/unsaving profile:", error);
+  }
+};
 
   useEffect(() => {
     const maintenanceTypes = ['electrician', 'plumber', 'decor', 'painter', 'builder'];
@@ -377,7 +384,7 @@ const requestSend = async ({
     inputRange: [-1, 1],
     outputRange: ["-2deg", "2deg"],
   });
-
+const insets = useSafeAreaInsets();
   return (
     <>
       <ScrollView className="flex-1 bg-white">
@@ -485,7 +492,7 @@ const requestSend = async ({
           {profile?.users_id!==user.id&&(
            <FollowButton
                           id={profile?.receiver_id}
-                          status={profile?.connection_status}
+                      status={connectionStatus}
                           isLoading={senddingRequest||accepting||canceling||unfollowing}
                           onPress={(status) => {
           
@@ -831,53 +838,53 @@ const requestSend = async ({
                 </View>
               )}
               {showPast && type.toLocaleLowerCase() !== "agent" && (
-                <View style={{ marginTop: vs(15) }}>
-                  <LegendList
-                    data={othePastdata?.data || []}
-                    keyExtractor={(item: any) =>
-                      item.user_past_work_id.toString()
-                    }
-                    renderItem={({ item }: any) => {
-                      const firstImage = item.images?.length
-                        ? ImageFormater(item.images[0])
-                        : null;
+                <View style={{ marginTop: vs(15),flex:1 }}>
+                <FlashList
+  data={othePastdata?.data || []}
+  keyExtractor={(item: any) =>
+    item.user_past_work_id.toString()
+  }
+  renderItem={({ item }: any) => {
+    const firstImage = item.images?.length
+      ? ImageFormater(item.images[0])
+      : null;
 
-                      return (
-                        <View style={styles.pastCard}>
-                          <Image
-                            source={firstImage ? { uri: firstImage } : NoImage}
-                            style={styles.fullImage}
-                          />
+    return (
+      <View style={styles.pastCard}>
+        <Image
+          source={firstImage ? { uri: firstImage } : NoImage}
+          style={styles.fullImage}
+        />
 
-                          <View style={styles.pastContent}>
-                            <View style={styles.rowBetween}>
-                              <View>
-                                <Text style={styles.pastTitle}>
-                                  {item.property_type}
-                                </Text>
+        <View style={styles.pastContent}>
+          <View style={styles.rowBetween}>
+            <View>
+              <Text style={styles.pastTitle}>
+                {item.property_type}
+              </Text>
 
-                                <Text style={styles.pastText}>
-                                  {item.property_sub_type}
-                                </Text>
-                              </View>
-                            </View>
+              <Text style={styles.pastText}>
+                {item.property_sub_type}
+              </Text>
+            </View>
+          </View>
 
-                            <Text style={styles.pastText}>
-                              Beds : {item.beds}
-                            </Text>
+          <Text style={styles.pastText}>
+            Beds : {item.beds}
+          </Text>
 
-                            <Text style={styles.pastText}>
-                              {item.city} , {item.state}
-                            </Text>
+          <Text style={styles.pastText}>
+            {item.city} , {item.state}
+          </Text>
 
-                            <Text style={styles.pastDesc}>
-                              {item.job_description}
-                            </Text>
-                          </View>
-                        </View>
-                      );
-                    }}
-                  />
+          <Text style={styles.pastDesc}>
+            {item.job_description}
+          </Text>
+        </View>
+      </View>
+    );
+  }}
+/>
                 </View>
               )}
             </>
@@ -914,7 +921,9 @@ const requestSend = async ({
 
 
       <TouchableOpacity
-        style={styles.stickyBottomBtn}
+        style={[styles.stickyBottomBtn,{   
+      bottom:  insets.bottom,
+    }]}
         onPress={() => {
           router.navigate({
             pathname: "/ChatScreen",
@@ -943,6 +952,10 @@ const requestSend = async ({
         </View>
       </TouchableOpacity>
       <Modal visible={reviewModal} transparent animationType="fade">
+               <SafeAreaView
+                                                         style={{ flex: 1 }}
+                                                         edges={[ "bottom", "left", "right"]}
+                                                       >
         <ScrollView style={{width:"100%"}}>
           <Formik
             initialValues={{
@@ -1087,9 +1100,14 @@ const requestSend = async ({
             )}
           </Formik>
         </ScrollView>
+        </SafeAreaView>
           <Loading isLoading={sendingReview} text='Loading...'/>
       </Modal>
       <Modal visible={showShare} animationType="slide" transparent>
+          <SafeAreaView
+                                                         style={{ flex: 1 }}
+                                                         edges={[ "bottom", "left", "right"]}
+                                                       >
         <View style={{
           flex: 1,
           backgroundColor: "rgba(0,0,0,0.5)",
@@ -1292,10 +1310,16 @@ const requestSend = async ({
 
           </View>
         </View>
+        </SafeAreaView>
         <Loading isLoading={sharing} text="Sharing..." />
       </Modal>
                  <Modal visible={showSaved} onRequestClose={() => setShowSaved(false)} animationType="slide"  statusBarTranslucent>
+                   <SafeAreaView
+                                                         style={{ flex: 1 }}
+                                                         edges={[ "bottom", "left", "right"]}
+                                                       >
               <SavedItems setShowSaved={setShowSaved} />
+              </SafeAreaView>
             </Modal>
                  <Modal
                     visible={showConnection}
@@ -1303,6 +1327,10 @@ const requestSend = async ({
                     animationType="fade"
                     onRequestClose={() => setShowConnection(false)}
                   >
+                     <SafeAreaView
+                                                         style={{ flex: 1 }}
+                                                         edges={[ "bottom", "left", "right"]}
+                                                       >
                     <TouchableOpacity
                       style={styles.overlay}
                       activeOpacity={1}
@@ -1356,6 +1384,7 @@ const requestSend = async ({
                         </ScrollView>
                       </View>
                     </TouchableOpacity>
+                    </SafeAreaView>
                   </Modal>
                   <Loading isLoading={askEvaluationLoading} text='Loading..'/>
                 

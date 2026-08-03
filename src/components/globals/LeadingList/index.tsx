@@ -1,9 +1,10 @@
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import Colors from "@src/constants/Colors";
 import { hs, ms, vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { useRef, useState } from "react";
 import { ImageBackground, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CircleImage from "../CircleImage/CircleImage";
 import ProfileSingleView from "../ProfileSingleView";
 
@@ -91,17 +92,25 @@ const renderItem = ({ item }: any) => {
   };
 
   return (
-    <View>
-      <LegendList
-        ref={scrollRef}
-         data={isFetching ? Array(3).fill({}) : Array.isArray(data) ? data : []}
-        renderItem={renderItem}
-        horizontal
-        keyExtractor={(item, i) => (item?.id ? item.id.toString() : i.toString())}
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
-      />
+    <View className="flex-1">
+    <FlashList
+  ref={scrollRef}
+  data={
+    isFetching
+      ? Array(3).fill({})
+      : Array.isArray(data)
+      ? data
+      : []
+  }
+  renderItem={renderItem}
+  horizontal
+  keyExtractor={(item, i) =>
+    item?.id ? item.id.toString() : i.toString()
+  }
+  pagingEnabled
+  showsHorizontalScrollIndicator={false}
+  onScroll={onScroll}
+/>
 
   
       <View style={styles.dotsContainer}>
@@ -122,7 +131,12 @@ const renderItem = ({ item }: any) => {
                   transparent={true}
                   statusBarTranslucent={true}
                 >
+                              <SafeAreaView
+                                                                                                    style={{ flex: 1 }}
+                                                                                                    edges={[ "bottom", "left", "right"]}
+                                                                                                  >
            <ProfileSingleView id={profileData?.id} type={profileData?.type} setshowModel={setSingleView}/>
+           </SafeAreaView>
                 </Modal>
     </View>
   );

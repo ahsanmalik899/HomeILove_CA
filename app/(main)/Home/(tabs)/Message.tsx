@@ -2,7 +2,7 @@ import { useDeleteChatsMutation, useGetConversationListQuery } from "@/store/api
 import { userdata } from "@/store/slices/selector/user";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import { Ionicons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import Loading from "@src/components/globals/Loading";
 import Colors from "@src/constants/Colors";
@@ -251,18 +251,18 @@ else if (chats?.length === 0) {
     }
   />
 </TouchableOpacity>
-      <LegendList
-        data={chats}
-        renderItem={renderItem}
-        estimatedItemSize={75}
-          extraData={selectedIds}
-       className="flex-1"
-         contentContainerStyle={{
-    paddingBottom: vs(100
-    ),
+<View className="flex-1">
+    <FlashList
+  data={chats}
+  renderItem={renderItem}
+  extraData={selectedIds}
+  style={{ flex: 1 }}
+  contentContainerStyle={{
+    paddingBottom: vs(100),
   }}
-        refreshing={false}
-      />
+  refreshing={false}
+/>
+      </View>
       <Loading isLoading={Deleting} text="Deleting..."/>
     </View>
   );

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { useGetReceivedRequestsApiQuery, useGetSentRequestsApiQuery, useUpdateConnectionApiMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import FollowButton from "@src/components/globals/FollowButton";
 import Loading from "@src/components/globals/Loading";
@@ -127,25 +127,45 @@ formData.append(
   };
 
   const receivedComponent = (
-    <LegendList
-      data={recivedlist || []}
-      renderItem={renderRequestItem}
-      keyExtractor={(item) => item.connection_id.toString()}
-      estimatedItemSize={140}
-      showsVerticalScrollIndicator={false}
-      ListEmptyComponent={<Text style={{ marginTop: vs(10),fontFamily: "PopinRegula", }}>No Received Requests</Text>}
-    />
+    <View className="flex-1">
+ <FlashList
+  data={recivedlist || []}
+  renderItem={renderRequestItem}
+  keyExtractor={(item) => item.connection_id.toString()}
+  showsVerticalScrollIndicator={false}
+  ListEmptyComponent={
+    <Text
+      style={{
+        marginTop: vs(10),
+        fontFamily: "PopinRegula",
+      }}
+    >
+      No Received Requests
+    </Text>
+  }
+/>
+    </View>
   );
 
   const sentComponent = (
-    <LegendList
-      data={sentlist || []}
-      renderItem={renderRequestItem}
-      keyExtractor={(item) => item.connection_id.toString()}
-      estimatedItemSize={140}
-      showsVerticalScrollIndicator={false}
-      ListEmptyComponent={<Text style={{ marginTop: vs(10),fontFamily: "PopinRegula", }}>No Sent Requests</Text>}
-    />
+        <View className="flex-1">
+<FlashList
+  data={sentlist || []}
+  renderItem={renderRequestItem}
+  keyExtractor={(item) => item.connection_id.toString()}
+  showsVerticalScrollIndicator={false}
+  ListEmptyComponent={
+    <Text
+      style={{
+        marginTop: vs(10),
+        fontFamily: "PopinRegula",
+      }}
+    >
+      No Sent Requests
+    </Text>
+  }
+/>
+    </View>
   );
 
   return (

@@ -12,7 +12,7 @@ import Back from "@assets/icons/BackArrow.svg";
 import Send from "@assets/icons/send.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import CircleImage from "@src/components/globals/CircleImage/CircleImage";
 import HeaderWithBack from "@src/components/globals/HeaderWithBack";
 import Loading from "@src/components/globals/Loading";
@@ -27,7 +27,9 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   RefreshControl,
   StyleSheet,
   Text,
@@ -35,6 +37,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const index = () => {
   const user = useAppSelector(userdata);
@@ -99,6 +102,17 @@ const index = () => {
   const [recived, setrecived] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [showProfiles, setShowProfiles] = useState<Record<string, boolean>>({});
+const [sentExpanded, setSentExpanded] = useState<Record<string, boolean>>({});
+const [sentShowMore, setSentShowMore] = useState<Record<string, boolean>>({});
+
+const [receivedExpanded, setReceivedExpanded] = useState<
+  Record<string, boolean>
+>({});
+
+const [receivedShowMore, setReceivedShowMore] = useState<
+  Record<string, boolean>
+>({});
   const { isFetching, data, refetch: refetchSended } = useGetsendedInquieryQuery({
     id: user.id,
     page: sendpage,
@@ -203,10 +217,7 @@ const index = () => {
     setMessages((prev) => [...prev, optimisticMsg]);
     setMessage("");
 
-    setTimeout(() => {
-      chatListRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-
+   
     try {
       const res: any = await sendInquireyMessageApi({
         sender_id: user.id,
@@ -272,9 +283,9 @@ const index = () => {
     useGetRecivedInquieryQuery({ id: user.id, page: recivedpage });
   const renderItem = ({ item }) => {
     const profileCount = item.profiles?.length || 0;
-    const [showprofile, setShowprofile] = useState(false);
-    const [expanded, setExpanded] = useState({});
-    const [showMore, setShowMore] = useState({});
+   const inquiryId = String(item.inquiry_id);
+
+  const showprofile = !!showProfiles[inquiryId];
 
     return (
       <TouchableOpacity
@@ -342,29 +353,33 @@ const index = () => {
         {item.message && (
           <>
             <Text
-              numberOfLines={expanded[item.inquiry_id] ? undefined : 2}
-              onTextLayout={(e) => {
-                setShowMore(prev => ({
-                  ...prev,
-                  [item.inquiry_id]: e.nativeEvent.lines.length > 2
-                }));
-              }}
+             numberOfLines={sentExpanded[inquiryId] ? undefined : 2}
+onTextLayout={(e) => {
+  const lines = e?.nativeEvent?.lines;
+
+  if (!Array.isArray(lines)) return;
+
+  setSentShowMore((prev) => ({
+    ...prev,
+    [inquiryId]: lines.length > 2,
+  }));
+}}
               style={styles.message}
             >
               {item.message}
             </Text>
 
-            {showMore[item.inquiry_id] && (
+         {sentShowMore[inquiryId] && (
               <Text
                 style={styles.seeMore}
-                onPress={() => {
-                  setExpanded(prev => ({
-                    ...prev,
-                    [item.inquiry_id]: !prev[item.inquiry_id]
-                  }));
-                }}
+            onPress={() => {
+  setSentExpanded((prev) => ({
+    ...prev,
+    [inquiryId]: !prev[inquiryId],
+  }));
+}}
               >
-                {expanded[item.inquiry_id] ? "See less" : "See more"}
+                {sentExpanded[inquiryId] ? "See less" : "See more"}
               </Text>
             )}
 
@@ -372,7 +387,12 @@ const index = () => {
         )}
         <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
         <TouchableOpacity
-          onPress={() => setShowprofile(showprofile ? false : true)}
+           onPress={() => {
+    setShowProfiles((prev) => ({
+      ...prev,
+      [inquiryId]: !prev[inquiryId],
+    }));
+  }}
         >
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -389,89 +409,85 @@ const index = () => {
 
         </TouchableOpacity>
         {showprofile && item.profiles?.length > 0 && (
-          <LegendList
-            className="bg-black"
-            data={item.profiles}
-            extraData={ids}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item) =>
-              item.users_id?.toString() || Math.random().toString()
-            }
-            renderItem={({ item: profile }) => (
+          <View className="flex-1">
+         <FlashList
+  style={{ flex: 1, backgroundColor: "white" }}
+  data={item.profiles ?? []}
+  extraData={ids}
+  showsVerticalScrollIndicator={false}
+  keyExtractor={(profile, index) =>
+    profile.users_id?.toString() ?? `profile-${index}`
+  }
+  renderItem={({ item: profile }) => (
+    <TouchableOpacity
+      style={styles.card}
+      disabled={profile?.inquiry_closed}
+      onPress={() => {
+        setSelectedChatProfile(profile);
+        setSelectedChatItem({
+          ...item,
+          chat_type: "sent",
+        });
+        setShowchatModal(true);
+      }}
+    >
+      <View style={styles.topRow}>
+        <View style={{ position: "relative" }}>
+          {profile?.unread_count > 0 && (
+            <Text
+              style={{
+                position: "absolute",
+                top: -5,
+                left: -5,
+                zIndex: 10,
+                color: "white",
+                fontWeight: "bold",
+                fontSize: 11,
+                height: 22,
+                width: 22,
+                textAlign: "center",
+                backgroundColor: Colors.light.red,
+                borderRadius: 11,
+                paddingTop: 3,
+              }}
+            >
+              {profile?.unread_count}
+            </Text>
+          )}
 
-              <TouchableOpacity style={styles.card}
-                disabled={profile?.inquiry_closed}
-              onPress={() => {
-                setSelectedChatProfile(profile);
-                setSelectedChatItem({
-                  ...item,
-                  chat_type: "sent",
-                });
-                setShowchatModal(true);
-                
-              }}>
-                <View style={styles.topRow}>
-
-                  <View style={{ position: 'relative' }}>
-
-                    {profile?.unread_count > 0 && (
-
-                      <Text style={{
-                        position: 'absolute',
-                        top: -5,
-                        left: -5,
-                        zIndex: 10,
-                        color: "white",
-                        fontWeight: 'bold',
-                        fontSize: 11,
-                        height: 22,
-                        width: 22,
-                        textAlign: "center",
-                        backgroundColor: Colors.light.red,
-                        borderRadius: 11,
-                        paddingTop: 3
-                      }}>
-                        {profile?.unread_count}
-                      </Text>
-
-                    )}
-
-                    <CircleImage
-                      Size={45}
-                      source={{ uri: ImageFormater(profile?.logo) }}
-                    />
-
-                  </View>
-
-                  <View style={{ flex: 1, marginLeft: 10 }}>
-                    <Text style={styles.name}>
-                      {profile?.business_name}
-                    </Text>
-
-                    <Text style={styles.address}>
-                      {profile?.address}
-                    </Text>
-
-                  </View>
-
-                </View>
-                {profile?.inquiry_closed && (
-                  <View style={styles.closedBadge}>
-                    <Text style={styles.closedText}>Inquiry Closed</Text>
-                  </View>
-                )}
-
-              </TouchableOpacity>
-            )}
+          <CircleImage
+            Size={45}
+            source={{ uri: ImageFormater(profile?.logo) }}
           />
+        </View>
+
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Text style={styles.name}>
+            {profile?.business_name}
+          </Text>
+
+          <Text style={styles.address}>
+            {profile?.address}
+          </Text>
+        </View>
+      </View>
+
+      {profile?.inquiry_closed && (
+        <View style={styles.closedBadge}>
+          <Text style={styles.closedText}>Inquiry Closed</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  )}
+/>
+          </View>
         )}
       </TouchableOpacity>
     );
   };
   const renderrecived = ({ item }) => {
 
-    const [expanded, setExpanded] = useState({});
-    const [showMore, setShowMore] = useState({});
+   const inquiryId = String(item.inquiry_id);
     return (
       <TouchableOpacity
         style={[
@@ -538,31 +554,35 @@ const index = () => {
         {item.message && (
           <>
             <Text
-              numberOfLines={expanded[item.msg_id] ? undefined : 2}
-              onTextLayout={(e) => {
-                if (!showMore[item.msg_id]) {
-                  setShowMore(prev => ({
-                    ...prev,
-                    [item.msg_id]: e.nativeEvent.lines.length > 2
-                  }));
-                }
-              }}
+             numberOfLines={receivedExpanded[inquiryId] ? undefined : 2}
+ onTextLayout={(e) => {
+  const lines = e?.nativeEvent?.lines;
+
+  if (!Array.isArray(lines)) return;
+
+  if (!receivedShowMore[inquiryId]) {
+    setReceivedShowMore((prev) => ({
+      ...prev,
+      [inquiryId]: lines.length > 2,
+    }));
+  }
+}}
               style={styles.message}
             >
               💬 {item.message}
             </Text>
 
-            {showMore[item.msg_id] && (
+           {receivedShowMore[inquiryId] && (
               <Text
                 style={styles.seeMore}
                 onPress={() => {
-                  setExpanded(prev => ({
-                    ...prev,
-                    [item.msg_id]: !prev[item.msg_id]
-                  }));
+                 setReceivedExpanded((prev) => ({
+  ...prev,
+  [inquiryId]: !prev[inquiryId],
+}));
                 }}
               >
-                {expanded[item.msg_id] ? "See less" : "See more"}
+             {receivedExpanded[inquiryId] ? "See less" : "See more"}
               </Text>
             )}
 
@@ -661,34 +681,42 @@ const index = () => {
       <View style={{ flex: 1 }}>
         {!isFetching && sended?.length === 0 ? (
           <View style={{ alignItems: "center", marginTop: 120 }}>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "black" }}>
+            <Text style={{ fontSize: 18, fontWeight: "600", color: "#F4F0F0" }}>
               No Data Found
             </Text>
           </View>
         ) : (
-          <LegendList
-            className="bg-black"
-            data={sended}
-            extraData={ids}
-            showsVerticalScrollIndicator={false}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.inquiry_id?.toString()}
-            onEndReached={() => {
-              if (sended?.length > 9) setsendPage((prev) => prev + 1);
-            }}
-            ListFooterComponent={
-              isFetching ? <ActivityIndicator size="small" /> : null
-            }
-            refreshControl={
-              <RefreshControl
-                refreshing={isFetching}
-                onRefresh={() => {
-                  setsendPage(1);
-                  refetchSended();
-                }}
-              />
-            }
-          />
+        <FlashList
+  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
+  data={sended ?? []}
+  extraData={ids}
+  showsVerticalScrollIndicator={false}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.inquiry_id?.toString()}
+  onEndReachedThreshold={1}
+  onEndReached={() => {
+    if (!isFetching && sended?.length > 9) {
+      setsendPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isFetching && sendpage > 1 ? (
+      <ActivityIndicator size="small" />
+    ) : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={isFetching && sendpage === 1}
+      onRefresh={() => {
+        if (sendpage === 1) {
+          refetchSended();
+        } else {
+          setsendPage(1);
+        }
+      }}
+    />
+  }
+/>
         )}
       </View>
     </View>
@@ -753,29 +781,39 @@ const index = () => {
               <Delete />
             </TouchableOpacity>
           </View>
-          <LegendList
-            className="bg-black"
-            data={recived}
-            extraData={recivesIds}
-            showsVerticalScrollIndicator={false}
-            renderItem={renderrecived}
-            keyExtractor={(item) => item.inquiry_id?.toString()}
-            onEndReached={() => {
-              if (recived?.length > 9) setrecivedPage((prev) => prev + 1);
-            }}
-            ListFooterComponent={
-              isFetching ? <ActivityIndicator size="small" /> : null
-            }
-            refreshControl={
-              <RefreshControl
-                refreshing={recivedLoading}
-                onRefresh={() => {
-                  setrecivedPage(1);
-                  refetchRecived();
-                }}
-              />
-            }
-          />
+          <View className="flex-1">
+        <FlashList
+  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
+  data={recived ?? []}
+  extraData={recivesIds}
+  showsVerticalScrollIndicator={false}
+  renderItem={renderrecived}
+  keyExtractor={(item) => item.inquiry_id?.toString()}
+  onEndReachedThreshold={1}
+  onEndReached={() => {
+    if (!isFetching && recived?.length > 9) {
+      setrecivedPage((prev) => prev + 1);
+    }
+  }}
+  ListFooterComponent={
+    isFetching && recivedpage > 1 ? (
+      <ActivityIndicator size="small" />
+    ) : null
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={recivedLoading}
+      onRefresh={() => {
+        if (recivedpage === 1) {
+          refetchRecived();
+        } else {
+          setrecivedPage(1);
+        }
+      }}
+    />
+  }
+/>
+          </View>
         </View>
       )}
     </View>
@@ -883,6 +921,15 @@ const index = () => {
           setPage(1);
           setChatHasMore(true);
         }}>
+          <SafeAreaView
+                                                            style={{ flex: 1 }}
+                                                            edges={[ "bottom", "left", "right"]}
+                                                          >
+                                                              <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0}
+    >
           <View style={{ flex: 1, backgroundColor: "#F4F0F0" }}>
 
 
@@ -955,9 +1002,13 @@ const index = () => {
 
                         <Text
                           numberOfLines={expanded ? undefined : 2}
-                          onTextLayout={(e) => {
-                            setShowMore(e.nativeEvent.lines.length > 2);
-                          }}
+                         onTextLayout={(e) => {
+  const lines = e?.nativeEvent?.lines;
+
+  if (!Array.isArray(lines)) return;
+
+  setShowMore(lines.length > 2);
+}}
                           style={styles.message}
                         >
                           {selectedChatItem.message}
@@ -989,31 +1040,30 @@ const index = () => {
                     <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
                   </View>
                 )}
-                <LegendList
-                  ref={chatListRef}
-                  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
-                  data={messages}
-                  renderItem={renderChatMessage}
-                  keyExtractor={(item: any) => item.msg_id?.toString()}
-                  estimatedItemSize={60}
-                  onEndReachedThreshold={0.1}
-                  onScroll={(e: any) => {
+                <View className="flex-1">
+               <FlashList
+  ref={chatListRef}
+  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
+  data={messages}
+  renderItem={renderChatMessage}
+  keyExtractor={(item: any) => item.msg_id?.toString()}
+  onEndReachedThreshold={0.1}
 
-                    const offset = e.nativeEvent.contentOffset.y;
+  onScroll={(e: any) => {
+    const offset = e.nativeEvent.contentOffset.y;
 
-                    if (
-                      offset <= 0 &&
-                      chatHasMore &&
-                      !chatLoadingMore &&
-                      !chatInitialLoading
-                    ) {
+    if (
+      offset <= 0 &&
+      chatHasMore &&
+      !chatLoadingMore &&
+      !chatInitialLoading
+    ) {
+      setPage((prev) => prev + 1);
+    }
+  }}
 
-                      setPage(prev => prev + 1);
-
-                    }
-
-                  }}
-                />
+/>
+                </View>
               </>
             )}
             <View className="flex-row p-3 border-t border-gray-200 mb-1 ">
@@ -1035,6 +1085,8 @@ const index = () => {
               </TouchableOpacity>
             </View>
           </View>
+          </KeyboardAvoidingView>
+          </SafeAreaView>
         </Modal>
       </View>
       <Loading isLoading={loadingRecivedDelet || isLoading} text="Deleting ..." />

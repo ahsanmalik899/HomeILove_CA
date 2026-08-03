@@ -14,7 +14,7 @@ import Profilelogo from "@assets/CreateProfile/uploadprofilewithcircle.svg";
 import Paypal from "@assets/SideBar/paypal-icon.svg";
 import Uploadlogo from "@assets/signupbg/solar_upload-bold-duotone.svg";
 import { MaterialIcons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
+import { FlashList } from "@shopify/flash-list";
 import { AdressInput } from "@src/components/globals/AddressInput";
 import CommunityPropertys from "@src/components/globals/CommunityPropertys";
 import CommunitySatatus from "@src/components/globals/CommunitySatatus";
@@ -39,12 +39,12 @@ import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import * as Yup from "yup";
 const index = () => {
   const user = useAppSelector(userdata);
@@ -1571,74 +1571,73 @@ const index = () => {
                         </>
                       }
                       Componet2={
-                        <View>
-                          <LegendList
-                            data={advertisePrices?.data}
-                            keyExtractor={(item) => item?.id}
-                            estimatedItemSize={50}
-                            extraData={values.ad_life}
-                            ListHeaderComponent={
-                              <View
-                                className="flex-row justify-between items-center"
-                                style={{
-                                  borderBottomWidth: 1,
-                                  borderColor: Colors.light.textGray,
-                                  borderRadius: ms(5),
-                                  paddingHorizontal: hs(10),
-                                  paddingVertical: vs(10),
-                                }}
-                              >
-                                <Text style={{ fontFamily: "PopinRegula" }}>
-                                  Advertise Time
-                                </Text>
-                                <Text style={{ fontFamily: "PopinRegula" }}>
-                                  Price
-                                </Text>
-                              </View>
-                            }
-                            renderItem={({ item }) => (
-                              <View
-                                className="flex-row justify-between items-center"
-                                style={{
-                                  paddingHorizontal: hs(10),
-                                  paddingVertical: vs(10),
-                                }}
-                              >
-                                <View className="flex-row items-center">
-                                  <TouchableOpacity
-                                    onPress={() => {
-                                      setFieldValue("ad_life", item?.life?.toString());
+                        <View className="flex-1">
+                       <FlashList
+  data={advertisePrices?.data ?? []}
+  keyExtractor={(item) => item?.id?.toString()}
+  extraData={values.ad_life}
+  ListHeaderComponent={
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        borderBottomWidth: 1,
+        borderColor: Colors.light.textGray,
+        borderRadius: ms(5),
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Advertise Time
+      </Text>
 
-                                      setSelectedAmount(item?.price?.toString());
-                                    }}
-                                  >
-                                    <MaterialIcons
-                                      size={25}
-                                      color={Colors.light.DarkGreen}
-                                      name={
-                                        values.ad_life === item?.life?.toString()
-                                          ? "radio-button-checked"
-                                          : "radio-button-unchecked"
-                                      }
-                                    />
-                                  </TouchableOpacity>
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        Price
+      </Text>
+    </View>
+  }
+  renderItem={({ item }) => (
+    <View
+      className="flex-row justify-between items-center"
+      style={{
+        paddingHorizontal: hs(10),
+        paddingVertical: vs(10),
+      }}
+    >
+      <View className="flex-row items-center">
+        <TouchableOpacity
+          onPress={() => {
+            setFieldValue("ad_life", item?.life?.toString());
+            setSelectedAmount(item?.price?.toString());
+          }}
+        >
+          <MaterialIcons
+            size={25}
+            color={Colors.light.DarkGreen}
+            name={
+              values.ad_life === item?.life?.toString()
+                ? "radio-button-checked"
+                : "radio-button-unchecked"
+            }
+          />
+        </TouchableOpacity>
 
-                                  <Text
-                                    style={{
-                                      marginLeft: hs(10),
-                                      fontFamily: "PopinRegula",
-                                    }}
-                                  >
-                                    For {item?.life?.toString()} Days
-                                  </Text>
-                                </View>
+        <Text
+          style={{
+            marginLeft: hs(10),
+            fontFamily: "PopinRegula",
+          }}
+        >
+          For {item?.life?.toString()} Days
+        </Text>
+      </View>
 
-                                <Text style={{ fontFamily: "PopinRegula" }}>
-                                  ${formatPrice(item?.price?.toString())}
-                                </Text>
-                              </View>
-                            )}
-                          />
+      <Text style={{ fontFamily: "PopinRegula" }}>
+        ${formatPrice(item?.price?.toString())}
+      </Text>
+    </View>
+  )}
+/>
 
                           <View
                             style={{
