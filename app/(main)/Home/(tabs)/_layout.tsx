@@ -17,6 +17,7 @@ const _layout = () => {
     const [unreadCount, setUnreadCount] = useState(0);
 useEffect(()=>{
 setUnreadCount(count?.unread_conversations)
+console.log("unread",count?.unread_conversations)
 },[count])
 useEffect(() => {
 

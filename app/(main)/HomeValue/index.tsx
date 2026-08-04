@@ -662,6 +662,7 @@ const map = {
                             ]}
                             title="Minimum Beds"
                             name="minBed"
+                            openDirection="TOP"
                             setValue={setFieldValue}
                             placeholder="Beds"
                             value={values.minBed}
@@ -690,6 +691,7 @@ const map = {
                             title="Maximum Beds"
                             placeholder="Beds"
                             name="maxBed"
+                            openDirection="TOP"
                             setValue={setFieldValue}
                             value={values.maxBed}
                             touched={!!touched.maxBed}
@@ -792,7 +794,7 @@ const map = {
               ) : (
                 <View className="flex-1">
             <FlashList
-  style={{ flex: 1, backgroundColor: "black" }}
+ 
   data={agents ?? []}
   extraData={ids}
   renderItem={renderItem}

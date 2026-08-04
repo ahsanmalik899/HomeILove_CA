@@ -27,7 +27,7 @@ const Index = () => {
       return (
      <ScrollView  showsVerticalScrollIndicator={false}  style={styles.section}>
           <HeaderWithBack />
-      
+      <View style={{paddingHorizontal:hs(20)}}>
             <Text style={styles.mainHeading}>
               Experts to <Text style={{ color: Colors.light.red }}> MOVE </Text>
               you with {"\n"}love
@@ -106,7 +106,7 @@ const Index = () => {
             />
             <Text style={styles.subHeading}>Mortgage Experts</Text>
               <LeadingList data={profileList?.data} isFetching={isFetching}/>
-      
+      </View>
         </ScrollView>
       );
       break;
@@ -114,6 +114,7 @@ const Index = () => {
       return (
         <ScrollView showsVerticalScrollIndicator={false}  style={styles.section}>
           <HeaderWithBack />
+                <View style={{paddingHorizontal:hs(20)}}>
             <Text style={styles.mainHeading}>
               Always<Text style={{ color: Colors.light.red }}> BETTER </Text>
               to consult {"\n"}experts
@@ -190,6 +191,7 @@ const Index = () => {
             />
             <Text style={styles.subHeading}>Agent Experts</Text>
               <LeadingList data={profileList?.data} isFetching={isFetching}/>
+              </View>
          </ScrollView>
    
       );
@@ -198,7 +200,7 @@ const Index = () => {
       return (
        <ScrollView showsVerticalScrollIndicator={false}  style={styles.section}>
           <HeaderWithBack />
-        
+              <View style={{paddingHorizontal:hs(20)}}>
             <Text style={styles.mainHeading}>
               Get<Text style={{ color: Colors.light.red,fontFamily: "PopinRegula", }}> BETTER </Text>
               rates from {"\n"}investors
@@ -277,6 +279,7 @@ const Index = () => {
             />
             <Text style={styles.subHeading}>Investor Experts</Text>
               <LeadingList data={profileList?.data} isFetching={isFetching} />
+              </View>
           </ScrollView>
    
       );
@@ -315,7 +318,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
   },
   section: {
-    paddingHorizontal: hs(20), 
+    
     backgroundColor:'white'
   },
 

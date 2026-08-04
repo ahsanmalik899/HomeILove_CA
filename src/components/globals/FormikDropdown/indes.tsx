@@ -28,6 +28,7 @@ export const FormikDropdown = ({
   multipleFields,
   setValue = () => {},
   name = "name",
+   openDirection="BOTTOM",
 }: FormikDropdownProps) => {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState(
@@ -105,7 +106,7 @@ export const FormikDropdown = ({
             maxHeight={400}
             setItems={setItems}
              listMode="SCROLLVIEW"
-  dropDownDirection="BOTTOM"
+  dropDownDirection={openDirection}
             placeholder={placeholder}
             setValue={(callback) => {
               const val = callback(currentValue);

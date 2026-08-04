@@ -28,6 +28,7 @@ export const FormikDropdownwithjson = ({
   multipleFields,
   setValue = () => {},
   name = "name",
+    openDirection="BOTTOM",
 }: FormikDropdownProps) => {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState(options);
@@ -94,7 +95,8 @@ export const FormikDropdownwithjson = ({
             items={items}
             setOpen={setOpen}
             setItems={setItems}
-            listMode="MODAL"
+           listMode="SCROLLVIEW"
+  dropDownDirection={openDirection}
             setValue={callback => {
               const val = callback(currentValue) as string | number;
               setCurrentValue(val);

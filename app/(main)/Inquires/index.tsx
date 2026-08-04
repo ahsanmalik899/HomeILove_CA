@@ -37,12 +37,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 const index = () => {
   const user = useAppSelector(userdata);
+  
   const params = useLocalSearchParams();
   const [value, setValue] = useState("Sent");
+  const insets = useSafeAreaInsets();
   const [sendInquireyMessageApi, { isLoading: sendInquireyMessageLoading }] = useSendInquireyMessageApiMutation();
   const [getInquireyMessagesApi, { isLoading: getInquireyMessagesLoading }] = useLazyGetInquireyMessagesApiQuery();
   const [message, setMessage] = useState("");
@@ -934,7 +935,7 @@ onTextLayout={(e) => {
 
 
             {selectedChatProfile && (
-              <View style={{ backgroundColor: '#fff', paddingBottom: vs(12), borderBottomLeftRadius: 16, borderBottomRightRadius: 16, elevation: 3 }}>
+              <View style={{ backgroundColor: '#fff', paddingBottom: vs(12), borderBottomLeftRadius: 16, borderBottomRightRadius: 16, elevation: 3,paddingTop:insets.top }}>
                 <View className="flex-row items-center gap-3" style={{ marginHorizontal: hs(10), paddingTop: vs(10), justifyContent: 'space-between' }}>
                   <TouchableOpacity onPress={() => {
                     setShowchatModal(false);

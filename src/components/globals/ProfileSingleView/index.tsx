@@ -562,14 +562,14 @@ const insets = useSafeAreaInsets();
             <Text style={{ color: Colors.light.textGray, fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>Ads by</Text>
              <Text style={{ color: Colors.light.red,fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>{profile?.business_name}</Text>
             <View style={styles.row}>
-              <TouchableOpacity style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }} onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"rent",profile_type:type}})}>
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }} onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"rent",profile_type:type,name:profile?.business_name}})}>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Rent ads</Text>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.rent_posts}</Text>
               </TouchableOpacity>
               <View style={{ width: hs(1), height: hs(50), backgroundColor: Colors.light.textGray }} />
               <TouchableOpacity style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }}
               
-              onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"sale",profile_type:type}})}>  
+              onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"sale",profile_type:type,name:profile?.business_name}})}>  
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Sale ads</Text>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.sale_posts}</Text>
               </TouchableOpacity>

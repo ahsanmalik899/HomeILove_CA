@@ -788,6 +788,7 @@ const index = () => {
                           errors={!!errors.min_age}
                           required
                           errorText={errors.min_age}
+                          openDirection="TOP"
                           options={[
                             { label: "No selection", value: "" },
                             { label: "5 yrs", value: "5" },
@@ -813,6 +814,7 @@ const index = () => {
                           touched={!!touched.max_age}
                           errors={!!errors.max_age}
                           required
+                          openDirection="TOP"
                           errorText={errors.max_age}
                           options={[
                             { label: "No selection", value: "" },
@@ -1288,6 +1290,7 @@ const index = () => {
                           touched={!!touched.min_price}
                           errors={!!errors.min_price}
                           required
+                          openDirection="TOP"
                           errorText={errors.min_price}
                           options={[
                             { label: "No selection", value: "" },
@@ -1327,6 +1330,7 @@ const index = () => {
                           touched={!!touched.max_price}
                           errors={!!errors.max_price}
                           required
+                          openDirection="TOP"
                           errorText={errors.max_price}
                           options={[
                             { value: "", label: "No selection" },

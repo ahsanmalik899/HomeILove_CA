@@ -1369,7 +1369,7 @@ const rotate = rotateAnim.interpolate({
               <StarRating size={20} rating={data?.posted_by?.rating} />
             </View>
             {type === "community" ? (
-             <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"community",profile_type:data?.posted_by_type}})}} className="items-center" style={{ flex: 1 }}>
+             <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"community",profile_type:data?.posted_by_type,name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
                 <Text style={[styles.heading, { color: Colors.light.red }]}>
                   {data?.posted_by?.total_posts}
                 </Text>
@@ -1377,7 +1377,7 @@ const rotate = rotateAnim.interpolate({
  </TouchableOpacity>
             ) : (
               <View className="flex-row mb-4">
-                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"sale",profile_type:data?.posted_by_type}})}} className="items-center" style={{ flex: 1 }}>
+                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"sale",profile_type:data?.posted_by_type,name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
                   <Text style={[styles.heading, { color: Colors.light.red }]}>
                     {data?.posted_by?.sale_posts ?? 0}
                   </Text>
@@ -1385,7 +1385,7 @@ const rotate = rotateAnim.interpolate({
                 </TouchableOpacity>
 
                 <VerticalLine />
-                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"rent"}})}} className="items-center" style={{ flex: 1 }}>
+                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"rent",name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
                   <Text style={[styles.heading, { color: Colors.light.red }]}>
                     {data?.posted_by?.rent_posts ?? 0}
                   </Text>

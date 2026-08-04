@@ -25,6 +25,7 @@ const index = () => {
   const id = useLocalSearchParams().id;
   const post_type = useLocalSearchParams().type;
     const profile_type = useLocalSearchParams().profile_type;
+    const name = useLocalSearchParams().name;
   const [ProfileType, SetProfilrType] = useState("");
   const type = String(rawType).toLowerCase();
     const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -112,8 +113,10 @@ useFocusEffect(
   }, [data]);
   return (
     <View className="flex-1 bg-white" style={{backgroundColor:"#F4F0F0"}}>
-      <HeaderWithBack title={type + " Listing"} onBackpress={()=>{isShowpost=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}}/>
+      <HeaderWithBack title={name?"Ads by "+name:type + " Listing"} onBackpress={()=>{isShowpost=="true"? router.replace("/Home/Feeds/NewsFeed"): router.back()}}/>
       <View className="flex-1">
+        {!name&&(
+        <View>
         {filter.length > 0 && (
           <View style={styles.filterContainer}>
             <Text style={styles.sortText}> Your ads by:</Text>
@@ -128,7 +131,7 @@ useFocusEffect(
             />
           </View>
         )}
-
+</View>)}
         <YourAdsPostDesign
           data={posts}
           hasmore={hasMore}

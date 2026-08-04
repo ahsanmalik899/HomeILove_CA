@@ -11,5 +11,6 @@ export interface FormikDropdownProps {
   additonalText?: string;
   multipleFields?:boolean;
  name?: string;
+ openDirection?:string;
   setValue?: (field: string, value: string) => void;
 }

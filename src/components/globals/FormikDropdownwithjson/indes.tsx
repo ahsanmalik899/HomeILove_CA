@@ -27,6 +27,7 @@ export const FormikDropdownwithjson = ({
   multipleFields,
   setValue = () => {},
   name = "name",
+    openDirection="BOTTOM",
 }: FormikDropdownProps) => {
   const [open, setOpen] = React.useState(false);
 const [items, setItems] = React.useState(options);
@@ -73,7 +74,7 @@ const handleRemove = (index: number) => {
   setOpen={setOpen}
   setItems={setItems}
   listMode="SCROLLVIEW"
-  dropDownDirection="BOTTOM"
+  dropDownDirection={openDirection}
   setValue={(callback) => {
     const val = callback(currentValue) as number;
     setCurrentValue(val);
