@@ -9,8 +9,8 @@ import { socket } from "@src/socket";
 import { vs } from "@utils/design/design";
 import { ImageFormater } from "@utils/ImageFormat";
 import { timeAgo } from "@utils/Timeago";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Text,
@@ -40,9 +40,23 @@ const Index = () => {
 
   const [sqlNotifications, setSqlNotifications] = useState<any[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
-
+const [refreshing, setRefreshing] = useState(false);
   const [markRead] = useMarkReadMutation();
+const handleRefresh = async () => {
+  try {
+    setRefreshing(true);
+    setPage(1);
 
+    const result = await refetch();
+
+    if (result.data) {
+      setSqlNotifications(result.data.data.data);
+      setHasMore(result.data.has_more);
+    }
+  } finally {
+    setRefreshing(false);
+  }
+};
   const handlePress = async (item: any) => {
     if (!item.is_read) {
       await markRead({
@@ -72,10 +86,18 @@ const Index = () => {
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-    const {data:notificationsdata,isLoading:notificationLiading,isFetching}=  useGetNotificationsQuery({
+    const {data:notificationsdata,isLoading:notificationLiading,isFetching,refetch}=  useGetNotificationsQuery({
         user_id: user.id,
         page: page
       });
+      useFocusEffect(
+  useCallback(() => {
+    if (!user?.id) return;
+
+    setPage(1);
+    refetch();
+  }, [user?.id, refetch])
+);
 useEffect(() => {
   if (!notificationsdata) return;
 
@@ -96,23 +118,19 @@ useEffect(() => {
 
     socket.emit("join", String(user.id));
 
-    const onNotification = (notification: any) => {
+ const onNotification = (notification: any) => {
+  if (notification.receiver_id != user.id) return;
 
-        if (notification.receiver_id != user.id) return;
+  setSqlNotifications(prev => {
+    if (prev.some(x => x.id == notification.id)) {
+      return prev;
+    }
 
-        setSqlNotifications(prev => {
+    return [notification, ...prev];
+  });
 
-            if (prev.some(x => x.id == notification.id)) {
-                return prev;
-            }
-
-            return [notification, ...prev];
-        });
-
-        dispatch(setNotificationCount(prev => prev + 1));
-
-    };
-
+  dispatch(setNotificationCount(prev => prev + 1));
+};
     socket.on("newNotification", onNotification);
 
     return () => {
@@ -170,16 +188,22 @@ useEffect(() => {
           <ActivityIndicator size="large" />
         </View>) : (
         <View className="mt-4 flex-1">
-    <FlashList
+<FlashList
   data={sqlNotifications}
   renderItem={renderItem}
   keyExtractor={(item) => item.id.toString()}
-  refreshing={false}
-  onEndReachedThreshold={2}
+
+  refreshing={refreshing}
+  onRefresh={handleRefresh}
+
+  onEndReachedThreshold={0.5}
   onEndReached={() => {
-    setPage((prev) => prev + 1);
+    if (hasMore && !isFetching) {
+      setPage(prev => prev + 1);
+    }
   }}
-    ListFooterComponent={
+
+  ListFooterComponent={
     isFetching && page > 1 ? (
       <View
         style={{
@@ -188,7 +212,7 @@ useEffect(() => {
           alignItems: "center",
         }}
       >
-        <ActivityIndicator size="small" />
+        <ActivityIndicator />
       </View>
     ) : null
   }

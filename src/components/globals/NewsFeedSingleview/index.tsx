@@ -1,4 +1,4 @@
-import { useDeleteCommentApiMutation, useGetHomeFeedsQuery, useGetPostByIdQuery, useGetPostCommentsApiQuery, useLikePostMutation, usePostReplyApiMutation, useShare_postApiMutation, useUnlikePostMutation } from '@/store/api/user/MainApi';
+import { useDeleteCommentApiMutation, useEditCommentApiMutation, useGetHomeFeedsQuery, useGetPostByIdQuery, useGetPostCommentsApiQuery, useLikePostMutation, usePostReplyApiMutation, useShare_postApiMutation, useUnlikePostMutation } from '@/store/api/user/MainApi';
 import { userdata } from '@/store/slices/selector/user';
 import CommunitySatatus from "@assets/CreateProfile/construction-house.svg";
 import Cross from "@assets/CreateProfile/cross.svg";
@@ -12,6 +12,7 @@ import Liked from "@assets/icons/ThumbUpRed.svg";
 import CommunityType from "@assets/SideBar/commercialGreen.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
+import { MaterialIcons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import Colors from '@src/constants/Colors';
 import { renderToastError, renderToastSuccess } from '@src/hooks/useToasty';
@@ -23,8 +24,8 @@ import { ViedioUrlFormat } from '@utils/ViedioUrlFormater';
 import { Video } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import { Formik } from 'formik';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Keyboard, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Keyboard, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import * as yup from "yup";
@@ -36,13 +37,361 @@ import HeaderWithBack from '../HeaderWithBack';
 import ImageSlider from '../ImageSlider';
 import LargeButton from '../LaregeButton';
 import Loading from '../Loading';
+
+  const CommentItem = ({ item, refetch , scrollRef }) => {
+     const user = useSelector(userdata);
+     const [deletingId, setDeletingId] = useState<number | null>(null);
+ const [editingComment, setEditingComment] = useState(false);
+const [editCommentText, setEditCommentText] = useState(item.comment);
+const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
+const [editReplyText, setEditReplyText] = useState("");
+const handleDelete = (
+  commentId: number,
+  type: "comment" | "reply"
+) => {
+  Alert.alert(
+    type === "comment" ? "Delete Comment" : "Delete Reply",
+    type === "comment"
+      ? "Are you sure you want to delete this comment? All replies to this comment will also be deleted."
+      : "Are you sure you want to delete this reply?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setDeletingId(commentId);
+
+            const res = await deleteComment(commentId).unwrap();
+
+            if (res?.success) {
+              await refetch();
+
+              if (type === "comment") {
+                refechfeeds();
+              }
+
+              renderToastSuccess(
+                res?.message ||
+                  `${type === "comment" ? "Comment" : "Reply"} deleted successfully`
+              );
+            }
+          } catch (error) {
+            renderToastError(
+              `Failed to delete ${type}`
+            );
+          } finally {
+            setDeletingId(null);
+          }
+        },
+      },
+    ]
+  );
+};
+const [editComment, { isLoading: editing }] =
+  useEditCommentApiMutation();
+      const handleEditComment = async () => {
+  if (!editCommentText.trim()) return;
+
+  try {
+    const res = await editComment({
+      comment_id: item.comment_id,
+      user_id: user?.id,
+      content: editCommentText.trim(),
+    }).unwrap();
+
+    if (res.success) {
+      setEditingComment(false);
+      refetch();
+      renderToastSuccess(res.message);
+    }
+  } catch (error) {
+    renderToastError("Failed to update comment");
+  }
+};
+  const handleEditReply = async (reply: any) => {
+  if (!editReplyText.trim()) return;
+
+  try {
+    const res = await editComment({
+      comment_id: reply.comment_id,
+      user_id: user?.id,
+      content: editReplyText.trim(),
+    }).unwrap();
+
+    if (res.success) {
+      setEditingReplyId(null);
+      setEditReplyText("");
+      refetch();
+
+      renderToastSuccess(res.message);
+    }
+  } catch (error) {
+    renderToastError("Failed to update reply");
+  }
+};
+     const [showReplyInput, setShowReplyInput] = useState(false);
+     const [replyText, setReplyText] = useState("");
+ 
+     const [postReply] = usePostReplyApiMutation();
+     const [deleteComment] = useDeleteCommentApiMutation();
+ 
+     const {
+       data,
+       isFetching,
+       refetch: refechfeeds,
+       isError,
+       error,
+     } = useGetHomeFeedsQuery({
+       id: user?.id,
+       type: "All",
+       page: 1,
+       limit: 10,
+     });
+ 
+     const handleReply = async () => {
+       if (!replyText.trim()) return;
+ 
+       await postReply({
+         user_id: user?.id,
+         creator_id: user?.id,
+         comment_id: item.comment_id,
+         content: replyText,
+       });
+ 
+       setReplyText("");
+       setShowReplyInput(false);
+       refetch();
+     };
+ 
+     return (
+       <View style={styles.commentWrapper}>
+         <CircleImage
+           Size={38}
+           source={{ uri: ImageFormater(item.profile_image) }}
+         />
+ 
+         <View style={{ flex: 1, marginLeft: 10 }}>
+           <View style={styles.commentCard}>
+             <View style={styles.commentHeader}>
+               <Text style={styles.userName}>{item.name}</Text>
+ 
+            {user?.id === item.sweetghar_user_id && (
+  <View style={{ flexDirection: "row", gap: 8 }}>
+
+    <TouchableOpacity
+       style={styles.iconBtn}
+      onPress={() => {
+        setEditCommentText(item.comment);
+        setEditingComment(true);
+      }}
+    >
+     <MaterialIcons
+  name="edit"
+  size={18}
+  color={Colors.light.DarkGreen}
+/>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+       style={styles.iconBtn}
+     onPress={() =>
+    handleDelete(item.comment_id, "comment")
+  }
+    >
+      <Delete width={18} height={18} />
+    </TouchableOpacity>
+
+  </View>
+)}
+             </View>
+ 
+         {editingComment ? (
+  <View style={styles.editBox}>
+    <TextInput
+      value={editCommentText}
+      onChangeText={setEditCommentText}
+      style={styles.editInput}
+      autoFocus
+      multiline
+    />
+
+    <View style={styles.editActions}>
+      <TouchableOpacity
+        onPress={() => {
+          setEditingComment(false);
+          setEditCommentText(item.comment);
+        }}
+      >
+        <Text style={styles.cancelText}>Cancel</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={handleEditComment}
+        disabled={editing}
+      >
+        <Text style={styles.saveText}>
+          {editing ? "Saving..." : "Save"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+) : (
+  <Text style={styles.commentText}>
+    {item.comment}
+  </Text>
+)}
+           </View>
+ 
+           <View style={styles.actionRow}>
+             <TouchableOpacity
+               onPress={() => setShowReplyInput(!showReplyInput)}
+             >
+               <Text style={styles.actionText}>Reply</Text>
+             </TouchableOpacity>
+ 
+             <Text style={styles.time}>{timeAgo(item.created_date)}</Text>
+           </View>
+ 
+           {showReplyInput && (
+             <View style={styles.replyInputBox}>
+             <TextInput
+  value={replyText}
+  onChangeText={setReplyText}
+  placeholder="Write a reply..."
+  style={styles.replyInput}
+  autoFocus
+  onFocus={() => {
+    setTimeout(() => {
+      scrollRef?.current?.scrollToEnd({
+        animated: true,
+      });
+    }, 300);
+  }}
+/>
+ 
+               <TouchableOpacity onPress={handleReply} style={styles.sendBtn}>
+                 <Text style={styles.sendText}>Send</Text>
+               </TouchableOpacity>
+             </View>
+           )}
+ 
+         {item.replies?.map((reply) => (
+  <View
+    key={reply.comment_id}
+    style={styles.replyWrapper}
+  >
+    <CircleImage
+      Size={28}
+      source={{
+        uri: ImageFormater(reply.profile_image),
+      }}
+    />
+
+    <View style={styles.replyCard}>
+
+      <View style={styles.commentHeader}>
+        <Text style={styles.userName}>
+          {reply.name}
+        </Text>
+
+        {user?.id === reply.sweetghar_user_id && (
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 8,
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => {
+                setEditingReplyId(reply.comment_id);
+                setEditReplyText(reply.comment);
+              }}
+            >
+                  <MaterialIcons
+  name="edit"
+  size={18}
+  color={Colors.light.DarkGreen}
+/>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.iconBtn}
+               onPress={() =>
+    handleDelete(item.comment_id, "comment")
+  }
+            >
+              <Delete width={18} height={18} />
+            </TouchableOpacity>
+
+          </View>
+        )}
+
+      </View>
+
+      {editingReplyId === reply.comment_id ? (
+        <View style={styles.editBox}>
+
+          <TextInput
+            value={editReplyText}
+            onChangeText={setEditReplyText}
+            style={styles.editInput}
+            autoFocus
+            multiline
+          />
+
+          <View style={styles.editActions}>
+
+            <TouchableOpacity
+              onPress={() => {
+                setEditingReplyId(null);
+                setEditReplyText("");
+              }}
+            >
+              <Text style={styles.cancelText}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleEditReply(reply)}
+            >
+              <Text style={styles.saveText}>
+                Save
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
+        </View>
+      ) : (
+        <Text style={styles.commentText}>
+          {reply.comment}
+        </Text>
+      )}
+
+    </View>
+  </View>
+))}
+         </View>
+       </View>
+     );
+   };
 export default function NewsFeedSingleview({ post_id,setshowModel,setAlreadyLiked,setData }: { post_id: number,setshowModel:(val:boolean)=>void, setData:(data:[])=>void,setAlreadyLiked?:(val:boolean)=>void }) {
     const user = useSelector(userdata);
+    const scrollRef = useRef<ScrollView>(null);
       const { data, isFetching, refetch } = useGetPostByIdQuery({ post_id:post_id,userid:user?.id });
     const [showShare, setShowShare] = useState(false);
     const formatPdfUrl = (file: string) => {
         return ImageFormater(file);
     };
+
     const insets = useSafeAreaInsets();
      const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -128,138 +477,11 @@ setData((prevData) =>
              renderToastError("Something went wrong");
            }
          };
-   const CommentItem = ({ item, refetch }) => {
-     const user = useSelector(userdata);
  
-     const [showReplyInput, setShowReplyInput] = useState(false);
-     const [replyText, setReplyText] = useState("");
- 
-     const [postReply] = usePostReplyApiMutation();
-     const [deleteComment] = useDeleteCommentApiMutation();
- 
-     const {
-       data,
-       isFetching,
-       refetch: refechfeeds,
-       isError,
-       error,
-     } = useGetHomeFeedsQuery({
-       id: user?.id,
-       type: "All",
-       page: 1,
-       limit: 10,
-     });
- 
-     const handleReply = async () => {
-       if (!replyText.trim()) return;
- 
-       await postReply({
-         user_id: user?.id,
-         creator_id: user?.id,
-         comment_id: item.comment_id,
-         content: replyText,
-       });
- 
-       setReplyText("");
-       setShowReplyInput(false);
-       refetch();
-     };
- 
-     return (
-       <View style={styles.commentWrapper}>
-         <CircleImage
-           Size={38}
-           source={{ uri: ImageFormater(item.profile_image) }}
-         />
- 
-         <View style={{ flex: 1, marginLeft: 10 }}>
-           <View style={styles.commentCard}>
-             <View style={styles.commentHeader}>
-               <Text style={styles.userName}>{item.name}</Text>
- 
-               {user?.id === item.sweetghar_user_id && (
-                 <TouchableOpacity
-                   style={styles.deleteBtn}
-                   onPress={() =>
-                     deleteComment(item.comment_id)
-                       .unwrap()
-                       .then(() => {
-                         refetch();
-                         refechfeeds();
-                       })
-                   }
-                 >
-                   <Delete width={14} height={14} />
-                 </TouchableOpacity>
-               )}
-             </View>
- 
-             <Text style={styles.commentText}>{item.comment}</Text>
-           </View>
- 
-           <View style={styles.actionRow}>
-             <TouchableOpacity
-               onPress={() => setShowReplyInput(!showReplyInput)}
-             >
-               <Text style={styles.actionText}>Reply</Text>
-             </TouchableOpacity>
- 
-             <Text style={styles.time}>{timeAgo(item.created_date)}</Text>
-           </View>
- 
-           {showReplyInput && (
-             <View style={styles.replyInputBox}>
-               <TextInput
-                 value={replyText}
-                 onChangeText={setReplyText}
-                 placeholder="Write a reply..."
-                 style={styles.replyInput}
-               />
- 
-               <TouchableOpacity onPress={handleReply} style={styles.sendBtn}>
-                 <Text style={styles.sendText}>Send</Text>
-               </TouchableOpacity>
-             </View>
-           )}
- 
-           {item.replies?.map((reply) => (
-             <View key={reply.comment_id} style={styles.replyWrapper}>
-               <CircleImage
-                 Size={28}
-                 source={{
-                   uri: ImageFormater(reply.profile_image),
-                 }}
-               />
- 
-               <View style={styles.replyCard}>
-                 <View style={styles.commentHeader}>
-                   <Text style={styles.userName}>{reply.name}</Text>
- 
-                   {/* ✅ REPLY DELETE */}
-                   {user?.id === reply.sweetghar_user_id && (
-                     <TouchableOpacity
-                       style={styles.deleteBtn}
-                       onPress={() =>
-                         deleteComment(reply.comment_id).unwrap().then(refetch)
-                       }
-                     >
-                       <Delete width={12} height={12} />
-                     </TouchableOpacity>
-                   )}
-                 </View>
- 
-                 <Text style={styles.commentText}>{reply.comment}</Text>
-               </View>
-             </View>
-           ))}
-         </View>
-       </View>
-     );
-   };
  
    const [imageNo, setImageNo] = useState(0);
  
-   const { data: comments, isFetching: commentFetching } =
+   const { data: comments, isFetching: commentFetching ,  refetch: refetchComments,} =
      useGetPostCommentsApiQuery({ post_id: post_id },  {
     skip: !post_id,
   });
@@ -268,7 +490,17 @@ setData((prevData) =>
    const [expanded, setExpanded] = useState(false);
         return (
      <>
-       <ScrollView className="flex-1 bg-white mb-6">
+     <ScrollView
+  ref={scrollRef}
+  className="flex-1 bg-white mb-6"
+  keyboardShouldPersistTaps="handled"
+  contentContainerStyle={{
+    paddingBottom:
+      keyboardHeight > 0
+        ? keyboardHeight + vs(120)
+        : vs(100),
+  }}
+>
          <HeaderWithBack onBackpress={()=>{setshowModel(false)}}/>
          <View
            className="flex-1"
@@ -536,13 +768,13 @@ setData((prevData) =>
                   >
                     {data?.post?.is_liked ?
                       <Liked
-                        width={22}
-                        height={22}
+                        width={28}
+                        height={28}
                       />
                       :
                       <Like
-                        width={22}
-                        height={22}
+                        width={28}
+                        height={28}
 
                       />}
                   </TouchableOpacity>
@@ -610,7 +842,11 @@ setData((prevData) =>
   data={comments?.data || []}
   keyExtractor={(item) => item.comment_id.toString()}
   renderItem={({ item }) => (
-    <CommentItem item={item} refetch={refetch} />
+<CommentItem
+  item={item}
+  refetch={refetchComments}
+  scrollRef={scrollRef}
+/>
   )}
    ListFooterComponent={
     <View style={{ height: vs(100) }} />
@@ -954,7 +1190,40 @@ setData((prevData) =>
      shadowOpacity: 0.2,
      shadowRadius: 2,
    },
- 
+ editBox: {
+  marginTop: vs(5),
+},
+
+editInput: {
+  backgroundColor: "#fff",
+  borderWidth: 1,
+  borderColor: "#ddd",
+  borderRadius: ms(10),
+  paddingHorizontal: hs(10),
+  paddingVertical: vs(7),
+  fontFamily: "PopinRegula",
+  fontSize: ms(13),
+},
+
+editActions: {
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  gap: 15,
+  marginTop: vs(6),
+},
+
+cancelText: {
+  color: "#777",
+  fontSize: ms(12),
+  fontWeight: "600",
+},
+
+saveText: {
+  color: Colors.light.DarkGreen,
+  fontSize: ms(12),
+  fontWeight: "700",
+},
    heading: {
      fontSize: ms(16),
      fontWeight: "600",
@@ -1033,8 +1302,7 @@ setData((prevData) =>
    deleteBtn: {
      padding: 5,
      borderRadius: 20,
-     backgroundColor: "#FFECEC",
-   },
+       },
  
    replyWrapper: {
      flexDirection: "row",
@@ -1057,7 +1325,19 @@ setData((prevData) =>
      paddingVertical: vs(8),
      fontFamily: "PopinRegula",
    },
- 
+ actionIcons: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: hs(6),
+},
+
+iconBtn: {
+  width: ms(30),
+  height: ms(30),
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: ms(15),
+},
    sendBtn: {
      backgroundColor: Colors.light.red,
      paddingHorizontal: hs(14),

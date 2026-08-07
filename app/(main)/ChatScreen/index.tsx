@@ -224,37 +224,51 @@ const renderItem = useCallback(({ item }: any) => {
         Size={40}
       />
 <View>
-    <Text style={styles.headerTitle} numberOfLines={1}>
-  Chat with{" "}
- {(type==="community"||type==="property")?(
-  <Text style={{color:Colors.light.red}}>
-  {name?.length > 15 ? `${name.slice(0, 15)}...` : name}
-  </Text>):(
-    <TouchableOpacity
-    style={{marginTop:vs(10)}}
-    onPress={()=>{
-      setShowprofile(true)
-    }}
+  <View style={styles.headerRow}>
+  <Text style={styles.headerLabel}>Chat with </Text>
+
+  {type === "community" || type === "property" ? (
+    <Text
+      style={styles.headerName}
+      numberOfLines={1}
+      ellipsizeMode="tail"
     >
-       <Text style={[styles.headerTitle,{color:Colors.light.red}]}>
-  {name?.length > 15 ? `${name.slice(0, 15)}...` : name}
-  </Text>
+      {name?.length > 15 ? `${name.slice(0, 15)}...` : name}
+    </Text>
+  ) : (
+    <TouchableOpacity
+      activeOpacity={0.7}
+      style={styles.nameButton}
+      onPress={() => {
+        // Profile open logic
+      }}
+    >
+      <Text
+        style={styles.headerName}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {name?.length > 15 ? `${name.slice(0, 15)}...` : name}
+      </Text>
     </TouchableOpacity>
   )}
- 
-</Text>
-{(type==="community"||type==="property")&&(
+</View>
+
 <TouchableOpacity onPress={()=>{
  
- setShowpost(true)
-  
+ if (type==="community"||type==="property"){
+  setShowpost(true)
+ }
+ else{
+      setShowprofile(true)
+ }
   
 }}>
 <Text style={{color:Colors.light.textGray,fontSize:ms(12),marginLeft:hs(10)}}>
     <Text style={{color:Colors.light.red}}>{type}:</Text>{title}
   </Text>
   </TouchableOpacity>
-)}
+
  </View>
     </View>
     
@@ -360,12 +374,43 @@ const renderItem = useCallback(({ item }: any) => {
     paddingHorizontal:hs(20),
     paddingVertical:vs(10)
   },
-  headerTitle: {
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-    maxWidth: 200,
-  },
+headerTitle: {
+  marginLeft: 10,
+  fontSize: 16,
+  lineHeight: 40,
+  fontWeight: "600",
+  color: "#000",
+  maxWidth: 200,
+  paddingBottom: 2,
+  includeFontPadding: true,
+},
+headerRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginLeft: 10,
+  maxWidth: 250,
+},
+
+headerLabel: {
+  fontSize: 16,
+  lineHeight: 22,
+  fontWeight: "600",
+  color: "#000",
+  includeFontPadding: false,
+},
+
+headerName: {
+  fontSize: 16,
+  lineHeight: 22,
+  fontWeight: "600",
+  color: Colors.light.red,
+  includeFontPadding: false,
+  paddingBottom: 1,
+},
+
+nameButton: {
+  flexShrink: 1,
+  justifyContent: "center",
+},
  })
 export default ChatScreen;

@@ -37,15 +37,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 const index = () => {
   const user = useAppSelector(userdata);
-  
+
   const params = useLocalSearchParams();
   const [value, setValue] = useState("Sent");
   const insets = useSafeAreaInsets();
-  const [sendInquireyMessageApi, { isLoading: sendInquireyMessageLoading }] = useSendInquireyMessageApiMutation();
-  const [getInquireyMessagesApi, { isLoading: getInquireyMessagesLoading }] = useLazyGetInquireyMessagesApiQuery();
+  const [sendInquireyMessageApi, { isLoading: sendInquireyMessageLoading }] =
+    useSendInquireyMessageApiMutation();
+  const [getInquireyMessagesApi, { isLoading: getInquireyMessagesLoading }] =
+    useLazyGetInquireyMessagesApiQuery();
   const [message, setMessage] = useState("");
   const [ids, setIds] = useState<number[]>([]);
   const [showchatModal, setShowchatModal] = useState(false);
@@ -68,9 +73,9 @@ const index = () => {
   const [deleteType, setDeleteType] = useState<"sent" | "received" | null>(
     null
   );
-
+const [receivedHasMore, setReceivedHasMore] = useState(true);
+const receivedEndReachedLock = useRef(false);
   useEffect(() => {
-
     inquirymarkAsRead({
       userId: user.id,
       chatUserId: selectedChatProfile?.users_id,
@@ -104,17 +109,21 @@ const index = () => {
   const [expanded, setExpanded] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [showProfiles, setShowProfiles] = useState<Record<string, boolean>>({});
-const [sentExpanded, setSentExpanded] = useState<Record<string, boolean>>({});
-const [sentShowMore, setSentShowMore] = useState<Record<string, boolean>>({});
+  const [sentExpanded, setSentExpanded] = useState<Record<string, boolean>>({});
+  const [sentShowMore, setSentShowMore] = useState<Record<string, boolean>>({});
 
-const [receivedExpanded, setReceivedExpanded] = useState<
-  Record<string, boolean>
->({});
+  const [receivedExpanded, setReceivedExpanded] = useState<
+    Record<string, boolean>
+  >({});
 
-const [receivedShowMore, setReceivedShowMore] = useState<
-  Record<string, boolean>
->({});
-  const { isFetching, data, refetch: refetchSended } = useGetsendedInquieryQuery({
+  const [receivedShowMore, setReceivedShowMore] = useState<
+    Record<string, boolean>
+  >({});
+  const {
+    isFetching,
+    data,
+    refetch: refetchSended,
+  } = useGetsendedInquieryQuery({
     id: user.id,
     page: sendpage,
   });
@@ -160,7 +169,6 @@ const [receivedShowMore, setReceivedShowMore] = useState<
   };
   useEffect(() => {
     if (showchatModal && selectedChatProfile) {
-
       if (page === 1) {
         setChatInitialLoading(true);
       } else {
@@ -176,35 +184,27 @@ const [receivedShowMore, setReceivedShowMore] = useState<
       })
         .unwrap()
         .then((res: any) => {
-
           if (res.success) {
-
             const msgs = res?.data ? [...res.data].reverse() : [];
 
             if (page === 1) {
               setMessages(msgs);
-            }
-            else {
-              setMessages(prev => [...msgs, ...prev]);
+            } else {
+              setMessages((prev) => [...msgs, ...prev]);
             }
 
             setChatHasMore(res.pagination?.has_more ?? false);
           }
-
         })
         .finally(() => {
           setChatInitialLoading(false);
           setChatLoadingMore(false);
         });
-
     }
-
   }, [showchatModal, selectedChatProfile, page]);
-
 
   const handleSend = async () => {
     if (!message.trim()) return;
-
 
     const optimisticMsg = {
       msg_id: `temp-${Date.now()}`,
@@ -218,7 +218,6 @@ const [receivedShowMore, setReceivedShowMore] = useState<
     setMessages((prev) => [...prev, optimisticMsg]);
     setMessage("");
 
-   
     try {
       const res: any = await sendInquireyMessageApi({
         sender_id: user.id,
@@ -232,14 +231,12 @@ const [receivedShowMore, setReceivedShowMore] = useState<
 
       if (res.success && res.message) {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.msg_id === optimisticMsg.msg_id ? res.message : m
-          )
+          prev.map((m) => (m.msg_id === optimisticMsg.msg_id ? res.message : m))
         );
       }
     } catch (err) {
       console.error("Send message error:", err);
-     
+
       setMessages((prev) =>
         prev.filter((m) => m.msg_id !== optimisticMsg.msg_id)
       );
@@ -268,25 +265,44 @@ const [receivedShowMore, setReceivedShowMore] = useState<
             maxWidth: "80%",
           }}
         >
-          <Text style={{ color: isMe ? "#fff" : "#000", fontSize: 14, fontFamily: "PopinRegula" }}>
+          <Text
+            style={{
+              color: isMe ? "#fff" : "#000",
+              fontSize: 14,
+              fontFamily: "PopinRegula",
+            }}
+          >
             {item.msg_description || item.content}
           </Text>
         </View>
         {item.last_activity && (
-          <Text style={{ fontSize: 10, color: "#999", marginTop: 2, marginHorizontal: 4 }}>
-            {new Date(item.last_activity).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          <Text
+            style={{
+              fontSize: 10,
+              color: "#999",
+              marginTop: 2,
+              marginHorizontal: 4,
+            }}
+          >
+            {new Date(item.last_activity).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </Text>
         )}
       </View>
     );
   };
-  const { isFetching: recivedLoading, data: recivedData, refetch: refetchRecived } =
-    useGetRecivedInquieryQuery({ id: user.id, page: recivedpage });
+  const {
+    isFetching: recivedLoading,
+    data: recivedData,
+    refetch: refetchRecived,
+  } = useGetRecivedInquieryQuery({ id: user.id, page: recivedpage });
   const renderItem = ({ item }) => {
     const profileCount = item.profiles?.length || 0;
-   const inquiryId = String(item.inquiry_id);
+    const inquiryId = String(item.inquiry_id);
 
-  const showprofile = !!showProfiles[inquiryId];
+    const showprofile = !!showProfiles[inquiryId];
 
     return (
       <TouchableOpacity
@@ -300,20 +316,37 @@ const [receivedShowMore, setReceivedShowMore] = useState<
             borderColor: ids.includes(Number(item.inquiry_id))
               ? Colors.light.DarkGreen
               : "#eee",
-          },{
-            
-          }
+          },
+          {},
         ]}
         activeOpacity={0.9}
         onPress={() => handleSelect(item.inquiry_id)}
       >
-        {item.total_unread > 0 && <Text style={{ color: "white", height: 30, width: 30, textAlign: "center", backgroundColor: Colors.light.red, fontWeight: "bold", position: "absolute", top: 5, right: 10, fontSize: 12, padding: 5, borderRadius: 15 }}>{item.total_unread}</Text>}
+        {item.total_unread > 0 && (
+          <Text
+            style={{
+              color: "white",
+              height: 30,
+              width: 30,
+              textAlign: "center",
+              backgroundColor: Colors.light.red,
+              fontWeight: "bold",
+              position: "absolute",
+              top: 5,
+              right: 10,
+              fontSize: 12,
+              padding: 5,
+              borderRadius: 15,
+            }}
+          >
+            {item.total_unread}
+          </Text>
+        )}
         <View style={styles.topRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>
               Request for {item.inquiry_for || "Property"}
               {item.property_type && ` ${item.property_type}`}
-
               {item.inquiry_type && (
                 <Text style={styles.subTitle}> • {item.inquiry_type}</Text>
               )}
@@ -335,7 +368,8 @@ const [receivedShowMore, setReceivedShowMore] = useState<
             {item.min_price && item.max_price && (
               <View style={styles.tag}>
                 <Text style={styles.tagText}>
-                  ${formatPrice(item.min_price)} - ${formatPrice(item.max_price)}
+                  ${formatPrice(item.min_price)} - $
+                  {formatPrice(item.max_price)}
                 </Text>
               </View>
             )}
@@ -349,54 +383,69 @@ const [receivedShowMore, setReceivedShowMore] = useState<
           </View>
         )}
 
-
-        <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
+        <View
+          style={{
+            height: 1,
+            backgroundColor: Colors.light.lightGray,
+            marginVertical: vs(10),
+          }}
+        />
         {item.message && (
           <>
             <Text
-             numberOfLines={sentExpanded[inquiryId] ? undefined : 2}
-onTextLayout={(e) => {
-  const lines = e?.nativeEvent?.lines;
+              numberOfLines={sentExpanded[inquiryId] ? undefined : 2}
+              onTextLayout={(e) => {
+                const lines = e?.nativeEvent?.lines;
 
-  if (!Array.isArray(lines)) return;
+                if (!Array.isArray(lines)) return;
 
-  setSentShowMore((prev) => ({
-    ...prev,
-    [inquiryId]: lines.length > 2,
-  }));
-}}
+                setSentShowMore((prev) => ({
+                  ...prev,
+                  [inquiryId]: lines.length > 2,
+                }));
+              }}
               style={styles.message}
             >
               {item.message}
             </Text>
 
-         {sentShowMore[inquiryId] && (
+            {sentShowMore[inquiryId] && (
               <Text
                 style={styles.seeMore}
-            onPress={() => {
-  setSentExpanded((prev) => ({
-    ...prev,
-    [inquiryId]: !prev[inquiryId],
-  }));
-}}
+                onPress={() => {
+                  setSentExpanded((prev) => ({
+                    ...prev,
+                    [inquiryId]: !prev[inquiryId],
+                  }));
+                }}
               >
                 {sentExpanded[inquiryId] ? "See less" : "See more"}
               </Text>
             )}
-
           </>
         )}
-        <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
+        <View
+          style={{
+            height: 1,
+            backgroundColor: Colors.light.lightGray,
+            marginVertical: vs(10),
+          }}
+        />
         <TouchableOpacity
-           onPress={() => {
-    setShowProfiles((prev) => ({
-      ...prev,
-      [inquiryId]: !prev[inquiryId],
-    }));
-  }}
+          onPress={() => {
+            setShowProfiles((prev) => ({
+              ...prev,
+              [inquiryId]: !prev[inquiryId],
+            }));
+          }}
         >
-
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Text style={styles.subTitle}>
               {profileCount} {profileCount > 1 ? "Businesses" : "Business"}{" "}
               received your inquiry
@@ -407,88 +456,82 @@ onTextLayout={(e) => {
               color={Colors.light.DarkGreen}
             />
           </View>
-
         </TouchableOpacity>
         {showprofile && item.profiles?.length > 0 && (
           <View className="flex-1">
-         <FlashList
-  style={{ flex: 1, backgroundColor: "white" }}
-  data={item.profiles ?? []}
-  extraData={ids}
-  showsVerticalScrollIndicator={false}
-  keyExtractor={(profile, index) =>
-    profile.users_id?.toString() ?? `profile-${index}`
-  }
-  renderItem={({ item: profile }) => (
-    <TouchableOpacity
-      style={styles.card}
-      disabled={profile?.inquiry_closed}
-      onPress={() => {
-        setSelectedChatProfile(profile);
-        setSelectedChatItem({
-          ...item,
-          chat_type: "sent",
-        });
-        setShowchatModal(true);
-      }}
-    >
-      <View style={styles.topRow}>
-        <View style={{ position: "relative" }}>
-          {profile?.unread_count > 0 && (
-            <Text
-              style={{
-                position: "absolute",
-                top: -5,
-                left: -5,
-                zIndex: 10,
-                color: "white",
-                fontWeight: "bold",
-                fontSize: 11,
-                height: 22,
-                width: 22,
-                textAlign: "center",
-                backgroundColor: Colors.light.red,
-                borderRadius: 11,
-                paddingTop: 3,
-              }}
-            >
-              {profile?.unread_count}
-            </Text>
-          )}
+            <FlashList
+              style={{ flex: 1, backgroundColor: "white" }}
+              data={item.profiles ?? []}
+              extraData={ids}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(profile, index) =>
+                profile.users_id?.toString() ?? `profile-${index}`
+              }
+              renderItem={({ item: profile }) => (
+                <TouchableOpacity
+                  style={styles.card}
+                  disabled={profile?.inquiry_closed}
+                  onPress={() => {
+                    setSelectedChatProfile(profile);
+                    setSelectedChatItem({
+                      ...item,
+                      chat_type: "sent",
+                    });
+                    setShowchatModal(true);
+                  }}
+                >
+                  <View style={styles.topRow}>
+                    <View style={{ position: "relative" }}>
+                      {profile?.unread_count > 0 && (
+                        <Text
+                          style={{
+                            position: "absolute",
+                            top: -5,
+                            left: -5,
+                            zIndex: 10,
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: 11,
+                            height: 22,
+                            width: 22,
+                            textAlign: "center",
+                            backgroundColor: Colors.light.red,
+                            borderRadius: 11,
+                            paddingTop: 3,
+                          }}
+                        >
+                          {profile?.unread_count}
+                        </Text>
+                      )}
 
-          <CircleImage
-            Size={45}
-            source={{ uri: ImageFormater(profile?.logo) }}
-          />
-        </View>
+                      <CircleImage
+                        Size={45}
+                        source={{ uri: ImageFormater(profile?.logo) }}
+                      />
+                    </View>
 
-        <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.name}>
-            {profile?.business_name}
-          </Text>
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <Text style={styles.name}>{profile?.business_name}</Text>
 
-          <Text style={styles.address}>
-            {profile?.address}
-          </Text>
-        </View>
-      </View>
+                      <Text style={styles.address}>{profile?.address}</Text>
+                    </View>
+                  </View>
 
-      {profile?.inquiry_closed && (
-        <View style={styles.closedBadge}>
-          <Text style={styles.closedText}>Inquiry Closed</Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  )}
-/>
+                  {profile?.inquiry_closed && (
+                    <View style={styles.closedBadge}>
+                      <Text style={styles.closedText}>Inquiry Closed</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
+            />
           </View>
         )}
       </TouchableOpacity>
     );
   };
   const renderrecived = ({ item }) => {
-
-   const inquiryId = String(item.inquiry_id);
+    const inquiryId = String(item.inquiry_id);
     return (
       <TouchableOpacity
         style={[
@@ -527,11 +570,9 @@ onTextLayout={(e) => {
               <Text style={styles.senderInfo}>✉️ {item.sender_email}</Text>
             )}
           </View>
-            {item.status==="Deleted"&&(
-            <Text style={{color:Colors.light.red}}>
-              Inquiery closed
-            </Text>
-            )}
+          {item.status === "Deleted" && (
+            <Text style={{ color: Colors.light.red }}>Inquiery closed</Text>
+          )}
         </View>
         {/* TOP ROW */}
         <View style={styles.header}>
@@ -548,58 +589,60 @@ onTextLayout={(e) => {
           </Text>
         </View>
 
-
         {item.address && <Text style={styles.address}>📍 {item.address}</Text>}
-        <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
+        <View
+          style={{
+            height: 1,
+            backgroundColor: Colors.light.lightGray,
+            marginVertical: vs(10),
+          }}
+        />
 
         {item.message && (
           <>
             <Text
-             numberOfLines={receivedExpanded[inquiryId] ? undefined : 2}
- onTextLayout={(e) => {
-  const lines = e?.nativeEvent?.lines;
+              numberOfLines={receivedExpanded[inquiryId] ? undefined : 2}
+              onTextLayout={(e) => {
+                const lines = e?.nativeEvent?.lines;
 
-  if (!Array.isArray(lines)) return;
+                if (!Array.isArray(lines)) return;
 
-  if (!receivedShowMore[inquiryId]) {
-    setReceivedShowMore((prev) => ({
-      ...prev,
-      [inquiryId]: lines.length > 2,
-    }));
-  }
-}}
+                if (!receivedShowMore[inquiryId]) {
+                  setReceivedShowMore((prev) => ({
+                    ...prev,
+                    [inquiryId]: lines.length > 2,
+                  }));
+                }
+              }}
               style={styles.message}
             >
               💬 {item.message}
             </Text>
 
-           {receivedShowMore[inquiryId] && (
+            {receivedShowMore[inquiryId] && (
               <Text
                 style={styles.seeMore}
                 onPress={() => {
-                 setReceivedExpanded((prev) => ({
-  ...prev,
-  [inquiryId]: !prev[inquiryId],
-}));
+                  setReceivedExpanded((prev) => ({
+                    ...prev,
+                    [inquiryId]: !prev[inquiryId],
+                  }));
                 }}
               >
-             {receivedExpanded[inquiryId] ? "See less" : "See more"}
+                {receivedExpanded[inquiryId] ? "See less" : "See more"}
               </Text>
             )}
-
           </>
         )}
 
-
         <TouchableOpacity
           style={styles.replyBtn}
-              disabled={item?.inquiry_closed || item.status === "Deleted"}
+          disabled={item?.inquiry_closed || item.status === "Deleted"}
           onPress={() => {
             setSelectedChatProfile({
               business_name: item.sender_name,
               logo: item.sender_image,
               users_id: item.sender_id,
-
             });
             setSelectedChatItem({
               ...item,
@@ -611,17 +654,19 @@ onTextLayout={(e) => {
           <MaterialIcons name="reply" size={18} color="#fff" />
           <Text style={styles.replyBtnText}>Reply</Text>
           {item.unread_count > 0 && (
-            <View style={{
-              backgroundColor: 'red',
-              borderRadius: 10,
-              minWidth: 20,
-              height: 20,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 5,
-              marginLeft: 6,
-            }}>
-              <Text style={{ color: '#fff', fontSize: 11, fontWeight: 'bold' }}>
+            <View
+              style={{
+                backgroundColor: "red",
+                borderRadius: 10,
+                minWidth: 20,
+                height: 20,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 5,
+                marginLeft: 6,
+              }}
+            >
+              <Text style={{ color: "#fff", fontSize: 11, fontWeight: "bold" }}>
                 {item.unread_count}
               </Text>
             </View>
@@ -640,15 +685,38 @@ onTextLayout={(e) => {
       }
     }
   }, [data]);
-  useEffect(() => {
-    if (recivedData?.success) {
-      if (recivedpage === 1) {
-        setrecived(recivedData?.data || []);
-      } else {
-        setrecived((prev) => [...prev, ...(recivedData?.data || [])]);
-      }
-    }
-  }, [recivedData]);
+useEffect(() => {
+  if (!recivedData?.success) return;
+
+  const newItems = recivedData?.data ?? [];
+
+  if (recivedpage === 1) {
+    setrecived(newItems);
+  } else {
+    setrecived((prev: any[]) => {
+      const existingIds = new Set(
+        prev.map((item) => Number(item.inquiry_id))
+      );
+
+      const uniqueItems = newItems.filter(
+        (item: any) =>
+          !existingIds.has(Number(item.inquiry_id))
+      );
+
+      return [...prev, ...uniqueItems];
+    });
+  }
+
+  // Backend has_more bhej raha ho to usko prefer karo.
+  // Warna current page ke 10 items ko fallback samjho.
+  const hasMore =
+    recivedData?.pagination?.has_more ??
+    recivedData?.has_more ??
+    newItems.length >= 10;
+
+  setReceivedHasMore(Boolean(hasMore));
+  receivedEndReachedLock.current = false;
+}, [recivedData, recivedpage]);
   const componenet1 = (
     <View style={{ marginTop: vs(10), flex: 1 }}>
       <Text>Your inquiries</Text>
@@ -687,37 +755,37 @@ onTextLayout={(e) => {
             </Text>
           </View>
         ) : (
-        <FlashList
-  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
-  data={sended ?? []}
-  extraData={ids}
-  showsVerticalScrollIndicator={false}
-  renderItem={renderItem}
-  keyExtractor={(item) => item.inquiry_id?.toString()}
-  onEndReachedThreshold={1}
-  onEndReached={() => {
-    if (!isFetching && sended?.length > 9) {
-      setsendPage((prev) => prev + 1);
-    }
-  }}
-  ListFooterComponent={
-    isFetching && sendpage > 1 ? (
-      <ActivityIndicator size="small" />
-    ) : null
-  }
-  refreshControl={
-    <RefreshControl
-      refreshing={isFetching && sendpage === 1}
-      onRefresh={() => {
-        if (sendpage === 1) {
-          refetchSended();
-        } else {
-          setsendPage(1);
-        }
-      }}
-    />
-  }
-/>
+          <FlashList
+            style={{ flex: 1, backgroundColor: "#F4F0F0" }}
+            data={sended ?? []}
+            extraData={ids}
+            showsVerticalScrollIndicator={false}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.inquiry_id?.toString()}
+            onEndReachedThreshold={1}
+            onEndReached={() => {
+              if (!isFetching && sended?.length > 9) {
+                setsendPage((prev) => prev + 1);
+              }
+            }}
+            ListFooterComponent={
+              isFetching && sendpage > 1 ? (
+                <ActivityIndicator size="small" />
+              ) : null
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={isFetching && sendpage === 1}
+                onRefresh={() => {
+                  if (sendpage === 1) {
+                    refetchSended();
+                  } else {
+                    setsendPage(1);
+                  }
+                }}
+              />
+            }
+          />
         )}
       </View>
     </View>
@@ -784,27 +852,44 @@ onTextLayout={(e) => {
           </View>
           <View className="flex-1">
         <FlashList
-  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
+  style={{
+    flex: 1,
+    backgroundColor: "#F4F0F0",
+  }}
   data={recived ?? []}
   extraData={recivesIds}
   showsVerticalScrollIndicator={false}
   renderItem={renderrecived}
-  keyExtractor={(item) => item.inquiry_id?.toString()}
-  onEndReachedThreshold={1}
+  keyExtractor={(item) =>
+    item.inquiry_id?.toString()
+  }
+  onEndReachedThreshold={0.3}
   onEndReached={() => {
-    if (!isFetching && recived?.length > 9) {
-      setrecivedPage((prev) => prev + 1);
+    if (
+      receivedEndReachedLock.current ||
+      recivedLoading ||
+      !receivedHasMore
+    ) {
+      return;
     }
+
+    receivedEndReachedLock.current = true;
+    setrecivedPage((prev) => prev + 1);
   }}
   ListFooterComponent={
-    isFetching && recivedpage > 1 ? (
+    recivedLoading && recivedpage > 1 ? (
       <ActivityIndicator size="small" />
     ) : null
   }
   refreshControl={
     <RefreshControl
-      refreshing={recivedLoading}
+      refreshing={
+        recivedLoading && recivedpage === 1
+      }
       onRefresh={() => {
+        setReceivedHasMore(true);
+        receivedEndReachedLock.current = false;
+
         if (recivedpage === 1) {
           refetchRecived();
         } else {
@@ -826,12 +911,11 @@ onTextLayout={(e) => {
 
     if (!inquiryId) return;
 
-
     if (!sended.length && !recived.length) return;
 
     const foundItem =
-      sended.find(item => Number(item.inquiry_id) === inquiryId) ||
-      recived.find(item => Number(item.inquiry_id) === inquiryId);
+      sended.find((item) => Number(item.inquiry_id) === inquiryId) ||
+      recived.find((item) => Number(item.inquiry_id) === inquiryId);
 
     setSelectedChatProfile({
       business_name: params.name || params.sender_name,
@@ -845,12 +929,10 @@ onTextLayout={(e) => {
       setSelectedChatItem({ inquiry_id: inquiryId });
     }
 
-
     setPage(1);
     setMessages([]);
     setChatHasMore(true);
     setShowchatModal(true);
-
   }, [sended, recived]);
   return (
     <View className="flex-1 bg-white" style={{ backgroundColor: "#F4F0F0" }}>
@@ -899,198 +981,275 @@ onTextLayout={(e) => {
                 borderRadius: 12,
               }}
             >
-              <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 20 }}>
+              <Text
+                style={{ fontSize: 16, fontWeight: "600", marginBottom: 20 }}
+              >
                 Are you sure you want to delete{" "}
-                {deleteType === "sent" ? ids.length : recivesIds.length} inquiries?
+                {deleteType === "sent" ? ids.length : recivesIds.length}{" "}
+                inquiries?
               </Text>
 
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
                 <TouchableOpacity onPress={() => setShowConfirm(false)}>
-                  <Text style={{ color: "gray", fontWeight: "600" }}>Cancel</Text>
+                  <Text style={{ color: "gray", fontWeight: "600" }}>
+                    Cancel
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={confirmDelete}>
-                  <Text style={{ color: Colors.light.red, fontWeight: "700" }}>Delete</Text>
+                  <Text style={{ color: Colors.light.red, fontWeight: "700" }}>
+                    Delete
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         )}
-        <Modal visible={showchatModal} animationType="slide" transparent onRequestClose={() => {
-          setShowchatModal(false);
-          setMessages([]);
-          setPage(1);
-          setChatHasMore(true);
-        }}>
-          <SafeAreaView
-                                                            style={{ flex: 1 }}
-                                                            edges={[ "bottom", "left", "right"]}
-                                                          >
-                                                              <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={0}
-    >
-          <View style={{ flex: 1, backgroundColor: "#F4F0F0" }}>
+        <Modal
+          visible={showchatModal}
+          animationType="slide"
+          transparent
+          onRequestClose={() => {
+            setShowchatModal(false);
+            setMessages([]);
+            setPage(1);
+            setChatHasMore(true);
+          }}
+        >
+          <SafeAreaView style={{ flex: 1 }} edges={["bottom", "left", "right"]}>
+            <KeyboardAvoidingView
+              style={{ flex: 1 }}
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={0}
+            >
+              <View style={{ flex: 1, backgroundColor: "#F4F0F0" }}>
+                {selectedChatProfile && (
+                  <View
+                    style={{
+                      backgroundColor: "#fff",
+                      paddingBottom: vs(12),
+                      borderBottomLeftRadius: 16,
+                      borderBottomRightRadius: 16,
+                      elevation: 3,
+                      paddingTop: insets.top,
+                    }}
+                  >
+                    <View
+                      className="flex-row items-center gap-3"
+                      style={{
+                        marginHorizontal: hs(10),
+                        paddingTop: vs(10),
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          setShowchatModal(false);
+                          setMessages([]);
+                          setPage(1);
+                          setChatHasMore(true);
+                        }}
+                      >
+                        <Back />
+                      </TouchableOpacity>
 
-
-            {selectedChatProfile && (
-              <View style={{ backgroundColor: '#fff', paddingBottom: vs(12), borderBottomLeftRadius: 16, borderBottomRightRadius: 16, elevation: 3,paddingTop:insets.top }}>
-                <View className="flex-row items-center gap-3" style={{ marginHorizontal: hs(10), paddingTop: vs(10), justifyContent: 'space-between' }}>
-                  <TouchableOpacity onPress={() => {
-                    setShowchatModal(false);
-                    setMessages([]);
-                    setPage(1);
-                    setChatHasMore(true);
-                  }}>
-                    <Back />
-                  </TouchableOpacity>
-
-
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.name}>{selectedChatProfile?.business_name}</Text>
-                  </View>
-                  <CircleImage
-                    Size={45}
-                    source={{ uri: ImageFormater(selectedChatProfile?.logo) }}
-                  />
-                  {selectedChatProfile?.inquiry_closed && (
-                    <View style={styles.closedBadge}>
-                      <Text style={styles.closedText}>Closed</Text>
-                    </View>
-                  )}
-                </View>
-
-                {selectedChatItem && (
-                  <View style={{ marginHorizontal: hs(10), marginTop: vs(10), paddingTop: vs(8), borderTopWidth: 1, borderColor: '#eee' }}>
-                    <Text style={styles.title}>
-                      Request for {selectedChatItem.inquiry_for || "Property"}
-                      {selectedChatItem.property_type && ` ${selectedChatItem.property_type}`}
-
-                      {selectedChatItem.inquiry_type && (
-                        <Text style={styles.subTitle}> • {selectedChatItem.inquiry_type}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.name}>
+                          {selectedChatProfile?.business_name}
+                        </Text>
+                      </View>
+                      <CircleImage
+                        Size={45}
+                        source={{
+                          uri: ImageFormater(selectedChatProfile?.logo),
+                        }}
+                      />
+                      {selectedChatProfile?.inquiry_closed && (
+                        <View style={styles.closedBadge}>
+                          <Text style={styles.closedText}>Closed</Text>
+                        </View>
                       )}
-                    </Text>
-                    {selectedChatItem.address && (
-                      <Text style={styles.address}>📍 {selectedChatItem.address}</Text>
-                    )}
-                    {(selectedChatItem.property_type || selectedChatItem.min_price || selectedChatItem.min_bed) && (
-                      <View style={styles.infoRow}>
-                        {selectedChatItem.property_type && (
-                          <View style={styles.tag}>
-                            <Text style={styles.tagText}>{selectedChatItem.property_type}</Text>
+                    </View>
+
+                    {selectedChatItem && (
+                      <View
+                        style={{
+                          marginHorizontal: hs(10),
+                          marginTop: vs(10),
+                          paddingTop: vs(8),
+                          borderTopWidth: 1,
+                          borderColor: "#eee",
+                        }}
+                      >
+                        <Text style={styles.title}>
+                          Request for{" "}
+                          {selectedChatItem.inquiry_for || "Property"}
+                          {selectedChatItem.property_type &&
+                            ` ${selectedChatItem.property_type}`}
+                          {selectedChatItem.inquiry_type && (
+                            <Text style={styles.subTitle}>
+                              {" "}
+                              • {selectedChatItem.inquiry_type}
+                            </Text>
+                          )}
+                        </Text>
+                        {selectedChatItem.address && (
+                          <Text style={styles.address}>
+                            📍 {selectedChatItem.address}
+                          </Text>
+                        )}
+                        {(selectedChatItem.property_type ||
+                          selectedChatItem.min_price ||
+                          selectedChatItem.min_bed) && (
+                          <View style={styles.infoRow}>
+                            {selectedChatItem.property_type && (
+                              <View style={styles.tag}>
+                                <Text style={styles.tagText}>
+                                  {selectedChatItem.property_type}
+                                </Text>
+                              </View>
+                            )}
+                            {selectedChatItem.min_price &&
+                              selectedChatItem.max_price && (
+                                <View style={styles.tag}>
+                                  <Text style={styles.tagText}>
+                                    ${formatPrice(selectedChatItem.min_price)} -
+                                    ${formatPrice(selectedChatItem.max_price)}
+                                  </Text>
+                                </View>
+                              )}
+                            {selectedChatItem.min_bed && (
+                              <View style={styles.tag}>
+                                <Text style={styles.tagText}>
+                                  {selectedChatItem.min_bed}-
+                                  {selectedChatItem.max_bed} Beds
+                                </Text>
+                              </View>
+                            )}
                           </View>
                         )}
-                        {selectedChatItem.min_price && selectedChatItem.max_price && (
-                          <View style={styles.tag}>
-                            <Text style={styles.tagText}>
-                              ${formatPrice(selectedChatItem.min_price)} - ${formatPrice(selectedChatItem.max_price)}
+                        <View
+                          style={{
+                            height: 1,
+                            backgroundColor: Colors.light.lightGray,
+                            marginVertical: vs(10),
+                          }}
+                        />
+                        {selectedChatItem.message && (
+                          <>
+                            <Text
+                              numberOfLines={expanded ? undefined : 2}
+                              onTextLayout={(e) => {
+                                const lines = e?.nativeEvent?.lines;
+
+                                if (!Array.isArray(lines)) return;
+
+                                setShowMore(lines.length > 2);
+                              }}
+                              style={styles.message}
+                            >
+                              {selectedChatItem.message}
                             </Text>
-                          </View>
-                        )}
-                        {selectedChatItem.min_bed && (
-                          <View style={styles.tag}>
-                            <Text style={styles.tagText}>
-                              {selectedChatItem.min_bed}-{selectedChatItem.max_bed} Beds
-                            </Text>
-                          </View>
+
+                            {showMore && (
+                              <Text
+                                style={styles.seeMore}
+                                onPress={() => setExpanded(!expanded)}
+                              >
+                                {expanded ? "See less" : "See more"}
+                              </Text>
+                            )}
+                          </>
                         )}
                       </View>
                     )}
-                    <View style={{ height: 1, backgroundColor: Colors.light.lightGray, marginVertical: vs(10) }} />
-                    {selectedChatItem.message && (
-                      <>
+                  </View>
+                )}
 
-                        <Text
-                          numberOfLines={expanded ? undefined : 2}
-                         onTextLayout={(e) => {
-  const lines = e?.nativeEvent?.lines;
-
-  if (!Array.isArray(lines)) return;
-
-  setShowMore(lines.length > 2);
-}}
-                          style={styles.message}
-                        >
-                          {selectedChatItem.message}
-                        </Text>
-
-                        {showMore && (
-                          <Text
-                            style={styles.seeMore}
-                            onPress={() => setExpanded(!expanded)}
-                          >
-                            {expanded ? "See less" : "See more"}
-                          </Text>
-                        )}
-                      </>
+                {chatInitialLoading ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ActivityIndicator
+                      size="large"
+                      color={Colors.light.DarkGreen}
+                    />
+                  </View>
+                ) : (
+                  <>
+                    {chatLoadingMore && (
+                      <View
+                        style={{ paddingVertical: 8, alignItems: "center" }}
+                      >
+                        <ActivityIndicator
+                          size="small"
+                          color={Colors.light.DarkGreen}
+                        />
+                      </View>
                     )}
-                  </View>
+                    <View className="flex-1">
+                      <FlashList
+                        ref={chatListRef}
+                        style={{ flex: 1, backgroundColor: "#F4F0F0" }}
+                        data={messages}
+                        renderItem={renderChatMessage}
+                        keyExtractor={(item: any) => item.msg_id?.toString()}
+                        onEndReachedThreshold={0.1}
+                        onScroll={(e: any) => {
+                          const offset = e.nativeEvent.contentOffset.y;
+
+                          if (
+                            offset <= 0 &&
+                            chatHasMore &&
+                            !chatLoadingMore &&
+                            !chatInitialLoading
+                          ) {
+                            setPage((prev) => prev + 1);
+                          }
+                        }}
+                      />
+                    </View>
+                  </>
                 )}
-              </View>
-            )}
+                <View className="flex-row p-3 border-t border-gray-200 mb-1 ">
+                  <TextInput
+                    value={message}
+                    onChangeText={setMessage}
+                    placeholder="Type message..."
+                    placeholderTextColor={Colors.light.textGray}
+                    className="flex-1 rounded-full px-5 text-lg"
+                    style={{
+                      borderColor: Colors.light.DarkGreen,
+                      borderWidth: 1,
+                      height: vs(52),
+                    }}
+                  />
 
-            {chatInitialLoading ? (
-              <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <ActivityIndicator size="large" color={Colors.light.DarkGreen} />
-              </View>
-            ) : (
-              <>
-                {chatLoadingMore && (
-                  <View style={{ paddingVertical: 8, alignItems: "center" }}>
-                    <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
-                  </View>
-                )}
-                <View className="flex-1">
-               <FlashList
-  ref={chatListRef}
-  style={{ flex: 1, backgroundColor: "#F4F0F0" }}
-  data={messages}
-  renderItem={renderChatMessage}
-  keyExtractor={(item: any) => item.msg_id?.toString()}
-  onEndReachedThreshold={0.1}
-
-  onScroll={(e: any) => {
-    const offset = e.nativeEvent.contentOffset.y;
-
-    if (
-      offset <= 0 &&
-      chatHasMore &&
-      !chatLoadingMore &&
-      !chatInitialLoading
-    ) {
-      setPage((prev) => prev + 1);
-    }
-  }}
-
-/>
+                  <TouchableOpacity
+                    onPress={handleSend}
+                    className="ml-2  px-3 justify-center rounded-full"
+                  >
+                    <Send height={30} width={30} />
+                  </TouchableOpacity>
                 </View>
-              </>
-            )}
-            <View className="flex-row p-3 border-t border-gray-200 mb-1 ">
-              <TextInput
-                value={message}
-                onChangeText={setMessage}
-                placeholder="Type message..."
-                placeholderTextColor={Colors.light.textGray}
-                className="flex-1 rounded-full px-5 text-lg"
-                style={{ borderColor: Colors.light.DarkGreen, borderWidth: 1, height: vs(52) }}
-              />
-
-              <TouchableOpacity
-                onPress={handleSend}
-                className="ml-2  px-3 justify-center rounded-full"
-
-              >
-                <Send height={30} width={30} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          </KeyboardAvoidingView>
+              </View>
+            </KeyboardAvoidingView>
           </SafeAreaView>
         </Modal>
       </View>
-      <Loading isLoading={loadingRecivedDelet || isLoading} text="Deleting ..." />
+      <Loading
+        isLoading={loadingRecivedDelet || isLoading}
+        text="Deleting ..."
+      />
     </View>
   );
 };

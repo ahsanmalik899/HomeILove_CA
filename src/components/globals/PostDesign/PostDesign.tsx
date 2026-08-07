@@ -26,6 +26,7 @@ import ThreeDots from "@assets/icons/threedots.svg";
 import Liked from "@assets/icons/ThumbUpRed.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
+import { MaterialIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import CommentInput from "@src/components/globals/CommentInput";
@@ -598,49 +599,80 @@ const handleRefresh = async () => {
               marginHorizontal: hs(10),
             }}
           />
-          {item.user_id !== user.id && (
-            <View style={{ alignItems: "flex-end", marginTop: vs(10) }}>
-              {item.users_id!==user.id&&(
-              <FollowButton
-                id={item.receiver_id}
-                status={item.connection_status}
-                onPress={(status) => {
+          {item.user_id !== user.id && item.users_id !== user.id && (
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: vs(10),
+    }}
+  >
+    {/* LEFT BADGE */}
+    <View>
+      {item.post_type === "Trending" && (
+        <View style={styles.trendingBadge}>
+          <MaterialIcons
+            name="trending-up"
+            size={15}
+            color="#fff"
+          />
 
-                  setStatus(status)
+          <Text style={styles.badgeText}>
+            Trending
+          </Text>
+        </View>
+      )}
 
-                  if (user.user_type === "Business") {
-                    setSelectedReceiver(item);
+      {item.post_type === "Promoted" && (
+        <View style={styles.promotedBadge}>
+          <MaterialIcons
+            name="campaign"
+            size={15}
+            color="#fff"
+          />
 
+          <Text style={styles.badgeText}>
+            Promoted
+          </Text>
+        </View>
+      )}
+    </View>
 
-                    if (status === "Connect") {
-                      setShowConnection(true);
-                    }
-                    else {
-                      requestSend({
-                        reciverProfile: item,
-                        sender_ProfileId: "",
-                        sender_type: "Business",
-                        statusi: status,
-                      });
-                    }
-                  } else {
-                    setStatus(status)
-                    requestSend({
-                      reciverProfile: item,
-                      sender_ProfileId: "",
-                      sender_type: "Private",
-                      statusi: status,
-                    });
+    {/* RIGHT FOLLOW BUTTON */}
+    <FollowButton
+      id={item.receiver_id}
+      status={item.connection_status}
+      onPress={(status) => {
+        setStatus(status);
 
-                  }
-                }
+        if (user.user_type === "Business") {
+          setSelectedReceiver(item);
 
+          if (status === "Connect") {
+            setShowConnection(true);
+          } else {
+            requestSend({
+              reciverProfile: item,
+              sender_ProfileId: "",
+              sender_type: "Business",
+              statusi: status,
+            });
+          }
+        } else {
+          setStatus(status);
 
-
-                }
-              />
-              )}
-            </View>)}
+          requestSend({
+            reciverProfile: item,
+            sender_ProfileId: "",
+            sender_type: "Private",
+            statusi: status,
+          });
+        }
+      }}
+    />
+  </View>
+)}
           {menuVisible && (
             <TouchableOpacity
               activeOpacity={1}
@@ -857,13 +889,13 @@ const handleRefresh = async () => {
                   >
                     {item.is_liked ?
                       <Liked
-                        width={22}
-                        height={22}
+                        width={28}
+                        height={28}
                       />
                       :
                       <Like
-                        width={22}
-                        height={22}
+                        width={28}
+                        height={28}
 
                       />}
                   </TouchableOpacity>
@@ -882,7 +914,7 @@ const handleRefresh = async () => {
                   style={{ paddingLeft: hs(10) }}
                 >
                   <TouchableOpacity>
-                    <Comment />
+                    <Comment height={28} width={28}/>
                   </TouchableOpacity>
                   <Text
                     style={{
@@ -1143,6 +1175,36 @@ const handleRefresh = async () => {
                   gap: vs(5),
                 }}
               >
+                {item.post_type === "Trending" && (
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: Colors.light.DarkGreen,
+      paddingHorizontal: hs(9),
+      paddingVertical: vs(5),
+      borderRadius: ms(15),
+    }}
+  >
+    <MaterialIcons
+      name="trending-up"
+      size={14}
+      color="#fff"
+    />
+
+    <Text
+      style={{
+        color: "#fff",
+        fontSize: ms(11),
+        fontWeight: "600",
+        fontFamily: "PopinRegula",
+        marginLeft: hs(3),
+      }}
+    >
+      Trending
+    </Text>
+  </View>
+)}
                 {item.saleprice_type === "Reduced Price" && (
                   <Text
                     style={{
@@ -1173,13 +1235,13 @@ const handleRefresh = async () => {
                   >
                     {item.is_liked ?
                       <Liked
-                        width={22}
-                        height={22}
+                        width={28}
+                        height={28}
                       />
                       :
                       <Like
-                        width={22}
-                        height={22}
+                        width={28}
+                        height={28}
 
                       />}
                   </TouchableOpacity>
@@ -1198,7 +1260,7 @@ const handleRefresh = async () => {
                   style={{ paddingLeft: hs(10) }}
                 >
                   <TouchableOpacity>
-                    <Comment />
+                    <Comment  heigh={28} width={28}/>
                   </TouchableOpacity>
                   <Text
                     style={{
@@ -2077,7 +2139,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
+trendingBadge: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: hs(4),
+  backgroundColor: Colors.light.DarkGreen,
+  paddingHorizontal: hs(10),
+  paddingVertical: vs(5),
+  borderRadius: ms(20),
+},
 
+promotedBadge: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: hs(4),
+backgroundColor: "#356fce",
+  paddingHorizontal: hs(10),
+  paddingVertical: vs(5),
+  borderRadius: ms(20),
+},
+
+badgeText: {
+  color: "#fff",
+  fontSize: ms(11),
+  fontWeight: "600",
+  fontFamily: "PopinRegula",
+},
 
 
 

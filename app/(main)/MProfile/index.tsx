@@ -561,12 +561,13 @@ const Index = () => {
         isLoading={isLoading || deleting || SavePastLoading || deletPastLoading}
         text="Loading.."
       />
-      <Modal visible={showoption} animationType="fade" transparent={true}>
+      <Modal visible={showoption} animationType="fade" transparent={true} onRequestClose={()=>setShowoption(false)}>
         <SafeAreaView
           style={{ flex: 1 }}
           edges={[ "bottom", "left", "right"]}
         >
           <ScrollView>
+            <HeaderWithBack onBackpress={()=>setShowoption(false)}/>
             <View
               style={{
                 flex: 1,

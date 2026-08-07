@@ -272,49 +272,50 @@ setShowConnection(false);
     );
   }
 };
-  const submitReview = async (values: {
-    review: any;
-    imp_facts: any;
-    sender_profile_type: any;
-    sender_profile_id?: any;
-  }) => {
-    try {
-      const body = {
-        sender_id: user.id,
-        sender_profile_id: values.sender_profile_id,
-        sender_profile_type: values.sender_profile_type,
+const submitReview = async (values: {
+  review: any;
+  imp_facts: any;
+  sender_profile_type: any;
+  sender_profile_id?: any;
+}) => {
+  if (postrating < 1) {
+    renderToastError("Please select at least one star");
+    return;
+  }
 
-        receiver_id: profile.users_id,
-        receiver_profile_id: profile.id,
-        receiver_profile_type: profile.type,
+  try {
+    const body = {
+      sender_id: user.id,
+      sender_profile_id: values.sender_profile_id,
+      sender_profile_type: values.sender_profile_type,
 
-        review: values.review,
-        imp_facts: values.imp_facts,
-        rating: postrating,
-      };
+      receiver_id: profile.users_id,
+      receiver_profile_id: profile.id,
+      receiver_profile_type: profile.type,
 
-      const res = await writeReview(body).unwrap();
+      review: values.review,
+      imp_facts: values.imp_facts,
+      rating: postrating,
+    };
 
-      // API returned success
-      if (res.success) {
-        renderToastSuccess(res.message);
-        setReviewModal(false)
-      } else {
-        // This shouldn't happen with unwrap(), but just in case
-        renderToastError(res.message || "Review submission failed");
-      }
-    } catch (error) {
-      // RTK Query unwrap throws here for 4xx/5xx responses
-      const errorMsg =
-        error?.data?.message || // your backend message
-        error?.error || // fallback
-        "Review submission failed";
+    const res = await writeReview(body).unwrap();
 
-      renderToastError(errorMsg);
-    } finally {
-      setReview(false);
+    if (res.success) {
+      renderToastSuccess(res.message);
+      setReviewModal(false);
+    } else {
+      renderToastError(
+        res.message || "Review submission failed"
+      );
     }
-  };
+  } catch (error: any) {
+    renderToastError(
+      error?.data?.message ||
+        error?.error ||
+        "Review submission failed"
+    );
+  }
+};
  const toggleSave = async () => {
   const nextSavedValue = !isSaved;
 

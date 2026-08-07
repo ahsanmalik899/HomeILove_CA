@@ -63,7 +63,7 @@ const index = ({ data, isfetching }: postDataType) => {
                         <View className="flex-row">
                             <View className="flex-row items-center ">
                                 <TouchableOpacity>
-                                    <Like />
+                                    <Like heigh={28} width={28}/>
                                 </TouchableOpacity>
                                 <Text
                                     style={{ color: Colors.light.DarkGreen, paddingLeft: hs(2),fontFamily: "PopinRegula", }}
@@ -76,7 +76,7 @@ const index = ({ data, isfetching }: postDataType) => {
                                 style={{ paddingLeft: hs(10) }}
                             >
                                 <TouchableOpacity>
-                                    <Comment />
+                                    <Comment height={28} width={28}/>
                                 </TouchableOpacity>
                                 <Text
                                     style={{ color: Colors.light.DarkGreen, paddingLeft: hs(2),fontFamily: "PopinRegula", }}

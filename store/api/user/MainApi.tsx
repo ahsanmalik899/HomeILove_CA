@@ -1069,6 +1069,13 @@ sendBlockedProfileMessage: builder.mutation({
         body,
     }),
 }),
+editCommentApi: builder.mutation({
+  query: (body) => ({
+    url: "/editCommentApi",
+    method: "POST",
+    body,
+  }),
+}),
   }),
 });
 
@@ -1105,6 +1112,7 @@ export const {
   useGetProfileListingQuery,
   useGetSingleProfileQuery,
   useGetProfileNamesQuery,
+ useEditCommentApiMutation,
   useGetDeveloperNamesQuery,
   useGetTrendingProfilesQuery,
   useInsertInquiryMutation,

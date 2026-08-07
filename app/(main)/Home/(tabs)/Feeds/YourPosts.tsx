@@ -275,13 +275,13 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
                 >
                   {alreadyLiked ?
                     <Liked
-                      width={22}
-                      height={22}
+                      width={28}
+                      height={28}
                     />
                     :
                     <Like
-                      width={22}
-                      height={22}
+                      width={28}
+                      height={28}
 
                     />}
                 </TouchableOpacity>
@@ -300,7 +300,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
                 style={{ paddingLeft: hs(10) }}
               >
                 <TouchableOpacity>
-                  <Comment />
+                  <Comment heigh={28} width={28}/>
                 </TouchableOpacity>
                 <Text
                   style={{
