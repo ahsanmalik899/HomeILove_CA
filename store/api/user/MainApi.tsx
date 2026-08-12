@@ -39,7 +39,7 @@ export const MainApi = createApi({
     "YourPosts",
     "singlePost"
   ],
-  baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.us/api/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://homeilove.co.uk/api/" }),
   endpoints: (builder) => ({
     getYourpost: builder.query<FeedResponse, GetPostType>({
       query: ({ userid, page }) => ({

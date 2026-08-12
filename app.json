@@ -1,8 +1,8 @@
 {
   "expo": {
     "scheme": "homeilove",
-    "name": "HomeILove.US ",
-    "slug": "home-i-love",
+    "name": "HomeILove.UK",
+    "slug": "homeilove-uk",
     "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon 1024x1024.png",
@@ -24,9 +24,9 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.revnosoft.homeilove",
+      "bundleIdentifier": "com.revnosoft.homeilove.uk",
       "associatedDomains": [
-        "applinks:homeilove.app"
+        "applinks:homeiloveuk.app"
       ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -52,7 +52,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.us",
+              "host": "homeilove.uk",
               "pathPrefix": "/CreateNewpass"
             }
           ],
@@ -67,7 +67,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.us",
+              "host": "homeilove.uk",
               "pathPrefix": "/Account"
             }
           ],
@@ -82,7 +82,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.us",
+              "host": "homeilove.uk",
               "pathPrefix": "/NewsFeedSingelView"
             }
           ],
@@ -97,7 +97,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.us",
+              "host": "homeilove.uk",
               "pathPrefix": "/AddSingleView"
             }
           ],
@@ -112,7 +112,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.us",
+              "host": "homeilove.uk",
               "pathPrefix": "/postRedirect"
             }
           ],
@@ -122,7 +122,7 @@
           ]
         }
       ],
-      "package": "com.revnosoft.homeilove"
+      "package": "com.revnosoft.homeilove.uk"
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
@@ -141,7 +141,7 @@
       },
       "GOOGLE_MAPS_API_KEY": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY",
       "eas": {
-        "projectId": "e370ca21-f752-4295-8201-cdd94e014280"
+        "projectId": "8b39deda-2558-4bba-ae5c-3b6bea278cea"
       }
     }
   }

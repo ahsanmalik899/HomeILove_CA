@@ -10,7 +10,7 @@ export default {
     cardgreenLight:'#006A7021',
     background: '#20201F',
     tint: tintColorLight,
-    red: '#BF0A30',
+    red: '#ff007a',
     tabIconDefault: '#ccc',
     DarkGreen: '#006A70',
     LightGreen: '#006A7021',

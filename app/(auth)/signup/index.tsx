@@ -255,6 +255,8 @@ export default function SignUpScreen() {
 
                     <DropDownPicker
                       open={open}
+                       listMode="SCROLLVIEW"
+  dropDownDirection="BOTTOM"
                       value={values.user_type}
                       items={[
                         { label: "Business", value: "Business" },

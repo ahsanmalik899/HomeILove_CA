@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "750528181489",
-    "project_id": "homeilove-us",
-    "storage_bucket": "homeilove-us.firebasestorage.app"
+    "project_number": "165943793003",
+    "project_id": "homeilove-uk",
+    "storage_bucket": "homeilove-uk.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:750528181489:android:0fc93c5aa59b4a675b2550",
+        "mobilesdk_app_id": "1:165943793003:android:f66880a0d85ecbf060282e",
         "android_client_info": {
-          "package_name": "com.revnosoft.homeilove"
+          "package_name": "com.revnosoft.homeilove.uk"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBQ3PVIZoJAsUr5t07J7VKwkqkYwbJACds"
+          "current_key": "AIzaSyCDQt9fh1FiI1f55y7tGYKeSrH1I7XSPW0"
         }
       ],
       "services": {
