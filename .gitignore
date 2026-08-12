@@ -24,4 +24,4 @@ expo-env.d.ts
 android
 ios
 
-
+*-firebase-adminsdk-*.json
