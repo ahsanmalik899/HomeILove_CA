@@ -201,6 +201,7 @@ const BlockedUserModal = ({
               {/* SEND */}
 
               <TouchableOpacity
+               activeOpacity={1}
                 disabled={loading}
                 style={styles.button}
                 onPress={handleSend}
@@ -221,6 +222,7 @@ const BlockedUserModal = ({
               {/* LOGOUT */}
 
               <TouchableOpacity
+               activeOpacity={1}
                 style={[
                   styles.button,
                   {

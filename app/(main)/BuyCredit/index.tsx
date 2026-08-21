@@ -73,7 +73,8 @@ const index = () => {
                 No time limits to consume credit balance means use it when you
                 need it.
               </Text>
-              <TouchableOpacity style={{ marginVertical: vs(20) }}>
+              <TouchableOpacity  activeOpacity={1}
+              style={{ marginVertical: vs(20) }}>
                 <Text
                   style={{
                     color: Colors.light.DarkGreen,
@@ -131,6 +132,7 @@ const index = () => {
     >
       <View className="flex-row items-center">
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => {
             setAdtype(adType === item.type ? "" : item.type);
             setSelectedAmount(item.price);
@@ -189,13 +191,14 @@ const index = () => {
                     fontSize:ms(15),
                   }}
                 >
-                  ${data?.amount ?? 0}
+                  £{data?.amount ?? 0}
                 </Text>
               )}
             </View>
 
             <View style={styles.paymentOptions}>
               <TouchableOpacity
+               activeOpacity={1}
                 style={styles.paypalMainButton}
                 onPress={() => {
                   if (adType === "") {

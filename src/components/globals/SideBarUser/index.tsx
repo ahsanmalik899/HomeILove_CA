@@ -1,7 +1,7 @@
 import { useLogoutApiMutation } from "@/store/api/user/MainApi";
 import { userdata } from "@/store/slices/selector/user";
 import { resetUserData } from "@/store/slices/user";
-import SidebarLogo from "@assets/SideBar/sideBarLogo.svg";
+import SidebarLogo from "@assets/logo/logo-black.svg";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";

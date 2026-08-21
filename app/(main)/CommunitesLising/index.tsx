@@ -191,6 +191,7 @@ useFocusEffect(
         )}
 
         <TouchableOpacity
+         activeOpacity={1}
           style={{
             backgroundColor: Colors.light.red,
             alignItems: "center",

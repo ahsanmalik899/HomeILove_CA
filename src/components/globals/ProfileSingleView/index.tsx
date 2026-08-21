@@ -403,7 +403,9 @@ const insets = useSafeAreaInsets();
                   ],
                 },
               ]}
-            ><TouchableOpacity onPress={() => {
+            ><TouchableOpacity 
+             activeOpacity={1}
+              onPress={() => {
               if (randomAdData?.data?.ad_link) {
                 const finalUrl = randomAdData.data.ad_link.startsWith("https")
                   ? randomAdData.data.ad_link
@@ -456,7 +458,8 @@ const insets = useSafeAreaInsets();
 
           {/* Contact */}
           <View style={styles.rowBetween}>
-            <TouchableOpacity style={styles.row} onPress={()=>{
+            <TouchableOpacity  activeOpacity={1}
+            style={styles.row} onPress={()=>{
               makeCall(profile?.contact)
             }}>
               <Call height={hs(20)} width={hs(20)} />
@@ -466,7 +469,8 @@ const insets = useSafeAreaInsets();
 
           </View>
           <View  className="mt-2" >
-          <TouchableOpacity style={styles.row} onPress={ ()=>{const finalUrl = profile?.web?.startsWith("https")
+          <TouchableOpacity  activeOpacity={1}
+          style={styles.row} onPress={ ()=>{const finalUrl = profile?.web?.startsWith("https")
                   ? profile?.web
                   : `https://${profile?.web}`;
                 WebBrowser.openBrowserAsync(finalUrl);}}>
@@ -479,14 +483,16 @@ const insets = useSafeAreaInsets();
 
     <View className='flex-row justify-between'>
           <View className='flex-row justify-end gap-3' style={styles.row}>
-         <TouchableOpacity onPress={()=>toggleSave()} >
+         <TouchableOpacity  activeOpacity={1}
+          onPress={()=>toggleSave()} >
                { isSaved ? (
                                                      <RedHeart />
                                                    ) : (
               <Heart />
                                                    )}
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowShare(true)}>
+            <TouchableOpacity  activeOpacity={1}
+            onPress={() => setShowShare(true)}>
               <Share />
             </TouchableOpacity>
           </View>
@@ -563,12 +569,15 @@ const insets = useSafeAreaInsets();
             <Text style={{ color: Colors.light.textGray, fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>Ads by</Text>
              <Text style={{ color: Colors.light.red,fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>{profile?.business_name}</Text>
             <View style={styles.row}>
-              <TouchableOpacity style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }} onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"rent",profile_type:type,name:profile?.business_name}})}>
+              <TouchableOpacity  activeOpacity={1}
+               style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }} onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"rent",profile_type:type,name:profile?.business_name}})}>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Rent ads</Text>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.rent_posts}</Text>
               </TouchableOpacity>
               <View style={{ width: hs(1), height: hs(50), backgroundColor: Colors.light.textGray }} />
-              <TouchableOpacity style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }}
+              <TouchableOpacity 
+               activeOpacity={1}
+               style={{ flex: 1, alignItems: 'center',backgroundColor:"white",paddingVertical:hs(20),borderRadius:hs(10),marginHorizontal:hs(20) }}
               
               onPress={()=>router.push({pathname:"/MyPostListing",params:{id:profile.users_id.toString(),type:"sale",profile_type:type,name:profile?.business_name}})}>  
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Sale ads</Text>
@@ -595,6 +604,7 @@ const insets = useSafeAreaInsets();
           {profile?.advisory_service === "Yes"||profile?.valuation_for && (
             <>
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => setShowMortgage(!showMortgage)}
                 style={{
                   backgroundColor: Colors.light.LightGreen,
@@ -777,6 +787,7 @@ const insets = useSafeAreaInsets();
                         required={false} />
 
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={styles.mortgageBtn}
                         onPress={() => handleSubmit()}
                       >
@@ -795,6 +806,7 @@ const insets = useSafeAreaInsets();
             <>
               {posts?.length > 0 && (
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => setShowpast(!showPast)}
                   style={{
                     backgroundColor: Colors.light.LightGreen,
@@ -906,6 +918,7 @@ const insets = useSafeAreaInsets();
             </View>
 
             <TouchableOpacity
+             activeOpacity={1}
               style={styles.reviewBtn}
               onPress={() => setReviewModal(true)}
             >
@@ -922,6 +935,7 @@ const insets = useSafeAreaInsets();
 
 
       <TouchableOpacity
+       activeOpacity={1}
         style={[styles.stickyBottomBtn,{   
       bottom:  insets.bottom,
     }]}
@@ -1030,6 +1044,7 @@ const insets = useSafeAreaInsets();
 
                       return (
                         <TouchableOpacity
+                         activeOpacity={1}
                           key={index}
                           style={[
                             styles.profileCard,
@@ -1081,6 +1096,7 @@ const insets = useSafeAreaInsets();
 
                   <View style={styles.modalButtons}>
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={() => {
                         setReviewModal(false);
                       }}
@@ -1090,6 +1106,7 @@ const insets = useSafeAreaInsets();
                     </TouchableOpacity>
 
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={handleSubmit}
                       style={styles.submitBtn}
                     >
@@ -1133,7 +1150,9 @@ const insets = useSafeAreaInsets();
                 Share Post
               </Text>
 
-              <TouchableOpacity onPress={() => setShowShare(false)}>
+              <TouchableOpacity 
+               activeOpacity={1}
+               onPress={() => setShowShare(false)}>
                 <Cross height={vs(24)} width={vs(24)} />
               </TouchableOpacity>
             </View>
@@ -1142,7 +1161,7 @@ const insets = useSafeAreaInsets();
               initialValues={{
                 recepient_email: "",
                 message: "",
-                link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${type}`,
+                link: `https://homeilove.co.uk/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${type}`,
                 post_id: id,
                 type: type.toLocaleLowerCase(),
               }}
@@ -1273,6 +1292,7 @@ const insets = useSafeAreaInsets();
 
 
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={async () => {
                           await Clipboard.setStringAsync(values.link);
                           renderToastSuccess("Link copied");
@@ -1333,8 +1353,9 @@ const insets = useSafeAreaInsets();
                                                          edges={[ "bottom", "left", "right"]}
                                                        >
                     <TouchableOpacity
+                     activeOpacity={1}
                       style={styles.overlay}
-                      activeOpacity={1}
+                     
                       onPressOut={() => setShowConnection(false)}
                     >
                       <View
@@ -1351,6 +1372,7 @@ const insets = useSafeAreaInsets();
                         >
                           {Profiles?.profiles?.map((item, index) => (
                             <TouchableOpacity
+                             activeOpacity={1}
                               key={index}
                               style={styles.profileCard}
                               onPress={() => {

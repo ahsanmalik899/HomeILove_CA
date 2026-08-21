@@ -10,6 +10,7 @@ const index = ({ Svg, text, type, totalPosts,profileType,id,isBlocked, onPress=(
   console.log("isblocked",isBlocked)
   return (
     <TouchableOpacity
+     activeOpacity={1}
       style={[styles.card, { height: type === "Buy" ? vs(160) : vs(140) ,backgroundColor:ProfileExist?'#F4F0F0':'white'}]}
       onPress={() => {
         type === "busenessProfile"

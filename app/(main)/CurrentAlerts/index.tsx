@@ -78,9 +78,21 @@ const handleRefresh = async () => {
     else if(item.app_url==="/ChatScreen"){
        router.push({ pathname: "/Home/Message"});
     }
-    else {
-      router.push({ pathname: item.app_url, params: { post_id: item.post_id, userId: item.sender_id, name: item.sender_name } });
-    }
+   else {
+  if (typeof item.app_url !== "string" || !item.app_url.trim()) {
+    console.log("Invalid notification app_url:", item.app_url, item);
+    return;
+  }
+
+  router.push({
+    pathname: item.app_url as any,
+    params: {
+      post_id: item.post_id,
+      userId: item.sender_id,
+      name: item.sender_name,
+    },
+  });
+}
 
   };
 
@@ -143,6 +155,7 @@ useEffect(() => {
 }, [notificationsdata]);
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
+     activeOpacity={1}
       onPress={() => handlePress(item)}
       style={{ marginVertical: vs(2),backgroundColor:item.is_read? "white" : Colors.light.LightGreen }}
       className={`flex-row items-center p-4 border-b border-gray-100 `}

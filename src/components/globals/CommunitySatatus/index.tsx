@@ -9,7 +9,9 @@ import { RentAndSaleProps } from '../SelectRentAndSale/type'
 const index = ({value,onPress}:RentAndSaleProps) => {
   return (
     <View className="flex-row justify-between">
-         <TouchableOpacity className="items-center"
+         <TouchableOpacity 
+          activeOpacity={1}
+          className="items-center"
            style={[value === "Completed" ? styles.activeButton : styles.Button]}
            onPress={()=>onPress('Completed')}
          >
@@ -18,6 +20,7 @@ const index = ({value,onPress}:RentAndSaleProps) => {
          </TouchableOpacity>
    
          <TouchableOpacity
+          activeOpacity={1}
          className="items-center"
            style={[value === "Constructing" ? styles.activeButton : styles.Button]}
           onPress={()=>onPress('Constructing')}
@@ -26,6 +29,7 @@ const index = ({value,onPress}:RentAndSaleProps) => {
            <Text style={[value === "Constructing" ? styles.TextActive : styles.Text]}>Constructing</Text>
          </TouchableOpacity>
           <TouchableOpacity
+           activeOpacity={1}
          className="items-center"
            style={[value === "In Planning" ? styles.activeButton : styles.Button]}
           onPress={()=>onPress('In Planning')}

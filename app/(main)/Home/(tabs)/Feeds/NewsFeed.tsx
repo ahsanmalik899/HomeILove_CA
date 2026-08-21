@@ -80,6 +80,7 @@ const NewsFeeds = () => {
 
     return (
       <TouchableOpacity
+       activeOpacity={1}
        onPress={() => {
   if (selectedFilter === item.name) return;
 
@@ -167,6 +168,7 @@ useEffect(() => {
       <View style={styles.btnRow}>
 
         <TouchableOpacity
+         activeOpacity={1}
           style={[styles.btn, { backgroundColor: Colors.light.DarkGreen}]}
           onPress={() => setVisible(false)}
         >
@@ -176,6 +178,7 @@ useEffect(() => {
         </TouchableOpacity>
 
         <TouchableOpacity
+         activeOpacity={1}
           style={[styles.btn, { backgroundColor: Colors.light.red }]}
         onPress={() => {
     const url =
@@ -226,7 +229,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: Colors.light.lightGray,
+    backgroundColor: "white",
     marginRight: 8,
     marginVertical:vs(5),
   },

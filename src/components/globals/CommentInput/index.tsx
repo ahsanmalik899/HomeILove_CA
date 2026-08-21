@@ -88,6 +88,7 @@ setData((prevData) =>
   <ActivityIndicator size="small" color={Colors.light.DarkGreen} />
 ) : (
   <TouchableOpacity
+   activeOpacity={1}
     onPress={handleSendComment}
     disabled={isLoading}
   >

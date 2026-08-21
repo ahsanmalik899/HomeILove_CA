@@ -125,6 +125,7 @@ useEffect(() => {
   const renderItem = ({ item }: any) => (
     
     <TouchableOpacity
+     activeOpacity={1}
       onPress={() => openChat(item)}
       className="flex-row items-center px-4 py-3 border-b border-gray-100"
     >
@@ -171,7 +172,8 @@ useEffect(() => {
           </View>
         )}
       </View>
-     <TouchableOpacity onPress={() => toggleSelection(`${user?.id}-${item.chat_user_id}-${item.receiver_post_id}-${item.type}`)}>
+     <TouchableOpacity
+      activeOpacity={1} onPress={() => toggleSelection(`${user?.id}-${item.chat_user_id}-${item.receiver_post_id}-${item.type}`)}>
   <Ionicons
     name={
       selectedIds.includes(`${user?.id}-${item.chat_user_id}-${item.receiver_post_id}-${item.type}`)
@@ -231,8 +233,9 @@ else if (chats?.length === 0) {
 }
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 " style={{backgroundColor:Colors.light.listingBackground}}>
 <TouchableOpacity
+ activeOpacity={1}
   onPress={handleDelete}
   disabled={Deleting || selectedIds.length === 0}
   style={{

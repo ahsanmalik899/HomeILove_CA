@@ -553,6 +553,7 @@ const Index = () => {
                     renderToastSuccess(
                     res?.message || "Profile created successfully"
                   );
+                  
                   router.replace("/BusenessProfiles");
                 }
                 } else {
@@ -858,6 +859,7 @@ const Index = () => {
                 >
                   <View className="flex-row items-center">
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={() => {
                         setFieldValue(
                           "advisory_service",
@@ -889,6 +891,7 @@ const Index = () => {
                     style={{ marginLeft: hs(20) }}
                   >
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={() => {
                         setFieldValue(
                           "advisory_service",
@@ -1086,6 +1089,7 @@ const Index = () => {
     >
       <View className="flex-row items-center">
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => {
             setFieldValue("time_period", item.life);
             setSelectedAmount(formatPrice(item.price));
@@ -1113,7 +1117,7 @@ const Index = () => {
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        ${formatPrice(item.price)}
+        £{formatPrice(item.price)}
       </Text>
     </View>
   )}
@@ -1190,6 +1194,7 @@ const Index = () => {
                               </Text>
 
                               <TouchableOpacity
+                               activeOpacity={1}
                                 className="mb-4"
                                 style={styles.paypalMainButton}
                                 onPress={async () => {

@@ -65,6 +65,7 @@ const MyPostItem = ({
 
   return (
     <TouchableOpacity
+     activeOpacity={1}
       onPress={() => {
         setSingleView(true);
         setSinglePost({
@@ -99,7 +100,7 @@ const MyPostItem = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  From $ {formatPrice(item.price1)}
+                  From £ {formatPrice(item.price1)}
                 </Text>
               ) : (
                 <Text
@@ -110,7 +111,7 @@ const MyPostItem = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  $ {formatPrice(item.asking_price)}{" "}
+                  £ {formatPrice(item.asking_price)}{" "}
                   {type === "rent" && (
                     <Text
                       style={{
@@ -145,6 +146,7 @@ const MyPostItem = ({
                 style={{ height: vs(40), width: hs(80) }}
               >
                 <TouchableOpacity
+                 activeOpacity={1}
                   className="justify-center"
                   style={{
                     height: vs(30),
@@ -210,6 +212,7 @@ const MyPostItem = ({
               </Text>
 
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSelectedImages(item.images || []);
                   setShowImages(true);
@@ -361,6 +364,7 @@ const MyPostItem = ({
                   {((type === "community" && item.post_status === "Active") ||
   (type !== "community" && item.status === "Active")) &&(
                   <TouchableOpacity
+                   activeOpacity={1}
                     style={{ marginRight: hs(10) }}
                     onPress={() => {
                       router.push({
@@ -382,6 +386,7 @@ const MyPostItem = ({
                     <Edit />
                   </TouchableOpacity>)}
                   <TouchableOpacity
+                   activeOpacity={1}
                     onPress={() => {
                       if (item.ad_by === "Agent") {
                          setSelectedPost(item);
@@ -604,6 +609,7 @@ const renderItem = ({ item }: any) => (
             }}
           >
             <TouchableOpacity
+             activeOpacity={1}
               style={{
                 position: "absolute",
                 top: hs(10),
@@ -648,6 +654,7 @@ const renderItem = ({ item }: any) => (
     >
       <View className="flex-row items-center">
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => {
             setTimeperiod(valueitem.life);
             setSelectedAmount(valueitem.price);
@@ -675,7 +682,7 @@ const renderItem = ({ item }: any) => (
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        ${valueitem.price}
+        £{valueitem.price}
       </Text>
     </View>
   )}
@@ -745,6 +752,7 @@ const renderItem = ({ item }: any) => (
               <Text style={styles.title}>Pay and Ad post Atomaticlly</Text>
 
               <TouchableOpacity
+               activeOpacity={1}
                 className="mb-4"
                 style={styles.paypalMainButton}
                 onPress={async () => {
@@ -812,6 +820,7 @@ const renderItem = ({ item }: any) => (
             </Text>
 
             <TouchableOpacity
+             activeOpacity={1}
               style={{ marginBottom: 15 }}
               onPress={() => {
                 setDeleteType("Past");
@@ -834,6 +843,7 @@ const renderItem = ({ item }: any) => (
             </TouchableOpacity>
 
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => {
                 setDeleteType("Deleted");
                 setDeleteModal(false);
@@ -855,6 +865,7 @@ const renderItem = ({ item }: any) => (
             </TouchableOpacity>
 
             <TouchableOpacity
+             activeOpacity={1}
               style={{ marginTop: 20 }}
               onPress={() => setDeleteModal(false)}
             >

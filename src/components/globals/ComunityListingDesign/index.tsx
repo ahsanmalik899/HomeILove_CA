@@ -96,6 +96,7 @@ const CommunityListItem = ({
   return (
   <>
     <TouchableOpacity
+     activeOpacity={1}
   onPress={() => {
   setSinglePost({
     type,
@@ -131,7 +132,7 @@ const CommunityListItem = ({
                   fontFamily: "PopinRegula",
                 }}
               >
-               From $ {formatPrice(item?.data?.price1)}
+               From £ {formatPrice(item?.data?.price1)}
               
               </Text>
               {item?.data?.post_type === "Trending" && (
@@ -212,6 +213,7 @@ const CommunityListItem = ({
               </Text>
 
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSelectedImages(item?.data?.images || []);
                   setShowImages(true);
@@ -293,6 +295,7 @@ const CommunityListItem = ({
                     </Text>
                   )}
                   <TouchableOpacity
+                   activeOpacity={1}
                                      style={{ marginLeft: "auto" }}
                                      onPress={toggleSave}
                                    >
@@ -314,6 +317,7 @@ const CommunityListItem = ({
   showsHorizontalScrollIndicator={false}
   renderItem={({ item: image, index }) => (
     <TouchableOpacity
+     activeOpacity={1}
       className="mt-4 mr-2"
       onPress={() => {
         openslider(index);
@@ -366,7 +370,7 @@ const CommunityListItem = ({
               <View
                 className="flex-row justify-between"
                 style={{
-                  backgroundColor: Colors.light.lightGray,
+                 backgroundColor: "#ff007b1f",
                   borderRadius: 8,
                   paddingRight: hs(20),
                   paddingVertical: vs(5),
@@ -376,6 +380,7 @@ const CommunityListItem = ({
                 }}
               >
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={()=>{
                     console.log(type)
                                                 router.navigate({
@@ -397,7 +402,9 @@ const CommunityListItem = ({
                                               }}>
                   <Mail />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity
+                 activeOpacity={1}
+                  onPress={()=>{
                                   makeCall(item?.data?.posted_by.contact||item?.data?.posted_by.mobile)
                                 }}>
                   <Call />

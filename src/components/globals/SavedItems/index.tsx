@@ -95,6 +95,7 @@ const SavedItemCard = ({
 if(item?.type==="profile"){
   return(
  <TouchableOpacity
+  activeOpacity={1}
           onPress={()=>openProfileModal(item)}
             onLongPress={()=>openProfileModal(item)}
         >
@@ -201,6 +202,7 @@ if(item?.type==="profile"){
               </Text>)}
 
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                  
                 }}
@@ -240,6 +242,7 @@ if(item?.type==="profile"){
                   className="flex-row justify-between"
                 >
                   <TouchableOpacity
+                   activeOpacity={1}
                                      style={{ marginLeft: "auto" }}
                                      onPress={toggleSave}
                                    >
@@ -270,7 +273,7 @@ if(item?.type==="profile"){
               <View
                 className="flex-row justify-between"
                 style={{
-                  backgroundColor: Colors.light.lightGray,
+                  backgroundColor: "#ff007b1f",
                   borderRadius: 8,
                   paddingRight: hs(20),
                   paddingVertical: vs(5),
@@ -278,10 +281,12 @@ if(item?.type==="profile"){
                   marginTop: vs(8),
                 }}
               >
-                <TouchableOpacity>
+                <TouchableOpacity
+                 activeOpacity={1}>
                   <Mail />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity
+                 activeOpacity={1}>
                   <Call />
                 </TouchableOpacity>
 
@@ -299,6 +304,7 @@ if(item?.type==="profile"){
 else if(item?.type==="community"){
   return(
     <TouchableOpacity
+     activeOpacity={1}
           onPress={() => {
             setPostSingleView(true);
            setSinglePost({ type: "community",
@@ -330,7 +336,7 @@ else if(item?.type==="community"){
                   fontFamily: "PopinRegula",
                 }}
               >
-               From $ {item?.data?.price}
+               From £ {item?.data?.price}
                 
               </Text>
               {item?.data?.post_type === "Trending" && (
@@ -411,6 +417,7 @@ else if(item?.type==="community"){
               </Text>
 
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSelectedImages(item?.data?.images || []);
                   setShowImages(true);
@@ -492,6 +499,7 @@ else if(item?.type==="community"){
                     </Text>
                   )}
                   <TouchableOpacity
+                   activeOpacity={1}
                                      style={{ marginLeft: "auto" }}
                                      onPress={toggleSave}
                                    >
@@ -512,6 +520,7 @@ else if(item?.type==="community"){
                 keyExtractor={(item, index) => `${item}-${index}`}
                 renderItem={({ item, index }) => (
                   <TouchableOpacity
+                   activeOpacity={1}
                     className="mt-4 mr-2"
                     onPress={() => {
                       openslider(index);
@@ -564,7 +573,7 @@ else if(item?.type==="community"){
               <View
                 className="flex-row justify-between"
                 style={{
-                  backgroundColor: Colors.light.lightGray,
+                  backgroundColor: "#ff007b1f",
                   borderRadius: 8,
                   paddingRight: hs(20),
                   paddingVertical: vs(5),
@@ -573,10 +582,13 @@ else if(item?.type==="community"){
                  
                 }}
               >
-                <TouchableOpacity>
+                <TouchableOpacity
+                 activeOpacity={1}
+                 >
                   <Mail />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity
+                 activeOpacity={1}>
                   <Call />
                 </TouchableOpacity>
 
@@ -593,6 +605,7 @@ else if(item?.type==="community"){
 else{
   return(
    <TouchableOpacity
+    activeOpacity={1}
           onPress={() => {
              setPostSingleView(true);
             setSinglePost({     type: item?.data?.property_for,
@@ -625,7 +638,7 @@ else{
                    fontFamily: "PopinRegular",
                  }}
                >
-                 $ {formatPrice(item?.data?.price.toString())}
+                 £ {formatPrice(item?.data?.price.toString())}
                  {item?.data?.property_for === "rent" && (
                    <Text
                      style={{
@@ -734,6 +747,7 @@ else{
                </Text>)}
  
                <TouchableOpacity
+                activeOpacity={1}
                  onPress={() => {
                    setSelectedImages(item?.data?.images || []);
                    setShowImages(true);
@@ -821,6 +835,7 @@ else{
                      </Text>
                    )}
                    <TouchableOpacity
+                    activeOpacity={1}
                      style={{ marginLeft: "auto" }}
                      onPress={toggleSave}
                    >
@@ -842,6 +857,7 @@ else{
                      keyExtractor={(item, index) => `${item}-${index}`}
                      renderItem={({ item, index }) => (
                        <TouchableOpacity
+                        activeOpacity={1}
                          className="mt-4 mr-2"
                          onPress={() => {
                            openslider(index);
@@ -906,7 +922,7 @@ else{
                <View
                  className="flex-row justify-between"
                  style={{
-                   backgroundColor: Colors.light.lightGray,
+                  backgroundColor: "#ff007b1f",
                    borderRadius: 8,
                    paddingRight: hs(20),
                    paddingVertical: vs(5),
@@ -914,10 +930,12 @@ else{
                    marginTop: vs(8),
                  }}
                >
-                 <TouchableOpacity>
+                 <TouchableOpacity
+                  activeOpacity={1}>
                    <Mail />
                  </TouchableOpacity>
-                 <TouchableOpacity>
+                 <TouchableOpacity
+                  activeOpacity={1}>
                    <Call />
                  </TouchableOpacity>
                  <CircleImage

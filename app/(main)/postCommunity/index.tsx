@@ -985,6 +985,7 @@ const index = () => {
                   >
                     <View className="flex-row items-center">
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => {
                           setFieldValue(
                             "property_visit",
@@ -1014,6 +1015,7 @@ const index = () => {
                       style={{ marginLeft: hs(20) }}
                     >
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => {
                           setFieldValue(
                             "property_visit",
@@ -1182,6 +1184,7 @@ const index = () => {
                   <View className="flex-row justify-between gap-3 mt-5">
                     <View className="flex-1">
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={{
                           backgroundColor: values.developer_logo
                             ? Colors.light.DarkGreen
@@ -1211,6 +1214,7 @@ const index = () => {
                     </View>
                     <View className="flex-1">
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={{
                           backgroundColor: values.project_logo
                             ? Colors.light.DarkGreen
@@ -1258,6 +1262,7 @@ const index = () => {
                         <View>
                           {(data?.profiles_exist?.agent.exists && data?.profiles_exist?.agent.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1289,6 +1294,7 @@ const index = () => {
                           )}
                           {(data?.profiles_exist?.builder.exists && data?.profiles_exist?.builder.status==="Active" ) && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1320,6 +1326,7 @@ const index = () => {
                           )}
                           {(data?.profiles_exist?.decor.exists && data?.profiles_exist?.decor.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1351,6 +1358,7 @@ const index = () => {
                           )}
                           {(data?.profiles_exist?.electrician.exists &&data?.profiles_exist?.electrician.status==="Active" ) && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1384,6 +1392,7 @@ const index = () => {
                           )}
                           {(data?.profiles_exist?.investor.exists && data?.profiles_exist?.investor.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1415,6 +1424,7 @@ const index = () => {
                           )}
                           {(data?.profiles_exist?.mortgage.exists && data?.profiles_exist?.mortgage.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1446,6 +1456,7 @@ const index = () => {
                           )}
                           {(data?.profiles_exist?.painter.exists && data?.profiles_exist?.painter.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1477,6 +1488,7 @@ const index = () => {
                           )}
                           {(data?.profiles_exist?.plumber.exists && data?.profiles_exist?.plumber.status==="Active")&& (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1606,6 +1618,7 @@ const index = () => {
     >
       <View className="flex-row items-center">
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => {
             setFieldValue("ad_life", item?.life?.toString());
             setSelectedAmount(item?.price?.toString());
@@ -1710,6 +1723,7 @@ const index = () => {
                               </Text>
 
                               <TouchableOpacity
+                               activeOpacity={1}
                                 className="mb-4"
                                 style={styles.paypalMainButton}
                                 onPress={async () => {

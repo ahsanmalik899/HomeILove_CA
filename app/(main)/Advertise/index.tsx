@@ -166,7 +166,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        $ 15 / Day
+        £ 15 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -204,7 +204,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        $ 10 / Day
+        £ 10 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -242,7 +242,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        $ 5/ Day
+        £ 5/ Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -279,7 +279,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        $ 25 / Day
+        £ 25 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -315,7 +315,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        $ 20 / Day
+        £ 20 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -588,6 +588,7 @@ const index = () => {
                       style={{ marginTop: vs(10), gap: hs(5) }}
                     >
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={[
                           styles.btn,
                           values.on_page === "newsfeed" && styles.btnselected,
@@ -611,6 +612,7 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={[
                           styles.btn,
                           values.on_page === "connections" &&
@@ -641,6 +643,7 @@ const index = () => {
                       style={{ marginTop: vs(10), gap: hs(5) }}
                     >
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={[
                           styles.btn,
                           values.on_page === "listing" && styles.btnselected,
@@ -664,6 +667,7 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={[
                           styles.btn,
                           values.on_page === "listing_details" &&
@@ -723,6 +727,7 @@ const index = () => {
                             style={{ marginTop: vs(10), gap: hs(5) }}
                           >
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "sale" ||
@@ -756,6 +761,7 @@ const index = () => {
                             </TouchableOpacity>
 
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "rent" ||
@@ -792,6 +798,7 @@ const index = () => {
                             style={{ marginTop: vs(10), gap: hs(5) }}
                           >
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "community" ||
@@ -826,6 +833,7 @@ const index = () => {
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "agent" ||
@@ -862,6 +870,7 @@ const index = () => {
                             style={{ marginTop: vs(10), gap: hs(5) }}
                           >
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "developer" ||
@@ -896,6 +905,7 @@ const index = () => {
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "mortgage" ||
@@ -936,6 +946,7 @@ const index = () => {
                             style={{ marginTop: vs(10), gap: hs(5) }}
                           >
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "investor" ||
@@ -970,6 +981,7 @@ const index = () => {
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
+                             activeOpacity={1}
                               style={[
                                 styles.btn,
                                 (values.on_page === "maintenance" ||
@@ -1026,6 +1038,7 @@ const index = () => {
                           style={{ marginTop: vs(10), gap: hs(5) }}
                         >
                           <TouchableOpacity
+                           activeOpacity={1}
                             style={[
                               styles.btn,
                               (values.on_page === "decor" ||
@@ -1057,6 +1070,7 @@ const index = () => {
                             </Text>
                           </TouchableOpacity>
                           <TouchableOpacity
+                           activeOpacity={1}
                             style={[
                               styles.btn,
                               (values.on_page === "electrician" ||
@@ -1093,6 +1107,7 @@ const index = () => {
                           style={{ marginTop: vs(10), gap: hs(5) }}
                         >
                           <TouchableOpacity
+                           activeOpacity={1}
                             style={[
                               styles.btn,
                               (values.on_page === "plumber" ||
@@ -1124,6 +1139,7 @@ const index = () => {
                             </Text>
                           </TouchableOpacity>
                           <TouchableOpacity
+                           activeOpacity={1}
                             style={[
                               styles.btn,
                               (values.on_page === "painter" ||
@@ -1313,6 +1329,7 @@ const index = () => {
                                 ]}
                               >
                                 <TouchableOpacity
+                                 activeOpacity={1}
                                   style={{ backgroundColor: "black" }}
                                   onPress={() => {
                                     if (values.ad_link) {
@@ -1337,6 +1354,7 @@ const index = () => {
                           )}
 
                           <TouchableOpacity
+                           activeOpacity={1}
                             onPress={() => setShowAdPreview(false)}
                             style={{
                               position: "absolute",
@@ -1471,6 +1489,7 @@ const index = () => {
                           </Text>
 
                           <TouchableOpacity
+                           activeOpacity={1}
                             className="mb-4"
                             style={styles.paypalMainButton}
                             onPress={async () => {
@@ -1703,7 +1722,7 @@ const index = () => {
           {[
             {
               label: "Amount",
-              value: `$ ${item.amount_received}`,
+              value: `£ ${item.amount_received}`,
             },
             {
               label: "Payment",
@@ -1791,6 +1810,7 @@ const index = () => {
           }}
         >
           <TouchableOpacity
+           activeOpacity={1}
             onPress={() => {
               setEditAdData(item);
               setEditAd(true);

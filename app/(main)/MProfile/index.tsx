@@ -247,6 +247,7 @@ const Index = () => {
         <View style={{ position: "relative" }}>
           <HeaderWithBack />
           <TouchableOpacity
+           activeOpacity={1}
             style={{
               position: "absolute",
               backgroundColor: "#bdbdbd71",
@@ -307,6 +308,7 @@ const Index = () => {
           <View className="flex-row justify-between">
             {profile?.post_type === "Normal" ? (
               <TouchableOpacity
+               activeOpacity={1}
                 style={{
                   backgroundColor: Colors.light.DarkGreen,
                   paddingHorizontal: hs(10),
@@ -326,6 +328,7 @@ const Index = () => {
               </TouchableOpacity>
             ) : profile?.post_type === "Trending" ? (
               <TouchableOpacity
+               activeOpacity={1}
                 style={{
                   backgroundColor: Colors.light.DarkGreen,
                   paddingHorizontal: hs(10),
@@ -348,10 +351,13 @@ const Index = () => {
               <></>
             )}
             <View style={styles.row}>
-              <TouchableOpacity onPress={handleDelete}>
+              <TouchableOpacity 
+               activeOpacity={1}
+               onPress={handleDelete}>
                 <Delete />
               </TouchableOpacity>
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   router.navigate({
                     pathname: "/CreateProfiles",
@@ -375,6 +381,7 @@ const Index = () => {
           className="flex-row justify-between"
         >
           <TouchableOpacity
+           activeOpacity={1}
             style={{
               borderColor: Colors.light.DarkGreen,
               borderWidth: 2,
@@ -407,6 +414,7 @@ const Index = () => {
           </TouchableOpacity>
           {Profiletype !== "agent" && (
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => openPastWorkModal()}
               style={{
                 backgroundColor: Colors.light.DarkGreen,
@@ -497,6 +505,7 @@ const Index = () => {
 
             <View style={styles.row}>
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => openPastWorkModal(item)}
                 style={styles.iconBtn}
               >
@@ -584,6 +593,7 @@ const Index = () => {
                 }}
               >
                 <TouchableOpacity
+                 activeOpacity={1}
                   style={{
                     position: "absolute",
                     top: hs(10),
@@ -639,6 +649,7 @@ const Index = () => {
     >
       <View className="flex-row items-center">
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => {
             setTimeperiod(valueitem.life);
             setSelectedAmount(valueitem.price);
@@ -666,7 +677,7 @@ const Index = () => {
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        ${valueitem.price}
+        £{valueitem.price}
       </Text>
     </View>
   )}
@@ -738,6 +749,7 @@ const Index = () => {
                   <Text style={styles.title}>Pay and Ad post Atomaticlly</Text>
 
                   <TouchableOpacity
+                   activeOpacity={1}
                     className="mb-4"
                     style={styles.paypalMainButton}
                     onPress={async () => {
@@ -813,7 +825,9 @@ const Index = () => {
                   Share Post
                 </Text>
 
-                <TouchableOpacity onPress={() => setShowShare(false)}>
+                <TouchableOpacity
+                 activeOpacity={1}
+                onPress={() => setShowShare(false)}>
                   <Cross height={vs(24)} width={vs(24)} />
                 </TouchableOpacity>
               </View>
@@ -822,7 +836,7 @@ const Index = () => {
                 initialValues={{
                   recepient_email: "",
                   message: "",
-                  link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${Profiletype}`,
+                  link: `https://homeilove.co.uk/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${Profiletype}`,
                   post_id: id,
                   type: Profiletype,
                 }}
@@ -951,6 +965,7 @@ const Index = () => {
                         />
 
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={async () => {
                             await Clipboard.setStringAsync(values.link);
                             renderToastSuccess("Link copied");

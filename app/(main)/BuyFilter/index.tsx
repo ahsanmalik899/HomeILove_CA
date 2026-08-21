@@ -256,6 +256,7 @@ const index = () => {
 
               return (
                 <TouchableOpacity
+                  activeOpacity={1}
                   key={option}
                   onPress={() => togglePropertySubType(option)}
                   style={{
@@ -292,6 +293,7 @@ const index = () => {
             marginBottom: vs(10),
             textAlign: "center",
             fontFamily: "PopinRegula",
+            marginTop:hs(10)
           }}
         >
           Quickly <Text style={{ color: Colors.light.red }}>SEARCH</Text> your dream living

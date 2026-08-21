@@ -1,5 +1,5 @@
 
-  const ViedioUrlFormat = (image:string) =>  `https://homeilove.us/videos/${image}`
+  const ViedioUrlFormat = (image:string) =>  `https://homeilove.co.uk/videos/${image}`
 
 export { ViedioUrlFormat }
 

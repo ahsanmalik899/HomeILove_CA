@@ -245,6 +245,7 @@ else if (values.post_video?.uri && !values.post_video?.isExisting) {
       
     
       <TouchableOpacity
+       activeOpacity={1}
         onPress={() => setFieldValue("post_video", null)}
         className="absolute right-0 top-0 z-10 bg-white"
         style={{ borderRadius: ms(12), padding: 4 }}
@@ -268,6 +269,7 @@ else if (values.post_video?.uri && !values.post_video?.isExisting) {
   </View>
                 ) : (
                   <TouchableOpacity
+                   activeOpacity={1}
                     className="flex-row"
                     onPress={() => {
                       pickVideo(setFieldValue);
@@ -280,6 +282,7 @@ else if (values.post_video?.uri && !values.post_video?.isExisting) {
               </View>
             </View>
             <TouchableOpacity
+             activeOpacity={1}
               style={{
                 backgroundColor: Colors.light.red,
                 paddingHorizontal: hs(50),

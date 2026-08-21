@@ -32,9 +32,10 @@ const AgentCard = ({ item }: { item: any }) => {
 
   return (
     <TouchableOpacity
+     activeOpacity={1}
       style={{ width: "100%", paddingHorizontal: hs(10), marginBottom: vs(20) }}
    
-      activeOpacity={0.92}
+     
     >
       <View style={styles.card}>
 
@@ -124,7 +125,9 @@ const AgentCard = ({ item }: { item: any }) => {
         {/* ── Footer ── */}
         <View style={styles.footer}>
          
-          <TouchableOpacity style={styles.btnPrimary}    onPress={() =>
+          <TouchableOpacity style={styles.btnPrimary}  
+           activeOpacity={1}
+             onPress={() =>
         router.navigate({
           pathname: "/ProfileSigleView",
           params: { type: item.type, id: item.id },

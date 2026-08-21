@@ -2,12 +2,13 @@ import Community from "@assets/Home/Community.svg";
 import Connection from "@assets/Home/Conection.svg";
 import Property from "@assets/Home/Property.svg";
 import PrefrenceCard from "@src/components/globals/PrefrenceCard";
+import Colors from "@src/constants/Colors";
 import { router } from "expo-router";
 import { ScrollView, View } from "react-native";
 
 const NewsFeedPreference = () => {
   return (
-     <ScrollView style={{backgroundColor:"#F4F0F0"}}>
+     <ScrollView style={{backgroundColor:Colors.light.listingBackground}}>
     <View className="flex-1 ">
      
       <View className="mt-4 ml-2 mr-2 items-center">

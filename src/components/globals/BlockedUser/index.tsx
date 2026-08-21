@@ -58,6 +58,7 @@ const BlockedProfileModal = ({
       <View style={styles.overlay}>
         <SafeAreaView style={styles.card}>
           <TouchableOpacity
+           activeOpacity={1}
             style={styles.closeButton}
             onPress={onClose}
           >
@@ -147,6 +148,7 @@ const BlockedProfileModal = ({
             }}
           >
           <TouchableOpacity
+           activeOpacity={1}
   style={styles.sendButton}
   onPress={handleSend}
   activeOpacity={0.8}

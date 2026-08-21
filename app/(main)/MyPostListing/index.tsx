@@ -88,6 +88,7 @@ useFocusEffect(
 
     return (
       <TouchableOpacity
+       activeOpacity={1}
         onPress={() => {
           setSelectedFilter(item.name);
           SetProfilrType(item.name);

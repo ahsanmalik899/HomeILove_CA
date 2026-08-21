@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-export const socket = io("https://livedata.homeilove.us", {
+export const socket = io("https://livedata.homeilove.co.uk", {
   transports: ["websocket"],
   autoConnect: true,
   reconnection: true,

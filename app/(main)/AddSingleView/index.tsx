@@ -159,7 +159,7 @@ const index = () => {
 
               {data?.post?.community_price?.length > 0 && (
                 <Text style={{ color: Colors.light.red, fontWeight: "600",fontFamily: "PopinRegula", }}>
-                  From $ {data.post.community_price[0]} To ${" "}
+                  From £ {data.post.community_price[0]} To £{" "}
                   {
                     data.post.community_price[
                       data.post.community_price.length - 1
@@ -190,12 +190,13 @@ const index = () => {
                   fontFamily: "PopinRegula",
                 }}
               >
-                $ {data?.post?.asking_price ?? 0}
+                £ {data?.post?.asking_price ?? 0}
                 {type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
               </Text>
             </View>
           )}
           <TouchableOpacity
+           activeOpacity={1}
             className="mt-4"
             onPress={() => {
               setShowImages(true);
@@ -218,6 +219,7 @@ const index = () => {
             />
             {type !== "community" && data?.floor_images.length > 0 && (
               <TouchableOpacity
+               activeOpacity={1}
                 style={{
                   position: "absolute",
                   bottom: vs(5),
@@ -261,6 +263,7 @@ const index = () => {
   showsHorizontalScrollIndicator={false}
   renderItem={({ item, index }) => (
     <TouchableOpacity
+     activeOpacity={1}
       className="mt-4 mr-2"
       onPress={() => {
         setImageNo(index);
@@ -341,10 +344,10 @@ const index = () => {
             </Text>
 
             <View className="flex-row gap-2">
-              <TouchableOpacity>
+              <TouchableOpacity  activeOpacity={1}>
                 <Heart />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowShare(true)}>
+              </TouchableOpacity >
+              <TouchableOpacity   activeOpacity={1} onPress={() => setShowShare(true)}>
                 <Share />
               </TouchableOpacity>
             </View>
@@ -633,6 +636,7 @@ const index = () => {
                   Floor Plan
                 </Text>
                 <TouchableOpacity
+                 activeOpacity={1}
                   className="mt-4"
                   onPress={() => {
                     setShowFloor(true);
@@ -719,6 +723,7 @@ const index = () => {
               >
                 {data.brochures.map((file: string, index: number) => (
                   <TouchableOpacity
+                   activeOpacity={1}
                     key={index}
                     onPress={() => openPDF(formatPdfUrl(file))}
                     style={{
@@ -966,7 +971,7 @@ const index = () => {
                       color: "white",
                     }}
                   >
-                    $ {monthlyPayment}
+                    £ {monthlyPayment}
                   </Text>
                 </View>
                 <Text className="mt-4">
@@ -990,6 +995,7 @@ const index = () => {
   showsHorizontalScrollIndicator={false}
   renderItem={({ item }) => (
     <TouchableOpacity
+     activeOpacity={1}
       style={[
         styles.card2,
         {
@@ -1192,7 +1198,9 @@ const index = () => {
             }}
           />
 
-          <TouchableOpacity style={[styles.card2, { alignItems: "center" }]}>
+          <TouchableOpacity 
+           activeOpacity={1}
+           style={[styles.card2, { alignItems: "center" }]}>
             <CircleImage
               Size={80}
               source={{ uri: ImageFormater(data?.posted_by?.logo) }}
@@ -1238,6 +1246,7 @@ const index = () => {
               </View>
             )}
             <TouchableOpacity
+             activeOpacity={1}
               style={{
                 backgroundColor: Colors.light.DarkGreen,
                 paddingHorizontal: hs(15),
@@ -1311,7 +1320,9 @@ const index = () => {
           Share Post
         </Text>
 
-        <TouchableOpacity onPress={() => setShowShare(false)}>
+        <TouchableOpacity 
+         activeOpacity={1}
+         onPress={() => setShowShare(false)}>
           <Cross height={vs(24)} width={vs(24)} />
         </TouchableOpacity>
       </View>
@@ -1320,7 +1331,7 @@ const index = () => {
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.us/postRedirect?post_id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type==="community"?"community":"property"}`,
+          link:`https://homeilove.co.uk/postRedirect?post_id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type==="community"?"community":"property"}`,
           post_id:type==="community"?data?.post?.post_community_id:data?.post?.post_property_id,
           type:type,
         }}
@@ -1450,6 +1461,7 @@ const index = () => {
 
     {/* Copy Button */}
     <TouchableOpacity
+     activeOpacity={1}
       onPress={async () => {
         await Clipboard.setStringAsync(values.link);
         renderToastSuccess("Link copied");

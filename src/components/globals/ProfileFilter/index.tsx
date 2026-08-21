@@ -59,6 +59,7 @@ const index = ({
   return (
     <View style={styles.card}>
       <TouchableOpacity
+       activeOpacity={1}
         style={{
           backgroundColor: Colors.light.lightGray,
           alignSelf: "flex-end",

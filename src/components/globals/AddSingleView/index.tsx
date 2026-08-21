@@ -234,7 +234,9 @@ const rotate = rotateAnim.interpolate({
       ],
     },
   ]}
-><TouchableOpacity onPress={() => {
+><TouchableOpacity 
+ activeOpacity={1}
+ onPress={() => {
   if(randomAdData?.data?.ad_link){
     const finalUrl = randomAdData.data.ad_link.startsWith("https")
       ? randomAdData.data.ad_link
@@ -261,7 +263,7 @@ const rotate = rotateAnim.interpolate({
              {data?.post?.community_price?.length > 0 && (
                 <Text style={{ color: Colors.light.red,  fontWeight: 700,
                   fontSize:ms(18),fontFamily: "PopinRegula", }}>
-                  From $ {formatPrice(data.post.community_price[0])} To ${" "}
+                  From £ {formatPrice(data.post.community_price[0])} To £{" "}
                   {
                     formatPrice(
                     data.post.community_price[
@@ -280,11 +282,12 @@ const rotate = rotateAnim.interpolate({
                   fontFamily: "PopinRegula",
                 }}
               >
-                $ {formatPrice(data?.post?.asking_price ?? 0)}
+                £ {formatPrice(data?.post?.asking_price ?? 0)}
                 {type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
               </Text>)}
 </View>
           <TouchableOpacity
+           activeOpacity={1}
             className="mt-4"
             onPress={() => {
               setShowImages(true);
@@ -308,6 +311,7 @@ const rotate = rotateAnim.interpolate({
             
             {type !== "community" && data?.floor_images.length > 0 && (
               <TouchableOpacity
+               activeOpacity={1}
                 style={{
                   position: "absolute",
                   bottom: vs(5),
@@ -351,6 +355,7 @@ const rotate = rotateAnim.interpolate({
   showsHorizontalScrollIndicator={false}
   renderItem={({ item, index }) => (
     <TouchableOpacity
+     activeOpacity={1}
       className="mt-4 mr-2"
       onPress={() => {
         setImageNo(index);
@@ -459,14 +464,18 @@ const rotate = rotateAnim.interpolate({
             </Text>
 
             <View className="flex-row ">
-                 <TouchableOpacity onPress={()=>toggleSave()} >
+                 <TouchableOpacity
+                  activeOpacity={1}
+                   onPress={()=>toggleSave()} >
                             { isSaved ? (
                                                                   <RedHeart />
                                                                 ) : (
                            <Heart />
                                                                 )}
                          </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowShare(true)}>
+              <TouchableOpacity 
+               activeOpacity={1}
+               onPress={() => setShowShare(true)}>
                 <Share />
               </TouchableOpacity>
             </View>
@@ -783,6 +792,7 @@ const rotate = rotateAnim.interpolate({
                   Floor Plan
                 </Text>
                 <TouchableOpacity
+                 activeOpacity={1}
                   className="mt-4"
                   onPress={() => {
                     setShowFloor(true);
@@ -869,6 +879,7 @@ const rotate = rotateAnim.interpolate({
               >
                 {data.brochures.map((file: string, index: number) => (
                   <TouchableOpacity
+                   activeOpacity={1}
                     key={index}
                     onPress={() => openPDF(formatPdfUrl(file))}
                     style={{
@@ -1116,7 +1127,7 @@ const rotate = rotateAnim.interpolate({
                       color: "white",
                     }}
                   >
-                    $ {monthlyPayment}
+                    £ {monthlyPayment}
                   </Text>
                 </View>
                 <Text className="mt-4">
@@ -1141,6 +1152,7 @@ const rotate = rotateAnim.interpolate({
   showsHorizontalScrollIndicator={false}
   renderItem={({ item }) => (
     <TouchableOpacity
+     activeOpacity={1}
       style={[
         styles.card2,
         {
@@ -1348,7 +1360,9 @@ const rotate = rotateAnim.interpolate({
             }}
           />
 
-          <TouchableOpacity style={[styles.card2, { alignItems: "center" }]} onPress={()=>{setprofileData({type:data?.posted_by_type,id:data?.posted_by?.id});setSingleView(true);}}>
+          <TouchableOpacity 
+           activeOpacity={1}
+           style={[styles.card2, { alignItems: "center" }]} onPress={()=>{setprofileData({type:data?.posted_by_type,id:data?.posted_by?.id});setSingleView(true);}}>
             <CircleImage
               Size={80}
               source={{ uri: ImageFormater(data?.posted_by?.logo) }}
@@ -1369,7 +1383,9 @@ const rotate = rotateAnim.interpolate({
               <StarRating size={20} rating={data?.posted_by?.rating} />
             </View>
             {type === "community" ? (
-             <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"community",profile_type:data?.posted_by_type,name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
+             <TouchableOpacity
+              activeOpacity={1} onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"community",profile_type:data?.posted_by_type,name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
+
                 <Text style={[styles.heading, { color: Colors.light.red }]}>
                   {data?.posted_by?.total_posts}
                 </Text>
@@ -1377,7 +1393,9 @@ const rotate = rotateAnim.interpolate({
  </TouchableOpacity>
             ) : (
               <View className="flex-row mb-4">
-                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"sale",profile_type:data?.posted_by_type,name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
+                <TouchableOpacity
+                 activeOpacity={1}onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"sale",profile_type:data?.posted_by_type,name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
+
                   <Text style={[styles.heading, { color: Colors.light.red }]}>
                     {data?.posted_by?.sale_posts ?? 0}
                   </Text>
@@ -1385,7 +1403,9 @@ const rotate = rotateAnim.interpolate({
                 </TouchableOpacity>
 
                 <VerticalLine />
-                <TouchableOpacity onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"rent",name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
+                <TouchableOpacity 
+                 activeOpacity={1}
+                onPress={()=>{router.navigate({pathname:"/MyPostListing",params:{id:data?.post?.user_id?.toString(),type:"rent",name:data?.posted_by?.business_name}})}} className="items-center" style={{ flex: 1 }}>
                   <Text style={[styles.heading, { color: Colors.light.red }]}>
                     {data?.posted_by?.rent_posts ?? 0}
                   </Text>
@@ -1394,6 +1414,7 @@ const rotate = rotateAnim.interpolate({
               </View>
             )}
             <TouchableOpacity
+             activeOpacity={1}
               style={{
                 backgroundColor: Colors.light.DarkGreen,
                 paddingHorizontal: hs(15),
@@ -1476,7 +1497,9 @@ const rotate = rotateAnim.interpolate({
           Share Post
         </Text>
 
-        <TouchableOpacity onPress={() => setShowShare(false)}>
+        <TouchableOpacity 
+         activeOpacity={1}
+         onPress={() => setShowShare(false)}>
           <Cross height={vs(24)} width={vs(24)} />
         </TouchableOpacity>
       </View>
@@ -1485,7 +1508,7 @@ const rotate = rotateAnim.interpolate({
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.us/postRedirect?post_id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type==="community"?"community":"property"}`,
+          link:`https://homeilove.co.uk/postRedirect?post_id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type==="community"?"community":"property"}`,
           post_id:type==="community"?data?.post?.post_community_id:data?.post?.post_property_id,
           type:type,
         }}
@@ -1615,6 +1638,7 @@ const rotate = rotateAnim.interpolate({
 
     {/* Copy Button */}
     <TouchableOpacity
+     activeOpacity={1}
       onPress={async () => {
         await Clipboard.setStringAsync(values.link);
         renderToastSuccess("Link copied");

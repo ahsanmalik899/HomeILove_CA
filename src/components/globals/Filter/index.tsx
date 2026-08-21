@@ -105,6 +105,7 @@ const index = ({
   return (
     <View style={styles.card}>
       <TouchableOpacity
+       activeOpacity={1}
         style={{
           backgroundColor: Colors.light.lightGray,
           alignSelf: "flex-end",
@@ -209,6 +210,7 @@ const index = ({
           >
             {options.map((option) => (
               <TouchableOpacity
+               activeOpacity={1}
                 key={option}
                 onPress={() =>
                   toggleValue("propertysubType", option, values, setFieldValue)
@@ -263,6 +265,7 @@ const index = ({
               </Text>
               {propertyConditions.map((item) => (
                 <TouchableOpacity
+                 activeOpacity={1}
                   key={item.value}
                   onPress={() =>
                     toggleValue(
@@ -312,6 +315,7 @@ const index = ({
               </Text>
             {PorposeForProperty.map((item) => (
                 <TouchableOpacity
+                 activeOpacity={1}
                   key={item.value}
                   onPress={() =>
                     toggleValue(
@@ -380,6 +384,7 @@ const index = ({
                 >
                   {["Yes", "No"].map((option) => (
                     <TouchableOpacity
+                     activeOpacity={1}
                       key={option}
                       onPress={() => setFieldValue("pet_allowers", option)}
                       style={{
@@ -435,6 +440,7 @@ const index = ({
                 >
                   {["Vacant now", "Any Date"].map((option) => (
                     <TouchableOpacity
+                     activeOpacity={1}
                       key={option}
                       onPress={() =>
                         setFieldValue(
@@ -505,6 +511,7 @@ const index = ({
                     "Under Construction",
                   ].map((option) => (
                     <TouchableOpacity
+                     activeOpacity={1}
                       key={option}
                       onPress={() =>
                         toggleValue(
@@ -634,27 +641,27 @@ const index = ({
                   required
                   errorText={errors.minPrice}
                   options={[
-                    { label: "below $ 50,000", value: "0" },
-                    { label: "$ 50,000", value: "50000" },
-                    { label: "$ 70,000", value: "70000" },
-                    { label: "$ 100,000", value: "100000" },
-                    { label: "$ 120,000", value: "120000" },
-                    { label: "$ 150,000", value: "150000" },
-                    { label: "$ 175,000", value: "175000" },
-                    { label: "$ 200,000", value: "200000" },
-                    { label: "$ 250,000", value: "250000" },
-                    { label: "$ 300,000", value: "300000" },
-                    { label: "$ 350,000", value: "350000" },
-                    { label: "$ 400,000", value: "400000" },
-                    { label: "$ 500,000", value: "500000" },
-                    { label: "$ 600,000", value: "600000" },
-                    { label: "$ 700,000", value: "700000" },
-                    { label: "$ 900,000", value: "900000" },
-                    { label: "$ 1,000,000", value: "1000000" },
-                    { label: "$ 1,200,000", value: "1200000" },
-                    { label: "$ 1,500,000", value: "1500000" },
-                    { label: "$ 2,000,000", value: "2000000" },
-                    { label: "$ 3,000,000", value: "3000000" },
+                    { label: "below £ 50,000", value: "0" },
+                    { label: "£ 50,000", value: "50000" },
+                    { label: "£ 70,000", value: "70000" },
+                    { label: "£ 100,000", value: "100000" },
+                    { label: "£ 120,000", value: "120000" },
+                    { label: "£ 150,000", value: "150000" },
+                    { label: "£ 175,000", value: "175000" },
+                    { label: "£ 200,000", value: "200000" },
+                    { label: "£ 250,000", value: "250000" },
+                    { label: "£ 300,000", value: "300000" },
+                    { label: "£ 350,000", value: "350000" },
+                    { label: "£ 400,000", value: "400000" },
+                    { label: "£ 500,000", value: "500000" },
+                    { label: "£ 600,000", value: "600000" },
+                    { label: "£ 700,000", value: "700000" },
+                    { label: "£ 900,000", value: "900000" },
+                    { label: "£ 1,000,000", value: "1000000" },
+                    { label: "£ 1,200,000", value: "1200000" },
+                    { label: "£ 1,500,000", value: "1500000" },
+                    { label: "£ 2,000,000", value: "2000000" },
+                    { label: "£ 3,000,000", value: "3000000" },
                   ]}
                   onSelect={(value) => {
                     setFieldValue("minPrice", value);
@@ -672,27 +679,27 @@ const index = ({
                   required
                   errorText={errors.maxPrice}
                   options={[
-                    { value: "50000", label: "$ 50,000" },
-                    { value: "70000", label: "$ 70,000" },
-                    { value: "100000", label: "$ 100,000" },
-                    { value: "120000", label: "$ 120,000" },
-                    { value: "150000", label: "$ 150,000" },
-                    { value: "175000", label: "$ 175,000" },
-                    { value: "200000", label: "$ 200,000" },
-                    { value: "250000", label: "$ 250,000" },
-                    { value: "300000", label: "$ 300,000" },
-                    { value: "350000", label: "$ 350,000" },
-                    { value: "400000", label: "$ 400,000" },
-                    { value: "500000", label: "$ 500,000" },
-                    { value: "600000", label: "$ 600,000" },
-                    { value: "700000", label: "$ 700,000" },
-                    { value: "900000", label: "$ 900,000" },
-                    { value: "1000000", label: "$ 1,000,000" },
-                    { value: "1200000", label: "$ 1,200,000" },
-                    { value: "1500000", label: "$ 1,500,000" },
-                    { value: "2000000", label: "$ 2,000,000" },
-                    { value: "3000000", label: "$ 3,000,000" },
-                    { value: "3000001", label: "Above $ 3,000,000" },
+                    { value: "50000", label: "£ 50,000" },
+                    { value: "70000", label: "£ 70,000" },
+                    { value: "100000", label: "£ 100,000" },
+                    { value: "120000", label: "£ 120,000" },
+                    { value: "150000", label: "£ 150,000" },
+                    { value: "175000", label: "£ 175,000" },
+                    { value: "200000", label: "£ 200,000" },
+                    { value: "250000", label: "£ 250,000" },
+                    { value: "300000", label: "£ 300,000" },
+                    { value: "350000", label: "£ 350,000" },
+                    { value: "400000", label: "£ 400,000" },
+                    { value: "500000", label: "£ 500,000" },
+                    { value: "600000", label: "£ 600,000" },
+                    { value: "700000", label: "£ 700,000" },
+                    { value: "900000", label: "£ 900,000" },
+                    { value: "1000000", label: "£ 1,000,000" },
+                    { value: "1200000", label: "£ 1,200,000" },
+                    { value: "1500000", label: "£ 1,500,000" },
+                    { value: "2000000", label: "£ 2,000,000" },
+                    { value: "3000000", label: "£ 3,000,000" },
+                    { value: "3000001", label: "Above £ 3,000,000" },
                   ]}
                   onSelect={(value) => setFieldValue("maxPrice", value)}
                 />
@@ -722,6 +729,7 @@ const index = ({
 
               <View style={styles.counterRow}>
                 <TouchableOpacity
+                 activeOpacity={1}
                   style={styles.counterBtn}
                   onPress={() => {
                     const current = Number(values.bathrooms || 0);
@@ -740,6 +748,7 @@ const index = ({
                 </View>
 
                 <TouchableOpacity
+                 activeOpacity={1}
                   style={styles.counterBtn}
                   onPress={() => {
                     const current = Number(values.bathrooms || 0);
@@ -794,6 +803,7 @@ const index = ({
                 "Others",
               ].map((option) => (
                 <TouchableOpacity
+                 activeOpacity={1}
                   key={option}
                   onPress={() =>
                     toggleValue("tenure", option, values, setFieldValue)
@@ -833,6 +843,7 @@ const index = ({
                 "More than 1 year",
               ].map((option) => (
                 <TouchableOpacity
+                 activeOpacity={1}
                   key={option}
                   onPress={() =>
                     toggleValue("tinency_tenure", option, values, setFieldValue)

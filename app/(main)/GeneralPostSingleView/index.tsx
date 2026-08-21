@@ -85,6 +85,7 @@ const index = () => {
 
               {user?.id === item.sweetghar_user_id && (
                 <TouchableOpacity
+                 activeOpacity={1}
                   style={styles.deleteBtn}
                   onPress={() =>
                     deleteComment(item.comment_id)
@@ -105,6 +106,7 @@ const index = () => {
 
           <View style={styles.actionRow}>
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => setShowReplyInput(!showReplyInput)}
             >
               <Text style={styles.actionText}>Reply</Text>
@@ -122,7 +124,8 @@ const index = () => {
                 style={styles.replyInput}
               />
 
-              <TouchableOpacity onPress={handleReply} style={styles.sendBtn}>
+              <TouchableOpacity  activeOpacity={1}
+              onPress={handleReply} style={styles.sendBtn}>
                 <Text style={styles.sendText}>Send</Text>
               </TouchableOpacity>
             </View>
@@ -144,6 +147,7 @@ const index = () => {
                   {/* ✅ REPLY DELETE */}
                   {user?.id === reply.sweetghar_user_id && (
                     <TouchableOpacity
+                     activeOpacity={1}
                       style={styles.deleteBtn}
                       onPress={() =>
                         deleteComment(reply.comment_id).unwrap().then(refetch)
@@ -212,6 +216,7 @@ const index = () => {
       
        
           <TouchableOpacity
+           activeOpacity={1}
             className="mt-4"
             onPress={() => {
               setShowImages(true);
@@ -258,6 +263,7 @@ const index = () => {
   showsHorizontalScrollIndicator={false}
   renderItem={({ item, index }) => (
     <TouchableOpacity
+     activeOpacity={1}
       className="mt-4 mr-2"
       onPress={() => {
         setImageNo(index);
@@ -301,10 +307,11 @@ const index = () => {
             </Text>
 
             <View className="flex-row gap-2">
-              <TouchableOpacity>
+              <TouchableOpacity
+               activeOpacity={1}>
                 <Heart />
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity  activeOpacity={1}>
                 <Share />
               </TouchableOpacity>
             </View>

@@ -52,6 +52,7 @@ export default function FormikTimePicker({
 
       {/* Button */}
       <TouchableOpacity
+       activeOpacity={1}
         onPress={() => setShow(true)}
         style={{
           borderRadius: ms(18),

@@ -305,6 +305,7 @@ const index = () => {
                       {/*  Sale */}
                       <View className="flex-row items-center">
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Sale",
@@ -341,6 +342,7 @@ const index = () => {
                         style={{ marginLeft: hs(20) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Rent",
@@ -475,27 +477,27 @@ const index = () => {
                             errorText={errors.min_price}
                             options={[
                               { label: "No selection", value: "" },
-                              { label: "below $ 50,000", value: "0" },
-                              { label: "$ 50,000", value: "50000" },
-                              { label: "$ 70,000", value: "70000" },
-                              { label: "$ 100,000", value: "100000" },
-                              { label: "$ 120,000", value: "120000" },
-                              { label: "$ 150,000", value: "150000" },
-                              { label: "$ 175,000", value: "175000" },
-                              { label: "$ 200,000", value: "200000" },
-                              { label: "$ 250,000", value: "250000" },
-                              { label: "$ 300,000", value: "300000" },
-                              { label: "$ 350,000", value: "350000" },
-                              { label: "$ 400,000", value: "400000" },
-                              { label: "$ 500,000", value: "500000" },
-                              { label: "$ 600,000", value: "600000" },
-                              { label: "$ 700,000", value: "700000" },
-                              { label: "$ 900,000", value: "900000" },
-                              { label: "$ 1,000,000", value: "1000000" },
-                              { label: "$ 1,200,000", value: "1200000" },
-                              { label: "$ 1,500,000", value: "1500000" },
-                              { label: "$ 2,000,000", value: "2000000" },
-                              { label: "$ 3,000,000", value: "3000000" },
+                              { label: "below £ 50,000", value: "0" },
+                              { label: "£ 50,000", value: "50000" },
+                              { label: "£ 70,000", value: "70000" },
+                              { label: "£ 100,000", value: "100000" },
+                              { label: "£ 120,000", value: "120000" },
+                              { label: "£ 150,000", value: "150000" },
+                              { label: "£ 175,000", value: "175000" },
+                              { label: "£ 200,000", value: "200000" },
+                              { label: "£ 250,000", value: "250000" },
+                              { label: "£ 300,000", value: "300000" },
+                              { label: "£ 350,000", value: "350000" },
+                              { label: "£ 400,000", value: "400000" },
+                              { label: "£ 500,000", value: "500000" },
+                              { label: "£ 600,000", value: "600000" },
+                              { label: "£ 700,000", value: "700000" },
+                              { label: "£ 900,000", value: "900000" },
+                              { label: "£ 1,000,000", value: "1000000" },
+                              { label: "£ 1,200,000", value: "1200000" },
+                              { label: "£ 1,500,000", value: "1500000" },
+                              { label: "£ 2,000,000", value: "2000000" },
+                              { label: "£ 3,000,000", value: "3000000" },
                             ]}
                             onSelect={(value) => {
                               setFieldValue("min_price", value);
@@ -514,27 +516,27 @@ const index = () => {
                             errorText={errors.max_price}
                             options={[
                               { value: "", label: "No selection" },
-                              { value: "50000", label: "$ 50,000" },
-                              { value: "70000", label: "$ 70,000" },
-                              { value: "100000", label: "$ 100,000" },
-                              { value: "120000", label: "$ 120,000" },
-                              { value: "150000", label: "$ 150,000" },
-                              { value: "175000", label: "$ 175,000" },
-                              { value: "200000", label: "$ 200,000" },
-                              { value: "250000", label: "$ 250,000" },
-                              { value: "300000", label: "$ 300,000" },
-                              { value: "350000", label: "$ 350,000" },
-                              { value: "400000", label: "$ 400,000" },
-                              { value: "500000", label: "$ 500,000" },
-                              { value: "600000", label: "$ 600,000" },
-                              { value: "700000", label: "$ 700,000" },
-                              { value: "900000", label: "$ 900,000" },
-                              { value: "1000000", label: "$ 1,000,000" },
-                              { value: "1200000", label: "$ 1,200,000" },
-                              { value: "1500000", label: "$ 1,500,000" },
-                              { value: "2000000", label: "$ 2,000,000" },
-                              { value: "3000000", label: "$ 3,000,000" },
-                              { value: "3000001", label: "Above $ 3,000,000" },
+                              { value: "50000", label: "£ 50,000" },
+                              { value: "70000", label: "£ 70,000" },
+                              { value: "100000", label: "£ 100,000" },
+                              { value: "120000", label: "£ 120,000" },
+                              { value: "150000", label: "£ 150,000" },
+                              { value: "175000", label: "£ 175,000" },
+                              { value: "200000", label: "£ 200,000" },
+                              { value: "250000", label: "£ 250,000" },
+                              { value: "300000", label: "£ 300,000" },
+                              { value: "350000", label: "£ 350,000" },
+                              { value: "400000", label: "£ 400,000" },
+                              { value: "500000", label: "£ 500,000" },
+                              { value: "600000", label: "£ 600,000" },
+                              { value: "700000", label: "£ 700,000" },
+                              { value: "900000", label: "£ 900,000" },
+                              { value: "1000000", label: "£ 1,000,000" },
+                              { value: "1200000", label: "£ 1,200,000" },
+                              { value: "1500000", label: "£ 1,500,000" },
+                              { value: "2000000", label: "£ 2,000,000" },
+                              { value: "3000000", label: "£ 3,000,000" },
+                              { value: "3000001", label: "Above £ 3,000,000" },
                             ]}
                             onSelect={(value) =>
                               setFieldValue("max_price", value)
@@ -557,27 +559,27 @@ const index = () => {
                             errorText={errors.min_rent}
                             options={[
                               { label: "No selection", value: "" },
-                              { label: "below $ 50,000", value: "0" },
-                              { label: "$ 50,000", value: "50000" },
-                              { label: "$ 70,000", value: "70000" },
-                              { label: "$ 100,000", value: "100000" },
-                              { label: "$ 120,000", value: "120000" },
-                              { label: "$ 150,000", value: "150000" },
-                              { label: "$ 175,000", value: "175000" },
-                              { label: "$ 200,000", value: "200000" },
-                              { label: "$ 250,000", value: "250000" },
-                              { label: "$ 300,000", value: "300000" },
-                              { label: "$ 350,000", value: "350000" },
-                              { label: "$ 400,000", value: "400000" },
-                              { label: "$ 500,000", value: "500000" },
-                              { label: "$ 600,000", value: "600000" },
-                              { label: "$ 700,000", value: "700000" },
-                              { label: "$ 900,000", value: "900000" },
-                              { label: "$ 1,000,000", value: "1000000" },
-                              { label: "$ 1,200,000", value: "1200000" },
-                              { label: "$ 1,500,000", value: "1500000" },
-                              { label: "$ 2,000,000", value: "2000000" },
-                              { label: "$ 3,000,000", value: "3000000" },
+                              { label: "below £ 50,000", value: "0" },
+                              { label: "£ 50,000", value: "50000" },
+                              { label: "£ 70,000", value: "70000" },
+                              { label: "£ 100,000", value: "100000" },
+                              { label: "£ 120,000", value: "120000" },
+                              { label: "£ 150,000", value: "150000" },
+                              { label: "£ 175,000", value: "175000" },
+                              { label: "£ 200,000", value: "200000" },
+                              { label: "£ 250,000", value: "250000" },
+                              { label: "£ 300,000", value: "300000" },
+                              { label: "£ 350,000", value: "350000" },
+                              { label: "£ 400,000", value: "400000" },
+                              { label: "£ 500,000", value: "500000" },
+                              { label: "£ 600,000", value: "600000" },
+                              { label: "£ 700,000", value: "700000" },
+                              { label: "£ 900,000", value: "900000" },
+                              { label: "£ 1,000,000", value: "1000000" },
+                              { label: "£ 1,200,000", value: "1200000" },
+                              { label: "£ 1,500,000", value: "1500000" },
+                              { label: "£ 2,000,000", value: "2000000" },
+                              { label: "£ 3,000,000", value: "3000000" },
                             ]}
                             onSelect={(value) => {
                               setFieldValue("min_rent", value);
@@ -596,27 +598,27 @@ const index = () => {
                             errorText={errors.max_rent}
                             options={[
                               { value: "", label: "No selection" },
-                              { value: "50000", label: "$ 50,000" },
-                              { value: "70000", label: "$ 70,000" },
-                              { value: "100000", label: "$ 100,000" },
-                              { value: "120000", label: "$ 120,000" },
-                              { value: "150000", label: "$ 150,000" },
-                              { value: "175000", label: "$ 175,000" },
-                              { value: "200000", label: "$ 200,000" },
-                              { value: "250000", label: "$ 250,000" },
-                              { value: "300000", label: "$ 300,000" },
-                              { value: "350000", label: "$ 350,000" },
-                              { value: "400000", label: "$ 400,000" },
-                              { value: "500000", label: "$ 500,000" },
-                              { value: "600000", label: "$ 600,000" },
-                              { value: "700000", label: "$ 700,000" },
-                              { value: "900000", label: "$ 900,000" },
-                              { value: "1000000", label: "$ 1,000,000" },
-                              { value: "1200000", label: "$ 1,200,000" },
-                              { value: "1500000", label: "$ 1,500,000" },
-                              { value: "2000000", label: "$ 2,000,000" },
-                              { value: "3000000", label: "$ 3,000,000" },
-                              { value: "3000001", label: "Above $ 3,000,000" },
+                              { value: "50000", label: "£ 50,000" },
+                              { value: "70000", label: "£ 70,000" },
+                              { value: "100000", label: "£ 100,000" },
+                              { value: "120000", label: "£ 120,000" },
+                              { value: "150000", label: "£ 150,000" },
+                              { value: "175000", label: "£ 175,000" },
+                              { value: "200000", label: "£ 200,000" },
+                              { value: "250000", label: "£ 250,000" },
+                              { value: "300000", label: "£ 300,000" },
+                              { value: "350000", label: "£ 350,000" },
+                              { value: "400000", label: "£ 400,000" },
+                              { value: "500000", label: "£ 500,000" },
+                              { value: "600000", label: "£ 600,000" },
+                              { value: "700000", label: "£ 700,000" },
+                              { value: "900000", label: "£ 900,000" },
+                              { value: "1000000", label: "£ 1,000,000" },
+                              { value: "1200000", label: "£ 1,200,000" },
+                              { value: "1500000", label: "£ 1,500,000" },
+                              { value: "2000000", label: "£ 2,000,000" },
+                              { value: "3000000", label: "£ 3,000,000" },
+                              { value: "3000001", label: "Above £ 3,000,000" },
                             ]}
                             onSelect={(value) =>
                               setFieldValue("max_rent", value)
@@ -843,6 +845,7 @@ const index = () => {
                     />
                     <View className="flex-row justify-between">
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={{
                           backgroundColor: Colors.light.lightGray,
                           borderRadius: ms(10),
@@ -882,6 +885,7 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => handleSubmit()}
                         style={{
                           backgroundColor: Colors.light.red,
@@ -1013,6 +1017,7 @@ const index = () => {
                       {/*  Residential */}
                       <View className="flex-row items-center">
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Residential",
@@ -1049,6 +1054,7 @@ const index = () => {
                         style={{ marginLeft: hs(20) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Commercial",
@@ -1085,6 +1091,7 @@ const index = () => {
                         style={{ marginLeft: hs(20) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Mix",
@@ -1152,6 +1159,7 @@ const index = () => {
                       {/* Completed */}
                       <View className="flex-row items-center">
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Completed",
@@ -1188,6 +1196,7 @@ const index = () => {
                         style={{ marginLeft: hs(20) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Constructed",
@@ -1224,6 +1233,7 @@ const index = () => {
                         style={{ marginLeft: hs(20) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "Inplanning",
@@ -1294,27 +1304,27 @@ const index = () => {
                           errorText={errors.min_price}
                           options={[
                             { label: "No selection", value: "" },
-                            { label: "below $ 50,000", value: "0" },
-                            { label: "$ 50,000", value: "50000" },
-                            { label: "$ 70,000", value: "70000" },
-                            { label: "$ 100,000", value: "100000" },
-                            { label: "$ 120,000", value: "120000" },
-                            { label: "$ 150,000", value: "150000" },
-                            { label: "$ 175,000", value: "175000" },
-                            { label: "$ 200,000", value: "200000" },
-                            { label: "$ 250,000", value: "250000" },
-                            { label: "$ 300,000", value: "300000" },
-                            { label: "$ 350,000", value: "350000" },
-                            { label: "$ 400,000", value: "400000" },
-                            { label: "$ 500,000", value: "500000" },
-                            { label: "$ 600,000", value: "600000" },
-                            { label: "$ 700,000", value: "700000" },
-                            { label: "$ 900,000", value: "900000" },
-                            { label: "$ 1,000,000", value: "1000000" },
-                            { label: "$ 1,200,000", value: "1200000" },
-                            { label: "$ 1,500,000", value: "1500000" },
-                            { label: "$ 2,000,000", value: "2000000" },
-                            { label: "$ 3,000,000", value: "3000000" },
+                            { label: "below £ 50,000", value: "0" },
+                            { label: "£ 50,000", value: "50000" },
+                            { label: "£ 70,000", value: "70000" },
+                            { label: "£ 100,000", value: "100000" },
+                            { label: "£ 120,000", value: "120000" },
+                            { label: "£ 150,000", value: "150000" },
+                            { label: "£ 175,000", value: "175000" },
+                            { label: "£ 200,000", value: "200000" },
+                            { label: "£ 250,000", value: "250000" },
+                            { label: "£ 300,000", value: "300000" },
+                            { label: "£ 350,000", value: "350000" },
+                            { label: "£ 400,000", value: "400000" },
+                            { label: "£ 500,000", value: "500000" },
+                            { label: "£ 600,000", value: "600000" },
+                            { label: "£ 700,000", value: "700000" },
+                            { label: "£ 900,000", value: "900000" },
+                            { label: "£ 1,000,000", value: "1000000" },
+                            { label: "£ 1,200,000", value: "1200000" },
+                            { label: "£ 1,500,000", value: "1500000" },
+                            { label: "£ 2,000,000", value: "2000000" },
+                            { label: "£ 3,000,000", value: "3000000" },
                           ]}
                           onSelect={(value) => {
                             setFieldValue("min_price", value);
@@ -1334,27 +1344,27 @@ const index = () => {
                           errorText={errors.max_price}
                           options={[
                             { value: "", label: "No selection" },
-                            { value: "50000", label: "$ 50,000" },
-                            { value: "70000", label: "$ 70,000" },
-                            { value: "100000", label: "$ 100,000" },
-                            { value: "120000", label: "$ 120,000" },
-                            { value: "150000", label: "$ 150,000" },
-                            { value: "175000", label: "$ 175,000" },
-                            { value: "200000", label: "$ 200,000" },
-                            { value: "250000", label: "$ 250,000" },
-                            { value: "300000", label: "$ 300,000" },
-                            { value: "350000", label: "$ 350,000" },
-                            { value: "400000", label: "$ 400,000" },
-                            { value: "500000", label: "$ 500,000" },
-                            { value: "600000", label: "$ 600,000" },
-                            { value: "700000", label: "$ 700,000" },
-                            { value: "900000", label: "$ 900,000" },
-                            { value: "1000000", label: "$ 1,000,000" },
-                            { value: "1200000", label: "$ 1,200,000" },
-                            { value: "1500000", label: "$ 1,500,000" },
-                            { value: "2000000", label: "$ 2,000,000" },
-                            { value: "3000000", label: "$ 3,000,000" },
-                            { value: "3000001", label: "Above $ 3,000,000" },
+                            { value: "50000", label: "£ 50,000" },
+                            { value: "70000", label: "£ 70,000" },
+                            { value: "100000", label: "£ 100,000" },
+                            { value: "120000", label: "£ 120,000" },
+                            { value: "150000", label: "£ 150,000" },
+                            { value: "175000", label: "£ 175,000" },
+                            { value: "200000", label: "£ 200,000" },
+                            { value: "250000", label: "£ 250,000" },
+                            { value: "300000", label: "£ 300,000" },
+                            { value: "350000", label: "£ 350,000" },
+                            { value: "400000", label: "£ 400,000" },
+                            { value: "500000", label: "£ 500,000" },
+                            { value: "600000", label: "£ 600,000" },
+                            { value: "700000", label: "£ 700,000" },
+                            { value: "900000", label: "£ 900,000" },
+                            { value: "1000000", label: "£ 1,000,000" },
+                            { value: "1200000", label: "£ 1,200,000" },
+                            { value: "1500000", label: "£ 1,500,000" },
+                            { value: "2000000", label: "£ 2,000,000" },
+                            { value: "3000000", label: "£ 3,000,000" },
+                            { value: "3000001", label: "Above £ 3,000,000" },
                           ]}
                           onSelect={(value) =>
                             setFieldValue("max_price", value)
@@ -1373,6 +1383,7 @@ const index = () => {
                     />
                     <View className="flex-row justify-between">
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={{
                           backgroundColor: Colors.light.lightGray,
                           borderRadius: ms(10),
@@ -1411,6 +1422,7 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => {
                           handleSubmit();
                           console.log(errors);
@@ -1532,6 +1544,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "electrician",
@@ -1569,6 +1582,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "builder",
@@ -1606,6 +1620,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "agent",
@@ -1642,6 +1657,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "plumber",
@@ -1678,6 +1694,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "mortgage",
@@ -1714,6 +1731,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "decor",
@@ -1750,6 +1768,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "painter",
@@ -1786,6 +1805,7 @@ const index = () => {
                         style={{ marginVertical: vs(5) }}
                       >
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() =>
                             toggleStatus(
                               "investor",
@@ -1828,6 +1848,7 @@ const index = () => {
                     />
                     <View className="flex-row justify-between">
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={{
                           backgroundColor: Colors.light.lightGray,
                           borderRadius: ms(10),
@@ -1866,6 +1887,7 @@ const index = () => {
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => {
                           handleSubmit();
                           console.log(errors);

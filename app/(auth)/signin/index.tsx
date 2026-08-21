@@ -161,6 +161,7 @@ export default function SignInScreen() {
                       value={values.password}
                     />
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={() => setShowPassword(!showPassword)}
                     >
                       <Ionicons
@@ -176,6 +177,7 @@ export default function SignInScreen() {
 
                   <View style={styles.forgotContainer}>
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={() => router.push("/(auth)/forgot")}
                     >
                       <Text style={styles.forgotText}>Forgot Password?</Text>
@@ -196,6 +198,7 @@ export default function SignInScreen() {
                       Don’t have an account?{" "}
                     </Text>
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={() => router.push("/(auth)/signup")}
                     >
                       <Text style={styles.loginTextGreen}>Register Now</Text>

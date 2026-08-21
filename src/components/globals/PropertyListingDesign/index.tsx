@@ -158,7 +158,7 @@ const renderItem = ({ item, index }) => {
                   fontFamily: "PopinRegular",
                 }}
               >
-                $ {formatPrice(item?.data?.asking_price)}
+                 £ {formatPrice(item?.data?.asking_price)}
                 {item?.data?.property_for === "rent" && (
                   <Text
                     style={{
@@ -267,6 +267,7 @@ const renderItem = ({ item, index }) => {
               </Text>)}
 
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSelectedImages(item?.data?.images || []);
                   setShowImages(true);
@@ -354,6 +355,7 @@ const renderItem = ({ item, index }) => {
                     </Text>
                   )}
                   <TouchableOpacity
+                   activeOpacity={1}
                     style={{ marginLeft: "auto" }}
                     onPress={toggleSave}
                   >
@@ -375,6 +377,7 @@ const renderItem = ({ item, index }) => {
   showsHorizontalScrollIndicator={false}
   renderItem={({ item: image, index }) => (
     <TouchableOpacity
+     activeOpacity={1}
       className="mt-4 mr-2"
       onPress={() => {
         openslider(index);
@@ -409,25 +412,25 @@ const renderItem = ({ item, index }) => {
               >
                 <>
                   <View className="flex-row items-center">
-                    <Bed />
+                    <Bed  heigh={30} width={30}/>
                     <Text
-                      style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
+                      style={{ marginLeft: vs(5), marginTop:vs(3),fontFamily: "PopinRegular" }}
                     >
                       {item?.data?.bedrooms}
                     </Text>
                   </View>
                   <View className="flex-row items-center">
-                    <Shower />
+                    <Shower heigh={30} width={30} />
                     <Text
-                      style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
+                      style={{ marginLeft: vs(5), marginTop:vs(3),fontFamily: "PopinRegular" }}
                     >
                       {item?.data?.bathrooms}
                     </Text>
                   </View>
                   <View className="flex-row items-center">
-                    <Area />
+                    <Area  heigh={30} width={30} />
                     <Text
-                      style={{ marginLeft: vs(5), fontFamily: "PopinRegular" }}
+                      style={{ marginLeft: vs(5),marginTop:vs(3), fontFamily: "PopinRegular" }}
                     >
                       {item?.data?.land_area} sqft
                     </Text>
@@ -436,9 +439,9 @@ const renderItem = ({ item, index }) => {
               </View>
 
               <View
-                className="flex-row justify-between"
+                className="flex-row justify-between items-center"
                 style={{
-                  backgroundColor: Colors.light.lightGray,
+                  backgroundColor: "#ff007b1f",
                   borderRadius: 8,
                   paddingRight: hs(20),
                   paddingVertical: vs(5),
@@ -447,6 +450,7 @@ const renderItem = ({ item, index }) => {
                 }}
               >
                 <TouchableOpacity  
+                 activeOpacity={1}
                 onPress={()=>{
                                 router.navigate({
                                   pathname:"/ChatScreen",
@@ -467,7 +471,9 @@ const renderItem = ({ item, index }) => {
                               }}>
                   <Mail />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity 
+                 activeOpacity={1}
+                 onPress={()=>{
                   makeCall(item?.data?.posted_by.contact||item?.data?.posted_by.mobile)
                 }}>
                   <Call />

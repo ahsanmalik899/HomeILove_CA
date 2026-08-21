@@ -134,6 +134,7 @@ export const FormikDropdown = ({
 
         {multipleFields && (
           <TouchableOpacity
+           activeOpacity={1}
             style={{
               marginLeft: hs(8),
               backgroundColor: Colors.light.LightGreen,
@@ -186,7 +187,9 @@ export const FormikDropdown = ({
                   {item}
                 </Text>
               </View>
-              <TouchableOpacity onPress={() => handleRemove(index)}>
+              <TouchableOpacity
+               activeOpacity={1}
+                onPress={() => handleRemove(index)}>
                 <Cross />
               </TouchableOpacity>
             </View>

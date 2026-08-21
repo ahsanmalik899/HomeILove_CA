@@ -3,10 +3,10 @@ import { useGetBlockedProfileMessageQuery, useGetUnreadNotificationsCountQuery, 
 import { setNotificationCount } from "@/store/slices/Notification";
 import { Notification } from "@/store/slices/selector/Notification";
 import { userdata } from "@/store/slices/selector/user";
-import HomeLogo from "@assets/Home/homeliogo.svg";
 import NotificatioOutline from "@assets/Home/notificationOutline.svg";
 import SidebarIcon from "@assets/Home/sideMenueIcon.svg";
 import Connection from "@assets/icons/bottom-tabs/connectio_icon.svg";
+import HomeLogo from "@assets/logo/logo-black.svg";
 import { MaterialIcons } from "@expo/vector-icons";
 import BlockedUserModal from "@src/components/globals/BlockedComponenet/BlockedUserModal";
 import SideBarUser from "@src/components/globals/SideBarUser";
@@ -119,7 +119,7 @@ useEffect(() => {
           >
             {/* Left section */}
             <View style={{ flex: 1, alignItems: "flex-start" }}>
-              <TouchableOpacity onPress={() => navigation.openDrawer()}>
+              <TouchableOpacity  activeOpacity={1} onPress={() => navigation.openDrawer()}>
                 <SidebarIcon />
               </TouchableOpacity>
             </View>
@@ -141,12 +141,14 @@ useEffect(() => {
               }}
             >
               <TouchableOpacity
+               activeOpacity={1}
                 style={{ marginRight: hs(10) }}
                 onPress={() => router.navigate("/(main)/Connection")}
               >
                 <Connection />
               </TouchableOpacity>
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => router.navigate("/CurrentAlerts")}
                 style={{ position: "relative" }}
               >

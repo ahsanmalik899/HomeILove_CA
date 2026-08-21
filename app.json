@@ -1,9 +1,9 @@
 {
   "expo": {
-    "scheme": "homeilove",
+    "scheme": "homeiloveuk",
     "name": "HomeILove.UK",
     "slug": "homeilove-uk",
-    "version": "1.0.5",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon 1024x1024.png",
     "newArchEnabled": true,
@@ -26,7 +26,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.revnosoft.homeilove.uk",
       "associatedDomains": [
-        "applinks:homeiloveuk.app"
+        "applinks:homeilove.co.uk"
       ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -35,7 +35,7 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
-      "versionCode": 6,
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app-icon 1024x1024.png",
         "backgroundColor": "#ffffff"
@@ -52,7 +52,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.uk",
+              "host": "homeilove.co.uk",
               "pathPrefix": "/CreateNewpass"
             }
           ],
@@ -67,7 +67,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.uk",
+              "host": "homeilove.co.uk",
               "pathPrefix": "/Account"
             }
           ],
@@ -82,7 +82,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.uk",
+              "host": "homeilove.co.uk",
               "pathPrefix": "/NewsFeedSingelView"
             }
           ],
@@ -97,7 +97,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.uk",
+              "host": "homeilove.co.uk",
               "pathPrefix": "/AddSingleView"
             }
           ],
@@ -112,7 +112,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.uk",
+              "host": "homeilove.co.uk",
               "pathPrefix": "/postRedirect"
             }
           ],

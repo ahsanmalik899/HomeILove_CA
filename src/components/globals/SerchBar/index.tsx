@@ -113,7 +113,8 @@ const AddressSearch = ({
           style={styles.input}
         />
 
-        <TouchableOpacity style={styles.searchButton} onPress={onpress}>
+        <TouchableOpacity
+         activeOpacity={1} style={styles.searchButton} onPress={onpress}>
           <Serch />
         </TouchableOpacity>
       </View>
@@ -135,6 +136,7 @@ const AddressSearch = ({
             nestedScrollEnabled
             renderItem={({ item }) => (
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() =>
                   handleSelectSuggestion(item.description, item.place_id)
                 }

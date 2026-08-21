@@ -6,6 +6,7 @@ import { QuickSerchCardProps } from "./type";
 const index = ({ Image, text, onPress }: QuickSerchCardProps) => {
   return (
     <TouchableOpacity
+     activeOpacity={1}
       style={styles.card}
       className="justify-between"
       onPress={onPress}

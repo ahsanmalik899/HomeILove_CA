@@ -184,6 +184,7 @@ const [editComment, { isLoading: editing }] =
   <View style={{ flexDirection: "row", gap: 8 }}>
 
     <TouchableOpacity
+     activeOpacity={1}
        style={styles.iconBtn}
       onPress={() => {
         setEditCommentText(item.comment);
@@ -198,6 +199,7 @@ const [editComment, { isLoading: editing }] =
     </TouchableOpacity>
 
     <TouchableOpacity
+     activeOpacity={1}
        style={styles.iconBtn}
      onPress={() =>
     handleDelete(item.comment_id, "comment")
@@ -222,6 +224,7 @@ const [editComment, { isLoading: editing }] =
 
     <View style={styles.editActions}>
       <TouchableOpacity
+       activeOpacity={1}
         onPress={() => {
           setEditingComment(false);
           setEditCommentText(item.comment);
@@ -231,6 +234,7 @@ const [editComment, { isLoading: editing }] =
       </TouchableOpacity>
 
       <TouchableOpacity
+       activeOpacity={1}
         onPress={handleEditComment}
         disabled={editing}
       >
@@ -249,6 +253,7 @@ const [editComment, { isLoading: editing }] =
  
            <View style={styles.actionRow}>
              <TouchableOpacity
+              activeOpacity={1}
                onPress={() => setShowReplyInput(!showReplyInput)}
              >
                <Text style={styles.actionText}>Reply</Text>
@@ -274,7 +279,9 @@ const [editComment, { isLoading: editing }] =
   }}
 />
  
-               <TouchableOpacity onPress={handleReply} style={styles.sendBtn}>
+               <TouchableOpacity 
+                activeOpacity={1}
+                onPress={handleReply} style={styles.sendBtn}>
                  <Text style={styles.sendText}>Send</Text>
                </TouchableOpacity>
              </View>
@@ -308,6 +315,7 @@ const [editComment, { isLoading: editing }] =
             }}
           >
             <TouchableOpacity
+             activeOpacity={1}
               style={styles.iconBtn}
               onPress={() => {
                 setEditingReplyId(reply.comment_id);
@@ -322,6 +330,7 @@ const [editComment, { isLoading: editing }] =
             </TouchableOpacity>
 
             <TouchableOpacity
+             activeOpacity={1}
               style={styles.iconBtn}
                onPress={() =>
     handleDelete(item.comment_id, "comment")
@@ -349,6 +358,7 @@ const [editComment, { isLoading: editing }] =
           <View style={styles.editActions}>
 
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => {
                 setEditingReplyId(null);
                 setEditReplyText("");
@@ -360,6 +370,7 @@ const [editComment, { isLoading: editing }] =
             </TouchableOpacity>
 
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => handleEditReply(reply)}
             >
               <Text style={styles.saveText}>
@@ -522,7 +533,9 @@ setData((prevData) =>
                       </Text>
              {data?.type!=="general" && (
                         <View style={{ flex: 1, alignItems: "flex-end" }}>
-                          <TouchableOpacity onPress={() => setSingleView(true)}>
+                          <TouchableOpacity
+                           activeOpacity={1}
+                            onPress={() => setSingleView(true)}>
                    <Text style={styles.fullDetailText}>See Full Details</Text>
                     </TouchableOpacity>
                 </View>)}
@@ -546,7 +559,7 @@ setData((prevData) =>
  
                {data?.post?.community_price?.length > 0 && (
                  <Text style={{ color: Colors.light.red, fontWeight: "600" }}>
-                   From $ {formatPrice(data?.post?.community_price[0])} To ${" "}
+                   From £ {formatPrice(data?.post?.community_price[0])} To £{" "}
                    {formatPrice(
                      data?.post?.community_price[
                        data?.post?.community_price?.length - 1
@@ -576,7 +589,7 @@ setData((prevData) =>
                    marginLeft: 8,
                  }}
                >
-                 $ {formatPrice(data?.post?.asking_price ?? 0)}
+                 £ {formatPrice(data?.post?.asking_price ?? 0)}
                  {data?.type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
                </Text>
              </View>
@@ -613,6 +626,7 @@ setData((prevData) =>
            </Text>
            )}
            <TouchableOpacity
+            activeOpacity={1}
              className="mt-4"
              onPress={() => {
                setShowImages(true);
@@ -635,6 +649,7 @@ setData((prevData) =>
              />
              {data?.type !== "community" && data?.floor_images?.length > 0 && (
                <TouchableOpacity
+                activeOpacity={1}
                  style={{
                    position: "absolute",
                    bottom: vs(5),
@@ -679,6 +694,7 @@ setData((prevData) =>
   showsHorizontalScrollIndicator={false}
   renderItem={({ item, index }) => (
     <TouchableOpacity
+     activeOpacity={1}
       className="mt-4 mr-2"
       onPress={() => {
         setImageNo(index);
@@ -763,6 +779,7 @@ setData((prevData) =>
              <View className="flex-row gap-2">
                    <View className="flex-row items-center ">
                   <TouchableOpacity
+                   activeOpacity={1}
                     disabled={liking || unliking}
                     onPress={() => handleLikeToggle()}
                   >
@@ -788,7 +805,8 @@ setData((prevData) =>
                     {data?.post?.likes}
                   </Text>
                 </View>
-              <TouchableOpacity onPress={()=>{setShowShare(true)}}>
+              <TouchableOpacity  activeOpacity={1}
+              onPress={()=>{setShowShare(true)}}>
                  <Share />
                </TouchableOpacity>
              </View>
@@ -955,7 +973,9 @@ setData((prevData) =>
            Share Post
          </Text>
  
-         <TouchableOpacity onPress={() => setShowShare(false)}>
+         <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setShowShare(false)}>
            <Cross height={vs(24)} width={vs(24)} />
          </TouchableOpacity>
        </View>
@@ -964,7 +984,7 @@ setData((prevData) =>
          initialValues={{
            recepient_email: "",
            message: "",
-           link:`https://homeilove.us/postRedirect?post_id=${post_id}`,
+           link:`https://homeilove.co.uk/postRedirect?post_id=${post_id}`,
            post_id:post_id,
            post_type:data?.type,
            post_image:data?.post_images?.[0]?? "",
@@ -1096,6 +1116,7 @@ setData((prevData) =>
  
      {/* Copy Button */}
      <TouchableOpacity
+      activeOpacity={1}
        onPress={async () => {
          await Clipboard.setStringAsync(values.link);
          renderToastSuccess("Link copied");

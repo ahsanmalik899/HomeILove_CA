@@ -92,6 +92,7 @@ export const SearchProfile = ({
             keyExtractor={(item: any) => item.id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSearch(item.business_name);
                   onSelect?.(item);

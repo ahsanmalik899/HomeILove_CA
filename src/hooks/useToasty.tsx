@@ -18,7 +18,7 @@ export const renderToastSuccess = (title: string) => {
 
 export const renderToastError = (title: string) => {
     if (Platform.OS === 'android') {
-    ToastAndroid.show(title, ToastAndroid.SHORT);
+    ToastAndroid.show(  String(title || "Something went wrong"), ToastAndroid.SHORT);
     return;
   }
   return ToastNew.show({

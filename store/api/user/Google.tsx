@@ -17,7 +17,7 @@ export const Google = createApi({
         params: {
           input,
           types: "address",
-          components: "country:us",
+          components: "country:gb",
           key: GOOGLE_API_KEY,
         },
       }),
@@ -29,7 +29,7 @@ export const Google = createApi({
         params: {
           input,
           types: "(cities)",
-          components: "country:us",
+          components: "country:gb",
           key: GOOGLE_API_KEY,
         },
       }),

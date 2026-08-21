@@ -46,7 +46,7 @@ const MyAlerts = ({ setVisible }: { setVisible: (value: boolean) => void }) => {
 
 
       <Text style={styles.info}>
-        Price Range:<Text style={{color:Colors.light.red}}> ${item.min_price?.toLocaleString()} - $
+        Price Range:<Text style={{color:Colors.light.red}}> £{item.min_price?.toLocaleString()} - £
         {item.max_price?.toLocaleString()}</Text>
       </Text>
 
@@ -72,7 +72,8 @@ const MyAlerts = ({ setVisible }: { setVisible: (value: boolean) => void }) => {
         Created: { formatDate(item?.created_date)}
       </Text>
       <View style={styles.actionButtons}>
-        <TouchableOpacity onPress={()=>{router.push({
+        <TouchableOpacity
+         activeOpacity={1} onPress={()=>{router.push({
           pathname:"/AddNewAlerts",
           params:{
             id:item.alert_id,
@@ -84,6 +85,7 @@ const MyAlerts = ({ setVisible }: { setVisible: (value: boolean) => void }) => {
           <Edit width={20} height={20} />
         </TouchableOpacity>
 <TouchableOpacity
+ activeOpacity={1}
   onPress={() => {
     Alert.alert(
       "Delete Alert",
@@ -117,6 +119,7 @@ const MyAlerts = ({ setVisible }: { setVisible: (value: boolean) => void }) => {
         </TouchableOpacity>
       </View>
   <TouchableOpacity
+   activeOpacity={1}
   style={{
     backgroundColor: Colors.light.DarkGreen,
     paddingVertical: 14,

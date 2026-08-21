@@ -103,6 +103,7 @@ const Index = () => {
 
     return (
       <TouchableOpacity
+       activeOpacity={1}
         onPress={() => {
           setSelectedFilter(item.name);
         }}
@@ -205,6 +206,7 @@ const Index = () => {
                 style={{ flexDirection: "row", justifyContent: "flex-end" }}
               >
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => setReviseModalVisible(false)}
                   style={{
                     paddingVertical: 10,
@@ -221,6 +223,7 @@ const Index = () => {
                 <View style={{ width: 10 }} />
 
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={async () => {
                     try {
                       setLoading(true);
@@ -271,10 +274,13 @@ const Index = () => {
 
           {type === "sent" ? (
             <View className="flex-row justify-between gap-3">
-              <TouchableOpacity onPress={handleDelete} disabled={loading}>
+              <TouchableOpacity
+               activeOpacity={1}
+                onPress={handleDelete} disabled={loading}>
                 <Delet />
               </TouchableOpacity>
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSelectedReview(item);
                   setpostRating(item.rating);
@@ -312,6 +318,7 @@ const Index = () => {
             </Text>
 
             <TouchableOpacity
+             activeOpacity={1}
               style={styles.reviseBtn}
               onPress={() => {
                 setEditModal(true), setIsRevise(true), setSelectedReview(item);
@@ -505,6 +512,7 @@ const Index = () => {
 
                 <View style={styles.modalButtons}>
                   <TouchableOpacity
+                   activeOpacity={1}
                     onPress={() => setEditModal(false)}
                     style={styles.cancelBtn}
                   >
@@ -512,6 +520,7 @@ const Index = () => {
                   </TouchableOpacity>
 
                   <TouchableOpacity
+                   activeOpacity={1}
                     onPress={handleSubmit}
                     style={styles.submitBtn}
                   >

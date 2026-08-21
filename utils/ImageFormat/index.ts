@@ -1,4 +1,5 @@
 
-  const ImageFormater = (image:string) =>  `https://homeilove.us/uploads/${image}`
+  const ImageFormater = (image:string) =>  `https://homeilove.co.uk/uploads/${image}`
 
 export { ImageFormater }
+

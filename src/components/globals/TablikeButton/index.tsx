@@ -31,6 +31,7 @@ const index = ({
           )}  
       <View className="flex-row justify-between" style={{ marginTop: vs(10),gap:hs(10) }}>
         <TouchableOpacity
+         activeOpacity={1}
           style={[styles.btn, value === btn1value && styles.btnselected,{flex:1}]}
           onPress={() => onPress(btn1value)}
         >
@@ -45,6 +46,7 @@ const index = ({
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+         activeOpacity={1}
           style={[styles.btn, value === btn2value && styles.btnselected,{flex:1}]}
           onPress={() => onPress(btn2value)}
         >
@@ -60,6 +62,7 @@ const index = ({
         </TouchableOpacity>
         {btn3value &&(
             <TouchableOpacity
+             activeOpacity={1}
           style={[styles.btn, value === btn3value && styles.btnselected,{flex:1}]}
           onPress={() => onPress(btn3value)}
         >

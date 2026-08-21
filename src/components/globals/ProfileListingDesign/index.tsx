@@ -71,6 +71,7 @@ const toggleSave = async () => {
 
   return (
     <TouchableOpacity
+     activeOpacity={1}
       onPress={() => openProfileModal(item?.data)}
       onLongPress={() => openProfileModal(item?.data)}
     >
@@ -179,6 +180,7 @@ const toggleSave = async () => {
               </Text>)}
 
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                  
                 }}
@@ -218,6 +220,7 @@ const toggleSave = async () => {
                   className="flex-row justify-between"
                 >
                   <TouchableOpacity
+                   activeOpacity={1}
                                      style={{ marginLeft: "auto" }}
                                      onPress={toggleSave}
                                    >
@@ -248,7 +251,7 @@ const toggleSave = async () => {
               <View
                 className="flex-row justify-between"
                 style={{
-                  backgroundColor: Colors.light.lightGray,
+        backgroundColor: "#ff007b1f",
                   borderRadius: 8,
                   paddingRight: hs(20),
                   paddingVertical: vs(5),
@@ -256,10 +259,12 @@ const toggleSave = async () => {
                   marginTop: vs(8),
                 }}
               >
-                <TouchableOpacity>
+                <TouchableOpacity
+                 activeOpacity={1}>
                   <Mail />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity
+                 activeOpacity={1}>
                   <Call />
                 </TouchableOpacity>
 

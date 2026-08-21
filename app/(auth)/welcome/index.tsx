@@ -117,7 +117,7 @@ const Welcome = () => {
           style={styles.header}
         >
           <Text>{`${currentIndex + 1}/${totalScreens}`}</Text>
-          <TouchableOpacity onPress={() => setCurrentIndex(totalScreens - 1)}>
+          <TouchableOpacity  activeOpacity={1} onPress={() => setCurrentIndex(totalScreens - 1)}>
             <Text className="text-black-700 ">Skip</Text>
           </TouchableOpacity>
         </View>
@@ -141,6 +141,7 @@ const Welcome = () => {
         >
           <View className="flex-row ">{dots}</View>
           <TouchableOpacity
+           activeOpacity={1}
             className="p-3 bg-white-700 "
             onPress={() => {
               if (currentIndex === totalScreens - 1) {

@@ -130,6 +130,7 @@ const PdfPicker = ({
             {pdfs.map((pdf, index) => (
               <View key={index} className="relative">
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => removePDF(index)}
                   className="absolute right-1 top-1 z-10 bg-white"
                 >
@@ -153,7 +154,9 @@ const PdfPicker = ({
 
         {/* ---------- ADD BUTTON ---------- */}
         {pdfs.length < limt && (
-          <TouchableOpacity onPress={pickPDF}>
+          <TouchableOpacity
+           activeOpacity={1}
+            onPress={pickPDF}>
             <View
               style={[
                 withCircule

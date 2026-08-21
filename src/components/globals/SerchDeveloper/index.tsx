@@ -77,6 +77,7 @@ export const SearchDeveloper = ({
             keyExtractor={(item: any) => item.id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSearch(item.name);
                   onSelect?.(item);

@@ -47,6 +47,7 @@ export default function FormikDatePicker({
       </View>
 
       <TouchableOpacity
+       activeOpacity={1}
         onPress={editable ? () => setShow(true) : undefined}
         style={{
           borderRadius: ms(18),

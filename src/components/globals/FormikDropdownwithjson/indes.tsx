@@ -102,6 +102,7 @@ const handleRemove = (index: number) => {
 
   {multipleFields && (
     <TouchableOpacity
+     activeOpacity={1}
       style={{
         marginLeft: hs(8),
         backgroundColor: Colors.light.LightGreen,
@@ -137,7 +138,9 @@ const handleRemove = (index: number) => {
         <Heart />
         <Text style={{fontFamily: "PopinRegula",}}>{selectedLabel}</Text>
       </View>
-      <TouchableOpacity onPress={() => handleRemove(index)}>
+      <TouchableOpacity 
+       activeOpacity={1}
+       onPress={() => handleRemove(index)}>
         <Cross />
       </TouchableOpacity>
     </View>

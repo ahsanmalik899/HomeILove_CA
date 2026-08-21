@@ -122,6 +122,7 @@ const pickImage = async () => {
             {images.map((img, index) => (
               <View key={index} className="relative">
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     if (limt === 1) {
                       setValue(name, null);
@@ -155,7 +156,8 @@ const pickImage = async () => {
         {/* ---------- ADD BUTTON ---------- */}
         {images.length < limt && (
 
-          <TouchableOpacity onPress={pickImage}>
+          <TouchableOpacity
+           activeOpacity={1} onPress={pickImage}>
             {UploadComponenet?(<UploadComponenet/>):(
                <View
               style={[

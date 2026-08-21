@@ -8,6 +8,7 @@ const index = ({ text, onPress }: SideBarButtonProps) => {
      const [pressed, setPressed] = useState(false);
   return (
     <TouchableOpacity
+     activeOpacity={1}
       onPress={onPress}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}

@@ -50,6 +50,7 @@ const CustomTabBar = ({ state, navigation }) => {
 
         return (
           <TouchableOpacity
+           activeOpacity={1}
             key={route.key}
             activeOpacity={0.7}
             style={styles.tabItem}

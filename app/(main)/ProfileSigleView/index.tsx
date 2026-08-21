@@ -261,7 +261,9 @@ const { data, isLoading } = useGetSingleProfileQuery(
 
           {/* Actions */}
           <View style={styles.row}    >
-            <TouchableOpacity onPress={()=>toggleSave()} >
+            <TouchableOpacity
+             activeOpacity={1}
+            onPress={()=>toggleSave()} >
                { isSaved ? (
                                                      <RedHeart />
                                                    ) : (
@@ -269,7 +271,8 @@ const { data, isLoading } = useGetSingleProfileQuery(
                                                    )}
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setShowShare(true)}>
+            <TouchableOpacity  activeOpacity={1}
+            onPress={() => setShowShare(true)}>
               <Share />
             </TouchableOpacity>
           </View>
@@ -302,12 +305,12 @@ const { data, isLoading } = useGetSingleProfileQuery(
           <View style={{ backgroundColor: Colors.light.lightGray, padding: hs(10), borderRadius: hs(10), marginVertical: hs(10), gap: hs(10) }}>
             <Text style={{ color: Colors.light.textGray, fontSize: hs(16), fontWeight: 'bold', textAlign: 'center' }}>Total post by <Text style={{ color: Colors.light.red }}>{profile?.business_name}</Text></Text>
             <View style={styles.row}>
-              <TouchableOpacity style={{ flex: 1, alignItems: 'center' }}>
+              <TouchableOpacity  activeOpacity={1} style={{ flex: 1, alignItems: 'center' }}>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Rent post</Text>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.rent_posts}</Text>
               </TouchableOpacity>
               <View style={{ width: hs(1), height: hs(50), backgroundColor: Colors.light.textGray }} />
-              <TouchableOpacity style={{ flex: 1, alignItems: 'center' }}>
+              <TouchableOpacity  activeOpacity={1} style={{ flex: 1, alignItems: 'center' }}>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(14), fontWeight: 'bold' }}>Sale post</Text>
                 <Text style={{ color: Colors.light.textGray, fontSize: hs(13) }}>{profile?.sale_posts}</Text>
               </TouchableOpacity>
@@ -332,6 +335,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
           {profile?.advisory_service === "Yes" && (
             <>
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => setShowMortgage(!showMortgage)}
                 style={{
                   backgroundColor: Colors.light.LightGreen,
@@ -515,6 +519,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
                         required={false} />
 
                       <TouchableOpacity
+                       activeOpacity={1}
                         style={styles.mortgageBtn}
                         onPress={() => handleSubmit()}
                       >
@@ -533,6 +538,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
             <>
               {posts?.length > 0 && (
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => setShowpast(!showPast)}
                   style={{
                     backgroundColor: Colors.light.LightGreen,
@@ -644,6 +650,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
             </View>
 
             <TouchableOpacity
+             activeOpacity={1}
               style={styles.reviewBtn}
               onPress={() => setReviewModal(true)}
             >
@@ -658,6 +665,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
 
 
       <TouchableOpacity
+       activeOpacity={1}
         style={styles.stickyBottomBtn}
         onPress={() => {
           router.navigate({
@@ -755,6 +763,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
 
                       return (
                         <TouchableOpacity
+                         activeOpacity={1}
                           key={index}
                           style={[
                             styles.profileCard,
@@ -806,6 +815,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
 
                   <View style={styles.modalButtons}>
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={() => {
                         setReviewModal(false);
                       }}
@@ -815,6 +825,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
                     </TouchableOpacity>
 
                     <TouchableOpacity
+                     activeOpacity={1}
                       onPress={handleSubmit}
                       style={styles.submitBtn}
                     >
@@ -857,7 +868,9 @@ const { data, isLoading } = useGetSingleProfileQuery(
                 Share Post
               </Text>
 
-              <TouchableOpacity onPress={() => setShowShare(false)}>
+              <TouchableOpacity 
+               activeOpacity={1}
+               onPress={() => setShowShare(false)}>
                 <Cross height={vs(24)} width={vs(24)} />
               </TouchableOpacity>
             </View>
@@ -866,7 +879,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
               initialValues={{
                 recepient_email: "",
                 message: "",
-                link: `https://homeilove.us/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${type}`,
+                link: `https://homeilove.co.uk/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${type}`,
                 post_id: id.toString(),
                 type: type,
               }}
@@ -997,6 +1010,7 @@ const { data, isLoading } = useGetSingleProfileQuery(
 
                       {/* Copy Button */}
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={async () => {
                           await Clipboard.setStringAsync(values.link);
                           renderToastSuccess("Link copied");

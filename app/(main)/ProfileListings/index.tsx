@@ -141,6 +141,7 @@ useFocusEffect(
     </Text>
   </View>
   <TouchableOpacity
+   activeOpacity={1}
     style={styles.filterBtn}
     onPress={() => setShowFilter(true)}
   >

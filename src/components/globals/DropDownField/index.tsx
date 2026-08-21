@@ -19,7 +19,8 @@ const SortDropdown = ({
       open={open}
       value={value}
       items={items}
-      
+          listMode="SCROLLVIEW"
+                     dropDownDirection="BOTTOM"
       setOpen={setOpen}
       setValue={(val)=>{setValue(val);
         setpage(1);

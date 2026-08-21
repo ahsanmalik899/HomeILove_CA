@@ -8,7 +8,7 @@ interface ButtonProps {
 }
 const LargeButton = ({ handleSubmit, text }: ButtonProps) => {
   return (
-    <TouchableOpacity  style={styles.button} onPress={() => handleSubmit()}>
+    <TouchableOpacity  activeOpacity={1} style={styles.button} onPress={() => handleSubmit()}>
       <Text style={styles.buttonText}>{text}</Text>
     </TouchableOpacity>
   );

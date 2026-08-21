@@ -208,6 +208,7 @@ export default function SignUpScreen() {
                         value={values.password}
                       />
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => setShowPassword(!showPassword)}
                       >
                         <Ionicons
@@ -234,6 +235,7 @@ export default function SignUpScreen() {
                         value={values.confirmPassword}
                       />
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
@@ -296,6 +298,7 @@ export default function SignUpScreen() {
                         Already have an account?{" "}
                       </Text>
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => router.push("/(auth)/signin")}
                       >
                         <Text style={styles.loginTextGreen}>Login</Text>

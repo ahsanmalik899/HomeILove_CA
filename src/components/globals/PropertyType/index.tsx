@@ -9,7 +9,9 @@ const index = ({value,onPress,errorText}:RentAndSaleProps) => {
   return (
     <>
     <View className="flex-row justify-between">
-         <TouchableOpacity className="items-center"
+         <TouchableOpacity 
+          activeOpacity={1}className="items-center"
+
            style={[value === "House" ? styles.activeButton : styles.Button]}
            onPress={()=>onPress('House')}
          >
@@ -18,6 +20,7 @@ const index = ({value,onPress,errorText}:RentAndSaleProps) => {
          </TouchableOpacity>
    
          <TouchableOpacity
+          activeOpacity={1}
          className="items-center"
            style={[value === "Commercial" ? styles.activeButton : styles.Button]}
           onPress={()=>onPress('Commercial')}
@@ -26,6 +29,7 @@ const index = ({value,onPress,errorText}:RentAndSaleProps) => {
            <Text style={[value === "Commercial" ? styles.TextActive : styles.Text]}>Commercials</Text>
          </TouchableOpacity>
           <TouchableOpacity
+           activeOpacity={1}
          className="items-center"
            style={[value === "Farms/Lands" ? styles.activeButton : styles.Button]}
           onPress={()=>onPress('Farms/Lands')}

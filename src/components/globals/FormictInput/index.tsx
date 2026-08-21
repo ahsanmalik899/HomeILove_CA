@@ -113,6 +113,7 @@ export const FormikInput = ({
         </View>
         {mulipleFields && (
           <TouchableOpacity
+           activeOpacity={1}
             style={{
               backgroundColor: Colors.light.LightGreen,
               borderRadius: ms(8),
@@ -154,6 +155,7 @@ export const FormikInput = ({
                   </Text>
                 </View>
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     handleRemove(index);
                   }}

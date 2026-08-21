@@ -237,6 +237,7 @@ const renderItem = useCallback(({ item }: any) => {
     </Text>
   ) : (
     <TouchableOpacity
+     activeOpacity={1}
       activeOpacity={0.7}
       style={styles.nameButton}
       onPress={() => {
@@ -254,7 +255,9 @@ const renderItem = useCallback(({ item }: any) => {
   )}
 </View>
 
-<TouchableOpacity onPress={()=>{
+<TouchableOpacity 
+ activeOpacity={1}
+ onPress={()=>{
  
  if (type==="community"||type==="property"){
   setShowpost(true)
@@ -332,6 +335,7 @@ const renderItem = useCallback(({ item }: any) => {
           <ActivityIndicator size={30} color={Colors.light.DarkGreen} />
           : 
         <TouchableOpacity
+         activeOpacity={1}
           onPress={handleSend}
           className="ml-2 px-3 justify-center rounded-full"
         >

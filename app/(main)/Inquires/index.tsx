@@ -368,7 +368,7 @@ const receivedEndReachedLock = useRef(false);
             {item.min_price && item.max_price && (
               <View style={styles.tag}>
                 <Text style={styles.tagText}>
-                  ${formatPrice(item.min_price)} - $
+                  £{formatPrice(item.min_price)} - £
                   {formatPrice(item.max_price)}
                 </Text>
               </View>
@@ -469,6 +469,7 @@ const receivedEndReachedLock = useRef(false);
               }
               renderItem={({ item: profile }) => (
                 <TouchableOpacity
+                 activeOpacity={1}
                   style={styles.card}
                   disabled={profile?.inquiry_closed}
                   onPress={() => {
@@ -534,6 +535,7 @@ const receivedEndReachedLock = useRef(false);
     const inquiryId = String(item.inquiry_id);
     return (
       <TouchableOpacity
+       activeOpacity={1}
         style={[
           styles.card,
           {
@@ -636,6 +638,7 @@ const receivedEndReachedLock = useRef(false);
         )}
 
         <TouchableOpacity
+         activeOpacity={1}
           style={styles.replyBtn}
           disabled={item?.inquiry_closed || item.status === "Deleted"}
           onPress={() => {
@@ -722,6 +725,7 @@ useEffect(() => {
       <Text>Your inquiries</Text>
       <View className="justify-between flex-row" style={{ marginTop: vs(10) }}>
         <TouchableOpacity
+         activeOpacity={1}
           className="flex-row gap-3 mb-3"
           onPress={() => {
             const newSelectAll = !selectAll;
@@ -738,6 +742,7 @@ useEffect(() => {
           <Text>Select All</Text>
         </TouchableOpacity>
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => {
             if (!ids.length) return;
             setDeleteType("sent");
@@ -812,7 +817,7 @@ useEffect(() => {
             starting getting enquiries straight into your account. Increase your
             clientele base without spending too much on advertisement.
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity  activeOpacity={1}>
             <Text style={{ color: Colors.light.DarkGreen }}>
               One place to boost your businesss
             </Text>
@@ -825,6 +830,7 @@ useEffect(() => {
             style={{ marginTop: vs(10) }}
           >
             <TouchableOpacity
+             activeOpacity={1}
               className="flex-row gap-3 mb-3"
               onPress={() => {
                 const newSelectAll = !selectAllcomp2;
@@ -841,6 +847,7 @@ useEffect(() => {
               <Text>Select All</Text>
             </TouchableOpacity>
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => {
                 if (!recivesIds.length) return;
                 setDeleteType("received");
@@ -995,13 +1002,17 @@ useEffect(() => {
                   justifyContent: "space-between",
                 }}
               >
-                <TouchableOpacity onPress={() => setShowConfirm(false)}>
+                <TouchableOpacity
+                 activeOpacity={1}
+                  onPress={() => setShowConfirm(false)}>
                   <Text style={{ color: "gray", fontWeight: "600" }}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={confirmDelete}>
+                <TouchableOpacity 
+                 activeOpacity={1}
+                  onPress={confirmDelete}>
                   <Text style={{ color: Colors.light.red, fontWeight: "700" }}>
                     Delete
                   </Text>
@@ -1048,6 +1059,7 @@ useEffect(() => {
                       }}
                     >
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => {
                           setShowchatModal(false);
                           setMessages([]);
@@ -1118,8 +1130,8 @@ useEffect(() => {
                               selectedChatItem.max_price && (
                                 <View style={styles.tag}>
                                   <Text style={styles.tagText}>
-                                    ${formatPrice(selectedChatItem.min_price)} -
-                                    ${formatPrice(selectedChatItem.max_price)}
+                                    £{formatPrice(selectedChatItem.min_price)} -
+                                    £{formatPrice(selectedChatItem.max_price)}
                                   </Text>
                                 </View>
                               )}
@@ -1235,6 +1247,7 @@ useEffect(() => {
                   />
 
                   <TouchableOpacity
+                   activeOpacity={1}
                     onPress={handleSend}
                     className="ml-2  px-3 justify-center rounded-full"
                   >

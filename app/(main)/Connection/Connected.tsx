@@ -43,6 +43,7 @@ const Connected = () => {
             </View>
           </View>
           <TouchableOpacity
+           activeOpacity={1}
             onPress={() => setMenuVisibleId(item?.data?.connection_id)}
           >
             <ThreeDots />

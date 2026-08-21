@@ -215,6 +215,7 @@ const handleRefresh = async () => {
 
               {user?.id === item.sweetghar_user_id && (
                 <TouchableOpacity
+                 activeOpacity={1}
                   style={styles.deleteBtn}
                   onPress={() =>
                     deleteComment(item.comment_id)
@@ -235,6 +236,7 @@ const handleRefresh = async () => {
 
           <View style={styles.actionRow}>
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => setShowReplyInput(!showReplyInput)}
             >
               <Text style={styles.actionText}>Reply</Text>
@@ -252,7 +254,8 @@ const handleRefresh = async () => {
                 style={styles.replyInput}
               />
 
-              <TouchableOpacity onPress={handleReply} style={styles.sendBtn}>
+              <TouchableOpacity  activeOpacity={1}
+               onPress={handleReply} style={styles.sendBtn}>
                 <Text style={styles.sendText}>Send</Text>
               </TouchableOpacity>
             </View>
@@ -274,6 +277,7 @@ const handleRefresh = async () => {
 
                   {user?.id === reply.sweetghar_user_id && (
                     <TouchableOpacity
+                     activeOpacity={1}
                       style={styles.deleteBtn}
                       onPress={() =>
                         deleteComment(reply.comment_id).unwrap().then(() => {
@@ -477,7 +481,9 @@ const handleRefresh = async () => {
 
     if (item.type === "Shared Connection") {
       return (
-        <TouchableOpacity className="bg-white" style={styles.card} onPress={() => {
+        <TouchableOpacity 
+         activeOpacity={1}
+         className="bg-white" style={styles.card} onPress={() => {
           setShowpostPostData(item);
           setShowpost(true);
 
@@ -505,7 +511,8 @@ const handleRefresh = async () => {
                 <Text style={{ fontFamily: "PopinRegula" }}>{item.city}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() =>  setMenuPost(itemKey)}>
+            <TouchableOpacity  activeOpacity={1}
+            onPress={() =>  setMenuPost(itemKey)}>
               <ThreeDots />
             </TouchableOpacity>
           </View>
@@ -523,6 +530,7 @@ const handleRefresh = async () => {
     }}
   >
     {item.dealing_areas === "Nationwide" ? (
+      
       <View
         style={{
           backgroundColor: "#E8F5E9",
@@ -675,6 +683,7 @@ const handleRefresh = async () => {
 )}
           {menuVisible && (
             <TouchableOpacity
+             activeOpacity={1}
               activeOpacity={1}
               onPress={() => setMenuPost(null)}
               style={{
@@ -700,6 +709,7 @@ const handleRefresh = async () => {
                 }}
               >
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     setMenuPost(null);
                     handleHidePost(item);
@@ -720,6 +730,7 @@ const handleRefresh = async () => {
                 <View style={{ height: 1, backgroundColor: "#eee" }} />
 
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={async () => {
                     setMenuPost(null);
                     setReportData(item);
@@ -746,6 +757,7 @@ const handleRefresh = async () => {
     } else if (item.type === "General Post") {
       return (
         <TouchableOpacity
+         activeOpacity={1}
           className="bg-white"
           style={styles.card}
           onPress={() => {
@@ -772,7 +784,9 @@ const handleRefresh = async () => {
                 <Text style={{ fontFamily: "PopinRegula", }}>{timeAgo(item.post_created_date || item.created_date)}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() =>  setMenuPost(itemKey)}>
+            <TouchableOpacity 
+             activeOpacity={1}
+             onPress={() =>  setMenuPost(itemKey)}>
               <ThreeDots />
             </TouchableOpacity>
 
@@ -796,6 +810,7 @@ const handleRefresh = async () => {
 
               {item.images.length > 0 && (
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     setSelectedImages(item.images || []);
                     setShowImages(true);
@@ -853,6 +868,7 @@ const handleRefresh = async () => {
 
                 {item.post_video && (
                   <TouchableOpacity
+                   activeOpacity={1}
                     onPress={() => {
                       setSelectedViedio(ViedioUrlFormat(item.post_video));
                       setShowViedio(true);
@@ -884,6 +900,7 @@ const handleRefresh = async () => {
               <View className="flex-row">
                 <View className="flex-row items-center ">
                   <TouchableOpacity
+                   activeOpacity={1}
                     disabled={liking || unliking}
                     onPress={() => handleLikeToggle(item)}
                   >
@@ -913,7 +930,8 @@ const handleRefresh = async () => {
                   className="flex-row items-center"
                   style={{ paddingLeft: hs(10) }}
                 >
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                   activeOpacity={1}>
                     <Comment height={28} width={28}/>
                   </TouchableOpacity>
                   <Text
@@ -927,7 +945,9 @@ const handleRefresh = async () => {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity onPress={() => { setShareData(item); setShowShare(true) }}>
+              <TouchableOpacity 
+               activeOpacity={1}
+               onPress={() => { setShareData(item); setShowShare(true) }}>
                 <Share />
               </TouchableOpacity>
             </View>
@@ -942,6 +962,7 @@ const handleRefresh = async () => {
           </View>
           {menuVisible && (
             <TouchableOpacity
+             activeOpacity={1}
               activeOpacity={1}
               onPress={() => setMenuPost(null)}
               style={{
@@ -967,6 +988,7 @@ const handleRefresh = async () => {
                 }}
               >
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     setMenuPost(null);
                     handleHidePost(item);
@@ -987,6 +1009,7 @@ const handleRefresh = async () => {
                 <View style={{ height: 1, backgroundColor: "#eee" }} />
 
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     setMenuPost(null);
                     setReportData(item);
@@ -1019,6 +1042,7 @@ const handleRefresh = async () => {
     else {
       return (
         <TouchableOpacity
+         activeOpacity={1}
           className="bg-white"
           style={styles.card}
           onPress={() => {
@@ -1050,7 +1074,9 @@ const handleRefresh = async () => {
                 </Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() =>  setMenuPost(itemKey)}>
+            <TouchableOpacity 
+             activeOpacity={1}
+             onPress={() =>  setMenuPost(itemKey)}>
               <ThreeDots />
             </TouchableOpacity>
           </View>
@@ -1070,6 +1096,7 @@ const handleRefresh = async () => {
               )}
             </Text>
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => {
                 setSelectedImages(item.images || []);
                 setShowImages(true);
@@ -1137,7 +1164,7 @@ const handleRefresh = async () => {
                     fontFamily: "PopinRegula",
                   }}
                 >
-                { item.type === "Shared Community"&&  "starting"} ${formatPrice(item.price)}
+                { item.type === "Shared Community"&&  "starting"} £{formatPrice(item.price)}
                 </Text>
               </View>
               <View
@@ -1230,6 +1257,7 @@ const handleRefresh = async () => {
               <View className="flex-row">
                 <View className="flex-row items-center ">
                   <TouchableOpacity
+                   activeOpacity={1}
                     disabled={liking || unliking}
                     onPress={() => handleLikeToggle(item)}
                   >
@@ -1259,7 +1287,8 @@ const handleRefresh = async () => {
                   className="flex-row items-center"
                   style={{ paddingLeft: hs(10) }}
                 >
-                  <TouchableOpacity>
+                  <TouchableOpacity 
+                   activeOpacity={1}>
                     <Comment  heigh={28} width={28}/>
                   </TouchableOpacity>
                   <Text
@@ -1273,7 +1302,9 @@ const handleRefresh = async () => {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity onPress={() => { setShowShare(true); setShareData(item) }}>
+              <TouchableOpacity 
+               activeOpacity={1}
+               onPress={() => { setShowShare(true); setShareData(item) }}>
                 <Share />
               </TouchableOpacity>
             </View>
@@ -1286,6 +1317,7 @@ const handleRefresh = async () => {
           </View>
           {menuVisible && (
             <TouchableOpacity
+             activeOpacity={1}
               activeOpacity={1}
               onPress={() => setMenuPost(null)}
               style={{
@@ -1311,6 +1343,7 @@ const handleRefresh = async () => {
                 }}
               >
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     setMenuPost(null);
                     handleHidePost(item);
@@ -1331,6 +1364,7 @@ const handleRefresh = async () => {
                 <View style={{ height: 1, backgroundColor: "#eee" }} />
 
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     setMenuPost(null);
                     setReportData(item);
@@ -1358,11 +1392,11 @@ const handleRefresh = async () => {
   };
 
   return (
-    <View style={{  flex: 1, backgroundColor: "#F4F0F0" }}>
+    <View style={{  flex: 1, backgroundColor:"#678e9152"}}>
 <FlashList
   style={{
     flex: 1,
-    backgroundColor: "#F4F0F0",
+    backgroundColor: "#89a8aa10",
   }}
 
   data={feedData}
@@ -1427,6 +1461,7 @@ onEndReached={() => {
                               edges={[ "bottom", "left", "right"]}
                             >
         <TouchableOpacity
+         activeOpacity={1}
           style={styles.overlay}
           activeOpacity={1}
           onPressOut={() => setShowConnection(false)}
@@ -1445,6 +1480,7 @@ onEndReached={() => {
             >
               {Profiles?.profiles?.map((item, index) => (
                 <TouchableOpacity
+                 activeOpacity={1}
                   key={index}
                   style={styles.profileCard}
                   onPress={() => {
@@ -1520,7 +1556,9 @@ onEndReached={() => {
                 style={StyleSheet.absoluteFillObject}
               />
             )}
-            <TouchableOpacity onPress={() => setShowViedio(false)} style={{ position: 'absolute', backgroundColor: 'white', borderRadius: ms(10), zIndex: 10, top: vs(50), right: hs(10) }}>
+            <TouchableOpacity 
+             activeOpacity={1}onPress={() => setShowViedio(false)} style={{ position: 'absolute', backgroundColor: 'white', borderRadius: ms(10), zIndex: 10, top: vs(50), right: hs(10) }}>
+
               <Cross height={vs(30)} width={vs(30)} />
             </TouchableOpacity>
 
@@ -1564,7 +1602,9 @@ onEndReached={() => {
                 Share Post
               </Text>
 
-              <TouchableOpacity onPress={() => setShowShare(false)}>
+              <TouchableOpacity
+               activeOpacity={1}
+                onPress={() => setShowShare(false)}>
                 <Cross height={vs(24)} width={vs(24)} />
               </TouchableOpacity>
             </View>
@@ -1573,7 +1613,7 @@ onEndReached={() => {
               initialValues={{
                 recepient_email: "",
                 message: "",
-                link: `https://homeilove.us/postRedirect?post_id=${shareData?.post_id || shareData?.post_id}`,
+                link: `https://homeilove.co.uk/postRedirect?post_id=${shareData?.post_id || shareData?.post_id}`,
                 post_id: shareData?.post_id,
                 post_type: shareData?.type,
                 post_image: shareData?.images?.[0] ?? "",
@@ -1704,6 +1744,7 @@ onEndReached={() => {
 
                       {/* Copy Button */}
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={async () => {
                           await Clipboard.setStringAsync(values.link);
                           renderToastSuccess("Link copied");
@@ -1756,7 +1797,9 @@ onEndReached={() => {
 
             <View style={styles.header}>
               <Text style={styles.title}>Report Post</Text>
-              <TouchableOpacity onPress={() => setShowReport(false)}>
+              <TouchableOpacity 
+               activeOpacity={1}onPress={() => setShowReport(false)}>
+
                 <Text style={styles.close}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -1765,6 +1808,7 @@ onEndReached={() => {
 
               {reportOptions.map((item, index) => (
                 <TouchableOpacity
+                 activeOpacity={1}
                   key={index}
                   style={styles.option}
                   onPress={() => setSelectedType(item)}

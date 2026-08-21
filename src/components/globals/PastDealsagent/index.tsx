@@ -120,6 +120,7 @@ const PastDealsagent = ({
     return (
       <>
         <TouchableOpacity
+         activeOpacity={1}
           className="bg-white"
           style={styles.card}
           onPress={() => {
@@ -153,6 +154,7 @@ const PastDealsagent = ({
              
             </View>
    <TouchableOpacity
+    activeOpacity={1}
     onPress={() => {
       Alert.alert(
         "Confirm",
@@ -191,6 +193,7 @@ const PastDealsagent = ({
               )}
             </Text>
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => {
                 setSelectedImages(item.images || []);
                 setShowImages(true);
@@ -244,7 +247,7 @@ const PastDealsagent = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  ${item.type==="community"?formatPrice(item.property_types?.price1):formatPrice(item.price1)}
+                  £{item.type==="community"?formatPrice(item.property_types?.price1):formatPrice(item.price1)}
                 </Text>
               </View>
               <View

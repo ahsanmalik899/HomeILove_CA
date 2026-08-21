@@ -12,7 +12,9 @@ import { CommunityTypeprops } from "./type";
 const index = ({ onPress, value }: CommunityTypeprops) => {
   return (
     <View className="flex-row justify-between">
-      <TouchableOpacity className="items-center"
+      <TouchableOpacity
+       activeOpacity={1}
+        className="items-center"
         style={[value === "Residential" ? styles.activeButton : styles.Button]}
         onPress={()=>onPress('Residential')}
       >
@@ -21,6 +23,7 @@ const index = ({ onPress, value }: CommunityTypeprops) => {
       </TouchableOpacity>
 
       <TouchableOpacity
+       activeOpacity={1}
       className="items-center"
         style={[value === "Commercial" ? styles.activeButton : styles.Button]}
        onPress={()=>onPress('Commercial')}
@@ -29,6 +32,7 @@ const index = ({ onPress, value }: CommunityTypeprops) => {
         <Text style={[value === "Commercial" ? styles.TextActive : styles.Text]}>Commercial</Text>
       </TouchableOpacity>
        <TouchableOpacity
+        activeOpacity={1}
       className="items-center"
         style={[value === "Mix" ? styles.activeButton : styles.Button]}
        onPress={()=>onPress('Mix')}

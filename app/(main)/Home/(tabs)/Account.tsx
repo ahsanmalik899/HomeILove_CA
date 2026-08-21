@@ -9,6 +9,7 @@ import { router } from "expo-router";
 import { ScrollView, Text, View } from "react-native";
 const Account = () => {
   const user = useAppSelector(userdata);
+  console.log(user?.logo)
   return (
     <View className="flex-1 bg-white">
       <View style={{ marginTop: vs(20) }} className="items-center">

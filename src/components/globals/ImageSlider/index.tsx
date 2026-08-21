@@ -42,17 +42,23 @@ const ImageSlider = ({ images ,setShowImage,imageNo}: ImageSliderProps) => {
     style={StyleSheet.absoluteFillObject}
   />
 )}
-   <TouchableOpacity onPress={()=>setShowImage(false)} style={{position:'absolute',backgroundColor:'white',borderRadius:ms(10),zIndex:10,top:vs(50),right:hs(10)}}>
+   <TouchableOpacity 
+    activeOpacity={1}
+     onPress={()=>setShowImage(false)} style={{position:'absolute',backgroundColor:'white',borderRadius:ms(10),zIndex:10,top:vs(50),right:hs(10)}}>
              <Cross height={vs(30)} width={vs(30)} />
         </TouchableOpacity>
        
    
-      <TouchableOpacity style={styles.leftArrow} onPress={prevImage}>
+      <TouchableOpacity 
+       activeOpacity={1}
+        style={styles.leftArrow} onPress={prevImage}>
         <SlideLeft />
       </TouchableOpacity>
 
      
-      <TouchableOpacity style={styles.rightArrow} onPress={nextImage}>
+      <TouchableOpacity 
+       activeOpacity={1}
+       style={styles.rightArrow} onPress={nextImage}>
         <SlideRight />
       </TouchableOpacity>
     </View>

@@ -31,6 +31,7 @@ const FollowButton = ({ id, status = 'none', onPress,isLoading }: ButtonProps) =
 
 return (
   <TouchableOpacity
+   activeOpacity={1}
     style={[styles.button, getButtonStyle()]}
     onPress={() => onPress(getButtonText())}
     disabled={isLoading}

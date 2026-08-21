@@ -107,7 +107,7 @@ const handleOpenGmail = () => {
             <View style={styles.resendContainer}>
               <Text style={styles.resendText}>
                 Didn't Receive Verification Link?{' '}
-                <TouchableOpacity disabled={timeLeft>0} onPress={handleResendLink} style={styles.resendLinkButton}>
+                <TouchableOpacity  activeOpacity={1} disabled={timeLeft>0} onPress={handleResendLink} style={styles.resendLinkButton}>
                   <Text style={styles.resendLinkText}>Resend</Text>
                 </TouchableOpacity>
               </Text>

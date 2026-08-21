@@ -114,6 +114,7 @@ const index = () => {
 
               {user?.id === item.sweetghar_user_id && (
                 <TouchableOpacity
+                 activeOpacity={1}
                   style={styles.deleteBtn}
                   onPress={() =>
                     deleteComment(item.comment_id)
@@ -134,6 +135,7 @@ const index = () => {
 
           <View style={styles.actionRow}>
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() => setShowReplyInput(!showReplyInput)}
             >
               <Text style={styles.actionText}>Reply</Text>
@@ -151,7 +153,9 @@ const index = () => {
                 style={styles.replyInput}
               />
 
-              <TouchableOpacity onPress={handleReply} style={styles.sendBtn}>
+              <TouchableOpacity 
+               activeOpacity={1}
+               onPress={handleReply} style={styles.sendBtn}>
                 <Text style={styles.sendText}>Send</Text>
               </TouchableOpacity>
             </View>
@@ -173,6 +177,7 @@ const index = () => {
                   {/* ✅ REPLY DELETE */}
                   {user?.id === reply.sweetghar_user_id && (
                     <TouchableOpacity
+                     activeOpacity={1}
                       style={styles.deleteBtn}
                       onPress={() =>
                         deleteComment(reply.comment_id).unwrap().then(refetch)
@@ -219,6 +224,7 @@ const index = () => {
             </Text>
             {data?.type!=="general" && (
             <TouchableOpacity
+             activeOpacity={1}
               onPress={() =>
                 router.push({
                   pathname: "/AddSingleView",
@@ -243,7 +249,7 @@ const index = () => {
 
               {data?.post?.community_price?.length > 0 && (
                 <Text style={{ color: Colors.light.red, fontWeight: "600" }}>
-                  From $ {formatPrice(data?.post?.community_price[0])} To ${" "}
+                  From £ {formatPrice(data?.post?.community_price[0])} To £{" "}
                   {formatPrice(
                     data?.post?.community_price[
                       data?.post?.community_price?.length - 1
@@ -273,7 +279,7 @@ const index = () => {
                   marginLeft: 8,
                 }}
               >
-                $ {formatPrice(data?.post?.asking_price ?? 0)}
+                £ {formatPrice(data?.post?.asking_price ?? 0)}
                 {data?.type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
               </Text>
             </View>
@@ -310,6 +316,7 @@ const index = () => {
           </Text>
           )}
           <TouchableOpacity
+           activeOpacity={1}
             className="mt-4"
             onPress={() => {
               setShowImages(true);
@@ -332,6 +339,7 @@ const index = () => {
             />
             {data?.type !== "community" && data?.floor_images?.length > 0 && (
               <TouchableOpacity
+               activeOpacity={1}
                 style={{
                   position: "absolute",
                   bottom: vs(5),
@@ -376,6 +384,7 @@ const index = () => {
   showsHorizontalScrollIndicator={false}
   renderItem={({ item, index }) => (
     <TouchableOpacity
+     activeOpacity={1}
       className="mt-4 mr-2"
       onPress={() => {
         setImageNo(index);
@@ -458,7 +467,7 @@ const index = () => {
             </Text>
 
             <View className="flex-row gap-2">
-              <TouchableOpacity>
+              <TouchableOpacity  activeOpacity={1} activeOpacity={1}>
                 <Heart />
               </TouchableOpacity>
              <TouchableOpacity onPress={()=>{setShowShare(true)}}>
@@ -567,7 +576,7 @@ const index = () => {
           Share Post
         </Text>
 
-        <TouchableOpacity onPress={() => setShowShare(false)}>
+        <TouchableOpacity  activeOpacity={1} onPress={() => setShowShare(false)}>
           <Cross height={vs(24)} width={vs(24)} />
         </TouchableOpacity>
       </View>
@@ -576,7 +585,7 @@ const index = () => {
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.us/postRedirect?post_id=${post_id}`,
+          link:`https://homeilove.co.uk/postRedirect?post_id=${post_id}`,
           post_id:post_id,
           post_type:data?.type,
           post_image:data?.post_images?.[0]?? "",
@@ -708,6 +717,7 @@ const index = () => {
 
     {/* Copy Button */}
     <TouchableOpacity
+     activeOpacity={1}
       onPress={async () => {
         await Clipboard.setStringAsync(values.link);
         renderToastSuccess("Link copied");

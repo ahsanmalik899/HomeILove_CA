@@ -15,7 +15,9 @@ const index = ({ rating, setRating, size }: Props) => {
         const filled = star <= rating;
 
         return (
-          <TouchableOpacity key={star} onPress={() => setRating(star)}>
+          <TouchableOpacity 
+           activeOpacity={1}
+           key={star} onPress={() => setRating(star)}>
             {filled ? (
               <FilledStar height={size} width={size} key={index} />
             ) : (

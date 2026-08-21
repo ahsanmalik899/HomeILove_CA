@@ -119,7 +119,7 @@ const handleOpenGmail = async () => {
             <View style={styles.resendContainer}>
               <Text style={styles.resendText}>
                  Didn’t Receive Reset Link?{' '}
-                 <TouchableOpacity onPress={handleResendLink} disabled={timeLeft>0}>
+                 <TouchableOpacity  activeOpacity={1} onPress={handleResendLink} disabled={timeLeft>0}>
                     <Text style={styles.resendLinkText} >
                       Resend Again
                                    </Text>

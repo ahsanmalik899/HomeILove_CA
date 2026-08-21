@@ -122,6 +122,7 @@ export const FormikDropdownwithjson = ({
 
         {multipleFields && (
           <TouchableOpacity
+           activeOpacity={1}
             style={{
               marginLeft: hs(8),
               backgroundColor: Colors.light.LightGreen,
@@ -159,7 +160,8 @@ export const FormikDropdownwithjson = ({
                   <Heart />
                   <Text style={{fontFamily: "PopinRegula",}}>{selectedLabel}</Text>
                 </View>
-                <TouchableOpacity onPress={() => handleRemove(index)}>
+                <TouchableOpacity  activeOpacity={1}
+                onPress={() => handleRemove(index)}>
                   <Cross />
                 </TouchableOpacity>
               </View>

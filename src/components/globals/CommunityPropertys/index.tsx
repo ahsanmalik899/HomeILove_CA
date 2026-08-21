@@ -1007,6 +1007,7 @@ const index = ({
 {count<5&&(
   
     <TouchableOpacity
+     activeOpacity={1}
         style={{
           alignSelf: "flex-end",
           backgroundColor: Colors.light.DarkGreen,

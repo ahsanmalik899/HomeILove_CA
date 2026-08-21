@@ -25,7 +25,7 @@ const Index = ({ data = [] ,isFetching}: { data?: any[],isFetching:boolean }) =>
     };
 const renderItem = ({ item }: any) => {
   return (
-    <TouchableOpacity style={{ width:hs(330), paddingHorizontal: hs(10),height:vs(280) }} onPress={()=>{openProfileModal(item),console.log(item)}}>
+    <TouchableOpacity  activeOpacity={1} style={{ width:hs(330), paddingHorizontal: hs(10),height:vs(280) }} onPress={()=>{openProfileModal(item),console.log(item)}}>
 
       <View style={styles.mainCard}>
 

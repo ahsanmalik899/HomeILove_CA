@@ -306,7 +306,9 @@ setValue(zip, "");
 
       {/* Nationwide Toggle */}
       <View className="flex-row items-center gap-1 ">
-        <TouchableOpacity onPress={toggleNationwide}>
+        <TouchableOpacity 
+         activeOpacity={1}
+         onPress={toggleNationwide}>
           <MaterialIcons
             size={25}
             color={Colors.light.DarkGreen}
@@ -364,6 +366,7 @@ setValue(zip, "");
 
       {/* Add Button */}
       <TouchableOpacity
+       activeOpacity={1}
         disabled={!canAdd}
         style={{
           marginTop: vs(10),
@@ -410,6 +413,7 @@ setValue(zip, "");
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() =>
                   handleSelectSuggestion(item.description, item.place_id)
                 }
@@ -486,7 +490,9 @@ setValue(zip, "");
                 ) : null}
               </View>
             </View>
-            <TouchableOpacity onPress={() => handleRemove(index)}>
+            <TouchableOpacity 
+             activeOpacity={1}
+             onPress={() => handleRemove(index)}>
               <Cross />
             </TouchableOpacity>
           </View>

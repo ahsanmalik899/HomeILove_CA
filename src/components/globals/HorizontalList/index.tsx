@@ -36,7 +36,7 @@ const index = ({ data, isfetching }: postDataType) => {
                             <Text style={{fontFamily: "PopinRegula",}}>{item.post_created_date || item.created_date}</Text>
                         </View>
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity  activeOpacity={1}>
                         <ThreeDots />
                     </TouchableOpacity>
                 </View>
@@ -62,7 +62,7 @@ const index = ({ data, isfetching }: postDataType) => {
                     >
                         <View className="flex-row">
                             <View className="flex-row items-center ">
-                                <TouchableOpacity>
+                                <TouchableOpacity  activeOpacity={1}>
                                     <Like heigh={28} width={28}/>
                                 </TouchableOpacity>
                                 <Text
@@ -75,7 +75,7 @@ const index = ({ data, isfetching }: postDataType) => {
                                 className="flex-row items-center"
                                 style={{ paddingLeft: hs(10) }}
                             >
-                                <TouchableOpacity>
+                                <TouchableOpacity  activeOpacity={1}>
                                     <Comment height={28} width={28}/>
                                 </TouchableOpacity>
                                 <Text
@@ -85,7 +85,7 @@ const index = ({ data, isfetching }: postDataType) => {
                                 </Text>
                             </View>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity  activeOpacity={1}>
                             <Share />
                         </TouchableOpacity>
                     </View>

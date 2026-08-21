@@ -74,6 +74,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatData,
       }),
+      invalidatesTags:["CheckProfile"]
     }),
     updateProfile: builder.mutation<any, FormData>({
       query: (formatData) => ({
@@ -81,6 +82,7 @@ export const MainApi = createApi({
         method: "POST",
         body: formatData,
       }),
+      invalidatesTags:["myProfile"]
     }),
     getSinglePost: builder.query<any, any>({
       query: ({ type, id,user_id }) => ({

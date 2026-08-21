@@ -150,6 +150,7 @@ const Index = () => {
                   const isSelected = estateType.includes(option);
                   return (
                     <TouchableOpacity
+                     activeOpacity={1}
                       key={option}
                       onPress={() => togglePropertySubType(option)}
                       style={[

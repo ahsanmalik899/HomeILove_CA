@@ -4,7 +4,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PrefrenceCardprops } from './typ';
 const index = ({Svg,Heading,BtnText,OnSubmit}:PrefrenceCardprops) => {
   return (
-    <TouchableOpacity  onPress={OnSubmit} style={{borderRadius:ms(10),width:"80%"}} className=' bg-white pt-1  '>
+    <TouchableOpacity   activeOpacity={1}
+    onPress={OnSubmit} style={{borderRadius:ms(10),width:"80%"}} className=' bg-white pt-1  '>
     <View className="absolute top-0 right-0">
 <Add/>
     </View>

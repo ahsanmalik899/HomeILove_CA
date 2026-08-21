@@ -31,7 +31,7 @@ export const AdCardWithoutAnimation = ({ ad ,isSqure=false}: { ad: any,isSqure?:
         shadowOffset: { width: 0, height: 3 },
       }}
     >
-      <TouchableOpacity activeOpacity={0.9} onPress={openLink}>
+      <TouchableOpacity  activeOpacity={1} onPress={openLink}>
         <Image
       source={{
     uri:

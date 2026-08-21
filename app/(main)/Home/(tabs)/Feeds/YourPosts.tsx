@@ -130,6 +130,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
 
     return (
       <TouchableOpacity
+       activeOpacity={1}
         className="bg-white"
         style={styles.card}
         onPress={() => {
@@ -155,7 +156,8 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
               <Text style={{ fontFamily: "PopinRegula", }}>{item.post_created_date || item.created_date}</Text>
             </View>
           </View>
-         <TouchableOpacity onPress={() => setMenuPost(item.id)}>
+         <TouchableOpacity  activeOpacity={1}
+         onPress={() => setMenuPost(item.id)}>
             <ThreeDots />
           </TouchableOpacity>
 
@@ -181,6 +183,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
 
             {Images.length > 0 && (
               <TouchableOpacity
+               activeOpacity={1}
                 onPress={() => {
                   setSelectedImages(Images || []);
                   setShowImages(true);
@@ -239,6 +242,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
               {/* RIGHT SIDE - Auto Playing Muted Video */}
               {item.post_video && (
                 <TouchableOpacity
+                 activeOpacity={1}
                   onPress={() => {
                     setSelectedViedio(ViedioUrlFormat(item.post_video));
                     setShowViedio(true);
@@ -270,6 +274,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
             <View className="flex-row">
               <View className="flex-row items-center ">
                 <TouchableOpacity
+                 activeOpacity={1}
                   disabled={liking || unliking}
                   onPress={() => handleLikeToggle(item)}
                 >
@@ -299,7 +304,8 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
                 className="flex-row items-center"
                 style={{ paddingLeft: hs(10) }}
               >
-                <TouchableOpacity>
+                <TouchableOpacity
+                 activeOpacity={1}>
                   <Comment heigh={28} width={28}/>
                 </TouchableOpacity>
                 <Text
@@ -313,7 +319,9 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
                 </Text>
               </View>
             </View>
-               <TouchableOpacity onPress={()=>{setShareData(item);setShowShare(true)}}>
+               <TouchableOpacity 
+                activeOpacity={1}
+                onPress={()=>{setShareData(item);setShowShare(true)}}>
               <Share />
             </TouchableOpacity>
           </View>
@@ -349,6 +357,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
               }}
             >
               <TouchableOpacity
+               activeOpacity={1}
                onPress={() => {
   setSelectedPost(item);
   setShowEditModal(true);
@@ -364,6 +373,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
               <View style={{ height: 1, backgroundColor: "#eee" }} />
 
               <TouchableOpacity
+               activeOpacity={1}
                 style={{ paddingVertical: 12, paddingHorizontal: 15 }}
                 onPress={() => {
                   setMenuPost(null);
@@ -433,7 +443,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
 <FlashList
   style={{
     flex: 1,
-    backgroundColor: "#F4F0F0",
+    backgroundColor: Colors.light.listingBackground,
   }}
   contentContainerStyle={{
     paddingBottom: vs(100),
@@ -514,7 +524,9 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
                 style={StyleSheet.absoluteFillObject}
               />
             )}
-            <TouchableOpacity onPress={() => setShowViedio(false)} style={{ position: 'absolute', backgroundColor: 'white', borderRadius: ms(10), zIndex: 10, top: vs(50), right: hs(10) }}>
+            <TouchableOpacity 
+             activeOpacity={1}
+             onPress={() => setShowViedio(false)} style={{ position: 'absolute', backgroundColor: 'white', borderRadius: ms(10), zIndex: 10, top: vs(50), right: hs(10) }}>
               <Cross height={vs(30)} width={vs(30)} />
             </TouchableOpacity>
 
@@ -567,7 +579,9 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
           Share Post
         </Text>
 
-        <TouchableOpacity onPress={() => setShowShare(false)}>
+        <TouchableOpacity 
+         activeOpacity={1}
+         onPress={() => setShowShare(false)}>
           <Cross height={vs(24)} width={vs(24)} />
         </TouchableOpacity>
       </View>
@@ -576,7 +590,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.us/NewsFeedSingelView?post_id=${shareData?.id}`,
+          link:`https://homeilove.co.uk/NewsFeedSingelView?post_id=${shareData?.id}`,
           post_id:shareData?.id,
           post_type:shareData?.type,
           post_image:shareData?.images?.[0]?? "",
@@ -708,6 +722,7 @@ const [menuPost, setMenuPost] = useState<number | null>(null);
 
     {/* Copy Button */}
     <TouchableOpacity
+     activeOpacity={1}
       onPress={async () => {
         await Clipboard.setStringAsync(values.link);
         renderToastSuccess("Link copied");

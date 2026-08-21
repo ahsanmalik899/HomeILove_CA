@@ -101,7 +101,7 @@ export default function CreateNewPasswordScreen() {
                         value={values.password}
                         style={styles.input}
                       />
-                      <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                      <TouchableOpacity  activeOpacity={1} onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                         <Ionicons
                           name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                           size={20}
@@ -126,7 +126,7 @@ export default function CreateNewPasswordScreen() {
                         value={values.confirmPassword}
                         style={styles.input}
                       />
-                      <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)} style={styles.eyeIcon}>
+                      <TouchableOpacity  activeOpacity={1} onPress={() => setShowConfirm(!showConfirm)} style={styles.eyeIcon}>
                         <Ionicons
                           name={showConfirm ? 'eye-outline' : 'eye-off-outline'}
                           size={20}

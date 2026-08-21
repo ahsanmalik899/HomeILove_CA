@@ -1,8 +1,8 @@
 import { Notification } from "@/store/slices/selector/Notification";
-import HomeLogo from "@assets/Home/homeliogo.svg";
 import NotificatioOutline from "@assets/Home/notificationOutline.svg";
 import Back from "@assets/icons/BackArrow.svg";
 import RedHeart from "@assets/icons/save_bar_icon.svg";
+import HomeLogo from "@assets/logo/logo-black.svg";
 import Colors from "@src/constants/Colors";
 import { useAppSelector } from "@src/hooks/useReduxHooks";
 import { hs, ms, vs } from "@utils/design/design";
@@ -29,6 +29,7 @@ const index = ({
         style={{ marginTop: vs(50), marginHorizontal: hs(20) }}
       >
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => (onBackpress ? onBackpress() : router.back())}
         >
           <Back />
@@ -44,6 +45,7 @@ const index = ({
         <View className="flex-row gap-1 justify-center items-center ">
         {isSavedItem&&<TouchableOpacity onPress={onpressSave}><RedHeart height={vs(30)} /></TouchableOpacity>}
   <TouchableOpacity
+   activeOpacity={1}
   onPress={() => router.navigate("/CurrentAlerts")}
   style={{ position: "relative" }}
 >
@@ -95,6 +97,7 @@ const index = ({
 
           {buttonTitile && (
             <TouchableOpacity
+             activeOpacity={1}
               style={{
                 backgroundColor: redButton
                   ? Colors.light.red

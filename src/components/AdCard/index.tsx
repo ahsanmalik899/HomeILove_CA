@@ -73,7 +73,7 @@ export const AdCard = ({ ad }) => {
         ],
       }}
     >
-      <TouchableOpacity activeOpacity={0.9} onPress={openLink}>
+      <TouchableOpacity  activeOpacity={1} onPress={openLink}>
         <Image
           source={{ uri: ImageFormater(ad?.ad_image) }}
           style={{

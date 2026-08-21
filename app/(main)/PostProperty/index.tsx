@@ -477,6 +477,7 @@ setpropertType( post.property_type)
                       <View className="flex-row" style={{ marginTop: vs(20) }}>
                         <View className="flex-row items-center">
                           <TouchableOpacity
+                           activeOpacity={1}
                             onPress={() => setFieldValue("sale_type", "Normal")}
                           >
                             <MaterialIcons
@@ -503,6 +504,7 @@ setpropertType( post.property_type)
                           style={{ marginLeft: hs(10) }}
                         >
                           <TouchableOpacity
+                           activeOpacity={1}
                             onPress={() =>
                               setFieldValue("sale_type", "Foreclosure")
                             }
@@ -1033,6 +1035,7 @@ setpropertType( post.property_type)
                       </Text>
                       <View className="flex-row gap-3 items-center justify-between">
                         <TouchableOpacity
+                         activeOpacity={1}
                           onPress={() => {
                             setFieldValue(
                               "available_on",
@@ -1114,6 +1117,7 @@ setpropertType( post.property_type)
                   >
                     <View className="flex-row items-center">
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => {
                           setFieldValue(
                             "property_visit",
@@ -1143,6 +1147,7 @@ setpropertType( post.property_type)
                       style={{ marginLeft: hs(20) }}
                     >
                       <TouchableOpacity
+                       activeOpacity={1}
                         onPress={() => {
                           setFieldValue(
                             "property_visit",
@@ -1359,6 +1364,7 @@ setpropertType( post.property_type)
                         <View>
                           {(data?.profiles_exist?.agent?.exists && data?.profiles_exist?.agent?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1390,6 +1396,7 @@ setpropertType( post.property_type)
                           )}
                           {(data?.profiles_exist?.builder?.exists && data?.profiles_exist?.builder?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1421,6 +1428,7 @@ setpropertType( post.property_type)
                           )}
                           {(data?.profiles_exist?.decor?.exists && data?.profiles_exist?.decor?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1452,6 +1460,7 @@ setpropertType( post.property_type)
                           )}
                           {(data?.profiles_exist?.electrician?.exists && data?.profiles_exist?.electrician?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1485,6 +1494,7 @@ setpropertType( post.property_type)
                           )}
                           {(data?.profiles_exist?.investor?.exists && data?.profiles_exist?.investor?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1516,6 +1526,7 @@ setpropertType( post.property_type)
                           )}
                           {(data?.profiles_exist?.mortgage?.exists && data?.profiles_exist?.mortgage?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1547,6 +1558,7 @@ setpropertType( post.property_type)
                           )}
                           {(data?.profiles_exist?.painter?.exists && data?.profiles_exist?.painter?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1578,6 +1590,7 @@ setpropertType( post.property_type)
                           )}
                           {(data?.profiles_exist?.plumber?.exists && data?.profiles_exist?.plumber?.status==="Active") && (
                             <TouchableOpacity
+                             activeOpacity={1}
                               onPress={() => {
                                 setFieldValue(
                                   "ad_by",
@@ -1706,6 +1719,7 @@ setpropertType( post.property_type)
     >
       <View className="flex-row items-center">
         <TouchableOpacity
+         activeOpacity={1}
           onPress={() => {
             const life = item?.life?.toString();
 
@@ -1738,7 +1752,7 @@ setpropertType( post.property_type)
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        ${formatPrice(item.price.toString())}
+        £{formatPrice(item.price.toString())}
       </Text>
     </View>
   )}
@@ -1815,6 +1829,7 @@ setpropertType( post.property_type)
                               </Text>
 
                               <TouchableOpacity
+                               activeOpacity={1}
                                 className="mb-4"
                                 style={styles.paypalMainButton}
                                 onPress={async () => {
