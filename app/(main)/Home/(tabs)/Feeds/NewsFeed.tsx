@@ -64,15 +64,16 @@ const NewsFeeds = () => {
   }, []);
   const filter = [
     { id: 1, name: "All" },
-    { id: 2, name: "Community" },
-    { id: 3, name: "Agents" },
-    { id: 4, name: "Builders" },
-    { id: 5, name: "Mortgages" },
-    { id: 6, name: "Electricians" },
-    { id: 7, name: "Decor" },
-    { id: 8, name: "Plumbers" },
-    { id: 9, name: "Painters" },
-    { id: 10, name: "Investors" },
+     { id: 2, name: "Property" },
+    { id: 3, name: "Community" },
+    { id: 4, name: "Agents" },
+    { id: 5, name: "Builders" },
+    { id: 6, name: "Mortgages" },
+    { id: 7, name: "Electricians" },
+    { id: 8, name: "Decor" },
+    { id: 9, name: "Plumbers" },
+    { id: 10, name: "Painters" },
+    { id: 11, name: "Investors" },
   ];
 
   const renderFilterItem = ({ item }) => {
