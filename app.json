@@ -1,8 +1,8 @@
 {
   "expo": {
-    "scheme": "homeiloveuk",
-    "name": "HomeILove.UK",
-    "slug": "homeilove-uk",
+    "scheme": "homeiloveca",
+    "name": "HomeILove.CA",
+    "slug": "homeilove-ca",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon 1024x1024.png",
@@ -24,9 +24,9 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.revnosoft.homeilove.uk",
+      "bundleIdentifier": "com.revnosoft.homeilove.ca",
       "associatedDomains": [
-        "applinks:homeilove.co.uk"
+        "applinks:homeilove.ca"
       ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -52,7 +52,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.co.uk",
+              "host": "homeilove.ca",
               "pathPrefix": "/CreateNewpass"
             }
           ],
@@ -67,7 +67,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.co.uk",
+              "host": "homeilove.ca",
               "pathPrefix": "/Account"
             }
           ],
@@ -82,7 +82,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.co.uk",
+              "host": "homeilove.ca",
               "pathPrefix": "/NewsFeedSingelView"
             }
           ],
@@ -97,7 +97,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.co.uk",
+              "host": "homeilove.ca",
               "pathPrefix": "/AddSingleView"
             }
           ],
@@ -112,7 +112,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.co.uk",
+              "host": "homeilove.ca",
               "pathPrefix": "/postRedirect"
             }
           ],
@@ -122,7 +122,7 @@
           ]
         }
       ],
-      "package": "com.revnosoft.homeilove.uk"
+      "package": "com.revnosoft.homeilove.ca"
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
@@ -133,7 +133,16 @@
       "expo-font",
       "expo-asset",
       "expo-web-browser",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+       [
+    "expo-build-properties",
+    {
+      "android": {
+        "enableMinifyInReleaseBuilds": true,
+        "enableShrinkResourcesInReleaseBuilds": true
+      }
+    }
+  ]
     ],
     "extra": {
       "router": {
@@ -141,7 +150,7 @@
       },
       "GOOGLE_MAPS_API_KEY": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY",
       "eas": {
-        "projectId": "8b39deda-2558-4bba-ae5c-3b6bea278cea"
+        "projectId": "36bcc7f1-37fb-4022-aa0f-0954fa27c753"
       }
     }
   }

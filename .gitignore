@@ -23,5 +23,6 @@ expo-env.d.ts
 # native folders
 android
 ios
-
+firebase-adminsdk*.json
+*.firebase-adminsdk*.json
 *-firebase-adminsdk-*.json
