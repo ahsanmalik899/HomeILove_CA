@@ -1164,9 +1164,42 @@ const handleRefresh = async () => {
                     fontFamily: "PopinRegula",
                   }}
                 >
-                { item.type === "Shared Community"&&  "starting"} £{formatPrice(item.price)}
+                { item.type === "Shared Community"&&  "starting"} C${formatPrice(item.price)}
                 </Text>
               </View>
+                <View
+    style={{
+      position: "absolute",
+      bottom: vs(40),
+      left: hs(8),
+      backgroundColor:
+        item.type === "Shared Community"
+          ? "#D80621"
+          : item.property_for?.toLowerCase() === "rent"
+          ? "#134686"
+          :Colors.light.red,
+      paddingHorizontal: hs(10),
+      paddingVertical: vs(5),
+      borderRadius: ms(15),
+      zIndex: 10,
+    }}
+  >
+    <Text
+      style={{
+        color: "#fff",
+        fontSize: ms(13),
+        paddingHorizontal:hs(10),
+        fontWeight: "700",
+        fontFamily: "PopinRegula",
+      }}
+    >
+      {item.type === "Shared Community"
+        ? item.community_type
+        : item.property_for?.toLowerCase() === "rent"
+        ? "Rent"
+        : "Sale"}
+    </Text>
+  </View>
               <View
                 style={{
                   position: "absolute",
@@ -1613,7 +1646,7 @@ onEndReached={() => {
               initialValues={{
                 recepient_email: "",
                 message: "",
-                link: `https://homeilove.co.uk/postRedirect?post_id=${shareData?.post_id || shareData?.post_id}`,
+                link: `https://homeilove.ca/postRedirect?post_id=${shareData?.post_id || shareData?.post_id}`,
                 post_id: shareData?.post_id,
                 post_type: shareData?.type,
                 post_image: shareData?.images?.[0] ?? "",

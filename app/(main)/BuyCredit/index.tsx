@@ -191,7 +191,7 @@ const index = () => {
                     fontSize:ms(15),
                   }}
                 >
-                  £{data?.amount ?? 0}
+                  C${data?.amount ?? 0}
                 </Text>
               )}
             </View>

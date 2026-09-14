@@ -677,7 +677,7 @@ const Index = () => {
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        £{valueitem.price}
+        C${valueitem.price}
       </Text>
     </View>
   )}
@@ -836,7 +836,7 @@ const Index = () => {
                 initialValues={{
                   recepient_email: "",
                   message: "",
-                  link: `https://homeilove.co.uk/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${Profiletype}`,
+                  link: `https://homeilove.ca/postRedirect?post_id=${id}&&type=${"profile"}&&profile_type=${Profiletype}`,
                   post_id: id,
                   type: Profiletype,
                 }}

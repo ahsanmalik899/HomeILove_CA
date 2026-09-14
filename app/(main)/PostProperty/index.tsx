@@ -1752,7 +1752,7 @@ setpropertType( post.property_type)
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        £{formatPrice(item.price.toString())}
+        C${formatPrice(item.price.toString())}
       </Text>
     </View>
   )}

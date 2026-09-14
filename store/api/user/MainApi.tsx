@@ -1078,6 +1078,19 @@ editCommentApi: builder.mutation({
     body,
   }),
 }),
+calculateLoanApi: builder.mutation({
+  query: (body) => ({
+    url: "morgageCalculator", 
+    method: "POST",
+    body,
+  }),
+}),
+getLoanInterestRate: builder.query<any, void>({
+  query: () => ({
+    url: "loan-interest-rate",
+    method: "GET",
+  }),
+}),
   }),
 });
 
@@ -1085,9 +1098,11 @@ export const {
   useGetYourpostQuery,
   useGetContentpostQuery,
   useGetHomepostQuery,
+  useGetLoanInterestRateQuery,
   useCreateProfileMutation,
   useGetSinglePostQuery,
   usePostPropertyMutation,
+  useCalculateLoanApiMutation,
   useGetProfilesQuery,
     useGetUserStatusQuery,
   usePostCommunityMutation,

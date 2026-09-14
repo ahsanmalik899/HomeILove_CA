@@ -166,7 +166,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        £ 15 / Day
+        C$ 15 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -204,7 +204,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        £ 10 / Day
+        C$ 10 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -242,7 +242,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        £ 5/ Day
+        C$ 5/ Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -279,7 +279,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        £ 25 / Day
+        C$ 25 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -315,7 +315,7 @@ const index = () => {
           fontFamily: "PopinRegula",
         }}
       >
-        £ 20 / Day
+        C$ 20 / Day
       </Text>
       <View className="justify-between " style={{ marginTop: vs(10) }}>
         <Text style={{ fontFamily: "PopinRegula" }}>
@@ -1722,7 +1722,7 @@ const index = () => {
           {[
             {
               label: "Amount",
-              value: `£ ${item.amount_received}`,
+              value: `C$ ${item.amount_received}`,
             },
             {
               label: "Payment",

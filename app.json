@@ -42,7 +42,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY"
+          "apiKey": "AIzaSyDDA_akLPvpnNifHJNaEBdixs1dHaJmbbw"
         }
       },
       "intentFilters": [
@@ -148,7 +148,7 @@
       "router": {
         "origin": false
       },
-      "GOOGLE_MAPS_API_KEY": "AIzaSyCcUdqUPvVaJYw1IcCL1PvsUQJ99-tuHiY",
+      "GOOGLE_MAPS_API_KEY": "AIzaSyDDA_akLPvpnNifHJNaEBdixs1dHaJmbbw",
       "eas": {
         "projectId": "36bcc7f1-37fb-4022-aa0f-0954fa27c753"
       }

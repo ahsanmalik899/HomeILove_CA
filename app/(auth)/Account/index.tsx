@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   topSection: {
     justifyContent: 'center',
     alignItems: 'center',
-  marginTop:vs(50),
+  marginTop:vs(20),
 
   },
   logoContainer: {
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
 
   },
   title: {
-    marginTop:vs(60),
+    marginTop:vs(0),
     fontSize: ms(47),
     fontWeight: '400',
     color: 'black',

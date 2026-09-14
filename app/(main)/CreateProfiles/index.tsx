@@ -1117,7 +1117,7 @@ const Index = () => {
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        £{formatPrice(item.price)}
+        C${formatPrice(item.price)}
       </Text>
     </View>
   )}

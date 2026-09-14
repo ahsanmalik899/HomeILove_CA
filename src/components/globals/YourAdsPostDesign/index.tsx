@@ -100,7 +100,7 @@ const MyPostItem = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  From £ {formatPrice(item.price1)}
+                  From C$ {formatPrice(item.price1)}
                 </Text>
               ) : (
                 <Text
@@ -111,7 +111,7 @@ const MyPostItem = ({
                     fontFamily: "PopinRegula",
                   }}
                 >
-                  £ {formatPrice(item.asking_price)}{" "}
+                  C$ {formatPrice(item.asking_price)}{" "}
                   {type === "rent" && (
                     <Text
                       style={{
@@ -682,7 +682,7 @@ const renderItem = ({ item }: any) => (
       </View>
 
       <Text style={{ fontFamily: "PopinRegula" }}>
-        £{valueitem.price}
+        C${valueitem.price}
       </Text>
     </View>
   )}

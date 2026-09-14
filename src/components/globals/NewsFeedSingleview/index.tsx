@@ -41,6 +41,7 @@ import Loading from '../Loading';
   const CommentItem = ({ item, refetch , scrollRef }) => {
      const user = useSelector(userdata);
      const [deletingId, setDeletingId] = useState<number | null>(null);
+  
  const [editingComment, setEditingComment] = useState(false);
 const [editCommentText, setEditCommentText] = useState(item.comment);
 const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
@@ -559,7 +560,7 @@ setData((prevData) =>
  
                {data?.post?.community_price?.length > 0 && (
                  <Text style={{ color: Colors.light.red, fontWeight: "600" }}>
-                   From £ {formatPrice(data?.post?.community_price[0])} To £{" "}
+                   From C$ {formatPrice(data?.post?.community_price[0])} To C${" "}
                    {formatPrice(
                      data?.post?.community_price[
                        data?.post?.community_price?.length - 1
@@ -589,7 +590,7 @@ setData((prevData) =>
                    marginLeft: 8,
                  }}
                >
-                 £ {formatPrice(data?.post?.asking_price ?? 0)}
+                 C$ {formatPrice(data?.post?.asking_price ?? 0)}
                  {data?.type === "rent" ? `/${data?.post?.rent_type ?? ""}` : ""}
                </Text>
              </View>
@@ -984,7 +985,7 @@ setData((prevData) =>
          initialValues={{
            recepient_email: "",
            message: "",
-           link:`https://homeilove.co.uk/postRedirect?post_id=${post_id}`,
+           link:`https://homeilove.ca/postRedirect?post_id=${post_id}`,
            post_id:post_id,
            post_type:data?.type,
            post_image:data?.post_images?.[0]?? "",

@@ -336,7 +336,7 @@ else if(item?.type==="community"){
                   fontFamily: "PopinRegula",
                 }}
               >
-               From £ {item?.data?.price}
+               From C$ {item?.data?.price}
                 
               </Text>
               {item?.data?.post_type === "Trending" && (
@@ -638,7 +638,7 @@ else{
                    fontFamily: "PopinRegular",
                  }}
                >
-                 £ {formatPrice(item?.data?.price.toString())}
+                 C$ {formatPrice(item?.data?.price.toString())}
                  {item?.data?.property_for === "rent" && (
                    <Text
                      style={{
@@ -959,6 +959,7 @@ const index = ({setShowSaved}:{setShowSaved:(value:boolean)=>void}) => {
     const user = useSelector(userdata);
     const [page,setPage]=useState(1);
     const [limit,setLimit]=useState(10);
+    const [hasMore, setHasMore] = useState(true);
       const [showImages, setShowImages] = useState(false);
       const [selectedImages, setSelectedImages] = useState<string[]>([]);
         const [scrollable, setscrollable] = useState(true);
@@ -972,18 +973,19 @@ const index = ({setShowSaved}:{setShowSaved:(value:boolean)=>void}) => {
     const [saveList, setSaveList] = useState<any[]>([]);
  const [saveItemApi] = useSaveItemApiMutation();
       const [unsaveItemApi] = useUnsaveItemApiMutation();
-    useEffect(() => {
-      if(page===1){
-        if(isLoading){
-         setInitialLoad(true);
-        }else{
-          setInitialLoad(false);
-        }
-        setSaveList(savedItems?.data?.feed ?? []);}
-        else{
-          setSaveList((prev) => [...prev, ...(savedItems?.data?.feed ?? [])]);
-        }
-    }, [savedItems]);
+   useEffect(() => {
+  const newItems = savedItems?.data?.feed ?? [];
+
+  if (page === 1) {
+    setInitialLoad(false);
+    setSaveList(newItems);
+  } else {
+    setSaveList((prev) => [...prev, ...newItems]);
+  }
+
+  setHasMore(newItems.length >= limit);
+
+}, [savedItems, page, limit]);
    
       const openProfileModal = async(item: any) => {
     setProfileData({
@@ -1002,11 +1004,11 @@ const index = ({setShowSaved}:{setShowSaved:(value:boolean)=>void}) => {
           <View className='flex-1'>
             <FlashList
   data={saveList}
-  onEndReached={() => {
-    if (!isFetching) {
-      setPage((prev) => prev + 1);
-    }
-  }}
+onEndReached={() => {
+  if (!isFetching && hasMore) {
+    setPage((prev) => prev + 1);
+  }
+}}
   onEndReachedThreshold={0.8}
   ListFooterComponent={
     isFetching ? <ActivityIndicator /> : null
@@ -1016,10 +1018,11 @@ const index = ({setShowSaved}:{setShowSaved:(value:boolean)=>void}) => {
       <Text>No Saved Items</Text>
     </View>
   }
-  onRefresh={() => {
-    setPage(1);
-    setSaveList([]);
-  }}
+onRefresh={() => {
+  setHasMore(true);
+  setPage(1);
+  setSaveList([]);
+}}
   refreshing={isFetching}
   keyExtractor={(item, index) => `${item?.type}-${item?.data?.id ?? index}`}
     renderItem={({ item }: { item: any }) => (

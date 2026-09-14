@@ -32,7 +32,7 @@ const index = () => {
          Svg={Currentalerts}
          type=''
          text='Current Alerts'
-           totalPosts={AlertCount?.count?.toString()}
+      totalPosts={(AlertCount?.count ?? 0).toString()}
          onPress={()=>{setModalVisible(true)}}
          />
       </View>
