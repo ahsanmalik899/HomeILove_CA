@@ -985,7 +985,7 @@ setData((prevData) =>
          initialValues={{
            recepient_email: "",
            message: "",
-           link:`https://homeilove.ca/postRedirect?post_id=${post_id}`,
+           link:`https://homeilove.ca/postRedirect?post_id=${post_id}&&type=post`,
            post_id:post_id,
            post_type:data?.type,
            post_image:data?.post_images?.[0]?? "",
