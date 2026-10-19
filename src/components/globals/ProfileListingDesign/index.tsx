@@ -455,6 +455,7 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     color: Colors.light.textGray,
     fontFamily: "PopinRegula",
+    fontSize:ms(15),
   },
   moreText: {
     color: Colors.light.DarkGreen,

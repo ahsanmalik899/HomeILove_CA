@@ -633,36 +633,84 @@ const index = ({
               />
               <View>
                 <FormikDropdownwithjson
-                  title={type === "sale" ? "Minimun Price" : "Minimun Rent"}
+              title={
+  type === "rent"
+    ? "Minimun Rent"
+    : type === "community"
+    ? "Minimun Price"
+    : "Minimun Price"
+}
                   placeholder="No Selection"
                   value={values.minPrice}
                   touched={!!touched.minPrice}
                   errors={!!errors.minPrice}
                   required
                   errorText={errors.minPrice}
-                  options={[
-                    { label: "below C$ 50,000", value: "0" },
-                    { label: "C$ 50,000", value: "50000" },
-                    { label: "C$ 70,000", value: "70000" },
-                    { label: "C$ 100,000", value: "100000" },
-                    { label: "C$ 120,000", value: "120000" },
-                    { label: "C$ 150,000", value: "150000" },
-                    { label: "C$ 175,000", value: "175000" },
-                    { label: "C$ 200,000", value: "200000" },
-                    { label: "C$ 250,000", value: "250000" },
-                    { label: "C$ 300,000", value: "300000" },
-                    { label: "C$ 350,000", value: "350000" },
-                    { label: "C$ 400,000", value: "400000" },
-                    { label: "C$ 500,000", value: "500000" },
-                    { label: "C$ 600,000", value: "600000" },
-                    { label: "C$ 700,000", value: "700000" },
-                    { label: "C$ 900,000", value: "900000" },
-                    { label: "C$ 1,000,000", value: "1000000" },
-                    { label: "C$ 1,200,000", value: "1200000" },
-                    { label: "C$ 1,500,000", value: "1500000" },
-                    { label: "C$ 2,000,000", value: "2000000" },
-                    { label: "C$ 3,000,000", value: "3000000" },
-                  ]}
+   options={
+  type === "rent"
+    ? [
+        { label: "No selection", value: "" },
+        { label: "Below C$ 1,000", value: "0" },
+        { label: "C$ 1,000", value: "1000" },
+        { label: "C$ 1,250", value: "1250" },
+        { label: "C$ 1,500", value: "1500" },
+        { label: "C$ 1,750", value: "1750" },
+        { label: "C$ 2,000", value: "2000" },
+        { label: "C$ 2,250", value: "2250" },
+        { label: "C$ 2,500", value: "2500" },
+        { label: "C$ 2,750", value: "2750" },
+        { label: "C$ 3,000", value: "3000" },
+        { label: "C$ 3,500", value: "3500" },
+        { label: "C$ 4,000", value: "4000" },
+        { label: "C$ 5,000", value: "5000" },
+        { label: "C$ 7,500", value: "7500" },
+        { label: "C$ 10,000", value: "10000" },
+      ]
+    : type === "community"
+    ? [
+        { label: "No selection", value: "" },
+        { label: "Below C$ 250,000", value: "0" },
+        { label: "C$ 250,000", value: "250000" },
+        { label: "C$ 300,000", value: "300000" },
+        { label: "C$ 400,000", value: "400000" },
+        { label: "C$ 500,000", value: "500000" },
+        { label: "C$ 600,000", value: "600000" },
+        { label: "C$ 750,000", value: "750000" },
+        { label: "C$ 1,000,000", value: "1000000" },
+        { label: "C$ 1,250,000", value: "1250000" },
+        { label: "C$ 1,500,000", value: "1500000" },
+        { label: "C$ 2,000,000", value: "2000000" },
+        { label: "C$ 3,000,000", value: "3000000" },
+        { label: "C$ 5,000,000", value: "5000000" },
+        { label: "C$ 7,500,000", value: "7500000" },
+        { label: "C$ 10,000,000", value: "10000000" },
+      ]
+    : [
+        { label: "No selection", value: "" },
+        { label: "Below C$ 100,000", value: "0" },
+        { label: "C$ 100,000", value: "100000" },
+        { label: "C$ 150,000", value: "150000" },
+        { label: "C$ 200,000", value: "200000" },
+        { label: "C$ 250,000", value: "250000" },
+        { label: "C$ 300,000", value: "300000" },
+        { label: "C$ 350,000", value: "350000" },
+        { label: "C$ 400,000", value: "400000" },
+        { label: "C$ 450,000", value: "450000" },
+        { label: "C$ 500,000", value: "500000" },
+        { label: "C$ 600,000", value: "600000" },
+        { label: "C$ 700,000", value: "700000" },
+        { label: "C$ 800,000", value: "800000" },
+        { label: "C$ 900,000", value: "900000" },
+        { label: "C$ 1,000,000", value: "1000000" },
+        { label: "C$ 1,250,000", value: "1250000" },
+        { label: "C$ 1,500,000", value: "1500000" },
+        { label: "C$ 2,000,000", value: "2000000" },
+        { label: "C$ 2,500,000", value: "2500000" },
+        { label: "C$ 3,000,000", value: "3000000" },
+        { label: "C$ 5,000,000", value: "5000000" },
+        { label: "C$ 10,000,000", value: "10000000" },
+      ]
+}
                   onSelect={(value) => {
                     setFieldValue("minPrice", value);
                   }}
@@ -671,36 +719,84 @@ const index = ({
 
               <View>
                 <FormikDropdownwithjson
-                  title={type === "sale" ? "Maximun Price" : "Maximun Rent"}
+                title={
+  type === "rent"
+    ? "Maximun Rent"
+    : type === "community"
+    ? "Maximun Price"
+    : "Maximun Price"
+}
                   placeholder="No Selction"
                   value={values.maxPrice}
                   touched={!!touched.maxPrice}
                   errors={!!errors.maxPrice}
                   required
                   errorText={errors.maxPrice}
-                  options={[
-                    { value: "50000", label: "C$ 50,000" },
-                    { value: "70000", label: "C$ 70,000" },
-                    { value: "100000", label: "C$ 100,000" },
-                    { value: "120000", label: "C$ 120,000" },
-                    { value: "150000", label: "C$ 150,000" },
-                    { value: "175000", label: "C$ 175,000" },
-                    { value: "200000", label: "C$ 200,000" },
-                    { value: "250000", label: "C$ 250,000" },
-                    { value: "300000", label: "C$ 300,000" },
-                    { value: "350000", label: "C$ 350,000" },
-                    { value: "400000", label: "C$ 400,000" },
-                    { value: "500000", label: "C$ 500,000" },
-                    { value: "600000", label: "C$ 600,000" },
-                    { value: "700000", label: "C$ 700,000" },
-                    { value: "900000", label: "C$ 900,000" },
-                    { value: "1000000", label: "C$ 1,000,000" },
-                    { value: "1200000", label: "C$ 1,200,000" },
-                    { value: "1500000", label: "C$ 1,500,000" },
-                    { value: "2000000", label: "C$ 2,000,000" },
-                    { value: "3000000", label: "C$ 3,000,000" },
-                    { value: "3000001", label: "Above C$ 3,000,000" },
-                  ]}
+  options={
+  type === "rent"
+    ? [
+        { label: "No selection", value: "" },
+        { label: "C$ 1,000", value: "1000" },
+        { label: "C$ 1,250", value: "1250" },
+        { label: "C$ 1,500", value: "1500" },
+        { label: "C$ 1,750", value: "1750" },
+        { label: "C$ 2,000", value: "2000" },
+        { label: "C$ 2,250", value: "2250" },
+        { label: "C$ 2,500", value: "2500" },
+        { label: "C$ 2,750", value: "2750" },
+        { label: "C$ 3,000", value: "3000" },
+        { label: "C$ 3,500", value: "3500" },
+        { label: "C$ 4,000", value: "4000" },
+        { label: "C$ 5,000", value: "5000" },
+        { label: "C$ 7,500", value: "7500" },
+        { label: "C$ 10,000", value: "10000" },
+        { label: "Above C$ 10,000", value: "10001" },
+      ]
+    : type === "community"
+    ? [
+        { label: "No selection", value: "" },
+        { label: "C$ 250,000", value: "250000" },
+        { label: "C$ 300,000", value: "300000" },
+        { label: "C$ 400,000", value: "400000" },
+        { label: "C$ 500,000", value: "500000" },
+        { label: "C$ 600,000", value: "600000" },
+        { label: "C$ 750,000", value: "750000" },
+        { label: "C$ 1,000,000", value: "1000000" },
+        { label: "C$ 1,250,000", value: "1250000" },
+        { label: "C$ 1,500,000", value: "1500000" },
+        { label: "C$ 2,000,000", value: "2000000" },
+        { label: "C$ 3,000,000", value: "3000000" },
+        { label: "C$ 5,000,000", value: "5000000" },
+        { label: "C$ 7,500,000", value: "7500000" },
+        { label: "C$ 10,000,000", value: "10000000" },
+        { label: "Above C$ 10,000,000", value: "10000001" },
+      ]
+    : [
+        { label: "No selection", value: "" },
+        { label: "C$ 100,000", value: "100000" },
+        { label: "C$ 150,000", value: "150000" },
+        { label: "C$ 200,000", value: "200000" },
+        { label: "C$ 250,000", value: "250000" },
+        { label: "C$ 300,000", value: "300000" },
+        { label: "C$ 350,000", value: "350000" },
+        { label: "C$ 400,000", value: "400000" },
+        { label: "C$ 450,000", value: "450000" },
+        { label: "C$ 500,000", value: "500000" },
+        { label: "C$ 600,000", value: "600000" },
+        { label: "C$ 700,000", value: "700000" },
+        { label: "C$ 800,000", value: "800000" },
+        { label: "C$ 900,000", value: "900000" },
+        { label: "C$ 1,000,000", value: "1000000" },
+        { label: "C$ 1,250,000", value: "1250000" },
+        { label: "C$ 1,500,000", value: "1500000" },
+        { label: "C$ 2,000,000", value: "2000000" },
+        { label: "C$ 2,500,000", value: "2500000" },
+        { label: "C$ 3,000,000", value: "3000000" },
+        { label: "C$ 5,000,000", value: "5000000" },
+        { label: "C$ 10,000,000", value: "10000000" },
+        { label: "Above C$ 10,000,000", value: "10000001" },
+      ]
+}
                   onSelect={(value) => setFieldValue("maxPrice", value)}
                 />
               </View>

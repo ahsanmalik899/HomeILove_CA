@@ -26,7 +26,7 @@ import ThreeDots from "@assets/icons/threedots.svg";
 import Liked from "@assets/icons/ThumbUpRed.svg";
 import Delete from "@assets/SideBar/deletbaskit.svg";
 import NoImage from "@assets/SideBar/no_images.png";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { AdCardWithoutAnimation } from "@src/AdCardWithoutAnimation";
 import CommentInput from "@src/components/globals/CommentInput";
@@ -40,12 +40,15 @@ import { timeAgo } from "@utils/Timeago";
 import { ViedioUrlFormat } from "@utils/ViedioUrlFormater";
 import { Video } from "expo-av";
 import * as Clipboard from 'expo-clipboard';
+import { File, Paths } from "expo-file-system";
+import * as WebBrowser from "expo-web-browser";
 import { Formik } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
   Modal,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -55,6 +58,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import RNShare from "react-native-share";
 import * as yup from "yup";
 import CircleImage from "../CircleImage/CircleImage";
 import FollowButton from "../FollowButton";
@@ -90,13 +94,299 @@ const PostDesign = ({
   const [showViedio, setShowViedio] = useState(false);
   const [showPast, setShowpast] = useState(false);
   const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
+  // ADD BELOW:
+// const [share_postApi, { isLoading: sharing }] = useShare_postApiMutation();
+
+const downloadShareImage = async (
+  imageUrl: string,
+  postId: string | number
+) => {
+  try {
+    if (!imageUrl) return null;
+
+    const cleanUrl = imageUrl.split("?")[0].toLowerCase();
+
+    let extension = "jpg";
+
+    if (cleanUrl.endsWith(".png")) {
+      extension = "png";
+    } else if (cleanUrl.endsWith(".webp")) {
+      extension = "webp";
+    } else if (cleanUrl.endsWith(".jpeg")) {
+      extension = "jpeg";
+    }
+
+    const destination = new File(
+      Paths.cache,
+      `homeilove-ca-share-${postId}-${Date.now()}.${extension}`
+    );
+
+    const downloadedFile = await File.downloadFileAsync(
+      imageUrl,
+      destination
+    );
+
+    return downloadedFile.uri;
+  } catch (error) {
+    console.log("Share image download error:", error);
+    return null;
+  }
+};
+
+
+const buildShareContent = () => {
+  const postUrl =
+    `https://homeilove.ca/postRedirect?post_id=${shareData?.post_id}&&type=post`;
+
+  let shareText = "";
+
+  // GENERAL POST
+  if (shareData?.type === "General Post") {
+    const description =
+      String(shareData?.description || "").trim();
+
+    shareText =
+      description.length > 150
+        ? `${description.slice(0, 150)}...`
+        : description || "Check out this post on Home I Love";
+  }
+
+  // COMMUNITY
+  else if (shareData?.type === "Shared Community") {
+    const communityTitle =
+      shareData?.title ||
+      shareData?.community_title ||
+      "Community";
+
+    const location =
+      [
+        shareData?.city,
+        shareData?.state,
+      ]
+        .filter(Boolean)
+        .join(", ") ||
+      shareData?.address ||
+      "";
+
+    const startingPrice =
+      shareData?.price ??
+      shareData?.community_price?.[0];
+
+    shareText =
+      `${communityTitle}` +
+      `${location ? ` in ${location}` : ""}` +
+      `${
+        startingPrice
+          ? ` - From C$${formatPrice(startingPrice)}`
+          : ""
+      }`;
+  }
+
+  // PROPERTY
+  else {
+    const bedroomCount =
+      Number(shareData?.bedrooms ?? 0);
+
+    const bedroomLabel =
+      bedroomCount > 0
+        ? `${bedroomCount} Bedroom `
+        : "";
+
+    const propertyType =
+      shareData?.property_sub_type || "Property";
+
+    const propertyFor =
+      shareData?.property_for?.toLowerCase() === "rent"
+        ? "Rent"
+        : "Sale";
+
+    const location =
+      [
+        shareData?.city,
+        shareData?.state,
+      ]
+        .filter(Boolean)
+        .join(", ") ||
+      shareData?.address ||
+      "";
+
+    const rawPrice =
+      shareData?.price ??
+      shareData?.asking_price ??
+      0;
+
+    const price = Number(
+      String(rawPrice).replace(/,/g, "")
+    );
+
+    const rentType =
+      propertyFor === "Rent" &&
+      shareData?.rent_type
+        ? `/${shareData.rent_type}`
+        : "";
+
+    shareText =
+      `${bedroomLabel}${propertyType} for ${propertyFor}` +
+      `${location ? ` in ${location}` : ""}` +
+      `${
+        price > 0
+          ? ` - C$${formatPrice(price)}${rentType}`
+          : ""
+      }`;
+  }
+
+  return {
+    postUrl,
+    shareText,
+    message: `${shareText}\n${postUrl}`,
+  };
+};
+
+
+const openFallbackShare = async (
+  options: any
+) => {
+  try {
+    await RNShare.open({
+      ...options,
+      failOnCancel: false,
+    });
+  } catch (error) {
+    console.log("Fallback share error:", error);
+  }
+};
+
+
+const shareOnSocial = async (
+  platform:
+    | "whatsapp"
+    | "facebook"
+    | "twitter"
+    | "linkedin"
+        | "more"
+) => {
+  try {
+    if (!shareData?.post_id) {
+      renderToastError("Post not found");
+      return;
+    }
+
+    const {
+      postUrl,
+      shareText,
+      message,
+    } = buildShareContent();
+
+    const remoteImage =
+      shareData?.images?.length > 0
+        ? ImageFormater(shareData.images[0])
+        : null;
+
+    const localImage =
+      remoteImage
+        ? await downloadShareImage(
+            remoteImage,
+            shareData.post_id
+          )
+        : null;
+
+    const shareOptions: any = {
+      title: shareText,
+      message,
+      url: localImage || postUrl,
+      failOnCancel: false,
+
+      ...(localImage && {
+        type: "image/*",
+      }),
+
+      ...(Platform.OS === "android" &&
+        localImage && {
+          useInternalStorage: true,
+        }),
+    };
+
+    try {
+      // WHATSAPP
+      if (platform === "whatsapp") {
+        await RNShare.shareSingle({
+          ...shareOptions,
+          social: RNShare.Social.WHATSAPP,
+        });
+
+        return;
+      }
+if (platform === "linkedin") {
+  const linkedInUrl =
+    `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+      postUrl
+    )}`;
+
+  await WebBrowser.openBrowserAsync(linkedInUrl);
+  return;
+}
+
+      // FACEBOOK
+      if (platform === "facebook") {
+        await RNShare.shareSingle({
+          ...shareOptions,
+          social: RNShare.Social.FACEBOOK,
+        });
+
+        return;
+      }
+
+      // X / TWITTER
+      if (
+        platform === "twitter" &&
+        Platform.OS === "ios"
+      ) {
+        await RNShare.shareSingle({
+          ...shareOptions,
+          social: RNShare.Social.TWITTER,
+        });
+
+        return;
+      }
+if (platform === "more") {
+  await openFallbackShare(shareOptions);
+  return;
+}
+      // LINKEDIN + ANDROID X
+      await openFallbackShare(
+        shareOptions
+      );
+
+    } catch (socialError) {
+      console.log(
+        `${platform} direct share error:`,
+        socialError
+      );
+
+      await openFallbackShare(
+        shareOptions
+      );
+    }
+
+  } catch (error: any) {
+    console.log(
+      "Social share error:",
+      error
+    );
+
+    renderToastError(
+      error?.message ||
+        "Unable to share post"
+    );
+  }
+};
   const [showReport, setShowReport] = useState(false);
   const [showFloor, setShowFloor] = useState(false);
 const [expandedPost, setExpandedPost] = useState<string | null>(null);
 const [menuPost, setMenuPost] = useState<string | null>(null);
   const [SelectedViedio, setSelectedViedio] = useState('');
   const [loading, setLoading] = useState(false);
-  const [shareData, setShareData] = useState('');
+const [shareData, setShareData] = useState<any>(null);
   const [showMortgage, setShowMortgage] = useState(false);
   const [unlikePost, { isLoading: unliking }] = useUnlikePostMutation();
   const { data: Profiles, isLoading: ProfilesLoading } =
@@ -1598,50 +1888,300 @@ onEndReached={() => {
           </View>
         )
       }
-      <Modal visible={showShare} animationType="slide" transparent >
-            <SafeAreaView
-                                style={{ flex: 1 }}
-                                edges={[ "bottom", "left", "right"]}
-                              >
-        <View style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          justifyContent: "flex-end",
-        }}>
-
+     <Modal
+  visible={showShare}
+  animationType="slide"
+  transparent
+  onRequestClose={() => setShowShare(false)}
+>
+  <SafeAreaView
+    style={{ flex: 1 }}
+    edges={["top", "bottom", "left", "right"]}
+  >
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        justifyContent: "flex-end",
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: "#fff",
+          borderTopLeftRadius: ms(20),
+          borderTopRightRadius: ms(20),
+          paddingHorizontal: hs(20),
+          paddingTop: vs(12),
+          paddingBottom: vs(15),
+          maxHeight: "85%",
+        }}
+      >
+        {/* Header */}
         <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: vs(15),
+          }}
+        >
+          <Text
+            style={{
+              fontSize: ms(18),
+              fontWeight: "600",
+              fontFamily: "PopinRegula",
+            }}
+          >
+            Share Post
+          </Text>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => setShowShare(false)}
+            style={{
+              width: hs(38),
+              height: hs(38),
+              borderRadius: hs(19),
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Cross height={vs(22)} width={vs(22)} />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            paddingBottom: vs(20),
+          }}
+        >
+
+<View style={{ marginBottom: 20 }}>
+  <Text
+    style={{
+      fontSize: 14,
+      fontWeight: "600",
+      marginBottom: 12,
+      fontFamily: "PopinRegula",
+    }}
+  >
+    Share via
+  </Text>
+
+  <View
+    style={{
+      flexDirection: "row",
+      justifyContent: "space-between",
+    }}
+  >
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() =>
+        shareOnSocial("whatsapp")
+      }
+      style={{
+        alignItems: "center",
+        width: "20%",
+      }}
+    >
+      <View
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          backgroundColor: "#25D366",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <FontAwesome
+          name="whatsapp"
+          size={27}
+          color="#fff"
+        />
+      </View>
+
+      <Text
+        style={{
+          fontSize: 11,
+          marginTop: 6,
+          fontFamily: "PopinRegula",
+        }}
+      >
+        WhatsApp
+      </Text>
+    </TouchableOpacity>
+
+
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() =>
+        shareOnSocial("facebook")
+      }
+      style={{
+        alignItems: "center",
+        width: "20%",
+      }}
+    >
+      <View
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          backgroundColor: "#1877F2",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <FontAwesome
+          name="facebook"
+          size={26}
+          color="#fff"
+        />
+      </View>
+
+      <Text
+        style={{
+          fontSize: 11,
+          marginTop: 6,
+          fontFamily: "PopinRegula",
+        }}
+      >
+        Facebook
+      </Text>
+    </TouchableOpacity>
+
+
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() =>
+        shareOnSocial("twitter")
+      }
+      style={{
+        alignItems: "center",
+        width: "20%",
+      }}
+    >
+      <View
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          backgroundColor: "#000",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 22,
+            fontWeight: "700",
+          }}
+        >
+          X
+        </Text>
+      </View>
+
+      <Text
+        style={{
+          fontSize: 11,
+          marginTop: 6,
+          fontFamily: "PopinRegula",
+        }}
+      >
+        X
+      </Text>
+    </TouchableOpacity>
+
+
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() =>
+        shareOnSocial("linkedin")
+      }
+      style={{
+        alignItems: "center",
+        width: "20%",
+      }}
+    >
+      <View
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          backgroundColor: "#0A66C2",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <FontAwesome
+          name="linkedin"
+          size={25}
+          color="#fff"
+        />
+      </View>
+
+      <Text
+        style={{
+          fontSize: 11,
+          marginTop: 6,
+          fontFamily: "PopinRegula",
+        }}
+      >
+        LinkedIn
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+  activeOpacity={0.8}
+  onPress={() => shareOnSocial("more")}
   style={{
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-
-    paddingTop: 20,
-    paddingHorizontal: 20,
-
-
-    paddingBottom: 20 + insets.bottom,
-
-    minHeight: "80%",
+    alignItems: "center",
+    width: "20%",
   }}
 >
+  <View
+    style={{
+      width: 46,
+      height: 46,
+      borderRadius: 23,
+      backgroundColor: "#E5E7EB",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: "#D1D5DB",
+    }}
+  >
+    <Ionicons
+      name="ellipsis-horizontal"
+      size={24}
+      color="#374151"
+    />
+  </View>
 
-            <View style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 15
-            }}>
-              <Text style={{ fontSize: 18, fontWeight: "600" }}>
-                Share Post
-              </Text>
+  <Text
+    style={{
+      fontSize: 10,
+      marginTop: 6,
+      fontFamily: "PopinRegula",
+    }}
+  >
+    More
+  </Text>
+</TouchableOpacity>
+  </View>
 
-              <TouchableOpacity
-               activeOpacity={1}
-                onPress={() => setShowShare(false)}>
-                <Cross height={vs(24)} width={vs(24)} />
-              </TouchableOpacity>
-            </View>
-
+  <View
+    style={{
+      height: 1,
+      backgroundColor: "#e5e7eb",
+      marginTop: 20,
+      marginBottom: 5,
+    }}
+  />
+</View>
             <Formik
               initialValues={{
                 recepient_email: "",
@@ -1813,10 +2353,11 @@ onEndReached={() => {
 
               )}
             </Formik>
-
+</ScrollView>
           </View>
         </View>
         </SafeAreaView>
+      
         <Loading isLoading={sharing} text="Sharing..." />
       </Modal>
       <Modal visible={showReport} animationType="slide" onRequestClose={() => setShowReport(false)} >
@@ -1955,6 +2496,7 @@ const styles = StyleSheet.create({
   description: {
     marginVertical: vs(10),
     fontFamily: "PopinRegula",
+    fontSize:ms(15),
   },
   moreText: {
     color: Colors.light.DarkGreen,
