@@ -1105,12 +1105,19 @@ getLoanInterestRate: builder.query<any, void>({
     method: "GET",
   }),
 }),
+getBundlesPrice: builder.query({
+  query: () => ({
+    url: "bundles-price",
+    method: "GET",
+  }),
+}),
   }),
 });
 
 export const {
   useGetYourpostQuery,
   useGetContentpostQuery,
+   useGetBundlesPriceQuery,
   useGetHomepostQuery,
   useGetLoanInterestRateQuery,
   useCreateProfileMutation,

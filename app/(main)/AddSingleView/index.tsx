@@ -1331,7 +1331,7 @@ const index = () => {
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.ca/postRedirect?post_id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type==="community"?"community":"property"}`,
+          link:`https://www.homeilove.ca/postRedirect?post_id=${type==="community"?data?.post?.post_community_id:data?.post?.post_property_id}&&type=${type==="community"?"community":"property"}`,
           post_id:type==="community"?data?.post?.post_community_id:data?.post?.post_property_id,
           type:type,
         }}

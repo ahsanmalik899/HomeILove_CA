@@ -110,7 +110,7 @@ const buildPostShareContent = () => {
   const postId = shareData?.id;
 
   const postUrl =
-    `https://homeilove.ca/postRedirect?post_id=${postId}&&type=post`;
+    `https://www.homeilove.ca/postRedirect?post_id=${postId}&&type=post`;
 
   const description =
     String(shareData?.description || "").trim();
@@ -1030,7 +1030,7 @@ if (platform === "linkedin") {
         initialValues={{
           recepient_email: "",
           message: "",
-          link:`https://homeilove.ca/NewsFeedSingelView?post_id=${shareData?.id}`,
+          link:`https://www.homeilove.ca/NewsFeedSingelView?post_id=${shareData?.id}`,
           post_id:shareData?.id,
           post_type:shareData?.type,
           post_image:shareData?.images?.[0]?? "",

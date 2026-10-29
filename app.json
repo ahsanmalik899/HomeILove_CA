@@ -3,7 +3,7 @@
     "scheme": "homeiloveca",
     "name": "Homeilove.ca",
     "slug": "homeilove-ca",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon 1024x1024.png",
     "newArchEnabled": true,
@@ -23,6 +23,7 @@
       "**/*"
     ],
     "ios": {
+      "buildNumber": "2",
       "supportsTablet": true,
       "bundleIdentifier": "com.revnosoft.homeilove.ca",
       "associatedDomains": [
@@ -35,7 +36,7 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app-icon 1024x1024.png",
         "backgroundColor": "#ffffff"
@@ -67,7 +68,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.ca",
+              "host": "www.homeilove.ca",
               "pathPrefix": "/Account"
             }
           ],
@@ -82,7 +83,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.ca",
+              "host": "www.homeilove.ca",
               "pathPrefix": "/NewsFeedSingelView"
             }
           ],
@@ -97,7 +98,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.ca",
+              "host": "www.homeilove.ca",
               "pathPrefix": "/AddSingleView"
             }
           ],
@@ -112,7 +113,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "homeilove.ca",
+              "host": "www.homeilove.ca",
               "pathPrefix": "/postRedirect"
             }
           ],

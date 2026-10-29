@@ -136,7 +136,7 @@ const downloadShareImage = async (
 
 const buildShareContent = () => {
   const postUrl =
-    `https://homeilove.ca/postRedirect?post_id=${shareData?.post_id}&&type=post`;
+    `https://www.homeilove.ca/postRedirect?post_id=${shareData?.post_id}&&type=post`;
 
   let shareText = "";
 
@@ -2186,7 +2186,7 @@ onEndReached={() => {
               initialValues={{
                 recepient_email: "",
                 message: "",
-                link: `https://homeilove.ca/postRedirect?post_id=${shareData?.post_id || shareData?.post_id}&&type=post`,
+                link: `https://www.homeilove.ca/postRedirect?post_id=${shareData?.post_id || shareData?.post_id}&&type=post`,
                 post_id: shareData?.post_id,
                 post_type: shareData?.type,
                 post_image: shareData?.images?.[0] ?? "",
